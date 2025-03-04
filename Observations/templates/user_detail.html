@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails de l'utilisateur</title>
+</head>
+<body>
+    <h1>{{ user.first_name }} {{ user.last_name }}</h1>
+    <p>Email : {{ user.email }}</p>
+    <p>Date d'inscription : {{ user.registration_date }}</p>
+    <p>Dernière connexion : {{ user.last_login }}</p>
+    <p>Nombre d'observations : {{ observations_count }}</p>
+    {% if last_observation %}
+        <p>Dernière observation : {{ last_observation.observation_text }} ({{ last_observation.observation_date }})</p>
+    {% else %}
+        <p>Aucune observation enregistrée.</p>
+    {% endif %}
+</body>
+</html>
