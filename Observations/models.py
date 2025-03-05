@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 
 class Utilisateur(models.Model):
@@ -31,7 +30,7 @@ class Espece(models.Model):
 
 
 class FicheObservation(models.Model):
-    num_fiche = models.CharField(max_length=50, unique=True)
+    num_fiche = models.AutoField(primary_key=True)  # Numéro de fiche auto-incrémenté
     observateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name="fiches")
     espece = models.ForeignKey(Espece, on_delete=models.PROTECT, related_name="observations")
     annee = models.IntegerField()
@@ -59,18 +58,19 @@ class Nid(models.Model):
     nid_prec_t_meme_couple = models.BooleanField(default=False)
     hauteur_nid = models.IntegerField(null=True, blank=True)
     hauteur_couvert = models.IntegerField(null=True, blank=True)
-    details_nid = models.TextField(blank=True, null=True)
+    details_nid = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"Nid de la fiche {self.fiche.num_fiche}"
 
+
 class Observation(models.Model):
-    fiche = models.ForeignKey(FicheObservation, on_delete=models.SET_NULL, null=True, blank=True, related_name="observations")
-    jour = models.IntegerField(null=True, blank=True)
-    mois = models.IntegerField(null=True, blank=True)
-    heure = models.CharField(max_length=10, default="12:00", null=True, blank=True)
-    nombre_oeufs = models.IntegerField(default=0, null=True, blank=True)
-    nombre_poussins = models.IntegerField(default=0, null=True, blank=True)
+    fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="observations")
+    jour = models.IntegerField()
+    mois = models.IntegerField()
+    heure = models.CharField(max_length=10)
+    nombre_oeufs = models.IntegerField(default=0)
+    nombre_poussins = models.IntegerField(default=0)
     observations = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -85,10 +85,10 @@ class ResumeObservation(models.Model):
     premier_poussin_eclos_mois = models.IntegerField(blank=True, null=True)
     premier_poussin_volant_jour = models.IntegerField(blank=True, null=True)
     premier_poussin_volant_mois = models.IntegerField(blank=True, null=True)
-    nombre_oeufs_pondus = models.IntegerField(default=0, null=True, blank=True)
-    nombre_oeufs_eclos = models.IntegerField(default=0, null=True, blank=True)
-    nombre_oeufs_non_eclos = models.IntegerField(default=0, null=True, blank=True)
-    nombre_poussins = models.IntegerField(default=0, null=True, blank=True)
+    nombre_oeufs_pondus = models.IntegerField(default=0)
+    nombre_oeufs_eclos = models.IntegerField(default=0)
+    nombre_oeufs_non_eclos = models.IntegerField(default=0)
+    nombre_poussins = models.IntegerField(default=0)
 
     def __str__(self):
         return f"Résumé Fiche {self.fiche.num_fiche}"
