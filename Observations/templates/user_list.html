@@ -3,13 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>Liste des utilisateurs</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <script>
+        function loadUserDetail(userId) {
+            fetch(`/users/${userId}/`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById("user-detail").innerHTML = html;
+            });
+        }
+    </script>
 </head>
 <body>
     <h1>Utilisateurs</h1>
-    <ul>
-        {% for user in users %}
-            <li><a href="{% url 'user_detail' user.id %}">{{ user.first_name }} {{ user.last_name }}</a></li>
-        {% endfor %}
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.last_name }}</td>
+                    <td>{{ user.first_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <button onclick="loadUserDetail({{ user.id }})">Voir détails</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Détails de l'utilisateur sélectionné</h2>
+    <div id="user-detail">
+        <p>Sélectionnez un utilisateur pour voir ses détails.</p>
+    </div>
 </body>
 </html>

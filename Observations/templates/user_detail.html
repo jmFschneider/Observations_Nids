@@ -1,19 +1,38 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Détails de l'utilisateur</title>
-</head>
-<body>
-    <h1>{{ user.first_name }} {{ user.last_name }}</h1>
-    <p>Email : {{ user.email }}</p>
-    <p>Date d'inscription : {{ user.registration_date }}</p>
-    <p>Dernière connexion : {{ user.last_login }}</p>
-    <p>Nombre d'observations : {{ observations_count }}</p>
-    {% if last_observation %}
-        <p>Dernière observation : {{ last_observation.observation_text }} ({{ last_observation.observation_date }})</p>
-    {% else %}
-        <p>Aucune observation enregistrée.</p>
-    {% endif %}
-</body>
-</html>
+<h2>Détails de l'utilisateur</h2>
+<table>
+    <tr><th>Nom</th><td>{{ user.nom }}</td></tr>
+    <tr><th>Prénom</th><td>{{ user.prenom }}</td></tr>
+    <tr><th>Email</th><td>{{ user.email }}</td></tr>
+    <tr><th>Date d'inscription</th><td>{{ user.date_inscription }}</td></tr>
+    <tr><th>Rôle</th><td>{{ user.role }}</td></tr>
+    <tr><th>Compte validé</th><td>{% if user.est_valide %} Oui {% else %} Non {% endif %}</td></tr>
+    <tr><th>Nombre de fiches d'observation</th><td>{{ observations_count }}</td></tr>
+</table>
+
+<h2>Fiches d'observation</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Numéro de Fiche</th>
+            <th>Date</th>
+            <th>Nombre d'œufs</th>
+            <th>Nombre de poussins</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fiche in fiches %}
+        <tr>
+            <td>{{ fiche.num_fiche }}</td>
+            <td>{{ fiche.date }}</td>
+            <td>{{ fiche.nombre_oeufs }}</td>
+            <td>{{ fiche.nombre_poussins }}</td>
+            <td><a href="{% url 'fiche_detail' fiche.num_fiche %}">Voir détails</a></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">Aucune fiche d'observation enregistrée.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

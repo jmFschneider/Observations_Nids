@@ -1,6 +1,6 @@
 # views.py
 from django.shortcuts import render, get_object_or_404
-from .models import Utilisateur, Observation
+from .models import Utilisateur, Observation,FicheObservation
 
 def home(request):
     users_count = Utilisateur.objects.count()
@@ -15,6 +15,21 @@ def user_list(request):
     return render(request, 'user_list.html', {'users': users})
 
 def user_detail(request, user_id):
+    user = get_object_or_404(Utilisateur, id=user_id)
+    observations_count = FicheObservation.objects.filter(observateur=user).count()
+    fiches = FicheObservation.objects.filter(observateur=user).order_by('-num_fiche')
+
+    return render(request, 'user_detail.html', {
+        'user': user,
+        'observations_count': observations_count,
+        'fiches': fiches
+    })
+
+def user_detail_old2(request, user_id):
+    user = get_object_or_404(Utilisateur, id=user_id)
+    return render(request, 'user_detail.html', {'user': user})
+
+def user_detail_old(request, user_id):
     user = get_object_or_404(Utilisateur, id=user_id)
     observations_count = Observation.objects.filter(user_id=user.id).count()
     last_observation = Observation.objects.filter(user_id=user.id).order_by('-observation_date').first()
