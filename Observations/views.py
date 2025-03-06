@@ -1,6 +1,7 @@
 # views.py
-from django.shortcuts import render, get_object_or_404
-from .models import Utilisateur, Observation,FicheObservation
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Utilisateur, Observation, FicheObservation
+from .forms import UtilisateurForm
 
 def home(request):
     users_count = Utilisateur.objects.count()
@@ -38,3 +39,15 @@ def user_detail_old(request, user_id):
         'observations_count': observations_count,
         'last_observation': last_observation
     })
+
+
+def user_create(request):
+    if request.method == "POST":
+        form = UtilisateurForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('user_list')  # Redirige vers la liste après l'ajout
+    else:
+        form = UtilisateurForm()
+
+    return render(request, 'user_create.html', {'form': form})
