@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
     Utilisateur, Espece, FicheObservation, Localisation, Nid,
-    Observation, ResumeObservation, CausesEchec, Validation, HistoriqueModification
+    Observation, ResumeObservation, CausesEchec, Validation,
+    HistoriqueModification, HistoriqueValidation
 )
 
 @admin.register(Utilisateur)
@@ -24,14 +25,20 @@ class FicheObservationAdmin(admin.ModelAdmin):
 
 @admin.register(Observation)
 class ObservationAdmin(admin.ModelAdmin):
-    list_display = ("fiche", "jour", "mois", "heure", "nombre_oeufs", "nombre_poussins")
-    list_filter = ("mois",)
+    list_display = ("fiche", "date_observation", "nombre_oeufs", "nombre_poussins")
+    list_filter = ("date_observation",)
     search_fields = ("fiche__num_fiche",)
 
 @admin.register(Validation)
 class ValidationAdmin(admin.ModelAdmin):
     list_display = ("observation", "reviewer", "date_validation")
     list_filter = ("date_validation",)
+
+@admin.register(HistoriqueValidation)
+class HistoriqueValidationAdmin(admin.ModelAdmin):
+    list_display = ('validation', 'ancien_statut', 'nouveau_statut', 'date_modification', 'modifie_par')
+    list_filter = ('nouveau_statut', 'date_modification')
+    ordering = ('-date_modification',)
 
 @admin.register(HistoriqueModification)
 class HistoriqueModificationAdmin(admin.ModelAdmin):

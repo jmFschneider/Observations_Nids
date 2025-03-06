@@ -26,8 +26,8 @@ def user_list(request):
 
 def user_detail(request, user_id):
     user = get_object_or_404(Utilisateur, id=user_id)
-    observations_count = FicheObservation.objects.filter(observateur=user).count()
-    fiches = FicheObservation.objects.filter(observateur=user).order_by('-num_fiche')
+    fiches = list(FicheObservation.objects.filter(observateur=user).order_by('-num_fiche'))
+    observations_count = len(fiches)  # Pas besoin d'une requête supplémentaire
 
     return render(request, 'user_detail.html', {
         'user': user,
