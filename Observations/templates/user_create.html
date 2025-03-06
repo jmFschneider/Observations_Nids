@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Ajouter un utilisateur</title>
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block content %}
     <h1>Ajouter un utilisateur</h1>
     <form method="post">
         {% csrf_token %}
@@ -15,5 +9,4 @@
     </form>
     <br>
     <a href="{% url 'user_list' %}">Retour à la liste des utilisateurs</a>
-</body>
-</html>
+{% endblock %}

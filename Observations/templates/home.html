@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Accueil</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block content %}
     <h1>Bienvenue sur le suivi des observations</h1>
     <p>Nombre total d'observateurs : {{ users_count }}</p>
     <p>Nombre total d'observations : {{ observations_count }}</p>
@@ -12,5 +8,4 @@
         <li><a href="{% url 'user_list' %}">Liste des observateurs</a></li>
         <li><a href="{% url 'user_create' %}">Ajouter un observateur</a></li>
     </ul>
-</body>
-</html>
+{% endblock %}

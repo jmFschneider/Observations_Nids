@@ -1,0 +1,14 @@
+<header class="header">
+    <h1>Suivi des nids</h1>
+    <p>Ce site permet d'enregistrer le suivi de la nidification de la création du nid à l'envol des poussins.</p>
+    {% if user.is_authenticated %}
+        <p>Bienvenue, {{ user.username }} !</p>
+    {% else %}
+        <p>Bienvenue sur notre site !</p>
+    {% endif %}
+</header>
+
+<nav class="navbar">
+    <a href="{% url 'home' %}">Accueil</a>
+    <a href="{% url 'admin:index' %}">Admin</a>
+</nav>

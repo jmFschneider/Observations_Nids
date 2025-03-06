@@ -1,19 +1,10 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Liste des utilisateurs</title>
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
-    <script>
-        function loadUserDetail(userId) {
-            fetch(`/users/${userId}/`)
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById("user-detail").innerHTML = html;
-            });
-        }
-    </script>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Liste des utilisateurs{% endblock %}
+
+{% block content %}
+
 </head>
 <body>
     <h1>Utilisateurs</h1>
@@ -45,5 +36,17 @@
     <div id="user-detail">
         <p>Sélectionnez un utilisateur pour voir ses détails.</p>
     </div>
-</body>
-</html>
+{% endblock %}
+
+
+{% block extra_js %}
+     <script>
+        function loadUserDetail(userId) {
+            fetch(`/users/${userId}/`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById("user-detail").innerHTML = html;
+            });
+        }
+    </script>
+{% endblock %}

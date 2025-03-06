@@ -2,8 +2,17 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Utilisateur, Observation, FicheObservation
 from .forms import UtilisateurForm
+import logging
+from django.http import HttpResponse
+logger = logging.getLogger('Observations')
 
 def home(request):
+    logger.info("Accueil visité")
+    if request.user.is_authenticated:
+        logger.debug(f"Utilisateur connecté : {request.user.username}")
+    else:
+        logger.debug("Visite anonyme")
+
     users_count = Utilisateur.objects.count()
     observations_count = Observation.objects.count()
     return render(request, 'home.html', {
@@ -24,20 +33,6 @@ def user_detail(request, user_id):
         'user': user,
         'observations_count': observations_count,
         'fiches': fiches
-    })
-
-def user_detail_old2(request, user_id):
-    user = get_object_or_404(Utilisateur, id=user_id)
-    return render(request, 'user_detail.html', {'user': user})
-
-def user_detail_old(request, user_id):
-    user = get_object_or_404(Utilisateur, id=user_id)
-    observations_count = Observation.objects.filter(user_id=user.id).count()
-    last_observation = Observation.objects.filter(user_id=user.id).order_by('-observation_date').first()
-    return render(request, 'user_detail.html', {
-        'user': user,
-        'observations_count': observations_count,
-        'last_observation': last_observation
     })
 
 

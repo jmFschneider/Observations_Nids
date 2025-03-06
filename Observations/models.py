@@ -1,5 +1,8 @@
 from django.db import models
+import logging
 
+
+logger = logging.getLogger('Observations')
 
 class Utilisateur(models.Model):
     ROLES = [
@@ -65,6 +68,12 @@ class Nid(models.Model):
 
 
 class Observation(models.Model):
+    nom = models.CharField(max_length=100)
+    date_observation = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        logger.info(f"Nouvelle observation ajoutée : {self.nom} à {self.date_observation}")
+        super().save(*args, **kwargs)
     fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="observations")
     jour = models.IntegerField()
     mois = models.IntegerField()
