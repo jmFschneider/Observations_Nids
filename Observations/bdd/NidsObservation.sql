@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : mer. 05 mars 2025 à 10:29
+-- Généré le : ven. 07 mars 2025 à 08:10
 -- Version du serveur : 10.11.6-MariaDB-0+deb12u1
 -- Version de PHP : 8.2.26
 
@@ -86,50 +86,50 @@ INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALU
 (22, 'Can change session', 6, 'change_session'),
 (23, 'Can delete session', 6, 'delete_session'),
 (24, 'Can view session', 6, 'view_session'),
-(25, 'Can add user', 7, 'add_user'),
-(26, 'Can change user', 7, 'change_user'),
-(27, 'Can delete user', 7, 'delete_user'),
-(28, 'Can view user', 7, 'view_user'),
-(29, 'Can add observation', 8, 'add_observation'),
-(30, 'Can change observation', 8, 'change_observation'),
-(31, 'Can delete observation', 8, 'delete_observation'),
-(32, 'Can view observation', 8, 'view_observation'),
-(33, 'Can add espece', 9, 'add_espece'),
-(34, 'Can change espece', 9, 'change_espece'),
-(35, 'Can delete espece', 9, 'delete_espece'),
-(36, 'Can view espece', 9, 'view_espece'),
-(37, 'Can add utilisateur', 10, 'add_utilisateur'),
-(38, 'Can change utilisateur', 10, 'change_utilisateur'),
-(39, 'Can delete utilisateur', 10, 'delete_utilisateur'),
-(40, 'Can view utilisateur', 10, 'view_utilisateur'),
-(41, 'Can add fiche observation', 11, 'add_ficheobservation'),
-(42, 'Can change fiche observation', 11, 'change_ficheobservation'),
-(43, 'Can delete fiche observation', 11, 'delete_ficheobservation'),
-(44, 'Can view fiche observation', 11, 'view_ficheobservation'),
-(45, 'Can add causes echec', 12, 'add_causesechec'),
-(46, 'Can change causes echec', 12, 'change_causesechec'),
-(47, 'Can delete causes echec', 12, 'delete_causesechec'),
-(48, 'Can view causes echec', 12, 'view_causesechec'),
-(49, 'Can add historique modification', 13, 'add_historiquemodification'),
-(50, 'Can change historique modification', 13, 'change_historiquemodification'),
-(51, 'Can delete historique modification', 13, 'delete_historiquemodification'),
-(52, 'Can view historique modification', 13, 'view_historiquemodification'),
-(53, 'Can add localisation', 14, 'add_localisation'),
-(54, 'Can change localisation', 14, 'change_localisation'),
-(55, 'Can delete localisation', 14, 'delete_localisation'),
-(56, 'Can view localisation', 14, 'view_localisation'),
-(57, 'Can add nid', 15, 'add_nid'),
-(58, 'Can change nid', 15, 'change_nid'),
-(59, 'Can delete nid', 15, 'delete_nid'),
-(60, 'Can view nid', 15, 'view_nid'),
-(61, 'Can add resume observation', 16, 'add_resumeobservation'),
-(62, 'Can change resume observation', 16, 'change_resumeobservation'),
-(63, 'Can delete resume observation', 16, 'delete_resumeobservation'),
-(64, 'Can view resume observation', 16, 'view_resumeobservation'),
-(65, 'Can add validation', 17, 'add_validation'),
-(66, 'Can change validation', 17, 'change_validation'),
-(67, 'Can delete validation', 17, 'delete_validation'),
-(68, 'Can view validation', 17, 'view_validation');
+(25, 'Can add espece', 7, 'add_espece'),
+(26, 'Can change espece', 7, 'change_espece'),
+(27, 'Can delete espece', 7, 'delete_espece'),
+(28, 'Can view espece', 7, 'view_espece'),
+(29, 'Can add utilisateur', 8, 'add_utilisateur'),
+(30, 'Can change utilisateur', 8, 'change_utilisateur'),
+(31, 'Can delete utilisateur', 8, 'delete_utilisateur'),
+(32, 'Can view utilisateur', 8, 'view_utilisateur'),
+(33, 'Can add fiche observation', 9, 'add_ficheobservation'),
+(34, 'Can change fiche observation', 9, 'change_ficheobservation'),
+(35, 'Can delete fiche observation', 9, 'delete_ficheobservation'),
+(36, 'Can view fiche observation', 9, 'view_ficheobservation'),
+(37, 'Can add causes echec', 10, 'add_causesechec'),
+(38, 'Can change causes echec', 10, 'change_causesechec'),
+(39, 'Can delete causes echec', 10, 'delete_causesechec'),
+(40, 'Can view causes echec', 10, 'view_causesechec'),
+(41, 'Can add localisation', 11, 'add_localisation'),
+(42, 'Can change localisation', 11, 'change_localisation'),
+(43, 'Can delete localisation', 11, 'delete_localisation'),
+(44, 'Can view localisation', 11, 'view_localisation'),
+(45, 'Can add nid', 12, 'add_nid'),
+(46, 'Can change nid', 12, 'change_nid'),
+(47, 'Can delete nid', 12, 'delete_nid'),
+(48, 'Can view nid', 12, 'view_nid'),
+(49, 'Can add observation', 13, 'add_observation'),
+(50, 'Can change observation', 13, 'change_observation'),
+(51, 'Can delete observation', 13, 'delete_observation'),
+(52, 'Can view observation', 13, 'view_observation'),
+(53, 'Can add historique modification', 14, 'add_historiquemodification'),
+(54, 'Can change historique modification', 14, 'change_historiquemodification'),
+(55, 'Can delete historique modification', 14, 'delete_historiquemodification'),
+(56, 'Can view historique modification', 14, 'view_historiquemodification'),
+(57, 'Can add resume observation', 15, 'add_resumeobservation'),
+(58, 'Can change resume observation', 15, 'change_resumeobservation'),
+(59, 'Can delete resume observation', 15, 'delete_resumeobservation'),
+(60, 'Can view resume observation', 15, 'view_resumeobservation'),
+(61, 'Can add validation', 16, 'add_validation'),
+(62, 'Can change validation', 16, 'change_validation'),
+(63, 'Can delete validation', 16, 'delete_validation'),
+(64, 'Can view validation', 16, 'view_validation'),
+(65, 'Can add historique validation', 17, 'add_historiquevalidation'),
+(66, 'Can change historique validation', 17, 'change_historiquevalidation'),
+(67, 'Can delete historique validation', 17, 'delete_historiquevalidation'),
+(68, 'Can view historique validation', 17, 'view_historiquevalidation');
 
 -- --------------------------------------------------------
 
@@ -156,7 +156,7 @@ CREATE TABLE `auth_user` (
 --
 
 INSERT INTO `auth_user` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`) VALUES
-(1, 'pbkdf2_sha256$870000$nTisphT1qqbyOkrUjlUEM6$GE8GYud4QdcdI1AfiQrZ/KI2KjZ8r0lPx4XYFcqkkkA=', '2025-03-04 18:13:17.660804', 1, 'jms', '', '', 'schneider.jm@free.fr', 1, 1, '2025-03-04 18:12:59.476765');
+(1, 'pbkdf2_sha256$870000$m4QrYrgL31F4Wzdi5qPv2U$nEcy5I4zsLKs5pemkMMeZ+Np7rq+30HeD4KwgLJctiU=', '2025-03-06 23:06:59.233306', 1, 'jms', '', '', 'schneider.jm@free.fr', 1, 1, '2025-03-06 23:06:31.451103');
 
 -- --------------------------------------------------------
 
@@ -199,15 +199,6 @@ CREATE TABLE `django_admin_log` (
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Déchargement des données de la table `django_admin_log`
---
-
-INSERT INTO `django_admin_log` (`id`, `action_time`, `object_id`, `object_repr`, `action_flag`, `change_message`, `content_type_id`, `user_id`) VALUES
-(1, '2025-03-04 18:26:10.151720', '1', 'Moineau domestique', 1, '[{\"added\": {}}]', 9, 1),
-(2, '2025-03-04 18:26:23.656588', '1', 'Fiche 1 - 2025 (Moineau domestique)', 1, '[{\"added\": {}}]', 11, 1),
-(3, '2025-03-04 21:31:06.058375', '1', 'Fiche 1 - 2025 (Moineau domestique)', 3, '', 11, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -230,17 +221,17 @@ INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES
 (2, 'auth', 'permission'),
 (4, 'auth', 'user'),
 (5, 'contenttypes', 'contenttype'),
-(12, 'Observations', 'causesechec'),
-(9, 'Observations', 'espece'),
-(11, 'Observations', 'ficheobservation'),
-(13, 'Observations', 'historiquemodification'),
-(14, 'Observations', 'localisation'),
-(15, 'Observations', 'nid'),
-(8, 'Observations', 'observation'),
-(16, 'Observations', 'resumeobservation'),
-(7, 'Observations', 'user'),
-(10, 'Observations', 'utilisateur'),
-(17, 'Observations', 'validation'),
+(10, 'Observations', 'causesechec'),
+(7, 'Observations', 'espece'),
+(9, 'Observations', 'ficheobservation'),
+(14, 'Observations', 'historiquemodification'),
+(17, 'Observations', 'historiquevalidation'),
+(11, 'Observations', 'localisation'),
+(12, 'Observations', 'nid'),
+(13, 'Observations', 'observation'),
+(15, 'Observations', 'resumeobservation'),
+(8, 'Observations', 'utilisateur'),
+(16, 'Observations', 'validation'),
 (6, 'sessions', 'session');
 
 -- --------------------------------------------------------
@@ -261,27 +252,25 @@ CREATE TABLE `django_migrations` (
 --
 
 INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
-(1, 'Observations', '0001_initial', '2025-03-03 21:07:32.231810'),
-(2, 'contenttypes', '0001_initial', '2025-03-03 21:07:32.302049'),
-(3, 'auth', '0001_initial', '2025-03-03 21:07:32.953158'),
-(4, 'admin', '0001_initial', '2025-03-03 21:07:33.094545'),
-(5, 'admin', '0002_logentry_remove_auto_add', '2025-03-03 21:07:33.103852'),
-(6, 'admin', '0003_logentry_add_action_flag_choices', '2025-03-03 21:07:33.118587'),
-(7, 'contenttypes', '0002_remove_content_type_name', '2025-03-03 21:07:33.245453'),
-(8, 'auth', '0002_alter_permission_name_max_length', '2025-03-03 21:07:33.304292'),
-(9, 'auth', '0003_alter_user_email_max_length', '2025-03-03 21:07:33.337548'),
-(10, 'auth', '0004_alter_user_username_opts', '2025-03-03 21:07:33.352356'),
-(11, 'auth', '0005_alter_user_last_login_null', '2025-03-03 21:07:33.407563'),
-(12, 'auth', '0006_require_contenttypes_0002', '2025-03-03 21:07:33.414161'),
-(13, 'auth', '0007_alter_validators_add_error_messages', '2025-03-03 21:07:33.422821'),
-(14, 'auth', '0008_alter_user_username_max_length', '2025-03-03 21:07:33.460218'),
-(15, 'auth', '0009_alter_user_last_name_max_length', '2025-03-03 21:07:33.491670'),
-(16, 'auth', '0010_alter_group_name_max_length', '2025-03-03 21:07:33.522595'),
-(17, 'auth', '0011_update_proxy_permissions', '2025-03-03 21:07:33.544936'),
-(18, 'auth', '0012_alter_user_first_name_max_length', '2025-03-03 21:07:33.582433'),
-(19, 'sessions', '0001_initial', '2025-03-03 21:07:33.658023'),
-(20, 'Observations', '0002_espece_utilisateur_remove_observation_user_and_more', '2025-03-04 14:04:56.527671'),
-(21, 'Observations', '0002_initial', '2025-03-05 10:21:14.114142');
+(1, 'Observations', '0001_initial', '2025-03-06 23:00:13.149971'),
+(2, 'contenttypes', '0001_initial', '2025-03-06 23:00:13.233085'),
+(3, 'auth', '0001_initial', '2025-03-06 23:00:14.043152'),
+(4, 'admin', '0001_initial', '2025-03-06 23:00:14.203519'),
+(5, 'admin', '0002_logentry_remove_auto_add', '2025-03-06 23:00:14.221091'),
+(6, 'admin', '0003_logentry_add_action_flag_choices', '2025-03-06 23:00:14.237138'),
+(7, 'contenttypes', '0002_remove_content_type_name', '2025-03-06 23:00:14.367348'),
+(8, 'auth', '0002_alter_permission_name_max_length', '2025-03-06 23:00:14.428818'),
+(9, 'auth', '0003_alter_user_email_max_length', '2025-03-06 23:00:14.512216'),
+(10, 'auth', '0004_alter_user_username_opts', '2025-03-06 23:00:14.525142'),
+(11, 'auth', '0005_alter_user_last_login_null', '2025-03-06 23:00:14.608801'),
+(12, 'auth', '0006_require_contenttypes_0002', '2025-03-06 23:00:14.608801'),
+(13, 'auth', '0007_alter_validators_add_error_messages', '2025-03-06 23:00:14.620402'),
+(14, 'auth', '0008_alter_user_username_max_length', '2025-03-06 23:00:14.684704'),
+(15, 'auth', '0009_alter_user_last_name_max_length', '2025-03-06 23:00:14.729092'),
+(16, 'auth', '0010_alter_group_name_max_length', '2025-03-06 23:00:14.775265'),
+(17, 'auth', '0011_update_proxy_permissions', '2025-03-06 23:00:14.803875'),
+(18, 'auth', '0012_alter_user_first_name_max_length', '2025-03-06 23:00:14.851359'),
+(19, 'sessions', '0001_initial', '2025-03-06 23:00:14.930767');
 
 -- --------------------------------------------------------
 
@@ -295,13 +284,6 @@ CREATE TABLE `django_session` (
   `expire_date` datetime(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Déchargement des données de la table `django_session`
---
-
-INSERT INTO `django_session` (`session_key`, `session_data`, `expire_date`) VALUES
-('vg2lw83qn4vb1of8hdhra2cfmoha8mjd', '.eJxVjEEOwiAQRe_C2hAYpFCX7nsGMsMwtmpKUtqV8e7apAvd_vfef6mE2zqmrZUlTawuyqrT70aYH2XeAd9xvlWd67wuE-ld0QdteqhcntfD_TsYsY3fuiPJcLYYewHvQQA8hx4zgEh0xE6cLRysEU9gUbpA7AuZkkkoGlHvD_ITOOc:1tpWlZ:wA1wsKw6gOr0mA8tekIGexA8Z8jNksP6wwfmmcTJwKs', '2025-03-18 18:13:17.676616');
-
 -- --------------------------------------------------------
 
 --
@@ -311,7 +293,7 @@ INSERT INTO `django_session` (`session_key`, `session_data`, `expire_date`) VALU
 CREATE TABLE `Observations_causesechec` (
   `id` bigint(20) NOT NULL,
   `description` longtext DEFAULT NULL,
-  `fiche_id` bigint(20) NOT NULL
+  `fiche_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -328,13 +310,6 @@ CREATE TABLE `Observations_espece` (
   `valide_par_admin` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Déchargement des données de la table `Observations_espece`
---
-
-INSERT INTO `Observations_espece` (`id`, `nom`, `commentaire`, `lien_oiseau_net`, `valide_par_admin`) VALUES
-(1, 'Moineau domestique', '', 'https://www.oiseaux.net/oiseaux/moineau.domestique.html', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -342,8 +317,8 @@ INSERT INTO `Observations_espece` (`id`, `nom`, `commentaire`, `lien_oiseau_net`
 --
 
 CREATE TABLE `Observations_ficheobservation` (
-  `id` bigint(20) NOT NULL,
-  `num_fiche` varchar(50) NOT NULL,
+  `num_fiche` int(11) NOT NULL,
+  `date_creation` datetime(6) NOT NULL,
   `annee` int(11) NOT NULL,
   `chemin_image` varchar(255) DEFAULT NULL,
   `espece_id` bigint(20) NOT NULL,
@@ -368,6 +343,21 @@ CREATE TABLE `Observations_historiquemodification` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `Observations_historiquevalidation`
+--
+
+CREATE TABLE `Observations_historiquevalidation` (
+  `id` bigint(20) NOT NULL,
+  `ancien_statut` varchar(10) NOT NULL,
+  `nouveau_statut` varchar(10) NOT NULL,
+  `date_modification` datetime(6) NOT NULL,
+  `modifie_par_id` bigint(20) DEFAULT NULL,
+  `validation_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `Observations_localisation`
 --
 
@@ -376,10 +366,12 @@ CREATE TABLE `Observations_localisation` (
   `commune` varchar(100) NOT NULL,
   `departement` varchar(10) NOT NULL,
   `coordonnees` varchar(100) DEFAULT NULL,
+  `latitude` decimal(9,6) DEFAULT NULL,
+  `longitude` decimal(9,6) DEFAULT NULL,
   `altitude` varchar(10) DEFAULT NULL,
   `paysage` longtext DEFAULT NULL,
   `alentours` longtext DEFAULT NULL,
-  `fiche_id` bigint(20) NOT NULL
+  `fiche_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -394,7 +386,7 @@ CREATE TABLE `Observations_nid` (
   `hauteur_nid` int(11) DEFAULT NULL,
   `hauteur_couvert` int(11) DEFAULT NULL,
   `details_nid` longtext DEFAULT NULL,
-  `fiche_id` bigint(20) NOT NULL
+  `fiche_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -405,13 +397,12 @@ CREATE TABLE `Observations_nid` (
 
 CREATE TABLE `Observations_observation` (
   `id` bigint(20) NOT NULL,
-  `heure` varchar(10) DEFAULT NULL,
-  `jour` int(11) DEFAULT NULL,
-  `mois` int(11) DEFAULT NULL,
-  `nombre_oeufs` int(11) DEFAULT NULL,
-  `nombre_poussins` int(11) DEFAULT NULL,
+  `nom` varchar(100) NOT NULL,
+  `date_observation` datetime(6) NOT NULL,
+  `nombre_oeufs` int(11) NOT NULL,
+  `nombre_poussins` int(11) NOT NULL,
   `observations` longtext DEFAULT NULL,
-  `fiche_id` bigint(20) DEFAULT NULL
+  `fiche_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -428,11 +419,11 @@ CREATE TABLE `Observations_resumeobservation` (
   `premier_poussin_eclos_mois` int(11) DEFAULT NULL,
   `premier_poussin_volant_jour` int(11) DEFAULT NULL,
   `premier_poussin_volant_mois` int(11) DEFAULT NULL,
-  `nombre_oeufs_pondus` int(11) DEFAULT NULL,
-  `nombre_oeufs_eclos` int(11) DEFAULT NULL,
-  `nombre_oeufs_non_eclos` int(11) DEFAULT NULL,
-  `nombre_poussins` int(11) DEFAULT NULL,
-  `fiche_id` bigint(20) NOT NULL
+  `nombre_oeufs_pondus` int(11) NOT NULL,
+  `nombre_oeufs_eclos` int(11) NOT NULL,
+  `nombre_oeufs_non_eclos` int(11) NOT NULL,
+  `nombre_poussins` int(11) NOT NULL,
+  `fiche_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -456,7 +447,7 @@ CREATE TABLE `Observations_utilisateur` (
 --
 
 INSERT INTO `Observations_utilisateur` (`id`, `nom`, `prenom`, `email`, `date_inscription`, `role`, `est_valide`) VALUES
-(1, 'Dupont', 'Jean', 'jean@example.com', '2025-03-04 18:16:36.477216', 'observateur', 0);
+(1, 'SCHNEIDER', 'Jean-Marie', 'schneider.jm@free.fr', '2025-03-06 23:07:54.353393', 'observateur', 0);
 
 -- --------------------------------------------------------
 
@@ -467,6 +458,7 @@ INSERT INTO `Observations_utilisateur` (`id`, `nom`, `prenom`, `email`, `date_in
 CREATE TABLE `Observations_validation` (
   `id` bigint(20) NOT NULL,
   `date_validation` datetime(6) NOT NULL,
+  `statut` varchar(10) NOT NULL,
   `observation_id` bigint(20) NOT NULL,
   `reviewer_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -566,8 +558,7 @@ ALTER TABLE `Observations_espece`
 -- Index pour la table `Observations_ficheobservation`
 --
 ALTER TABLE `Observations_ficheobservation`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `num_fiche` (`num_fiche`),
+  ADD PRIMARY KEY (`num_fiche`),
   ADD KEY `Observations_ficheob_espece_id_f87d4ff5_fk_Observati` (`espece_id`),
   ADD KEY `Observations_ficheob_observateur_id_77755281_fk_Observati` (`observateur_id`);
 
@@ -577,6 +568,14 @@ ALTER TABLE `Observations_ficheobservation`
 ALTER TABLE `Observations_historiquemodification`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Observations_histori_observation_id_6344b72c_fk_Observati` (`observation_id`);
+
+--
+-- Index pour la table `Observations_historiquevalidation`
+--
+ALTER TABLE `Observations_historiquevalidation`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Observations_histori_modifie_par_id_7227ef49_fk_Observati` (`modifie_par_id`),
+  ADD KEY `Observations_histori_validation_id_815caeec_fk_Observati` (`validation_id`);
 
 --
 -- Index pour la table `Observations_localisation`
@@ -665,7 +664,7 @@ ALTER TABLE `auth_user_user_permissions`
 -- AUTO_INCREMENT pour la table `django_admin_log`
 --
 ALTER TABLE `django_admin_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `django_content_type`
@@ -677,7 +676,7 @@ ALTER TABLE `django_content_type`
 -- AUTO_INCREMENT pour la table `django_migrations`
 --
 ALTER TABLE `django_migrations`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT pour la table `Observations_causesechec`
@@ -689,18 +688,24 @@ ALTER TABLE `Observations_causesechec`
 -- AUTO_INCREMENT pour la table `Observations_espece`
 --
 ALTER TABLE `Observations_espece`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `Observations_ficheobservation`
 --
 ALTER TABLE `Observations_ficheobservation`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `num_fiche` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `Observations_historiquemodification`
 --
 ALTER TABLE `Observations_historiquemodification`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `Observations_historiquevalidation`
+--
+ALTER TABLE `Observations_historiquevalidation`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
@@ -719,7 +724,7 @@ ALTER TABLE `Observations_nid`
 -- AUTO_INCREMENT pour la table `Observations_observation`
 --
 ALTER TABLE `Observations_observation`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `Observations_resumeobservation`
@@ -781,7 +786,7 @@ ALTER TABLE `django_admin_log`
 -- Contraintes pour la table `Observations_causesechec`
 --
 ALTER TABLE `Observations_causesechec`
-  ADD CONSTRAINT `Observations_causese_fiche_id_ef17440f_fk_Observati` FOREIGN KEY (`fiche_id`) REFERENCES `Observations_ficheobservation` (`id`);
+  ADD CONSTRAINT `Observations_causese_fiche_id_ef17440f_fk_Observati` FOREIGN KEY (`fiche_id`) REFERENCES `Observations_ficheobservation` (`num_fiche`);
 
 --
 -- Contraintes pour la table `Observations_ficheobservation`
@@ -797,28 +802,35 @@ ALTER TABLE `Observations_historiquemodification`
   ADD CONSTRAINT `Observations_histori_observation_id_6344b72c_fk_Observati` FOREIGN KEY (`observation_id`) REFERENCES `Observations_observation` (`id`);
 
 --
+-- Contraintes pour la table `Observations_historiquevalidation`
+--
+ALTER TABLE `Observations_historiquevalidation`
+  ADD CONSTRAINT `Observations_histori_modifie_par_id_7227ef49_fk_Observati` FOREIGN KEY (`modifie_par_id`) REFERENCES `Observations_utilisateur` (`id`),
+  ADD CONSTRAINT `Observations_histori_validation_id_815caeec_fk_Observati` FOREIGN KEY (`validation_id`) REFERENCES `Observations_validation` (`id`);
+
+--
 -- Contraintes pour la table `Observations_localisation`
 --
 ALTER TABLE `Observations_localisation`
-  ADD CONSTRAINT `Observations_localis_fiche_id_38dd145c_fk_Observati` FOREIGN KEY (`fiche_id`) REFERENCES `Observations_ficheobservation` (`id`);
+  ADD CONSTRAINT `Observations_localis_fiche_id_38dd145c_fk_Observati` FOREIGN KEY (`fiche_id`) REFERENCES `Observations_ficheobservation` (`num_fiche`);
 
 --
 -- Contraintes pour la table `Observations_nid`
 --
 ALTER TABLE `Observations_nid`
-  ADD CONSTRAINT `Observations_nid_fiche_id_b11b0396_fk_Observati` FOREIGN KEY (`fiche_id`) REFERENCES `Observations_ficheobservation` (`id`);
+  ADD CONSTRAINT `Observations_nid_fiche_id_b11b0396_fk_Observati` FOREIGN KEY (`fiche_id`) REFERENCES `Observations_ficheobservation` (`num_fiche`);
 
 --
 -- Contraintes pour la table `Observations_observation`
 --
 ALTER TABLE `Observations_observation`
-  ADD CONSTRAINT `Observations_observa_fiche_id_ab3214cf_fk_Observati` FOREIGN KEY (`fiche_id`) REFERENCES `Observations_ficheobservation` (`id`);
+  ADD CONSTRAINT `Observations_observa_fiche_id_ab3214cf_fk_Observati` FOREIGN KEY (`fiche_id`) REFERENCES `Observations_ficheobservation` (`num_fiche`);
 
 --
 -- Contraintes pour la table `Observations_resumeobservation`
 --
 ALTER TABLE `Observations_resumeobservation`
-  ADD CONSTRAINT `Observations_resumeo_fiche_id_30e7b36b_fk_Observati` FOREIGN KEY (`fiche_id`) REFERENCES `Observations_ficheobservation` (`id`);
+  ADD CONSTRAINT `Observations_resumeo_fiche_id_30e7b36b_fk_Observati` FOREIGN KEY (`fiche_id`) REFERENCES `Observations_ficheobservation` (`num_fiche`);
 
 --
 -- Contraintes pour la table `Observations_validation`
