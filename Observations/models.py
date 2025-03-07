@@ -1,9 +1,9 @@
 from django.db import models
 import logging
 from django.core.validators import MinValueValidator
-from django.core.exceptions import ObjectDoesNotExist
 
 logger = logging.getLogger('Observations')
+
 
 class Utilisateur(models.Model):
     ROLES = [
@@ -72,10 +72,9 @@ class Nid(models.Model):
 
 
 class Observation(models.Model):
+    fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="observations")
     nom = models.CharField(max_length=100)
     date_observation = models.DateTimeField()  # Remplace jour, mois, heure
-
-    fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="observations")
     nombre_oeufs = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     nombre_poussins = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     observations = models.TextField(blank=True, null=True)
@@ -86,6 +85,7 @@ class Observation(models.Model):
 
     def __str__(self):
         return f"Observation du {self.date_observation.strftime('%d/%m/%Y %H:%M')} (Fiche {self.fiche.num_fiche})"
+
 
 class ResumeObservation(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="resume")
@@ -113,35 +113,38 @@ class CausesEchec(models.Model):
 
 
 class Validation(models.Model):
+    fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="validations")
+    reviewer = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, limit_choices_to={'role': 'reviewer'})
+
     STATUTS = [
         ('en_cours', 'En cours'),
         ('validee', 'Validée'),
         ('rejete', 'Rejetée')
     ]
-    observation = models.ForeignKey(Observation, on_delete=models.CASCADE, related_name="validations")
-    reviewer = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, limit_choices_to={'role': 'reviewer'})
-    date_validation = models.DateTimeField(auto_now_add=True)
+
+    date_modification = models.DateTimeField(auto_now_add=True)
     statut = models.CharField(max_length=10, choices=STATUTS, default='en_cours')
 
     def save(self, *args, **kwargs):
         # Vérifier si l'instance existe déjà pour récupérer l'ancien statut
         if self.pk:
-            try:
-                ancienne_instance = Validation.objects.get(pk=self.pk)
-                if ancienne_instance.statut != self.statut:
-                    HistoriqueValidation.objects.create(
-                        validation=self,
-                        ancien_statut=ancienne_instance.statut,
-                        nouveau_statut=self.statut,
-                        modifie_par=self.reviewer  # Ou autre utilisateur si nécessaire
-                    )
-            except ObjectDoesNotExist:
-                pass  # L'instance est nouvelle, pas de modification précédente
+            ancienne_instance = Validation.objects.filter(pk=self.pk).first()
+            if ancienne_instance and ancienne_instance.statut != self.statut:
+                HistoriqueValidation.objects.create(
+                    validation=self,
+                    ancien_statut=ancienne_instance.statut,
+                    nouveau_statut=self.statut,
+                    modifie_par=self.reviewer
+                )
 
         super().save(*args, **kwargs)
 
+    class Meta:
+        ordering = ['-date_modification']  # Les plus récentes en premier
+
     def __str__(self):
-        return f"Validation {self.observation.fiche.num_fiche} par {self.reviewer.nom}"
+        return f"Validation Fiche {self.fiche.num_fiche} par {self.reviewer.nom}"
+
 
 class HistoriqueValidation(models.Model):
     validation = models.ForeignKey(Validation, on_delete=models.CASCADE, related_name="historique")
@@ -150,15 +153,35 @@ class HistoriqueValidation(models.Model):
     date_modification = models.DateTimeField(auto_now_add=True)
     modifie_par = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True, blank=True)
 
+    class Meta:
+        ordering = ['-date_modification']  # Les plus récentes en premier
+
     def __str__(self):
-        return f"Changement de {self.ancien_statut} à {self.nouveau_statut} pour Validation {self.validation.id}"
+        return f"Changement de {self.ancien_statut} à {self.nouveau_statut} (Fiche {self.validation.fiche.num_fiche})"
+
 
 class HistoriqueModification(models.Model):
-    observation = models.ForeignKey(Observation, on_delete=models.CASCADE, related_name="modifications")
+    fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="modifications")
     champ_modifie = models.CharField(max_length=100)
     ancienne_valeur = models.TextField()
     nouvelle_valeur = models.TextField()
     date_modification = models.DateTimeField(auto_now_add=True)
+
+    CATEGORIES = [
+        ('fiche', 'Fiche Observation'),
+        ('observation', 'Observation'),
+        ('validation', 'Validation'),
+        ('localisation', 'Localisation'),
+        ('nid', 'Nid'),
+        ('resume_observation', 'Résumé Observation'),
+        ('causes_echec', 'Causes d’échec')
+    ]
+    categorie = models.CharField(max_length=20, choices=CATEGORIES, default='fiche', db_index=True)
+
+    class Meta:
+        verbose_name = "Historique de modification"
+        verbose_name_plural = "Historiques des modifications"
+        ordering = ['-date_modification']
 
     def __str__(self):
         return f"Modification {self.champ_modifie} ({self.date_modification})"

@@ -31,8 +31,10 @@ class ObservationAdmin(admin.ModelAdmin):
 
 @admin.register(Validation)
 class ValidationAdmin(admin.ModelAdmin):
-    list_display = ("observation", "reviewer", "date_validation")
-    list_filter = ("date_validation",)
+    list_display = ("fiche", "reviewer", "date_modification", "statut")
+    list_filter = ("statut", "date_modification")
+    search_fields = ("fiche__num_fiche", "reviewer__nom")
+    ordering = ("-date_modification",)
 
 @admin.register(HistoriqueValidation)
 class HistoriqueValidationAdmin(admin.ModelAdmin):
@@ -42,10 +44,12 @@ class HistoriqueValidationAdmin(admin.ModelAdmin):
 
 @admin.register(HistoriqueModification)
 class HistoriqueModificationAdmin(admin.ModelAdmin):
-    list_display = ("observation", "champ_modifie", "date_modification")
-    search_fields = ("observation__fiche__num_fiche", "champ_modifie")
+    list_display = ("fiche", "champ_modifie", "categorie", "date_modification")
+    search_fields = ("fiche__num_fiche", "champ_modifie")
+    list_filter = ("categorie", "date_modification")
+    ordering = ('-date_modification',)
 
-# Enregistrement simple des autres modèles
+# Enregistrement des autres modèles
 admin.site.register(Localisation)
 admin.site.register(Nid)
 admin.site.register(ResumeObservation)
