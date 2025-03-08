@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Fiche Observation n°{{ fiche.num_fiche }}</h2>
+
+<table border="1">
+    <tr>
+        <th>Numéro</th>
+        <th>Observateur</th>
+        <th>Espèce</th>
+        <th>Date de création</th>
+        <th>Année</th>
+        <th>Image</th>
+    </tr>
+    <tr>
+        <td>{{ fiche.num_fiche }}</td>
+        <td>{{ fiche.observateur.prenom }} {{ fiche.observateur.nom }}</td>
+        <td>{{ fiche.espece.nom }}</td>
+        <td>{{ fiche.date_creation|date:"d/m/Y" }}</td>
+        <td>{{ fiche.annee }}</td>
+        <td>
+            {% if fiche.chemin_image %}
+                <a href="{{ fiche.chemin_image }}" target="_blank">Voir l'image</a>
+            {% else %}
+                Pas d'image
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+<h3>Localisation</h3>
+<table border="1">
+    <tr><th>Commune</th><td>{{ localisation.commune }}</td></tr>
+    <tr><th>Département</th><td>{{ localisation.departement }}</td></tr>
+    <tr><th>Coordonnées</th><td>{{ localisation.coordonnees }}</td></tr>
+    <tr><th>Latitude</th><td>{{ localisation.latitude }}</td></tr>
+    <tr><th>Longitude</th><td>{{ localisation.longitude }}</td></tr>
+    <tr><th>Altitude</th><td>{{ localisation.altitude }}</td></tr>
+    <tr><th>Paysage</th><td>{{ localisation.paysage }}</td></tr>
+    <tr><th>Alentours</th><td>{{ localisation.alentours }}</td></tr>
+</table>
+
+{% endblock %}

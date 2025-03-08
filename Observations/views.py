@@ -46,3 +46,13 @@ def user_create(request):
         form = UtilisateurForm()
 
     return render(request, 'user_create.html', {'form': form})
+
+def fiche_observation_view(request, fiche_id):
+    fiche = get_object_or_404(FicheObservation, pk=fiche_id)
+    localisation = fiche.localisation  # Récupérer la localisation liée
+
+    context = {
+        'fiche': fiche,
+        'localisation': localisation,
+    }
+    return render(request, 'fiche_observation.html', context)

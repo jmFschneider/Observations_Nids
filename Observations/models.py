@@ -34,38 +34,47 @@ class Espece(models.Model):
 
 
 class FicheObservation(models.Model):
-    num_fiche = models.AutoField(primary_key=True)  # Numéro de fiche auto-incrémenté
+    num_fiche = models.AutoField(primary_key=True)
     date_creation = models.DateTimeField(auto_now_add=True)
     observateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name="fiches")
     espece = models.ForeignKey(Espece, on_delete=models.PROTECT, related_name="observations")
     annee = models.IntegerField()
     chemin_image = models.CharField(max_length=255, blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not hasattr(self, 'localisation'):
+            Localisation.objects.create(fiche=self)
+        if not hasattr(self, 'resume'):
+            ResumeObservation.objects.create(fiche=self)
+        if not hasattr(self, 'nid'):
+            Nid.objects.create(fiche=self)
+        if not hasattr(self, 'causes_echec'):
+            CausesEchec.objects.create(fiche=self)
+
     def __str__(self):
         return f"Fiche {self.num_fiche} - {self.annee} ({self.espece.nom})"
 
-
 class Localisation(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="localisation")
-    commune = models.CharField(max_length=100)
-    departement = models.CharField(max_length=10)
-    coordonnees = models.CharField(max_length=100, blank=True, null=True)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
-    altitude = models.CharField(max_length=10, blank=True, null=True)
-    paysage = models.TextField(blank=True, null=True)
-    alentours = models.TextField(blank=True, null=True)
+    commune = models.CharField(max_length=30, default='Non spécifiée')
+    departement = models.CharField(max_length=5, default='00')
+    coordonnees = models.CharField(max_length=30, default='0,0')
+    latitude = models.CharField(max_length=15, default='0.0')
+    longitude = models.CharField(max_length=15, default='0.0')
+    altitude = models.CharField(max_length=10, default='0')
+    paysage = models.TextField(default='Non spécifié')
+    alentours = models.TextField(default='Non spécifié')
 
     def __str__(self):
         return f"Localisation {self.commune} ({self.departement})"
 
-
 class Nid(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="nid")
     nid_prec_t_meme_couple = models.BooleanField(default=False)
-    hauteur_nid = models.IntegerField(null=True, blank=True)
-    hauteur_couvert = models.IntegerField(null=True, blank=True)
-    details_nid = models.TextField(null=True, blank=True)
+    hauteur_nid = models.IntegerField(null=True, blank=True, default=0)
+    hauteur_couvert = models.IntegerField(null=True, blank=True, default=0)
+    details_nid = models.TextField(null=True, blank=True, default='Aucun détail')
 
     def __str__(self):
         return f"Nid de la fiche {self.fiche.num_fiche}"
@@ -73,11 +82,11 @@ class Nid(models.Model):
 
 class Observation(models.Model):
     fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="observations")
-    nom = models.CharField(max_length=100)
-    date_observation = models.DateTimeField()  # Remplace jour, mois, heure
+    nom = models.CharField(max_length=100, default='Observation sans nom')
+    date_observation = models.DateTimeField(auto_now_add=True)
     nombre_oeufs = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     nombre_poussins = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    observations = models.TextField(blank=True, null=True)
+    observations = models.TextField(blank=True, null=True, default='Aucune observation')
 
     def save(self, *args, **kwargs):
         logger.info(f"Nouvelle observation ajoutée : {self.nom} à {self.date_observation}")
@@ -104,9 +113,10 @@ class ResumeObservation(models.Model):
         return f"Résumé Fiche {self.fiche.num_fiche}"
 
 
+
 class CausesEchec(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="causes_echec")
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True, default='Aucune cause identifiée')
 
     def __str__(self):
         return f"Causes d'échec Fiche {self.fiche.num_fiche}"

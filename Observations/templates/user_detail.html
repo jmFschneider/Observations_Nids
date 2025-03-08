@@ -27,7 +27,7 @@
             <td>{{ fiche.date }}</td>
             <td>{{ fiche.nombre_oeufs }}</td>
             <td>{{ fiche.nombre_poussins }}</td>
-            <td><a href="{% url 'fiche_detail' fiche.num_fiche %}">Voir détails</a></td>
+            <td><a href="{% url 'fiche_observation' fiche.num_fiche %}">Voir détails</a></td>
         </tr>
         {% empty %}
         <tr>
