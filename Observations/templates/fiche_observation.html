@@ -3,7 +3,7 @@
 {% block content %}
 <h2>Fiche Observation n°{{ fiche.num_fiche }}</h2>
 
-<table border="1">
+<table>
     <tr>
         <th>Numéro</th>
         <th>Observateur</th>
@@ -29,7 +29,7 @@
 </table>
 
 <h3>Localisation</h3>
-<table border="1">
+<table>
     <tr><th>Commune</th><td>{{ localisation.commune }}</td></tr>
     <tr><th>Département</th><td>{{ localisation.departement }}</td></tr>
     <tr><th>Coordonnées</th><td>{{ localisation.coordonnees }}</td></tr>
@@ -39,5 +39,29 @@
     <tr><th>Paysage</th><td>{{ localisation.paysage }}</td></tr>
     <tr><th>Alentours</th><td>{{ localisation.alentours }}</td></tr>
 </table>
+
+<h3>Observations</h3>
+    {% include "observations/fiche_observation/observation_table.html" with observations=fiche.observations.all %}
+    
+    <h3>Détails du Nid</h3>
+    {% if nid %}
+        {% include "observations/fiche_observation/nid_detail.html" with fiche=fiche %}
+    {% else %}
+        <p>Aucun nid trouvé pour cette fiche.</p>
+    {% endif %} 
+    
+    <h3>Résumé de l'observation</h3>
+    {% if resume %}
+        {% include "observations/fiche_observation/resume_observation.html" %}
+    {% else %}
+        <p>Aucun résumé d'observation disponible.</p>
+    {% endif %}
+    
+    <h3>Causes de l'échec</h3>
+    {% if causes_echec %}
+        {% include "observations/fiche_observation/causes_echec.html" with fiche=fiche %}
+    {% else %}
+        <p>Aucune cause d'échec enregistrée.</p>
+    {% endif %}
 
 {% endblock %}
