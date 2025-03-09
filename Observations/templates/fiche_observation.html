@@ -42,26 +42,33 @@
 
 <h3>Observations</h3>
     {% include "observations/fiche_observation/observation_table.html" with observations=fiche.observations.all %}
-    
+
     <h3>Détails du Nid</h3>
     {% if nid %}
         {% include "observations/fiche_observation/nid_detail.html" with fiche=fiche %}
     {% else %}
         <p>Aucun nid trouvé pour cette fiche.</p>
-    {% endif %} 
-    
+    {% endif %}
+
     <h3>Résumé de l'observation</h3>
     {% if resume %}
         {% include "observations/fiche_observation/resume_observation.html" %}
     {% else %}
         <p>Aucun résumé d'observation disponible.</p>
     {% endif %}
-    
+
     <h3>Causes de l'échec</h3>
     {% if causes_echec %}
         {% include "observations/fiche_observation/causes_echec.html" with fiche=fiche %}
     {% else %}
         <p>Aucune cause d'échec enregistrée.</p>
+    {% endif %}
+
+    <h3>Remarques</h3>
+    {% if fiche.remarques.all %}
+        {% include "observations/fiche_observation/remarques_table.html" with remarques=fiche.remarques.all %}
+    {% else %}
+        <p>Aucune remarque enregistrée.</p>
     {% endif %}
 
 {% endblock %}

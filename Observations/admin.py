@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     Utilisateur, Espece, FicheObservation, Localisation, Nid,
     Observation, ResumeObservation, CausesEchec, Validation,
-    HistoriqueModification, HistoriqueValidation
+    HistoriqueModification, HistoriqueValidation, Remarque
 )
 
 @admin.register(Utilisateur)
@@ -48,6 +48,13 @@ class HistoriqueModificationAdmin(admin.ModelAdmin):
     search_fields = ("fiche__num_fiche", "champ_modifie")
     list_filter = ("categorie", "date_modification")
     ordering = ('-date_modification',)
+
+@admin.register(Remarque)
+class RemarqueAdmin(admin.ModelAdmin):
+    list_display = ("fiche", "date_remarque", "remarque")  # Ajout de la remarque dans la liste
+    list_filter = ("date_remarque",)
+    search_fields = ("fiche__num_fiche", "remarque")  # Permet aussi de rechercher par texte
+
 
 # Enregistrement des autres modèles
 admin.site.register(Localisation)

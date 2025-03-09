@@ -11,4 +11,5 @@ urlpatterns = [
     path('fiche/<int:fiche_id>/nid/',nid_detail_view, name='nid_detail'),
     path('fiche/<int:fiche_id>/resume/', resume_observation_view, name='resume_observation'),
     path('fiche/<int:fiche_id>/causes_echec/', causes_echec_view, name='causes_echec'),
+    path('fiche/<int:fiche_id>/remarque/', causes_echec_view, name='causes_echec'),
 ]

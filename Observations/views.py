@@ -102,3 +102,15 @@ def causes_echec_view(request, fiche_id):
         'causes_echec': causes_echec,  # Ajout explicite de l'objet CausesEchec dans le contexte
     }
     return render(request, 'observations/fiche_observation/causes_echec.html', context)
+
+def remarque_view(request, fiche_id):
+    fiche = get_object_or_404(FicheObservation, pk=fiche_id)
+
+    # Vérifie si un objet CausesEchec existe, sinon passe None
+    causes_echec = fiche.causes_echec if hasattr(fiche, 'causes_echec') else None
+
+    context = {
+        'fiche': fiche,
+        'causes_echec': causes_echec,  # Ajout explicite de l'objet CausesEchec dans le contexte
+    }
+    return render(request, 'observations/fiche_observation/causes_echec.html', context)
