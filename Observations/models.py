@@ -82,7 +82,6 @@ class Nid(models.Model):
 
 class Observation(models.Model):
     fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="observations")
-    nom = models.CharField(max_length=100, default='Observation sans nom')
     date_observation = models.DateTimeField(auto_now_add=True)
     nombre_oeufs = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     nombre_poussins = models.IntegerField(default=0, validators=[MinValueValidator(0)])

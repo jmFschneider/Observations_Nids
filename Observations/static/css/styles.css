@@ -13,11 +13,94 @@ table {
     margin-top: 10px;
 }
 
-th, td {
-    border: 1px solid #ddd;
+/* === Table de la fiche observation === */
+.fiche-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.fiche-table th, .fiche-table td {
+    border: 2px solid #000;
+    padding: 8px;
+    text-align: center;
+}
+
+.fiche-table th {
+    background-color: #e0e0e0;
+    font-weight: bold;
+}
+
+/* === Conteneur principal pour la section Localisation === */
+/* === Conteneur principal pour la section Localisation === *//* === Conteneur principal pour la section Localisation === */
+/* === Conteneur principal pour la section Localisation et Observations === */
+.localisation-container {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+/* === Partie gauche et droite === */
+.localisation-left {
+    width: 50%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.localisation-right {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* === Table uniformisée pour la partie gauche === */
+.localisation-table,
+.observations-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.localisation-table th, .localisation-table td,
+.observations-table th, .observations-table td {
+    border: 2px solid #000;
     padding: 8px;
     text-align: left;
 }
+
+.localisation-table th, .observations-table th {
+    background-color: #e0e0e0;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* === Titres des sections Paysage & Alentours === */
+.section-title {
+    background-color: #e0e0e0;
+    border: 2px solid #000;
+    padding: 8px;
+    font-weight: bold;
+    text-align: center;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+/* === Contenu des sections Paysage & Alentours === */
+.section-content {
+    background: #fff;
+    border: 2px solid #000;
+    padding: 10px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+
 
 th {
     background-color: #f4f4f4;
