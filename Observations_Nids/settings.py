@@ -182,3 +182,12 @@ LOGGING = {
         },
     },
 }
+
+
+# Lire la version du fichier version.txt
+VERSION_FILE = os.path.join(BASE_DIR, "version.txt")
+try:
+    with open(VERSION_FILE, "r") as f:
+        VERSION = f.read().strip()
+except FileNotFoundError:
+    VERSION = "0.0.0"  # Valeur par défaut en cas d'erreur
