@@ -32,8 +32,8 @@ table {
 }
 
 /* === Conteneur principal pour la section Localisation === */
-/* === Conteneur principal pour la section Localisation === *//* === Conteneur principal pour la section Localisation === */
-/* === Conteneur principal pour la section Localisation et Observations === */
+/* === Conteneur principal pour la section Localisation === */
+
 .localisation-container {
     display: flex;
     align-items: flex-start;
@@ -76,6 +76,26 @@ table {
 }
 
 /* === Titres des sections Paysage & Alentours === */
+/* === Table du nid sous Observations === */
+.nid-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.nid-table th, .nid-table td {
+    border: 2px solid #000;
+    padding: 8px;
+    text-align: left;
+}
+
+.nid-table th {
+    background-color: #e0e0e0;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* === Section Détails du Nid === */
 .section-title {
     background-color: #e0e0e0;
     border: 2px solid #000;
@@ -86,10 +106,9 @@ table {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0;
+    margin-top: 10px;
 }
 
-/* === Contenu des sections Paysage & Alentours === */
 .section-content {
     background: #fff;
     border: 2px solid #000;
@@ -98,6 +117,113 @@ table {
     display: flex;
     align-items: center;
     margin: 0;
+}
+
+/* === Conteneur du résumé de l'observation === */
+.resume-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* === Table du résumé === */
+.resume-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* === Style des cellules du tableau === */
+.resume-container th, .resume-container td {
+    border: 2px solid #000;
+    padding: 8px;
+    text-align: center;
+}
+
+/* === Style des en-têtes du tableau === */
+.resume-container th {
+    background-color: #e0e0e0;
+    font-weight: bold;
+}
+
+/* === Conteneur Causes de l'échec & Remarques === */
+.causes-remarques-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+/* === Partie gauche et droite avec 50% de largeur === */
+.causes-container {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 2px solid #000;
+    padding: 15px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* === Titres des sections === */
+.causes-container h3 {
+    background-color: #e0e0e0;
+    padding: 8px;
+    text-align: center;
+    border-bottom: 2px solid #000;
+}
+
+/* === Contenu des sections === */
+.causes-container p {
+    padding: 10px;
+}
+
+/* === Conteneur des remarques (fusion des bordures) === */
+.remarques-container {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 2px solid #000;
+    padding: 0; /* Supprimer le padding pour éviter l'espace autour de la table */
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* === Table des remarques === */
+.remarques-container table {
+    width: 100%;
+    border-collapse: collapse; /* Fusionne les bordures */
+    margin: 0; /* Supprime l'espace supplémentaire */
+}
+
+/* === Style des cellules du tableau === */
+.remarques-container th, .remarques-container td {
+    border: 2px solid #000; /* Utilise la même bordure que le container */
+    padding: 8px;
+    text-align: left;
+}
+
+/* === Style des en-têtes du tableau === */
+.remarques-container th {
+    background-color: #e0e0e0;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* === Suppression de la bordure du bas du titre pour fusion avec la table === */
+.remarques-container h3 {
+    background-color: #e0e0e0;
+    padding: 8px;
+    text-align: center;
+    border-bottom: none; /* Évite une séparation visuelle avec la table */
+    margin: 0;
+}
+/* === Ajustement des colonnes pour la table des remarques === */
+.remarques-container table th:first-child,
+.remarques-container table td:first-child {
+    width: 25%; /* La première colonne (Date) prend 25% */
+}
+
+.remarques-container table th:last-child,
+.remarques-container table td:last-child {
+    width: 75%; /* La deuxième colonne (Remarque) prend 75% */
 }
 
 
