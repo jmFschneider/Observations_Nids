@@ -307,3 +307,27 @@ main {
         max-width: 100%;
     }
 }
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f8f9fa; /* Couleur de fond optionnelle */
+}
+
+.navbar a {
+    text-decoration: none;
+    color: #007bff;
+    margin-right: 15px;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    margin-left: auto;  /* C'est cette ligne qui pousse le contenu à droite */
+}
+
+.navbar-right form {
+    margin-left: 10px;
+}

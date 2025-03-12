@@ -25,6 +25,12 @@ SECRET_KEY = 'django-insecure-^tzqm_vr2-7f#2p10rehlk4pr9!z8z^!3atbbwq@2!%h_$n2f0
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+AUTH_USER_MODEL = 'Observations.Utilisateur'
+LOGIN_REDIRECT_URL = '/'
+
+# Durée de session : 3600 secondes (1 heure)
+SESSION_COOKIE_AGE = 3600
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Déconnexion si l’utilisateur ferme son navigateur
 
 ALLOWED_HOSTS = []
 

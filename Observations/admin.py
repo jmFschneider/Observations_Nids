@@ -7,9 +7,9 @@ from .models import (
 
 @admin.register(Utilisateur)
 class UtilisateurAdmin(admin.ModelAdmin):
-    list_display = ("prenom", "nom", "email", "role", "est_valide")
+    list_display = ("first_name", "last_name", "email", "role", "est_valide", "username")  # Correction ici
     list_filter = ("role", "est_valide")
-    search_fields = ("prenom", "nom", "email")
+    search_fields = ("first_name", "last_name", "email")  # Correction ici
 
 @admin.register(Espece)
 class EspeceAdmin(admin.ModelAdmin):
@@ -21,7 +21,7 @@ class EspeceAdmin(admin.ModelAdmin):
 class FicheObservationAdmin(admin.ModelAdmin):
     list_display = ("num_fiche", "observateur", "espece", "annee")
     list_filter = ("annee", "espece")
-    search_fields = ("num_fiche", "observateur__nom", "espece__nom")
+    search_fields = ("num_fiche", "observateur__first_name", "observateur__last_name", "espece__nom")  # Correction ici
 
 @admin.register(Observation)
 class ObservationAdmin(admin.ModelAdmin):
@@ -33,7 +33,7 @@ class ObservationAdmin(admin.ModelAdmin):
 class ValidationAdmin(admin.ModelAdmin):
     list_display = ("fiche", "reviewer", "date_modification", "statut")
     list_filter = ("statut", "date_modification")
-    search_fields = ("fiche__num_fiche", "reviewer__nom")
+    search_fields = ("fiche__num_fiche", "reviewer__first_name", "reviewer__last_name")  # Correction ici
     ordering = ("-date_modification",)
 
 @admin.register(HistoriqueValidation)
@@ -51,10 +51,9 @@ class HistoriqueModificationAdmin(admin.ModelAdmin):
 
 @admin.register(Remarque)
 class RemarqueAdmin(admin.ModelAdmin):
-    list_display = ("fiche", "date_remarque", "remarque")  # Ajout de la remarque dans la liste
+    list_display = ("fiche", "date_remarque", "remarque")
     list_filter = ("date_remarque",)
-    search_fields = ("fiche__num_fiche", "remarque")  # Permet aussi de rechercher par texte
-
+    search_fields = ("fiche__num_fiche", "remarque")
 
 # Enregistrement des autres modèles
 admin.site.register(Localisation)

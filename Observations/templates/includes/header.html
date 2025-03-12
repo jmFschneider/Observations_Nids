@@ -7,8 +7,18 @@
         <p>Bienvenue sur notre site !</p>
     {% endif %}
 </header>
-
 <nav class="navbar">
     <a href="{% url 'home' %}">Accueil</a>
     <a href="{% url 'admin:index' %}">Admin</a>
+
+    {% if user.is_authenticated %}
+        <div class="navbar-right">
+            <span>Bienvenue, {{ user.username }}</span>
+            <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Déconnexion</button>
+            </form>
+        </div>
+    {% endif %}
 </nav>
+

@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 import logging
 from django.core.validators import MinValueValidator
@@ -5,23 +6,18 @@ from django.core.validators import MinValueValidator
 logger = logging.getLogger('Observations')
 
 
-class Utilisateur(models.Model):
+class Utilisateur(AbstractUser):  # On étend l'utilisateur Django
     ROLES = [
         ('observateur', 'Observateur'),
         ('reviewer', 'Reviewer'),
         ('administrateur', 'Administrateur')
     ]
 
-    nom = models.CharField(max_length=50)
-    prenom = models.CharField(max_length=50)
-    email = models.EmailField(unique=True)
-    date_inscription = models.DateTimeField(auto_now_add=True)
     role = models.CharField(max_length=15, choices=ROLES, default='observateur')
     est_valide = models.BooleanField(default=False)  # Validation par l'administrateur
 
     def __str__(self):
-        return f"{self.prenom} {self.nom} ({self.get_role_display()})"
-
+        return f"{self.first_name} {self.last_name} ({self.get_role_display()})"
 
 class Espece(models.Model):
     nom = models.CharField(max_length=100, unique=True)

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Saisie d'une nouvelle observation</h2>
+
+<form method="post" action="{% url 'traiter_saisie_observation' %}">
+    {% csrf_token %}
+    
+    <table class="fiche-table">
+        <tr>
+            <th>N° Fiche</th>
+            <th>Observateur</th>
+            <th>Espèce</th>
+            <th>Année</th>
+        </tr>
+        <tr>
+            <td>{{ fiche.num_fiche }}</td>  <!-- Auto-généré -->
+            <td>
+                <input type="text" name="observateur" value="{{ utilisateur_nom }}" readonly>
+            </td>       
+            <td>
+                <select name="espece">
+                    {% for espece in especes_disponibles %}
+                        <option value="{{ espece.id }}">{{ espece.nom }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                <input type="text" name="annee" value="{{ annee_actuelle }}" readonly>
+            </td>
+        </tr>
+    </table>
+    
+    <button type="submit">Enregistrer</button>
+</form>
+{% endblock %}
