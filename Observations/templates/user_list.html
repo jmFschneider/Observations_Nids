@@ -1,11 +1,13 @@
 {% extends "base.html" %}
-{% load static %}
+
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
 
 {% block title %}Liste des utilisateurs{% endblock %}
 
 {% block content %}
-
-
 <body>
     <h1>Utilisateurs</h1>
     <table>

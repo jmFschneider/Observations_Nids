@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/saisie_observation.css' %}">
+{% endblock %}
+
 {% block content %}
 <h2>Saisie d'une nouvelle observation</h2>
 
@@ -14,23 +19,160 @@
             <th>Année</th>
         </tr>
         <tr>
-            <td>{{ fiche.num_fiche }}</td>  <!-- Auto-généré -->
+            <td>{{ fiche.num_fiche }}</td>
             <td>
-                <input type="text" name="observateur" value="{{ utilisateur_nom }}" readonly>
-            </td>       
+                <input type="text" id="observateur" name="observateur" value="{{ utilisateur_nom }}" readonly aria-label="Observateur">
+            </td>
             <td>
-                <select name="espece">
+                <select id="espece" name="espece" aria-label="Espèce observée">
                     {% for espece in especes_disponibles %}
                         <option value="{{ espece.id }}">{{ espece.nom }}</option>
                     {% endfor %}
                 </select>
             </td>
             <td>
-                <input type="text" name="annee" value="{{ annee_actuelle }}" readonly>
-            </td>
+                <input type="text" id="annee" name="annee" value="{{ annee_actuelle }}" readonly aria-label="Année d'observation">
+     </td>
         </tr>
     </table>
-    
-    <button type="submit">Enregistrer</button>
+
+
+    <h3>Localisation</h3>
+    <div class="localisation-container">
+        <div class="localisation-left">
+            <table class="localisation-table">
+                <tr>
+                    <th>Commune</th>
+                    <td><input type="text" name="commune" required aria-label="Commune"></td>
+                    <th>Département</th>
+                    <td><input type="text" name="departement" required aria-label="Département"></td>
+                </tr>
+                <tr>
+                    <th>Lieu-dit</th>
+                    <td><input type="text" name="lieu_dit" aria-label="Lieu-dit"></td>
+                    <th>Altitude</th>
+                    <td><input type="number" name="altitude" aria-label="Altitude"></td>
+                </tr>
+                <tr>
+                    <th>Latitude</th>
+                    <td><input type="text" name="latitude" aria-label="Latitude"></td>
+                    <th>Longitude</th>
+                    <td><input type="text" name="longitude" aria-label="Longitude"></td>
+                </tr>
+            </table>
+
+            <!-- Tableau pour les informations du nid -->
+            <h3>Détails du Nid</h3>
+            <table class="nid-table">
+                <tr>
+                    <th>Utilisé par le même couple</th>
+                    <th>Hauteur du nid (cm)</th>
+                    <th>Hauteur du couvert (cm)</th>
+                </tr>
+                <tr>
+                    <td>
+                        <select name="nid_prec_t_meme_couple" aria-label="Utilisé par le même couple">
+                            <option value="oui">Oui</option>
+                            <option value="non">Non</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="hauteur_nid" aria-label="Hauteur du nid"></td>
+                    <td><input type="number" name="hauteur_couvert" aria-label="Hauteur du couvert"></td>
+                </tr>
+            </table>
+
+            <!-- Observations -->
+            <h3>Observations</h3>
+            <table class="observations-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Nombre d'œufs</th>
+                        <th>Nombre de poussins</th>
+                        <th>Observations</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="observations-body">
+                    <tr>
+                        <td><input type="datetime-local" name="observations_date[]" required></td>
+                        <td><input type="number" name="observations_oeufs[]" min="0" required></td>
+                        <td><input type="number" name="observations_poussins[]" min="0" required></td>
+                        <td><input type="text" name="observations_text[]" required></td>
+                        <td><button type="button" onclick="removeObservationRow(this)">❌</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Partie droite : Paysage & Alentours -->
+        <div class="localisation-right">
+            <div class="section-title">Paysage (200 à 500m)</div>
+            <textarea name="paysage" rows="2" aria-label="Paysage"></textarea>
+
+            <div class="section-title">Alentours (20 à 50m)</div>
+            <textarea name="alentours" rows="2" aria-label="Alentours"></textarea>
+
+            <div class="section-title">Détails du Nid</div>
+            <textarea name="details_nid" rows="3" aria-label="Détails du Nid"></textarea>
+        </div>
+    </div>
+
+    <!-- Résumé de l'observation en pleine largeur -->
+    <div class="resume-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Premier œuf pondu</th>
+                    <th>Premier poussin éclos</th>
+                    <th>Premier poussin volant</th>
+                    <th>Œufs pondus</th>
+                    <th>Œufs éclos</th>
+                    <th>Œufs non éclos</th>
+                    <th>Poussins</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="number" name="premier_oeuf_pondu_jour" placeholder="Jour" min="1" max="31">
+                        <input type="number" name="premier_oeuf_pondu_mois" placeholder="Mois" min="1" max="12">
+                    </td>
+                    <td>
+                        <input type="number" name="premier_poussin_eclos_jour" placeholder="Jour" min="1" max="31">
+                        <input type="number" name="premier_poussin_eclos_mois" placeholder="Mois" min="1" max="12">
+                    </td>
+                    <td>
+                        <input type="number" name="premier_poussin_volant_jour" placeholder="Jour" min="1" max="31">
+                        <input type="number" name="premier_poussin_volant_mois" placeholder="Mois" min="1" max="12">
+                    </td>
+                    <td><input type="number" name="nombre_oeufs_pondus" placeholder="Nombre"></td>
+                    <td><input type="number" name="nombre_oeufs_eclos" placeholder="Nombre"></td>
+                    <td><input type="number" name="nombre_oeufs_non_eclos" placeholder="Nombre"></td>
+                    <td><input type="number" name="nombre_poussins" placeholder="Nombre"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Conteneur pour Causes de l'échec et Remarques -->
+    <div class="causes-remarques-container">
+        <!-- Partie gauche : Causes de l'échec -->
+        <div class="causes-container">
+            <h3>Description des causes d'échec</h3>
+            <textarea name="causes_echec" rows="3" placeholder="Décrivez les causes d'échec..."></textarea>
+        </div>
+
+        <!-- Partie droite : Remarques -->
+        <div class="remarques-container">
+            <h3>Remarque</h3>
+            <textarea name="remarque" rows="3" placeholder="Ajoutez une remarque..."></textarea>
+        </div>
+    </div>
+
+    <!-- Bouton de soumission -->
+    <div class="submit-container">
+        <button type="submit">Enregistrer l'observation</button>
+    </div>
 </form>
 {% endblock %}

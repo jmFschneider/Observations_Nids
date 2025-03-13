@@ -1,0 +1,141 @@
+/* === Styles généraux === */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* === Conteneur principal de la fiche de saisie === */
+.localisation-container {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 20px;
+    justify-content: space-between;
+}
+
+.localisation-left {
+    width: 48%; /* Ajustement à 48% pour éviter le dépassement */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.localisation-right {
+    width: 48%; /* Ajustement similaire pour un bon alignement */
+    display: flex;
+    flex-direction: column;
+}
+
+/* === Table uniforme pour toutes les sections === */
+.fiche-table, .localisation-table, .nid-table, .observations-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background: white;
+}
+
+.fiche-table th, .fiche-table td,
+.localisation-table th, .localisation-table td,
+.nid-table th, .nid-table td,
+.observations-table th, .observations-table td {
+    border: 2px solid #000;
+    padding: 8px;
+    text-align: left;
+}
+
+.fiche-table th, .localisation-table th, .nid-table th, .observations-table th {
+    background-color: #e0e0e0;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* === Titres des sections === */
+.section-title {
+    background-color: #e0e0e0;
+    border: 2px solid #000;
+    padding: 8px;
+    font-weight: bold;
+    text-align: center;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.section-content {
+    background: #fff;
+    border: 2px solid #000;
+    padding: 10px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+/* === Zones de texte === */
+textarea {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #000;
+    border-radius: 4px;
+    resize: vertical;
+    background: white;
+    min-height: 80px; /* Augmentation de la hauteur minimale */
+}
+
+/* === Bouton de validation === */
+button {
+    display: block;
+    margin: 20px auto;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* === Responsive Design === */
+@media screen and (max-width: 768px) {
+    .localisation-container {
+        flex-direction: column;
+    }
+    .localisation-left, .localisation-right {
+        width: 100%;
+    }
+}
+.resume-container input {
+    width: 80px;
+    text-align: center;
+    margin: 5px;
+}
+
+.causes-container textarea, .remarques-container textarea {
+    width: 100%;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.submit-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.submit-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.submit-container button:hover {
+    background-color: #45a049;
+}

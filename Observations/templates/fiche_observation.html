@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/saisie_observation.css' %}">
+{% endblock %}
+
+
 {% block content %}
 <h2>Fiche Observation n°{{ fiche.num_fiche }}</h2>
 
@@ -13,7 +19,7 @@
     </tr>
     <tr>
         <td>{{ fiche.num_fiche }}</td>
-        <td>{{ fiche.observateur.prenom }} {{ fiche.observateur.nom }}</td>
+        <td>{{ fiche.observateur.first_name }} {{ fiche.observateur.last_name }}</td>
         <td>{{ fiche.espece.nom }}</td>
         <td>{{ fiche.espece.nom }}</td>
         <td>{{ fiche.annee }}</td>
@@ -64,7 +70,30 @@
         <!-- Tableau des observations sous Localisation -->
         <h3>Observations</h3>
         <div class="observations-table">
-            {% include "observations/fiche_observation/observation_table.html" with observations=fiche.observations.all %}
+            <table>
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Nombre d'œufs</th>
+						<th>Nombre de poussins</th>
+						<th>Observations</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for observation in observations %}
+					<tr>
+						<td>{{ observation.date_observation|date:"d/m/Y H:i" }}</td>
+						<td>{{ observation.nombre_oeufs }}</td>
+						<td>{{ observation.nombre_poussins }}</td>
+						<td>{{ observation.observations }}</td>
+					</tr>
+					{% empty %}
+					<tr>
+						<td colspan="5">Aucune observation enregistrée.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
         </div>
     </div>
 
@@ -85,32 +114,91 @@
 
 <!-- Résumé de l'observation en pleine largeur -->
 <div class="resume-container">
-    <h3>Résumé de l'observation</h3>
-    {% if resume %}
-        {% include "observations/fiche_observation/resume_observation.html" %}
-    {% else %}
-        <p>Aucun résumé d'observation disponible.</p>
-    {% endif %}
+	<table>
+		<thead>
+			<tr>
+				<th>Premier œuf pondu</th>
+				<th>Premier poussin éclos</th>
+				<th>Premier poussin volant</th>
+				<th>Œufs pondus</th>
+				<th>Œufs éclos</th>
+				<th>Œufs non éclos</th>
+				<th>Poussins</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					{% if fiche.resume.premier_oeuf_pondu_jour and fiche.resume.premier_oeuf_pondu_mois %}
+						{{ fiche.resume.premier_oeuf_pondu_jour }}/{{ fiche.resume.premier_oeuf_pondu_mois }}
+					{% else %}
+						Non renseigné
+					{% endif %}
+				</td>
+				<td>
+					{% if fiche.resume.premier_poussin_eclos_jour and fiche.resume.premier_poussin_eclos_mois %}
+						{{ fiche.resume.premier_poussin_eclos_jour }}/{{ fiche.resume.premier_poussin_eclos_mois }}
+					{% else %}
+						Non renseigné
+					{% endif %}
+				</td>
+				<td>
+					{% if fiche.resume.premier_poussin_volant_jour and fiche.resume.premier_poussin_volant_mois %}
+						{{ fiche.resume.premier_poussin_volant_jour }}/{{ fiche.resume.premier_poussin_volant_mois }}
+					{% else %}
+						Non renseigné
+					{% endif %}
+				</td>
+				<td>{{ fiche.resume.nombre_oeufs_pondus }}</td>
+				<td>{{ fiche.resume.nombre_oeufs_eclos }}</td>
+				<td>{{ fiche.resume.nombre_oeufs_non_eclos }}</td>
+				<td>{{ fiche.resume.nombre_poussins }}</td>
+			</tr>
+		</tbody>
+	</table>
 </div>
 <!-- Conteneur pour Causes de l'échec et Remarques -->
 <div class="causes-remarques-container">
     <!-- Partie gauche : Causes de l'échec -->
     <div class="causes-container">
         <h3>Description des causes d'échec</h3>
-        {% if causes_echec %}
-            {% include "observations/fiche_observation/causes_echec.html" with fiche=fiche %}
-        {% else %}
-            <p>Aucune cause d'échec enregistrée.</p>
-        {% endif %}
+			<table>
+				<tbody>
+					<tr>
+						<td>
+							{% if fiche.causes_echec.description %}
+								{{ fiche.causes_echec.description }}
+							{% else %}
+								Non renseigné
+							{% endif %}
+						</td>
+					</tr>
+				</tbody>
+			</table>
     </div>
 
     <!-- Partie droite : Remarques -->
     <div class="remarques-container">
-        {% if fiche.remarques.all %}
-            {% include "observations/fiche_observation/remarques_table.html" with remarques=fiche.remarques.all %}
-        {% else %}
-            <p>Aucune remarque enregistrée.</p>
-        {% endif %}
+		<table>
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Remarque</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for remarque in remarques %}
+				<tr>
+					<td>{{ remarque.date_remarque|date:"d/m/Y H:i" }}</td>
+					<td>{{ remarque.remarque }}</td>
+				</tr>
+				{% empty %}
+				<tr>
+					<td colspan="2">Aucune remarque trouvée.</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
     </div>
 </div>
 

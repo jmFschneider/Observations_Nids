@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
 {% block content %}
     <h1>Bienvenue sur le suivi des observations</h1>
     <p>Nombre total d'observateurs : {{ users_count }}</p>
