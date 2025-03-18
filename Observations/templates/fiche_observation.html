@@ -2,7 +2,7 @@
 
 {% block head %}
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/saisie_observation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
 {% endblock %}
 
 
@@ -13,7 +13,6 @@
     <tr>
         <th>N° Fiche</th>
         <th>Observateur</th>
-        <th>N°</th>
         <th>Espèce</th>
         <th>Année</th>
     </tr>
@@ -21,98 +20,96 @@
         <td>{{ fiche.num_fiche }}</td>
         <td>{{ fiche.observateur.first_name }} {{ fiche.observateur.last_name }}</td>
         <td>{{ fiche.espece.nom }}</td>
-        <td>{{ fiche.espece.nom }}</td>
         <td>{{ fiche.annee }}</td>
     </tr>
 </table>
 
-<h3>Localisation</h3>
+<div class="lieu">
+   <table class="localisation-table">
+		<tr>
+			<th>Commune</th>
+			<td>{{ localisation.commune }}</td>
+			<th>Département</th>
+			<td>{{ localisation.departement }}</td>
+		</tr>
+		<tr>
+			<th>Lieu-dit</th>
+			<td>{{ localisation.lieu_dit }}</td>
+			<th>Altitude</th>
+			<td>{{ localisation.altitude }}</td>
+		</tr>
+		<tr>
+			<th>Latitude</th>
+			<td>{{ localisation.latitude }}</td>
+			<th>Longitude</th>
+			<td>{{ localisation.longitude }}</td>
+		</tr>
+	</table>
+</div>		
 
 <div class="localisation-container">
-    <!-- Partie gauche : Localisation + Observations + Nid -->
+    <!-- Partie gauche : Paysage -->
     <div class="localisation-left">
-        <table class="localisation-table">
-            <tr>
-                <th>Commune</th>
-                <td>{{ localisation.commune }}</td>
-                <th>Département</th>
-                <td>{{ localisation.departement }}</td>
-            </tr>
-            <tr>
-                <th>Lieu-dit</th>
-                <td>{{ localisation.lieu_dit }}</td>
-                <th>Altitude</th>
-                <td>{{ localisation.altitude }}</td>
-            </tr>
-            <tr>
-                <th>Latitude</th>
-                <td>{{ localisation.latitude }}</td>
-                <th>Longitude</th>
-                <td>{{ localisation.longitude }}</td>
-            </tr>
-        </table>
-
-        <!-- Tableau pour les informations du nid -->
-        <h3>Détails du Nid</h3>
-        <table class="nid-table">
-            <tr>
-                <th>Utilisé par le même couple</th>
-                <th>Hauteur du nid (cm)</th>
-                <th>Hauteur du couvert (cm)</th>
-            </tr>
-            <tr>
-                <td>{% if fiche.nid.nid_prec_t_meme_couple %}Oui{% else %}Non{% endif %}</td>
-                <td>{{ fiche.nid.hauteur_nid }}</td>
-                <td>{{ fiche.nid.hauteur_couvert }}</td>
-            </tr>
-        </table>
-
-        <!-- Tableau des observations sous Localisation -->
-        <h3>Observations</h3>
-        <div class="observations-table">
-            <table>
-				<thead>
-					<tr>
-						<th>Date</th>
-						<th>Nombre d'œufs</th>
-						<th>Nombre de poussins</th>
-						<th>Observations</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for observation in observations %}
-					<tr>
-						<td>{{ observation.date_observation|date:"d/m/Y H:i" }}</td>
-						<td>{{ observation.nombre_oeufs }}</td>
-						<td>{{ observation.nombre_poussins }}</td>
-						<td>{{ observation.observations }}</td>
-					</tr>
-					{% empty %}
-					<tr>
-						<td colspan="5">Aucune observation enregistrée.</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-        </div>
-    </div>
-
-    <!-- Partie droite : Paysage & Alentours -->
-    <div class="localisation-right">
         <div class="section-title">Paysage (200 à 500m)</div>
         <div class="section-content">{{ localisation.paysage }}</div>
-
+    </div>
+    <!-- Partie droite : Alentours -->
+    <div class="localisation-right">
         <div class="section-title">Alentours (20 à 50m)</div>
         <div class="section-content">{{ localisation.alentours }}</div>
-
-
-        <!-- Section Détails du Nid sous forme de cadre -->
-        <div class="section-title">Détails du Nid</div>
-        <div class="section-content">{{ fiche.nid.details_nid }}</div>
     </div>
 </div>
 
+<div class="nid">
+	<!-- Tableau pour les informations du nid -->
+		<h3>Description du Nid</h3>
+	<table class="nid-table">
+		<tr>
+			<th>Utilisé par le même couple</th>
+			<th>Hauteur du nid (cm)</th>
+			<th>Hauteur du couvert (cm)</th>
+		</tr>
+		<tr>
+			<td>{% if fiche.nid.nid_prec_t_meme_couple %}Oui{% else %}Non{% endif %}</td>
+			<td>{{ fiche.nid.hauteur_nid }}</td>
+			<td>{{ fiche.nid.hauteur_couvert }}</td>
+		</tr>
+	</table>
+	<!-- Section Détails du Nid sous forme de cadre -->
+	<div class="section-title">Détails du Nid</div>
+	<div class="section-content">{{ fiche.nid.details_nid }}</div>
+</div>
 <!-- Résumé de l'observation en pleine largeur -->
+        <!-- Tableau des observations -->
+<div class="observations">
+	<h3>Observations</h3>
+	<div class="observations-table">
+		<table>
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Nombre d'œufs</th>
+					<th>Nombre de poussins</th>
+					<th>Observations</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for observation in observations %}
+				<tr>
+					<td>{{ observation.date_observation|date:"d/m/Y H:i" }}</td>
+					<td>{{ observation.nombre_oeufs }}</td>
+					<td>{{ observation.nombre_poussins }}</td>
+					<td>{{ observation.observations }}</td>
+				</tr>
+				{% empty %}
+				<tr>
+					<td colspan="5">Aucune observation enregistrée.</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
 <div class="resume-container">
 	<table>
 		<thead>
@@ -160,10 +157,14 @@
 <!-- Conteneur pour Causes de l'échec et Remarques -->
 <div class="causes-remarques-container">
     <!-- Partie gauche : Causes de l'échec -->
-    <div class="causes-container">
-        <h3>Description des causes d'échec</h3>
-			<table>
-				<tbody>
+    <div class="remarques-container">
+		<table>
+			<thead>
+				<tr>
+					<th>Description des causes d'échec</th>
+				</tr>
+			</thead>
+			<tbody>
 					<tr>
 						<td>
 							{% if fiche.causes_echec.description %}
@@ -173,8 +174,8 @@
 							{% endif %}
 						</td>
 					</tr>
-				</tbody>
-			</table>
+			</tbody>
+		</table>
     </div>
 
     <!-- Partie droite : Remarques -->

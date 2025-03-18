@@ -32,7 +32,7 @@ LOGIN_REDIRECT_URL = '/'
 SESSION_COOKIE_AGE = 3600
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Déconnexion si l’utilisateur ferme son navigateur
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: list[str] = []
 
 
 # Application definition

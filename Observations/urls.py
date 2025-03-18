@@ -1,5 +1,7 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
+
+from Observations.views.view_test import saisie_test
 from Observations.views.views_home import home, user_list, user_detail, inscription, default_view
 from Observations.views.views_observation import (
     fiche_observation_view)
@@ -21,4 +23,5 @@ urlpatterns = [
     path('fiche/<int:fiche_id>/', fiche_observation_view, name='fiche_observation'),
     path('observations/nouvelle/', saisie_observation, name='saisie_observation'),
     path('observations/sauvegarde/', traiter_saisie_observation, name='traiter_saisie_observation'),
+    path('observations/saisie/', saisie_test, name='saisie_test'),
 ]

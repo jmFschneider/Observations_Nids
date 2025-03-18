@@ -1,122 +1,21 @@
 /* === Styles généraux === */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
+
 
 /* === Conteneur principal de la fiche de saisie === */
-.localisation-container {
-    display: flex;
-    align-items: flex-start;
-    margin-top: 20px;
-    justify-content: space-between;
-}
 
-.localisation-left {
-    width: 48%; /* Ajustement à 48% pour éviter le dépassement */
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
 
-.localisation-right {
-    width: 48%; /* Ajustement similaire pour un bon alignement */
-    display: flex;
-    flex-direction: column;
-}
 
-/* === Table uniforme pour toutes les sections === */
-.fiche-table, .localisation-table, .nid-table, .observations-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    background: white;
-}
 
-.fiche-table th, .fiche-table td,
-.localisation-table th, .localisation-table td,
-.nid-table th, .nid-table td,
-.observations-table th, .observations-table td {
-    border: 2px solid #000;
-    padding: 8px;
-    text-align: left;
-}
 
-.fiche-table th, .localisation-table th, .nid-table th, .observations-table th {
-    background-color: #e0e0e0;
-    font-weight: bold;
-    text-align: center;
-}
 
-/* === Titres des sections === */
-.section-title {
-    background-color: #e0e0e0;
-    border: 2px solid #000;
-    padding: 8px;
-    font-weight: bold;
-    text-align: center;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.section-content {
-    background: #fff;
-    border: 2px solid #000;
-    padding: 10px;
-    min-height: 160px;
-    display: flex;
-    align-items: center;
-    margin: 0;
-}
-
-/* === Zones de texte === */
-textarea {
-    width: 100%;
-    padding: 8px;
-    border: 2px solid #000;
-    border-radius: 4px;
-    resize: vertical;
-    background: white;
-    min-height: 80px; /* Augmentation de la hauteur minimale */
-}
-
-/* === Bouton de validation === */
-button {
-    display: block;
-    margin: 20px auto;
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-/* === Responsive Design === */
-@media screen and (max-width: 768px) {
-    .localisation-container {
-        flex-direction: column;
-    }
-    .localisation-left, .localisation-right {
-        width: 100%;
-    }
-}
 .resume-container input {
     width: 80px;
     text-align: center;
     margin: 5px;
 }
 
-.causes-container textarea, .remarques-container textarea {
+.causes-container textarea,
+.remarques-container textarea {
     width: 100%;
     padding: 5px;
     font-size: 14px;
@@ -138,4 +37,226 @@ button:hover {
 
 .submit-container button:hover {
     background-color: #45a049;
+}
+
+/* Styles pour les tableaux imbriqués (si nécessaire) */
+.observations-table table {
+    width: 100%; /* Assurez-vous qu'ils prennent toute la largeur disponible */
+    border-collapse: collapse;
+}
+
+/* Conteneur du résumé de l'observation */
+.resume-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* Table du résumé */
+.resume-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Style des cellules du tableau */
+.resume-container th,
+.resume-container td {
+    border: 2px solid #000;
+    padding: 8px;
+    text-align: center;
+}
+
+/* Style des en-têtes du tableau */
+.resume-container th {
+    background-color: #e0e0e0;
+    font-weight: bold;
+}
+
+/* Conteneur Causes de l'échec & Remarques */
+.causes-remarques-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+/* Partie gauche et droite avec 50% de largeur */
+.causes-container {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 2px solid #000;
+    padding: 15px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Titres des sections */
+.causes-container h3 {
+    background-color: #e0e0e0;
+    padding: 8px;
+    text-align: center;
+    border-bottom: 2px solid #000;
+}
+
+/* Contenu des sections */
+.causes-container p {
+    padding: 10px;
+}
+
+/* Conteneur des remarques (fusion des bordures) */
+.remarques-container {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 2px solid #000;
+    padding: 0;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Table des remarques */
+.remarques-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+/* Style des cellules du tableau */
+.remarques-container th,
+.remarques-container td {
+    border: 2px solid #000;
+    padding: 8px;
+    text-align: left;
+}
+
+/* Style des en-têtes du tableau */
+.remarques-container th {
+    background-color: #e0e0e0;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Suppression de la bordure du bas du titre pour fusion avec la table */
+.remarques-container h3 {
+    background-color: #e0e0e0;
+    padding: 8px;
+    text-align: center;
+    border-bottom: none;
+    margin: 0;
+}
+
+/* Ajustement des colonnes pour la table des remarques */
+.remarques-container table th:first-child,
+.remarques-container table td:first-child {
+    width: 25%;
+}
+
+.remarques-container table th:last-child,
+.remarques-container table td:last-child {
+    width: 75%;
+}
+
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+/* === Header === */
+.header {
+    background-color: #f8f9fa;
+    padding: 15px;
+    text-align: center;
+    border-bottom: 2px solid #ccc;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+.header p {
+    margin: 5px 0;
+    color: #555;
+}
+
+/* === Navbar === */
+.navbar {
+    display: flex;
+    justify-content: center;
+    background-color: #007bff;
+    padding: 10px 0;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    font-weight: bold;
+}
+
+.navbar a:hover {
+    background-color: #0056b3;
+    border-radius: 5px;
+}
+
+/* === Contenu principal === */
+main {
+    padding: 20px;
+    max-width: 1000px;
+    margin: auto;
+    background: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+/* === Styles pour les messages de bienvenue === */
+.welcome-message {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 10px;
+}
+
+/* === Responsive design === */
+@media screen and (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .navbar a {
+        display: block;
+        padding: 10px;
+    }
+
+    main {
+        padding: 10px;
+        max-width: 100%;
+    }
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f8f9fa;
+    /* Couleur de fond optionnelle */
+}
+
+.navbar a {
+    text-decoration: none;
+    color: #007bff;
+    margin-right: 15px;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    /* C'est cette ligne qui pousse le contenu à droite */
+}
+
+.navbar-right form {
+    margin-left: 10px;
 }

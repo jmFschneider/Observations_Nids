@@ -1,157 +1,184 @@
-/* === Styles globaux === */
+/* === Styles généraux === */
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
     background-color: #f4f4f4;
+    /* Normalize.css gère les marges et paddings de base */
 }
 
-/* === Styles des tables === */
-table {
-    width: 50%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-/* === Table de la fiche observation === */
-.fiche-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-.fiche-table th, .fiche-table td {
-    border: 2px solid #000;
-    padding: 8px;
-    text-align: center;
-}
-
-.fiche-table th {
-    background-color: #e0e0e0;
-    font-weight: bold;
-}
-
-/* === Conteneur principal pour la section Localisation === */
-/* === Conteneur principal pour la section Localisation === */
-
+/* === Conteneur principal de la fiche de saisie === */
 .localisation-container {
     display: flex;
-    align-items: flex-start;
-    margin-top: 20px;
+    align-items: stretch;
 }
 
-/* === Partie gauche et droite === */
 .localisation-left {
-    width: 50%;
-    margin: 0;
+    width: 48%; /* Ajustement pour éviter le dépassement */
     display: flex;
     flex-direction: column;
-    gap: 20px;
 }
 
 .localisation-right {
-    width: 50%;
+    width: 48%; /* Ajustement similaire pour un bon alignement */
     display: flex;
     flex-direction: column;
 }
 
-/* === Table uniformisée pour la partie gauche === */
-.localisation-table,
-.observations-table table {
-    width: 100%;
-    border-collapse: collapse;
+/* === Styles des tableaux === */
+table {
+    width: 100%; /* Les tableaux prennent toute la largeur par défaut */
+    border-collapse: collapse; /* Fusion des bordures */
+    margin-bottom: 20px; /* Espacement sous les tableaux */
+    background: white; /* Fond blanc pour les tableaux */
 }
 
-.localisation-table th, .localisation-table td,
-.observations-table th, .observations-table td {
-    border: 2px solid #000;
-    padding: 8px;
-    text-align: left;
+th,
+td {
+    border: 2px solid #000; /* Bordures noires de 2px */
+    padding: 8px; /* Espacement intérieur des cellules */
+    text-align: left; /* Alignement du texte à gauche */
 }
 
-.localisation-table th, .observations-table th {
-    background-color: #e0e0e0;
-    font-weight: bold;
-    text-align: center;
+th {
+    background-color: #e0e0e0; /* Fond gris pour les en-têtes */
+    font-weight: bold; /* Texte en gras pour les en-têtes */
+    text-align: center; /* Alignement du texte au centre pour les en-têtes */
 }
 
-/* === Titres des sections Paysage & Alentours === */
-/* === Table du nid sous Observations === */
-.nid-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-.nid-table th, .nid-table td {
-    border: 2px solid #000;
-    padding: 8px;
-    text-align: left;
-}
-
-.nid-table th {
-    background-color: #e0e0e0;
-    font-weight: bold;
-    text-align: center;
-}
-
-/* === Section Détails du Nid === */
+/* === Titres des sections === */
 .section-title {
-    background-color: #e0e0e0;
-    border: 2px solid #000;
-    padding: 8px;
-    font-weight: bold;
-    text-align: center;
-    height: 40px;
+    background-color: #e0e0e0; /* Fond gris */
+    border: 2px solid #000; /* Bordure noire */
+    padding: 8px; /* Espacement intérieur */
+    font-weight: bold; /* Texte en gras */
+    text-align: center; /* Texte centré */
+    height: 40px; /* Hauteur fixe */
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: 10px; /* Espacement au-dessus */
 }
 
 .section-content {
-    background: #fff;
-    border: 2px solid #000;
-    padding: 10px;
-    min-height: 160px;
+    background: #fff; /* Fond blanc */
+    border: 2px solid #000; /* Bordure noire */
+    padding: 10px; /* Espacement intérieur */
+    max-height: 80px; /* Hauteur minimale */
     display: flex;
     align-items: center;
-    margin: 0;
+    margin: 0; /* Suppression des marges */
 }
 
-/* === Conteneur du résumé de l'observation === */
+/* === Zones de texte === */
+textarea {
+    width: 100%; /* Prend toute la largeur du conteneur */
+    padding: 8px; /* Espacement intérieur */
+    border: 2px solid #000; /* Bordure noire */
+    border-radius: 4px; /* Bords arrondis */
+    resize: vertical; /* Autorise le redimensionnement vertical */
+    background: white; /* Fond blanc */
+    min-height: 80px; /* Hauteur minimale */
+}
+
+/* === Bouton de validation === */
+button {
+    display: block; /* Affiche comme un bloc */
+    margin: 20px auto; /* Centré horizontalement avec espacement vertical */
+    background-color: #4CAF50; /* Fond vert */
+    color: white; /* Texte blanc */
+    padding: 10px 15px; /* Espacement intérieur */
+    border: none; /* Pas de bordure */
+    cursor: pointer; /* Curseur de type "lien" au survol */
+    font-size: 16px; /* Taille de la police */
+}
+
+button:hover {
+    background-color: #45a049; /* Fond vert plus foncé au survol */
+}
+
+/* === Responsive Design === */
+@media screen and (max-width: 768px) {
+    .localisation-container {
+        flex-direction: column; /* Les éléments s'empilent verticalement */
+    }
+
+    .localisation-left,
+    .localisation-right {
+        width: 100%; /* Les éléments prennent toute la largeur */
+    }
+}
+
+/* === Styles spécifiques à certains éléments === */
+.resume-container input {
+    width: 80px; /* Largeur des inputs dans le résumé */
+    text-align: center; /* Texte centré */
+    margin: 5px; /* Espacement autour */
+}
+
+.causes-container textarea,
+.remarques-container textarea {
+    width: 100%; /* Textareas prennent toute la largeur */
+    padding: 5px; /* Espacement intérieur */
+    font-size: 14px; /* Taille de police plus petite */
+}
+
+.submit-container {
+    text-align: center; /* Boutons de soumission centrés */
+    margin-top: 20px; /* Espacement au-dessus */
+}
+
+.submit-container button {
+    padding: 10px 20px; /* Espacement intérieur */
+    font-size: 16px; /* Taille de police */
+    background-color: #4CAF50; /* Fond vert */
+    color: white; /* Texte blanc */
+    border: none; /* Pas de bordure */
+    cursor: pointer; /* Curseur "lien" au survol */
+}
+
+.submit-container button:hover {
+    background-color: #45a049; /* Fond vert plus foncé au survol */
+}
+
+/* === Styles pour les tableaux imbriqués (si nécessaire) === */
+.observations-table table {
+    width: 100%; /* Assurez-vous qu'ils prennent toute la largeur disponible */
+    border-collapse: collapse;
+}
+
+/* Conteneur du résumé de l'observation */
 .resume-container {
     width: 100%;
     margin-top: 20px;
 }
 
-/* === Table du résumé === */
+/* Table du résumé */
 .resume-container table {
     width: 100%;
     border-collapse: collapse;
 }
 
-/* === Style des cellules du tableau === */
-.resume-container th, .resume-container td {
+/* Style des cellules du tableau */
+.resume-container th,
+.resume-container td {
     border: 2px solid #000;
     padding: 8px;
     text-align: center;
 }
 
-/* === Style des en-têtes du tableau === */
+/* Style des en-têtes du tableau */
 .resume-container th {
     background-color: #e0e0e0;
     font-weight: bold;
 }
 
-/* === Conteneur Causes de l'échec & Remarques === */
+/* Conteneur Causes de l'échec & Remarques */
 .causes-remarques-container {
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
 }
 
-/* === Partie gauche et droite avec 50% de largeur === */
+/* Partie gauche et droite avec 50% de largeur */
 .causes-container {
     width: 50%;
     display: flex;
@@ -162,7 +189,7 @@ table {
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* === Titres des sections === */
+/* Titres des sections */
 .causes-container h3 {
     background-color: #e0e0e0;
     padding: 8px;
@@ -170,12 +197,12 @@ table {
     border-bottom: 2px solid #000;
 }
 
-/* === Contenu des sections === */
+/* Contenu des sections */
 .causes-container p {
     padding: 10px;
 }
 
-/* === Conteneur des remarques (fusion des bordures) === */
+/* Conteneur des remarques (fusion des bordures) */
 .remarques-container {
     width: 50%;
     display: flex;
@@ -186,28 +213,29 @@ table {
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* === Table des remarques === */
+/* Table des remarques */
 .remarques-container table {
     width: 100%;
     border-collapse: collapse; /* Fusionne les bordures */
     margin: 0; /* Supprime l'espace supplémentaire */
 }
 
-/* === Style des cellules du tableau === */
-.remarques-container th, .remarques-container td {
+/* Style des cellules du tableau */
+.remarques-container th,
+.remarques-container td {
     border: 2px solid #000; /* Utilise la même bordure que le container */
     padding: 8px;
     text-align: left;
 }
 
-/* === Style des en-têtes du tableau === */
+/* Style des en-têtes du tableau */
 .remarques-container th {
     background-color: #e0e0e0;
     font-weight: bold;
     text-align: center;
 }
 
-/* === Suppression de la bordure du bas du titre pour fusion avec la table === */
+/* Suppression de la bordure du bas du titre pour fusion avec la table */
 .remarques-container h3 {
     background-color: #e0e0e0;
     padding: 8px;
@@ -215,7 +243,8 @@ table {
     border-bottom: none; /* Évite une séparation visuelle avec la table */
     margin: 0;
 }
-/* === Ajustement des colonnes pour la table des remarques === */
+
+/* Ajustement des colonnes pour la table des remarques */
 .remarques-container table th:first-child,
 .remarques-container table td:first-child {
     width: 25%; /* La première colonne (Date) prend 25% */
@@ -225,8 +254,6 @@ table {
 .remarques-container table td:last-child {
     width: 75%; /* La deuxième colonne (Remarque) prend 75% */
 }
-
-
 
 th {
     background-color: #f4f4f4;
@@ -313,7 +340,8 @@ main {
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    background-color: #f8f9fa; /* Couleur de fond optionnelle */
+    background-color: #f8f9fa;
+    /* Couleur de fond optionnelle */
 }
 
 .navbar a {
@@ -325,7 +353,8 @@ main {
 .navbar-right {
     display: flex;
     align-items: center;
-    margin-left: auto;  /* C'est cette ligne qui pousse le contenu à droite */
+    margin-left: auto;
+    /* C'est cette ligne qui pousse le contenu à droite */
 }
 
 .navbar-right form {

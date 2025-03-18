@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h2>Saisie d'une nouvelle observation</h2>
+    <form method="post">
+        {% csrf_token %}
+        <table class="fiche-table">
+            <tr>
+                <th>N° Fiche</th>
+                <th>Observateur</th>
+                <th>Espèce</th>
+                <th>Année</th>
+            </tr>
+            <tr>
+                <td>{{ form.num_fiche }}</td>
+                <td>{{ form.observateur }}</td>
+                <td>{{ form.espece }}</td>
+                <td>{{ form.annee }}</td>
+            </tr>
+        </table>
+        {{ form.chemin_image.label_tag }} {{ form.chemin_image }}
+        <button type="submit">Enregistrer</button>
+    </form>
+{% endblock %}
