@@ -1,9 +1,9 @@
 <h2>Détails de l'utilisateur</h2>
 <table>
-    <tr><th>Nom</th><td>{{ user.nom }}</td></tr>
-    <tr><th>Prénom</th><td>{{ user.prenom }}</td></tr>
+    <tr><th>Nom</th><td>{{ user.last_name }}</td></tr>
+    <tr><th>Prénom</th><td>{{ user.first_name }}</td></tr>
     <tr><th>Email</th><td>{{ user.email }}</td></tr>
-    <tr><th>Date d'inscription</th><td>{{ user.date_inscription }}</td></tr>
+    <tr><th>Date d'inscription</th><td>{{ user.date_joined }}</td></tr>
     <tr><th>Rôle</th><td>{{ user.role }}</td></tr>
     <tr><th>Compte validé</th><td>{% if user.est_valide %} Oui {% else %} Non {% endif %}</td></tr>
     <tr><th>Nombre de fiches d'observation</th><td>{{ observations_count }}</td></tr>

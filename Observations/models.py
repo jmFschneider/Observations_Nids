@@ -108,14 +108,24 @@ class ResumeObservation(models.Model):
     def __str__(self):
         return f"Résumé Fiche {self.fiche.num_fiche}"
 
-
-
 class CausesEchec(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="causes_echec")
     description = models.TextField(blank=True, null=True, default='Aucune cause identifiée')
 
     def __str__(self):
         return f"Causes d'échec Fiche {self.fiche.num_fiche}"
+
+class Remarque(models.Model):  # Correction du nom (majuscule par convention)
+    fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="remarques")
+    remarque = models.CharField(max_length=200, default='RAS')  # Correction de la valeur par défaut
+    date_remarque = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        logger.info(f"Nouvelle remarque ajoutée : {self.remarque} à {self.date_remarque}")  # Correction ici
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Remarque du {self.date_remarque.strftime('%d/%m/%Y %H:%M')} (Fiche {self.fiche.num_fiche})"
 
 
 class Validation(models.Model):
@@ -191,16 +201,3 @@ class HistoriqueModification(models.Model):
 
     def __str__(self):
         return f"Modification {self.champ_modifie} ({self.date_modification})"
-
-
-class Remarque(models.Model):  # Correction du nom (majuscule par convention)
-    fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="remarques")
-    remarque = models.CharField(max_length=200, default='RAS')  # Correction de la valeur par défaut
-    date_remarque = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        logger.info(f"Nouvelle remarque ajoutée : {self.remarque} à {self.date_remarque}")  # Correction ici
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"Remarque du {self.date_remarque.strftime('%d/%m/%Y %H:%M')} (Fiche {self.fiche.num_fiche})"

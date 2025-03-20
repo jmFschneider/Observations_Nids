@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h2>Saisie d'une nouvelle observation</h2>
+    <form method="post">
+        {% csrf_token %}
+        <table class="fiche-table">
+            <tr>
+                <th>N° Fiche</th>
+                <th>Observateur</th>
+                <th>Espèce</th>
+                <th>Année</th>
+            </tr>
+            <tr>
+                <td>
+                    {% if fiche_form.instance.pk %}
+                        {{ fiche_form.instance.pk }}
+                    {% else %}
+                        À définir
+                    {% endif %}</td>
+                <td>
+                    {% if user.is_authenticated %}
+                        {{ user.first_name }} {{ user.last_name }}
+                    {% else %}
+                        Non connecté
+                    {% endif %}
+                </td>
+                <td>{{ fiche_form.espece }}</td>
+                <td>{{ fiche_form.annee }}</td>
+            </tr>
+        </table>
+        {{ fiche_form.chemin_image.label_tag }} {{ fiche_form.chemin_image }}
+
+
+        <div class="lieu">
+            <table class="localisation-table">
+                <tr>
+                    <th>Commune</th>
+                    <td>{{localisation_form.commune}}</td>
+                    <th>Département</th>
+                    <td>{{localisation_form.departement}}</td>
+                </tr>
+                <tr>
+                    <th>Lieu-dit</th>
+                    <td>{{localisation_form.lieu_dit}}</td>
+                    <th>Altitude</th>
+                    <td>{{localisation_form.altitude}}</td>
+                </tr>
+                <tr>
+                    <th>Latitude</th>
+                    <td>{{localisation_form.latitude}}</td>
+                    <th>Longitude</th>
+                    <td>{{localisation_form.longitude}}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="localisation-container">
+            <div class="localisation-left">
+                <div class="section-title">Paysage (200 à 500m)</div>
+                <textarea class="section-content" name="paysage" rows="2" aria-label="Paysage">{{ localisation_form.paysage.value|default_if_none:"" }}</textarea>
+            </div>
+            <!-- Partie droite : Paysage & Alentours -->
+            <div class="localisation-right">
+                <div class="section-title">Alentours (20 à 50m)</div>
+                <textarea class="section-content" name="paysage" rows="2" aria-label="Paysage">{{ localisation_form.alentours.value|default_if_none:"" }}</textarea>
+			</div>
+		</div>
+
+        <div class="resume-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Premier œuf pondu</th>
+                        <th>Premier poussin éclos</th>
+                        <th>Premier poussin volant</th>
+                        <th>Œufs pondus</th>
+                        <th>Œufs éclos</th>
+                        <th>Œufs non éclos</th>
+                        <th>Nombre de poussins</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="form-field">
+                                {{ resume_form.premier_oeuf_pondu_jour.errors }}
+                                <label for="{{ resume_form.premier_oeuf_pondu_jour.id_for_label }}">Jour</label>
+                                {{ resume_form.premier_oeuf_pondu_jour }}
+                            </div>
+                            <div class="form-field">
+                                {{ resume_form.premier_oeuf_pondu_mois.errors }}
+                                <label for="{{ resume_form.premier_oeuf_pondu_mois.id_for_label }}">Mois</label>
+                                {{ resume_form.premier_oeuf_pondu_mois }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-field">
+                                {{ resume_form.premier_poussin_eclos_jour.errors }}
+                                <label for="{{ resume_form.premier_poussin_eclos_jour.id_for_label }}">Jour</label>
+                                {{ resume_form.premier_poussin_eclos_jour }}
+                            </div>
+                            <div class="form-field">
+                                {{ resume_form.premier_poussin_eclos_mois.errors }}
+                                <label for="{{ resume_form.premier_poussin_eclos_mois.id_for_label }}">Mois</label>
+                                {{ resume_form.premier_poussin_eclos_mois }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-field">
+                                {{ resume_form.premier_poussin_volant_jour.errors }}
+                                <label for="{{ resume_form.premier_poussin_volant_jour.id_for_label }}">Jour</label>
+                                {{ resume_form.premier_poussin_volant_jour }}
+                            </div>
+                            <div class="form-field">
+                                {{ resume_form.premier_poussin_volant_mois.errors }}
+                                <label for="{{ resume_form.premier_poussin_volant_mois.id_for_label }}">Mois</label>
+                                {{ resume_form.premier_poussin_volant_mois }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-field">
+                                {{ resume_form.nombre_oeufs_pondus.errors }}
+                                <label for="{{ resume_form.nombre_oeufs_pondus.id_for_label }}"></label>
+                                {{ resume_form.nombre_oeufs_pondus }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-field">
+                                {{ resume_form.nombre_oeufs_eclos.errors }}
+                                <label for="{{ resume_form.nombre_oeufs_eclos.id_for_label }}"></label>
+                                {{ resume_form.nombre_oeufs_eclos }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-field">
+                                {{ resume_form.nombre_oeufs_non_eclos.errors }}
+                                <label for="{{ resume_form.nombre_oeufs_non_eclos.id_for_label }}"></label>
+                                {{ resume_form.nombre_oeufs_non_eclos }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-field">
+                                {{ resume_form.nombre_poussins.errors }}
+                                {{ resume_form.nombre_poussins }}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="nid">
+            <h3>Description du Nid</h3>
+            <table class="nid-table">
+                <tr>
+                    <th>Utilisé par le même couple</th>
+                    <th>Hauteur du nid (cm)</th>
+                    <th>Hauteur du couvert (cm)</th>
+                </tr>
+                <tr>
+                    <td>
+                        {{ nid_form.nid_prec_t_meme_couple.errors }}
+                        {{ nid_form.nid_prec_t_meme_couple }}
+                    </td>
+                    <td>
+                        <div class="form-field">
+                            {{ nid_form.hauteur_nid.errors }}
+                            <label for="{{ nid_form.hauteur_nid.id_for_label }}">cm</label>
+                            {{ nid_form.hauteur_nid }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-field">
+                            {{ nid_form.hauteur_couvert.errors }}
+                            <label for="{{ nid_form.hauteur_couvert.id_for_label }}">cm</label>
+                            {{ nid_form.hauteur_couvert }}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="section-title">Détails du Nid</div>
+            <textarea class="section-content" name="details_nid" rows="2" aria-label="Paysage">{{ nid_form.details_nid.value|default_if_none:"" }}</textarea>
+        </div>
+
+
+		<!-- Conteneur pour Causes de l'échec et Remarques -->
+		<div class="causes-remarques-container">
+			<!-- Partie gauche : Causes de l'échec -->
+			<div class="remarques-container">
+				<table>
+					<thead>
+						<tr>
+							<th>Description des causes d'échec</th>
+						</tr>
+					</thead>
+					<tbody>
+							<tr>
+								<td>
+									<textarea class="section-content" name="paysage" rows="2" aria-label="Paysage">{{ causes_echec_form.description.value|default_if_none:"non renseigné" }}</textarea>
+								</td>
+							</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<!-- Partie droite : Remarques -->
+			<div class="remarques-container">
+				<table>
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Remarque</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for remarque in remarques %}
+						<tr>
+							<td>{{ remarque.date_remarque|date:"d/m/Y H:i" }}</td>
+							<td>{{ remarque.remarque }}</td>
+						</tr>
+						{% empty %}
+						<tr>
+							<td colspan="2">Aucune remarque trouvée.</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+        <button type="submit">Enregistrer</button>
+    </form>
+{% endblock %}

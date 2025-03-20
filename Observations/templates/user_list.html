@@ -22,8 +22,8 @@
         <tbody>
             {% for user in users %}
                 <tr>
-                    <td>{{ user.nom }}</td>
-                    <td>{{ user.prenom }}</td>
+                    <td>{{ user.last_name }}</td>
+                    <td>{{ user.first_name }}</td>
                     <td>{{ user.email }}</td>
                     <td>
                         <button onclick="loadUserDetail({{ user.id }})">Voir détails</button>
