@@ -1,0 +1,41 @@
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+<form method="post">
+    {% csrf_token %}
+
+        <!-- Résumé de l'observation en pleine largeur -->
+        <!-- Tableau des observations -->
+        <div class="observations">
+            <h3>Observations</h3>
+            <div class="observations-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Nombre d'œufs</th>
+                            <th>Nombre de poussins</th>
+                            <th>Observations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for observation in observations %}
+                        <tr>
+                            <td>{{ observation.date_observation|date:"d/m/Y H:i" }}</td>
+                            <td>{{ observation.nombre_oeufs }}</td>
+                            <td>{{ observation.nombre_poussins }}</td>
+                            <td>{{ observation.observations }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">Aucune observation enregistrée.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <button type="submit">Ajouter une observation</button>
+</form>

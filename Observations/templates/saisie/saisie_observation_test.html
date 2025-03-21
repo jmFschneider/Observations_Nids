@@ -12,7 +12,7 @@
         <table class="fiche-table">
             <tr>
                 <th>N° Fiche</th>
-                <th>Observateur</th>
+                <th>Observateur</th>  <!-- //TODO l'observateur n'est pas affiché : c'est la personne connécté qui est prise en consiération -->
                 <th>Espèce</th>
                 <th>Année</th>
             </tr>
@@ -24,7 +24,7 @@
                         À définir
                     {% endif %}</td>
                 <td>
-                    {% if user.is_authenticated %}
+                    {% if user.is_authenticated %} <!-- //TODO l'observateur n'est pas affiché : c'est la personne connécté qui est prise en consiération -->
                         {{ user.first_name }} {{ user.last_name }}
                     {% else %}
                         Non connecté
@@ -71,6 +71,72 @@
                 <textarea class="section-content" name="paysage" rows="2" aria-label="Paysage">{{ localisation_form.alentours.value|default_if_none:"" }}</textarea>
 			</div>
 		</div>
+
+        <div class="nid">
+            <h3>Description du Nid</h3>
+            <table class="nid-table">
+                <tr>
+                    <th>Utilisé par le même couple</th>
+                    <th>Hauteur du nid (cm)</th>
+                    <th>Hauteur du couvert (cm)</th>
+                </tr>
+                <tr>
+                    <td>
+                        {{ nid_form.nid_prec_t_meme_couple.errors }}
+                        {{ nid_form.nid_prec_t_meme_couple }}
+                    </td>
+                    <td>
+                        <div class="form-field">
+                            {{ nid_form.hauteur_nid.errors }}
+                            <label for="{{ nid_form.hauteur_nid.id_for_label }}">cm</label>
+                            {{ nid_form.hauteur_nid }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-field">
+                            {{ nid_form.hauteur_couvert.errors }}
+                            <label for="{{ nid_form.hauteur_couvert.id_for_label }}">cm</label>
+                            {{ nid_form.hauteur_couvert }}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="section-title">Détails du Nid</div>
+            <textarea class="section-content" name="details_nid" rows="2" aria-label="Paysage">{{ nid_form.details_nid.value|default_if_none:"" }}</textarea>
+        </div>
+
+        <!-- Résumé de l'observation en pleine largeur -->
+                <!-- Tableau des observations -->
+        <div class="observations">
+            <h3>Observations</h3>
+            <div class="observations-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Nombre d'œufs</th>
+                            <th>Nombre de poussins</th>
+                            <th>Observations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for observation in observations %}
+                        <tr>
+                            <td>{{ observation.date_observation|date:"d/m/Y H:i" }}</td>
+                            <td>{{ observation.nombre_oeufs }}</td>
+                            <td>{{ observation.nombre_poussins }}</td>
+                            <td>{{ observation.observations }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">Aucune observation enregistrée.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         <div class="resume-container">
             <table>
@@ -155,41 +221,6 @@
             </table>
         </div>
 
-        <div class="nid">
-            <h3>Description du Nid</h3>
-            <table class="nid-table">
-                <tr>
-                    <th>Utilisé par le même couple</th>
-                    <th>Hauteur du nid (cm)</th>
-                    <th>Hauteur du couvert (cm)</th>
-                </tr>
-                <tr>
-                    <td>
-                        {{ nid_form.nid_prec_t_meme_couple.errors }}
-                        {{ nid_form.nid_prec_t_meme_couple }}
-                    </td>
-                    <td>
-                        <div class="form-field">
-                            {{ nid_form.hauteur_nid.errors }}
-                            <label for="{{ nid_form.hauteur_nid.id_for_label }}">cm</label>
-                            {{ nid_form.hauteur_nid }}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-field">
-                            {{ nid_form.hauteur_couvert.errors }}
-                            <label for="{{ nid_form.hauteur_couvert.id_for_label }}">cm</label>
-                            {{ nid_form.hauteur_couvert }}
-                        </div>
-                    </td>
-                </tr>
-            </table>
-
-            <div class="section-title">Détails du Nid</div>
-            <textarea class="section-content" name="details_nid" rows="2" aria-label="Paysage">{{ nid_form.details_nid.value|default_if_none:"" }}</textarea>
-        </div>
-
-
 		<!-- Conteneur pour Causes de l'échec et Remarques -->
 		<div class="causes-remarques-container">
 			<!-- Partie gauche : Causes de l'échec -->
@@ -203,7 +234,9 @@
 					<tbody>
 							<tr>
 								<td>
-									<textarea class="section-content" name="paysage" rows="2" aria-label="Paysage">{{ causes_echec_form.description.value|default_if_none:"non renseigné" }}</textarea>
+									<textarea class="section-content" name="paysage" rows="2" aria-label="Paysage">
+                                        {{ causes_echec_form.description.value|default_if_none:"non renseigné" }}
+                                    </textarea>
 								</td>
 							</tr>
 					</tbody>
@@ -211,28 +244,50 @@
 			</div>
 
 			<!-- Partie droite : Remarques -->
-			<div class="remarques-container">
-				<table>
-					<thead>
-						<tr>
-							<th>Date</th>
-							<th>Remarque</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for remarque in remarques %}
-						<tr>
-							<td>{{ remarque.date_remarque|date:"d/m/Y H:i" }}</td>
-							<td>{{ remarque.remarque }}</td>
-						</tr>
-						{% empty %}
-						<tr>
-							<td colspan="2">Aucune remarque trouvée.</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-			</div>
+            <div class="remarques-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Remarque</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for remarque in remarques %}
+                            <tr>
+                                <td>{{ remarque.date_remarque|date:"d/m/Y H:i" }}</td>
+                                <td>{{ remarque.remarque }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" id="aucune-remarque">Aucune remarque trouvée.</td>
+                            </tr>
+                        {% endfor %}
+                        <tr id="ligne-remarque-initiale" style="display:none;">
+                            <td>À la création</td>
+                            <td>
+                                <textarea id="remarque-initiale" placeholder="Ajouter une remarque initiale"></textarea>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                 <input type="hidden" name="remarque-initiale" id="remarque-initiale-field" value="">
+            </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Use a proper JavaScript comparison that handles None values
+                        {% if fiche_form.instance.pk %}
+                            // We have a pk, so we're editing an existing fiche
+                            console.log("Editing existing fiche: {{ fiche_form.instance.pk }}");
+                        {% else %}
+                            // No pk, we're creating a new fiche
+                            console.log("Creating new fiche");
+                            document.getElementById('aucune-remarque').style.display = 'none';
+                            document.getElementById('ligne-remarque-initiale').style.display = '';
+                        {% endif %}
+                    });
+                </script>
 		</div>
 
         <button type="submit">Enregistrer</button>

@@ -7,17 +7,21 @@ from Observations.models import (Utilisateur,
                                  Localisation,
                                  ResumeObservation,
                                  Nid,
-                                 CausesEchec, Remarque)
+                                 CausesEchec,
+                                 Observation,
+                                 Remarque)
+
 
 class FicheObservationForm(forms.ModelForm):
-    espece = forms.ModelChoiceField(queryset=Espece.objects.get_queryset(), empty_label="Sélectionnez une espèce", label="Espèce observée")
+    espece = forms.ModelChoiceField(queryset=Espece.objects.get_queryset(), empty_label="Sélectionnez une espèce",
+                                    label="Espèce observée")
     annee = forms.IntegerField(initial=datetime.now().year, disabled=True, label="Année d'observation")
 
     class Meta:
         model = FicheObservation
         fields = ["espece", "annee", "chemin_image"]
         widgets = {
-            "num_fiche": forms.TextInput(attrs={"readonly": True}), # Rendre le champ num_fiche non modifiable
+            "num_fiche": forms.TextInput(attrs={"readonly": True}),  # Rendre le champ num_fiche non modifiable
         }
 
 
@@ -26,6 +30,15 @@ class LocalisationForm(forms.ModelForm):
         model = Localisation
         fields = ['commune', 'lieu_dit', 'departement', 'coordonnees',
                   'latitude', 'longitude', 'altitude', 'paysage', 'alentours']  # Définissez les champs pertinents
+
+
+class ObservationForm(forms.ModelForm):
+    class Meta:
+        model = Observation
+        fields = ['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations']
+        widgets = {
+            'date_observation': forms.DateTimeInput(attrs={'type': 'datetime-local'})
+        }
 
 
 class ResumeObservationForm(forms.ModelForm):
@@ -56,6 +69,7 @@ class ResumeObservationForm(forms.ModelForm):
             'nombre_poussins': forms.NumberInput(attrs={'min': 0}),
         }
 
+
 class NidForm(forms.ModelForm):
     class Meta:
         model = Nid
@@ -66,11 +80,12 @@ class NidForm(forms.ModelForm):
             'details_nid',
         ]
         widgets = {
-            'nid_prec_t_meme_couple':forms.CheckboxInput(),
-            'hauteur_nid':forms.NumberInput(attrs={'placeholder': 'hauteur_nid', 'min': 0}),
-            'hauteur_couvert':forms.NumberInput(attrs={'placeholder': 'hauteur_couvert', 'min': 0}),
-            'details_nid':forms.Textarea(attrs={'placeholder': 'details_nid'}),
+            'nid_prec_t_meme_couple': forms.CheckboxInput(),
+            'hauteur_nid': forms.NumberInput(attrs={'placeholder': 'hauteur_nid', 'min': 0}),
+            'hauteur_couvert': forms.NumberInput(attrs={'placeholder': 'hauteur_couvert', 'min': 0}),
+            'details_nid': forms.Textarea(attrs={'placeholder': 'details_nid'}),
         }
+
 
 class CausesEchecForm(forms.ModelForm):
     class Meta:
@@ -82,6 +97,7 @@ class CausesEchecForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'placeholder': 'description'}),
         }
 
+
 class RemarqueForm(forms.ModelForm):
     class Meta:
         model = Remarque
@@ -90,10 +106,12 @@ class RemarqueForm(forms.ModelForm):
             'remarque': forms.TextInput(attrs={'placeholder': 'Entrez une remarque'}),
         }
 
+
 class UtilisateurForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
         fields = ['first_name', 'last_name', 'email']  # Correction ici
+
 
 class InscriptionForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -101,4 +119,3 @@ class InscriptionForm(UserCreationForm):
     class Meta:
         model = Utilisateur
         fields = ['username', 'email', 'password1', 'password2']
-

@@ -76,21 +76,25 @@ class Nid(models.Model):
     def __str__(self):
         return f"Nid de la fiche {self.fiche.num_fiche}"
 
+from django.db import models
+from django.core.validators import MinValueValidator
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Observation(models.Model):
-    fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="observations")
-    date_observation = models.DateTimeField(auto_now_add=True)
+    fiche = models.ForeignKey('FicheObservation', on_delete=models.CASCADE, related_name="observations")
+    date_observation = models.DateTimeField(blank=False, null=False)
     nombre_oeufs = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     nombre_poussins = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     observations = models.TextField(blank=True, null=True, default='Aucune observation')
 
     def save(self, *args, **kwargs):
-        logger.info(f"Nouvelle observation ajoutée : {self.nom} à {self.date_observation}")
+        logger.info(f"Nouvelle observation ajoutée : Fiche {self.fiche.num_fiche} à {self.date_observation}")
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Observation du {self.date_observation.strftime('%d/%m/%Y %H:%M')} (Fiche {self.fiche.num_fiche})"
-
 
 class ResumeObservation(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="resume")

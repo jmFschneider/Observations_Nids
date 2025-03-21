@@ -1,15 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from Observations.forms import (
     FicheObservationForm,
     LocalisationForm,
     ResumeObservationForm,
     NidForm,
-    CausesEchecForm, RemarqueForm,
+    CausesEchecForm, RemarqueForm, ObservationForm,
 )
-from Observations.models import FicheObservation, Espece, Remarque
+from Observations.models import FicheObservation, Espece, Remarque, Observation
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
-
+# //TODO il reste à terminer la mise en place de la sasie observation et remarque : actuellement les formulaire n'ont pas le possibilité de nouveau ajout
 #@login_required
 def fiche_test_observation_view(request, fiche_id=None):
     if request.method == "POST":
@@ -40,6 +40,23 @@ def fiche_test_observation_view(request, fiche_id=None):
                 instance.fiche = fiche
                 instance.save()
 
+            # Créer la remarque initiale si elle existe
+            remarque_initiale = request.POST.get('remarque-initiale')
+            if remarque_initiale:
+                remarque = Remarque(
+                    fiche=fiche,
+                    remarque=remarque_initiale
+                )
+                remarque.save()
+
+            # Créer la remarque initiale si elle existe
+            observation_initiale = request.POST.get('observation-initiale')
+            if observation_initiale:
+                observation = Observation(
+                    fiche=fiche,
+                    nombre_oeufs=observation_initiale.nombre_oeufs
+                )
+                remarque.save()
 
             # Récupérez l'instance de FicheObservation pour l'affichage
             fiche_instance = FicheObservation.objects.get(pk=fiche.pk)  # Utilisez fiche.pk pour obtenir l'ID
@@ -94,6 +111,22 @@ def fiche_test_observation_view(request, fiche_id=None):
             'remarques': remarques
         })
 
+
+
+@login_required
+def ajouter_observation(request, fiche_id):
+    fiche = get_object_or_404(FicheObservation, pk=fiche_id)  # Utilisation de get_object_or_404
+    if request.method == 'POST':
+        form = ObservationForm(request.POST)
+        if form.is_valid():
+            observation = form.save(commit=False)
+            observation.fiche = fiche
+            observation.save()
+            return redirect('saisie_test_edit', fiche_id=fiche_id)  # Assurez-vous que ce chemin est correct
+    else:
+        form = ObservationForm()
+    return render(request, 'saisie/ajouter_observation.html', {'form': form, 'fiche': fiche})
+
 @login_required
 def ajouter_remarque(request, fiche_id):
     fiche = FicheObservation.objects.get(pk=fiche_id)  # Récupérer l'instance de FicheObservation
@@ -103,7 +136,7 @@ def ajouter_remarque(request, fiche_id):
             remarque = form.save(commit=False)  # Créer l'objet Remarque sans l'enregistrer
             remarque.fiche = fiche  # Associer la remarque à la fiche
             remarque.save()  # Enregistrer l'objet Remarque
-            return redirect('detail_fiche', fiche_id=fiche_id)  # Rediriger vers la vue de détail de la fiche
+            return redirect('saisie_test_edit', fiche_id=fiche_id)  # Rediriger vers la vue de détail de la fiche
     else:
         form = RemarqueForm(initial={'fiche': fiche})  # Pré-remplir le champ fiche
     return render(request, 'saisie/ajouter_remarque.html', {'form': form})

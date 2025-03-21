@@ -18,6 +18,7 @@
             <th>Nombre d'œufs</th>
             <th>Nombre de poussins</th>
             <th>Actions</th>
+            <th>Actions test</th>
         </tr>
     </thead>
     <tbody>
@@ -28,6 +29,7 @@
             <td>{{ fiche.nombre_oeufs }}</td>
             <td>{{ fiche.nombre_poussins }}</td>
             <td><a href="{% url 'fiche_observation' fiche.num_fiche %}">Voir détails</a></td>
+            <td><a href="{% url 'saisie_test_edit' fiche.num_fiche %}">Voir détails</a></td>
         </tr>
         {% empty %}
         <tr>
