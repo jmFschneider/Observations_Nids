@@ -1,0 +1,153 @@
+<!-- templates/transcription/processing.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Traitement des images en cours</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            Progression du traitement
+        </div>
+        <div class="card-body">
+            <div class="progress mb-3">
+                <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                     role="progressbar" style="width: 0%;" 
+                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Répertoire:</strong> <span id="directory">{{ directory }}</span></p>
+                    <p><strong>Fichier en cours:</strong> <span id="current-file">En attente...</span></p>
+                    <p><strong>Temps écoulé:</strong> <span id="elapsed-time">00:00:00</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Fichiers traités:</strong> <span id="processed-count">0</span> / <span id="total-files">0</span></p>
+                    <p><strong>Progression:</strong> <span id="progress-percent">0%</span></p>
+                    <p><strong>Temps estimé restant:</strong> <span id="remaining-time">Calcul en cours...</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            Résultats récents
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Fichier</th>
+                        <th>Statut</th>
+                        <th>Durée</th>
+                    </tr>
+                </thead>
+                <tbody id="results-table">
+                    <tr>
+                        <td colspan="3" class="text-center">En attente des résultats...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Fonction pour formater le temps en heures:minutes:secondes
+function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+// Fonction pour mettre à jour l'interface avec les données de progression
+function updateUI(data) {
+    // Mettre à jour la barre de progression
+    const progressPercent = data.total_files > 0 
+        ? Math.round((data.processed_count / data.total_files) * 100) 
+        : 0;
+    
+    document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+    document.getElementById('progress-bar').textContent = `${progressPercent}%`;
+    document.getElementById('progress-bar').setAttribute('aria-valuenow', progressPercent);
+    
+    // Mettre à jour les statistiques
+    document.getElementById('current-file').textContent = data.current_file || 'En attente...';
+    document.getElementById('processed-count').textContent = data.processed_count;
+    document.getElementById('total-files').textContent = data.total_files;
+    document.getElementById('progress-percent').textContent = `${progressPercent}%`;
+    document.getElementById('elapsed-time').textContent = formatTime(data.elapsed_seconds);
+    
+    // Calculer le temps restant estimé
+    if (data.processed_count > 0) {
+        const avgTimePerFile = data.elapsed_seconds / data.processed_count;
+        const remainingFiles = data.total_files - data.processed_count;
+        const remainingSeconds = avgTimePerFile * remainingFiles;
+        
+        document.getElementById('remaining-time').textContent = formatTime(remainingSeconds);
+    }
+    
+    // Mettre à jour le tableau des résultats récents
+    if (data.results && data.results.length > 0) {
+        const tableBody = document.getElementById('results-table');
+        tableBody.innerHTML = '';
+        
+        data.results.forEach(result => {
+            const row = document.createElement('tr');
+            
+            // Créer la cellule pour le nom de fichier
+            const fileCell = document.createElement('td');
+            fileCell.textContent = result.filename;
+            row.appendChild(fileCell);
+            
+            // Créer la cellule pour le statut
+            const statusCell = document.createElement('td');
+            if (result.status === 'success') {
+                statusCell.innerHTML = '<span class="badge bg-success">Succès</span>';
+            } else {
+                statusCell.innerHTML = '<span class="badge bg-danger">Erreur</span>';
+            }
+            row.appendChild(statusCell);
+            
+            // Créer la cellule pour la durée
+            const durationCell = document.createElement('td');
+            durationCell.textContent = `${result.duration} secondes`;
+            row.appendChild(durationCell);
+            
+            tableBody.appendChild(row);
+        });
+    }
+}
+
+// Fonction pour vérifier la progression
+function checkProgress() {
+    fetch('{% url "check_progress" %}')
+        .then(response => response.json())
+        .then(data => {
+            updateUI(data);
+            
+            // Continuer à vérifier si le traitement n'est pas terminé
+            if (data.processed_count < data.total_files) {
+                setTimeout(checkProgress, 2000); // Vérifier toutes les 2 secondes
+            } else if (data.processed_count === data.total_files && data.total_files > 0) {
+                // Rediriger vers la page de résultats si terminé
+                window.location.href = '{% url "transcription_results" %}';
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            // Continuer à vérifier malgré l'erreur
+            setTimeout(checkProgress, 5000);
+        });
+}
+
+// Démarrer la vérification au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    checkProgress();
+});
+</script>
+{% endblock %}

@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 
+from django.template.context_processors import media
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -137,6 +139,9 @@ STATICFILES_DIRS = [
 # Dossier où Django collectera tous les fichiers statiques pour la mise en production
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
+# Dossier où seront stocké les fichiers jpg
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

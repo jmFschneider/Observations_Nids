@@ -1,0 +1,64 @@
+<!-- select_directory.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Sélection du répertoire d'images à transcrire</h2>
+
+    <form method="post" id="directory-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="selected_directory">Sélectionnez un répertoire d'images:</label>
+            <select name="selected_directory" id="selected_directory" class="form-control">
+                <option value="">-- Choisir un répertoire --</option>
+                {% for dir in directories %}
+                    <option value="{{ dir }}">{{ dir }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="directory-info" class="alert alert-info mt-3" style="display: none;">
+            <p>Nombre d'images trouvées: <span id="file-count">0</span></p>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Sélectionner ce répertoire</button>
+    </form>
+</div>
+
+<script>
+document.getElementById('directory-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const form = this;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('directory-info').style.display = 'block';
+            document.getElementById('file-count').textContent = data.file_count;
+
+            // Ajouter un bouton pour commencer le traitement
+            const startButton = document.createElement('a');
+            startButton.href = "{% url 'process_images' %}";
+            startButton.className = "btn btn-success mt-3";
+            startButton.textContent = "Commencer la transcription des images";
+            form.appendChild(startButton);
+        } else {
+            alert("Erreur: " + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+    });
+});
+</script>
+{% endblock %}

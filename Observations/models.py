@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-import logging
 from django.core.validators import MinValueValidator
+import logging
 
 logger = logging.getLogger('Observations')
 
@@ -76,11 +76,7 @@ class Nid(models.Model):
     def __str__(self):
         return f"Nid de la fiche {self.fiche.num_fiche}"
 
-from django.db import models
-from django.core.validators import MinValueValidator
-import logging
 
-logger = logging.getLogger(__name__)
 
 class Observation(models.Model):
     fiche = models.ForeignKey('FicheObservation', on_delete=models.CASCADE, related_name="observations")
@@ -163,7 +159,7 @@ class Validation(models.Model):
         ordering = ['-date_modification']  # Les plus récentes en premier
 
     def __str__(self):
-        return f"Validation Fiche {self.fiche.num_fiche} par {self.reviewer.nom}"
+        return f"Validation Fiche {self.fiche.num_fiche} par {self.reviewer.username}"
 
 
 class HistoriqueValidation(models.Model):
