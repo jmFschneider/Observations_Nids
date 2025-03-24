@@ -8,6 +8,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.utils import timezone
 import datetime
+from dotenv import load_dotenv
 
 
 def select_directory(request):
@@ -52,7 +53,7 @@ def process_images(request):
         return redirect('select_directory')
 
     # Définir le chemin complet du répertoire
-    base_dir = os.path.join(media_root, 'scans_observations', directory)
+    base_dir = os.path.join(media_root, directory)
 
     # Créer un répertoire pour les résultats JSON
     results_dir = os.path.join(media_root, 'transcription_results', directory)
@@ -68,7 +69,8 @@ def process_images(request):
     results = []
 
     # Configuration de l'API Gemini
-    api_key = "api_key"  # À remplacer par votre clé API
+    load_dotenv()
+    api_key = os.environ.get("GEMINI_API_KEY")  # À remplacer par votre clé API
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-2.0-flash")
 
@@ -187,14 +189,20 @@ def process_images(request):
     # Calculer le temps total
     total_duration = time.time() - start_time_total
 
+    successful_files = sum(1 for r in results if r['status'] == 'success')
+    error_files = sum(1 for r in results if r['status'] == 'error')
+    total_files = len(image_files)
+    success_rate = (successful_files / total_files * 100) if total_files > 0 else 0
+
     # Préparer le contexte pour le template
     context = {
         'directory': directory,
         'results': results,
         'total_duration': round(total_duration, 2),
-        'total_files': len(image_files),
-        'successful_files': sum(1 for r in results if r['status'] == 'success'),
-        'error_files': sum(1 for r in results if r['status'] == 'error')
+        'total_files': total_files,
+        'successful_files': successful_files,
+        'error_files': error_files,
+        'success_rate': round(success_rate, 1)
     }
 
     # Sauvegarder les résultats en session pour référence ultérieure

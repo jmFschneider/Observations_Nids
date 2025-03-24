@@ -24,7 +24,13 @@
                 <div class="col-md-6">
                     <p><strong>Fichiers réussis:</strong> {{ successful_files }}</p>
                     <p><strong>Fichiers en erreur:</strong> {{ error_files }}</p>
-                    <p><strong>Taux de réussite:</strong> {% if total_files > 0 %}{{ successful_files|floatformat:0 }}%{% else %}N/A{% endif %}</p>
+                    <p><strong>Taux de réussite:</strong>
+                        {% if total_files > 0 %}
+                          {{ success_rate }}%
+                        {% else %}
+                          N/A
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>
