@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'Observations.apps.ObservationsConfig',
+    'Importation.apps.ImportationConfig',
 ]
 
 MIDDLEWARE = [
@@ -57,9 +59,21 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'Observations_Nids.urls'
+
+
+# Configurez les adresses IP autorisées à voir la toolbar
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+# Configuration optionnelle
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,  # Affiche toujours la toolbar en développement
+}
 
 TEMPLATES = [
     {

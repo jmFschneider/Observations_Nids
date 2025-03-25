@@ -23,7 +23,12 @@ from Observations_Nids import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Observations.urls')),  # Inclure les URLs de l'application Observations
+    path('', include('Importation.urls')),  # Inclure les URLs de l'application Observations
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    import debug_toolbar
+    urlpatterns += [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ]

@@ -1,0 +1,372 @@
+# importation_service.py
+import os
+import json
+import logging
+from difflib import SequenceMatcher
+from django.db import transaction
+from django.conf import settings
+from django.utils import timezone
+
+from Observations.models import (
+    Utilisateur, Espece, FicheObservation, Localisation,
+    Nid, Observation, ResumeObservation, CausesEchec, Remarque
+)
+from .models import (
+    TranscriptionBrute, EspeceCandidate, ObservateurCandidat, ImportationEnCours
+)
+
+logger = logging.getLogger(__name__)
+
+
+class ImportationService:
+    """Service pour gérer l'importation des données JSON transcrites vers la base de données"""
+
+    def __init__(self):
+        self.seuil_similarite = 0.8  # Seuil à partir duquel on considère une correspondance probable
+
+    def importer_fichiers_json(self, repertoire):
+        """Importe tous les fichiers JSON d'un répertoire vers la table TranscriptionBrute"""
+        chemin_complet = os.path.join(settings.MEDIA_ROOT, 'transcription_results', repertoire)
+        resultats = {
+            'total': 0,
+            'reussis': 0,
+            'ignores': 0,
+            'erreurs': []
+        }
+
+        if not os.path.exists(chemin_complet):
+            logger.error(f"Le répertoire {chemin_complet} n'existe pas")
+            return resultats
+
+        for fichier in os.listdir(chemin_complet):
+            if not fichier.endswith('_result.json'):
+                continue
+
+            resultats['total'] += 1
+            chemin_fichier = os.path.join(chemin_complet, fichier)
+
+            try:
+                # Vérifier si le fichier a déjà été importé
+                if TranscriptionBrute.objects.filter(fichier_source=fichier).exists():
+                    resultats['ignores'] += 1
+                    continue
+
+                # Charger le contenu JSON
+                with open(chemin_fichier, 'r', encoding='utf-8') as f:
+                    contenu_json = json.load(f)
+
+                # Créer l'entrée dans TranscriptionBrute
+                TranscriptionBrute.objects.create(
+                    fichier_source=fichier,
+                    json_brut=contenu_json
+                )
+                resultats['reussis'] += 1
+
+            except json.JSONDecodeError as e:
+                erreur = f"Erreur de format JSON dans {fichier}: {str(e)}"
+                logger.error(erreur)
+                resultats['erreurs'].append(erreur)
+            except Exception as e:
+                erreur = f"Erreur lors de l'importation de {fichier}: {str(e)}"
+                logger.error(erreur)
+                resultats['erreurs'].append(erreur)
+
+        return resultats
+
+    def extraire_donnees_candidats(self):
+        """Extrait les espèces et observateurs candidats des transcriptions brutes"""
+        transcriptions = TranscriptionBrute.objects.filter(traite=False)
+        especes_ajoutees = 0
+        observateurs_ajoutes = 0
+
+        for transcription in transcriptions:
+            try:
+                donnees = transcription.json_brut
+
+                # Extraire l'espèce
+                if 'informations_generales' in donnees and 'espece' in donnees['informations_generales']:
+                    nom_espece = donnees['informations_generales']['espece']
+                    if nom_espece and isinstance(nom_espece, str):
+                        # Vérifier si cette espèce existe déjà comme candidate
+                        espece, created = EspeceCandidate.objects.get_or_create(
+                            nom_transcrit=nom_espece
+                        )
+                        if created:
+                            especes_ajoutees += 1
+
+                            # Tenter une correspondance automatique
+                            self._trouver_correspondance_espece(espece)
+
+                # Extraire l'observateur
+                if 'informations_generales' in donnees and 'observateur' in donnees['informations_generales']:
+                    nom_observateur = donnees['informations_generales']['observateur']
+                    if nom_observateur and isinstance(nom_observateur, str):
+                        # Vérifier si cet observateur existe déjà comme candidat
+                        observateur, created = ObservateurCandidat.objects.get_or_create(
+                            nom_complet_transcrit=nom_observateur
+                        )
+                        if created:
+                            observateurs_ajoutes += 1
+
+                            # Tenter une correspondance automatique
+                            self._trouver_correspondance_observateur(observateur)
+
+            except Exception as e:
+                logger.error(
+                    f"Erreur lors de l'extraction des candidats depuis {transcription.fichier_source}: {str(e)}")
+                continue
+
+        return {
+            'especes_ajoutees': especes_ajoutees,
+            'observateurs_ajoutes': observateurs_ajoutes
+        }
+
+    def _trouver_correspondance_espece(self, espece_candidate):
+        """Tente de trouver une correspondance pour une espèce candidate"""
+        especes_existantes = Espece.objects.filter(valide_par_admin=True)
+        meilleure_correspondance = None
+        meilleur_score = 0
+
+        for espece_existante in especes_existantes:
+            score = SequenceMatcher(None, espece_candidate.nom_transcrit.lower(),
+                                    espece_existante.nom.lower()).ratio()
+
+            if score > meilleur_score and score >= self.seuil_similarite:
+                meilleur_score = score
+                meilleure_correspondance = espece_existante
+
+        if meilleure_correspondance:
+            espece_candidate.espece_validee = meilleure_correspondance
+            espece_candidate.save()
+            return True
+
+        return False
+
+    def _trouver_correspondance_observateur(self, observateur_candidat):
+        """Tente de trouver une correspondance pour un observateur candidat"""
+        utilisateurs = Utilisateur.objects.filter(est_valide=True)
+        meilleure_correspondance = None
+        meilleur_score = 0
+
+        for utilisateur in utilisateurs:
+            nom_complet = f"{utilisateur.first_name} {utilisateur.last_name}".strip()
+            score = SequenceMatcher(None, observateur_candidat.nom_complet_transcrit.lower(),
+                                    nom_complet.lower()).ratio()
+
+            if score > meilleur_score and score >= self.seuil_similarite:
+                meilleur_score = score
+                meilleure_correspondance = utilisateur
+
+        if meilleure_correspondance:
+            observateur_candidat.utilisateur_valide = meilleure_correspondance
+            observateur_candidat.save()
+            return True
+
+        return False
+
+    def preparer_importations(self):
+        """Prépare les importations pour les transcriptions qui ont des candidats validés"""
+        transcriptions = TranscriptionBrute.objects.filter(traite=False)
+        importations_creees = 0
+
+        for transcription in transcriptions:
+            try:
+                # Vérifier si une importation existe déjà
+                if ImportationEnCours.objects.filter(transcription=transcription).exists():
+                    continue
+
+                donnees = transcription.json_brut
+
+                # Extraire et vérifier l'espèce
+                espece_candidate = None
+                if 'informations_generales' in donnees and 'espece' in donnees['informations_generales']:
+                    nom_espece = donnees['informations_generales']['espece']
+                    if nom_espece:
+                        espece_candidate = EspeceCandidate.objects.filter(nom_transcrit=nom_espece).first()
+
+                # Extraire et vérifier l'observateur
+                observateur_candidat = None
+                if 'informations_generales' in donnees and 'observateur' in donnees['informations_generales']:
+                    nom_observateur = donnees['informations_generales']['observateur']
+                    if nom_observateur:
+                        observateur_candidat = ObservateurCandidat.objects.filter(
+                            nom_complet_transcrit=nom_observateur).first()
+
+                # Créer l'importation en cours
+                ImportationEnCours.objects.create(
+                    transcription=transcription,
+                    espece_candidate=espece_candidate,
+                    observateur_candidat=observateur_candidat,
+                    statut='en_attente'
+                )
+                importations_creees += 1
+
+            except Exception as e:
+                logger.error(
+                    f"Erreur lors de la préparation de l'importation pour {transcription.fichier_source}: {str(e)}")
+                continue
+
+        return importations_creees
+
+    @transaction.atomic
+    def finaliser_importation(self, importation_id):
+        """Finalise l'importation d'une transcription en créant les entrées dans les tables principales"""
+        try:
+            importation = ImportationEnCours.objects.select_for_update().get(id=importation_id)
+
+            # Vérifier si l'espèce et l'observateur sont validés
+            if not importation.espece_candidate or not importation.espece_candidate.espece_validee:
+                importation.statut = 'erreur'
+                importation.save()
+                return False, "Espèce non validée"
+
+            if not importation.observateur_candidat or not importation.observateur_candidat.utilisateur_valide:
+                importation.statut = 'erreur'
+                importation.save()
+                return False, "Observateur non validé"
+
+            # Récupérer les données JSON
+            donnees = importation.transcription.json_brut
+
+            # Extraire l'année (utiliser l'année actuelle si non disponible)
+            annee = timezone.now().year
+            if 'informations_generales' in donnees and 'année' in donnees['informations_generales']:
+                annee_str = donnees['informations_generales']['année']
+                if annee_str and annee_str.isdigit():
+                    annee = int(annee_str)
+
+            # Créer la fiche d'observation
+            fiche = FicheObservation.objects.create(
+                observateur=importation.observateur_candidat.utilisateur_valide,
+                espece=importation.espece_candidate.espece_validee,
+                annee=annee,
+                chemin_image=importation.transcription.fichier_source
+            )
+
+            # Enregistrer la référence à la fiche dans l'importation
+            importation.fiche_observation = fiche
+
+            # Mettre à jour la localisation
+            if 'localisation' in donnees:
+                loc = donnees['localisation']
+                Localisation.objects.filter(fiche=fiche).update(
+                    commune=loc.get('commune') or loc.get('IGN_50000') or 'Non spécifiée',
+                    lieu_dit=loc.get('coordonnees_et_ou_lieu_dit') or 'Non spécifiée',
+                    departement=loc.get('dep_t') or '00',
+                    altitude=loc.get('altitude') or '0',
+                    paysage=loc.get('paysage') or 'Non spécifié',
+                    alentours=loc.get('alentours') or 'Non spécifié'
+                )
+
+            # Mettre à jour les informations du nid
+            if 'nid' in donnees:
+                nid_data = donnees['nid']
+                nid_meme_couple = False
+                if nid_data.get('nid_prec_t_meme_c_ple') in ['oui', 'Oui', 'OUI', 'true', 'True', 'TRUE', '1']:
+                    nid_meme_couple = True
+
+                # Essayer de convertir la hauteur en entier
+                hauteur_nid = 0
+                hauteur_str = nid_data.get('haut_nid') or '0'
+                try:
+                    # Remplacer la virgule par un point si nécessaire
+                    hauteur_str = hauteur_str.replace(',', '.')
+                    hauteur_nid = int(float(hauteur_str))
+                except (ValueError, TypeError):
+                    pass
+
+                hauteur_couvert = 0
+                couvert_str = nid_data.get('h_c_vert') or '0'
+                try:
+                    couvert_str = couvert_str.replace(',', '.')
+                    hauteur_couvert = int(float(couvert_str))
+                except (ValueError, TypeError):
+                    pass
+
+                Nid.objects.filter(fiche=fiche).update(
+                    nid_prec_t_meme_couple=nid_meme_couple,
+                    hauteur_nid=hauteur_nid,
+                    hauteur_couvert=hauteur_couvert,
+                    details_nid=nid_data.get('nid') or 'Aucun détail'
+                )
+
+            # Créer les observations
+            if 'tableau_donnees' in donnees and isinstance(donnees['tableau_donnees'], list):
+                for obs in donnees['tableau_donnees']:
+                    # Essayer de construire une date valide
+                    try:
+                        jour = int(obs.get('Jour') or 1)
+                        mois = int(obs.get('Mois') or 1)
+                        heure = int(obs.get('Heure') or 12)
+                        minute = 0
+
+                        date_obs = timezone.datetime(annee, mois, jour, heure, minute)
+
+                        # Convertir en format datetime-aware
+                        date_obs = timezone.make_aware(date_obs)
+
+                        nombre_oeufs = int(obs.get('Nombre_oeuf') or 0)
+                        nombre_poussins = int(obs.get('Nombre_pou') or 0)
+
+                        Observation.objects.create(
+                            fiche=fiche,
+                            date_observation=date_obs,
+                            nombre_oeufs=nombre_oeufs,
+                            nombre_poussins=nombre_poussins,
+                            observations=obs.get('observations') or ''
+                        )
+                    except (ValueError, TypeError) as e:
+                        logger.warning(f"Impossible de créer l'observation pour la fiche {fiche.num_fiche}: {str(e)}")
+                        continue
+
+            # Mettre à jour le résumé de l'observation
+            if 'tableau_donnees_2' in donnees:
+                resume_data = donnees['tableau_donnees_2']
+                nombre_poussins_data = None
+
+                if 'nombre_poussins' in resume_data and resume_data['nombre_poussins']:
+                    nombre_poussins_data = resume_data['nombre_poussins'][0] if resume_data['nombre_poussins'] else None
+
+                nombre_poussins_total = 0
+                if nombre_poussins_data:
+                    # Prendre la valeur 'vol_t' si disponible
+                    if 'vol_t' in nombre_poussins_data and nombre_poussins_data['vol_t']:
+                        try:
+                            nombre_poussins_total = int(nombre_poussins_data['vol_t'])
+                        except (ValueError, TypeError):
+                            pass
+
+                ResumeObservation.objects.filter(fiche=fiche).update(
+                    nombre_poussins=nombre_poussins_total
+                )
+
+            # Ajouter causes d'échec si disponibles
+            if 'causes_echec' in donnees and donnees['causes_echec'].get('causes_d_echec'):
+                CausesEchec.objects.filter(fiche=fiche).update(
+                    description=donnees['causes_echec'].get('causes_d_echec')
+                )
+
+            # Ajouter une remarque avec le nom du fichier source
+            Remarque.objects.create(
+                fiche=fiche,
+                remarque=f"Importé depuis le fichier {importation.transcription.fichier_source}"
+            )
+
+            # Marquer l'importation comme terminée
+            importation.statut = 'complete'
+            importation.save()
+
+            # Marquer la transcription comme traitée
+            importation.transcription.traite = True
+            importation.transcription.save()
+
+            return True, f"Fiche d'observation #{fiche.num_fiche} créée avec succès"
+
+        except ImportationEnCours.DoesNotExist:
+            return False, "Importation non trouvée"
+        except Exception as e:
+            logger.error(f"Erreur lors de la finalisation de l'importation {importation_id}: {str(e)}")
+            if 'importation' in locals():
+                importation.statut = 'erreur'
+                importation.save()
+            return False, str(e)

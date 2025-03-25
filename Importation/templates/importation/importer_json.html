@@ -1,0 +1,48 @@
+<!-- templates/importation/importer_json.html -->
+{% extends "base.html" %}
+
+{% block title %}Importer des fichiers JSON{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'accueil_importation' %}">Importation</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Importer JSON</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">Importer des fichiers JSON transcrits</h1>
+    
+    <div class="alert alert-info">
+        <p>Cette étape permet d'importer les fichiers JSON générés par le processus de transcription des fiches manuscrites.</p>
+        <p>Sélectionnez le répertoire contenant les fichiers JSON à importer.</p>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Sélection du répertoire</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="repertoire">Répertoire des fichiers JSON:</label>
+                    <select name="repertoire" id="repertoire" class="form-control" required>
+                        <option value="">-- Sélectionnez un répertoire --</option>
+                        {% for dir in directories %}
+                            <option value="{{ dir }}">{{ dir }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">
+                        Les fichiers JSON doivent se trouver dans un sous-répertoire de MEDIA_ROOT/transcription_results/
+                    </small>
+                </div>
+                
+                <button type="submit" class="btn btn-primary mt-3">Importer les fichiers</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
