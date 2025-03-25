@@ -8,8 +8,10 @@ charset-normalizer
 click
 colorama
 Django
+django-debug-toolbar
 django-stubs
 django-stubs-ext
+dotenv
 google
 google-ai-generativelanguage
 google-api-core
@@ -36,6 +38,7 @@ pydantic
 pydantic_core
 pyparsing
 pyproject_hooks
+python-dotenv
 requests
 rsa
 setuptools
