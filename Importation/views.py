@@ -416,3 +416,53 @@ def finaliser_importation(request, importation_id):
 
     return redirect('detail_importation', importation_id=importation_id)
 
+
+# Ajout de cette nouvelle vue dans views.py
+
+@login_required
+@user_passes_test(est_admin)
+def reinitialiser_importation(request, importation_id):
+    """Vue pour réinitialiser une importation spécifique"""
+    if request.method == 'POST':
+        service = ImportationService()
+        resultat = service.reinitialiser_importation(importation_id=importation_id)
+
+        if resultat['success']:
+            messages.success(request, resultat['message'])
+        else:
+            messages.error(request, resultat['message'])
+
+    return redirect('liste_importations')
+
+
+@login_required
+@user_passes_test(est_admin)
+def reinitialiser_toutes_importations(request):
+    """Vue pour réinitialiser toutes les importations terminées ou en erreur"""
+    if request.method == 'POST':
+        statut = request.POST.get('statut', 'all')
+
+        # Filtrer les importations à réinitialiser
+        query = Q()
+        if statut == 'complete':
+            query = Q(statut='complete')
+        elif statut == 'erreur':
+            query = Q(statut='erreur')
+        elif statut == 'all':
+            query = Q(statut='complete') | Q(statut='erreur')
+
+        importations = ImportationEnCours.objects.filter(query)
+        count = 0
+        service = ImportationService()
+
+        for importation in importations:
+            resultat = service.reinitialiser_importation(importation_id=importation.id)
+            if resultat['success']:
+                count += 1
+
+        if count > 0:
+            messages.success(request, f"{count} importation(s) réinitialisée(s) avec succès")
+        else:
+            messages.info(request, "Aucune importation n'a été réinitialisée")
+
+    return redirect('liste_importations')

@@ -19,6 +19,31 @@
            les informations détaillées d'une importation et la finaliser.</p>
     </div>
     
+    <!-- Ajout d'une section pour réinitialiser en masse des importations -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-white">
+            <h5 class="mb-0">Actions de réinitialisation</h5>
+        </div>
+        <div class="card-body">
+            <p>Utilisez ces actions pour réinitialiser les importations et recommencer le processus d'importation:</p>
+
+            <form method="post" action="{% url 'reinitialiser_toutes_importations' %}" class="d-inline">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="statut_reinit">Réinitialiser les importations:</label>
+                    <select name="statut" id="statut_reinit" class="form-control mb-2">
+                        <option value="all">Toutes (terminées et en erreur)</option>
+                        <option value="complete">Terminées uniquement</option>
+                        <option value="erreur">En erreur uniquement</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-warning" onclick="return confirm('Êtes-vous sûr de vouloir réinitialiser ces importations ? Cette action supprimera les fiches d\'observation associées et ne peut pas être annulée.')">
+                    <i class="fas fa-redo"></i> Réinitialiser les importations sélectionnées
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Filtres de recherche -->
     <div class="card mb-4">
         <div class="card-header bg-secondary text-white">
@@ -43,7 +68,7 @@
             </form>
         </div>
     </div>
-    
+
     <!-- Liste des importations -->
     <div class="card">
         <div class="card-header bg-primary text-white">
@@ -84,7 +109,7 @@
                             {% if importation.observateur_candidat %}
                                 {% if importation.observateur_candidat.utilisateur_valide %}
                                     <span class="text-success">
-                                        {{ importation.observateur_candidat.utilisateur_valide.first_name }} 
+                                        {{ importation.observateur_candidat.utilisateur_valide.first_name }}
                                         {{ importation.observateur_candidat.utilisateur_valide.last_name }}
                                     </span>
                                 {% else %}
@@ -108,7 +133,7 @@
                         <td>{{ importation.date_creation|date:"d/m/Y H:i" }}</td>
                         <td>
                             <a href="{% url 'detail_importation' importation.id %}" class="btn btn-sm btn-info">Voir détails</a>
-                            
+
                             {% if importation.statut == 'en_attente' %}
                                 {% if importation.espece_candidate.espece_validee and importation.observateur_candidat.utilisateur_valide %}
                                     <form method="post" action="{% url 'finaliser_importation' importation.id %}" class="d-inline">
@@ -116,11 +141,20 @@
                                         <button type="submit" class="btn btn-sm btn-success">Finaliser</button>
                                     </form>
                                 {% else %}
-                                    <button type="button" class="btn btn-sm btn-success" disabled 
+                                    <button type="button" class="btn btn-sm btn-success" disabled
                                             title="L'espèce et l'observateur doivent être validés">
                                         Finaliser
                                     </button>
                                 {% endif %}
+                            {% endif %}
+
+                            {% if importation.statut == 'complete' or importation.statut == 'erreur' %}
+                                <form method="post" action="{% url 'reinitialiser_importation' importation.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Êtes-vous sûr de vouloir réinitialiser cette importation ? Cette action supprimera la fiche d\'observation associée et ne peut pas être annulée.')">
+                                        Réinitialiser
+                                    </button>
+                                </form>
                             {% endif %}
                         </td>
                     </tr>

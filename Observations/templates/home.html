@@ -9,10 +9,30 @@
     <h1>Bienvenue sur le suivi des observations</h1>
     <p>Nombre total d'observateurs : {{ users_count }}</p>
     <p>Nombre total d'observations : {{ observations_count }}</p>
-    <ul>
-        <li><a href="{% url 'user_list' %}">Liste des observateurs</a></li>
-        <li><a href="{% url 'user_create' %}">Ajouter un observateur</a></li>
-        <li><a href="{% url 'saisie_observation' %}">Nouvelle observation</a></li>
-        <li><a href="{% url 'saisie_test_new' %}">Nouvelle observation V2</a></li>
-    </ul>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3>Observations</h3>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li><a href="{% url 'user_list' %}">Liste des observateurs</a></li>
+                <li><a href="{% url 'user_create' %}">Ajouter un observateur</a></li>
+                <li><a href="{% url 'saisie_observation' %}">Nouvelle observation</a></li>
+                <li><a href="{% url 'saisie_test_new' %}">Nouvelle observation V2</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h3>Transcription & Importation</h3>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li><a href="{% url 'select_directory' %}">Transcription d'images</a></li>
+                <li><a href="{% url 'accueil_importation' %}">Importation des transcriptions</a></li>
+            </ul>
+        </div>
+    </div>
 {% endblock %}

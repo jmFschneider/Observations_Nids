@@ -370,3 +370,57 @@ class ImportationService:
                 importation.statut = 'erreur'
                 importation.save()
             return False, str(e)
+
+    def reinitialiser_importation(self, importation_id=None, fichier_source=None):
+        """
+        Réinitialise une importation pour permettre de recommencer le processus
+
+        Args:
+            importation_id: ID de l'importation à réinitialiser
+            fichier_source: Nom du fichier source à réinitialiser (alternative à importation_id)
+
+        Returns:
+            dict: Résultat de l'opération avec succès (bool) et message (str)
+        """
+        try:
+            # Si un ID d'importation est fourni, on l'utilise
+            if importation_id:
+                importation = ImportationEnCours.objects.get(id=importation_id)
+                transcription = importation.transcription
+
+            # Sinon, on recherche par le nom du fichier
+            elif fichier_source:
+                transcription = TranscriptionBrute.objects.get(fichier_source=fichier_source)
+                try:
+                    importation = ImportationEnCours.objects.get(transcription=transcription)
+                except ImportationEnCours.DoesNotExist:
+                    importation = None
+            else:
+                return {"success": False, "message": "Aucun identifiant fourni pour la réinitialisation"}
+
+            # Suppression de la fiche d'observation si elle existe
+            if importation and importation.fiche_observation:
+                fiche_id = importation.fiche_observation.num_fiche
+                importation.fiche_observation.delete()
+                logger.info(f"Fiche d'observation #{fiche_id} supprimée")
+
+            # Marquer la transcription comme non traitée
+            transcription.traite = False
+            transcription.save()
+
+            # Supprimer l'importation en cours
+            if importation:
+                importation.delete()
+                logger.info(f"Importation pour {transcription.fichier_source} réinitialisée")
+
+            return {
+                "success": True,
+                "message": f"L'importation de {transcription.fichier_source} a été réinitialisée avec succès"
+            }
+
+        except (ImportationEnCours.DoesNotExist, TranscriptionBrute.DoesNotExist) as e:
+            logger.error(f"Erreur lors de la réinitialisation: {str(e)}")
+            return {"success": False, "message": f"Importation ou transcription non trouvée: {str(e)}"}
+        except Exception as e:
+            logger.error(f"Erreur inattendue lors de la réinitialisation: {str(e)}")
+            return {"success": False, "message": f"Erreur lors de la réinitialisation: {str(e)}"}
