@@ -1,0 +1,112 @@
+```json
+{
+  "informations_generales": {
+    "n_fiche": "1",
+    "observateur": "ALE",
+    "n_espece": null,
+    "espece": "Accenteur mouchet",
+    "annee": "2011"
+  },
+  "nid": {
+    "nid_prec_t_meme_c_ple": true,
+    "haut_nid": "106",
+    "h_c_vert": "142",
+    "nid": "Dimension!\nExt. 10 cm\nInt. 5 cm\nhaut: 6cm\ncoupe exterieure: Grindille\n+ intérieur: mousse\nou poils d'animaux, matilia"
+  },
+  "localisation": {
+    "IGN_50000": null,
+    "commune": "Blonville s/Mer",
+    "dep_t": "14",
+    "coordonnees_et_ou_lieu_dit": "Lieu Tallet",
+    "altitude": "00m",
+    "paysage": "Lotissement et campagne",
+    "alentours": "Jardin"
+  },
+  "tableau_donnees": [
+    {
+      "Jour": "19",
+      "Mois": "5",
+      "Heure": "13e",
+      "Nombre_oeuf": "5",
+      "Nombre_pou": null,
+      "age": null,
+      "observations": null
+    },
+    {
+      "Jour": "25",
+      "Mois": "5",
+      "Heure": "18",
+      "Nombre_oeuf": "4",
+      "Nombre_pou": "1",
+      "age": null,
+      "observations": null
+    },
+    {
+      "Jour": "26",
+      "Mois": "5",
+      "Heure": "20",
+      "Nombre_oeuf": "2",
+      "Nombre_pou": "3",
+      "age": null,
+      "observations": null
+    },
+    {
+      "Jour": "28",
+      "Mois": "1",
+      "Heure": "14",
+      "Nombre_oeuf": "4",
+      "Nombre_pou": "2",
+      "age": null,
+      "observations": null
+    },
+    {
+      "Jour": "30",
+      "Mois": "5",
+      "Heure": "17e",
+      "Nombre_oeuf": "2",
+      "Nombre_pou": "2",
+      "age": null,
+      "observations": null
+    },
+    {
+      "Jour": "3",
+      "Mois": "6",
+      "Heure": "15e",
+      "Nombre_oeuf": "0",
+      "Nombre_pou": "1",
+      "age": null,
+      "observations": null
+    }
+  ],
+ "tableau_resume": {
+        "1er_o_pondu": {
+            "Jour": null,
+            "Mois": null,
+            "Precision": null
+        },
+        "1er_p_eclos": {
+            "Jour": null,
+            "Mois": null,
+            "Precision": null
+        },
+        "1er_p_volant": {
+            "Jour": null,
+            "Mois": null,
+            "Precision": null
+        },
+        "nombre_oeufs": {
+            "pondus": "5",
+            "eclos": "3",
+            "n_ecl": "2"
+        },
+        "nombre_poussins": {
+            "1/2": null,
+            "3/4": null,
+            "vol_t": null
+        }
+    },
+  "causes_echec": {
+    "causes_d_echec": null
+  }
+}
+```

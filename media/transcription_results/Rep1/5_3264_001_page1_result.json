@@ -1,0 +1,103 @@
+```json
+{
+  "informations_generales": {
+    "n_fiche": null,
+    "observateur": null,
+    "n_espece": null,
+    "espece": "LINOTTE",
+    "annee": "19"
+  },
+  "nid": {
+    "nid_prec_t_meme_c_ple": null,
+    "haut_nid": null,
+    "h_c_vert": null,
+    "nid": "Dans du lieue retombaul d'une clôture"
+  },
+  "localisation": {
+    "IGN_50000": null,
+    "commune": "CROCY",
+    "dép_t": "14",
+    "coordonées_et_ou_lieu_dit": "La VALLEE",
+    "altitude": "0m",
+    "paysage": null,
+    "alentours": null
+  },
+  "tableau_donnees": [
+    {
+      "Jour": "19",
+      "Mois": "05",
+      "Heure": null,
+      "Nombre_oeuf": null,
+      "Nombre_pou": "3",
+      "age": null,
+      "observations": null
+    },
+    {
+      "Jour": "23",
+      "Mois": "05",
+      "Heure": "12:00",
+      "Nombre_oeuf": null,
+      "Nombre_pou": "5",
+      "age": null,
+      "observations": null
+    },
+    {
+      "Jour": "26",
+      "Mois": "05",
+      "Heure": "19:00",
+      "Nombre_oeuf": null,
+      "Nombre_pou": "5",
+      "age": null,
+      "observations": null
+    },
+    {
+      "Jour": "28",
+      "Mois": "05",
+      "Heure": "20:00",
+      "Nombre_oeuf": null,
+      "Nombre_pou": "5",
+      "age": null,
+      "observations": null
+    },
+    {
+      "Jour": "30",
+      "Mois": "05",
+      "Heure": null,
+      "Nombre_oeuf": null,
+      "Nombre_pou": "5",
+      "age": null,
+      "observations": "oeufs froids"
+    }
+  ],
+  "tableau_donnees_2": {
+    "premier_oeuf_pondu": {
+      "jour": null,
+      "Mois": null,
+      "Precision": null
+    },
+    "premier_p_eclos": {
+      "jour": null,
+      "Mois": null,
+      "Precision": null
+    },
+    "premier_p_volant": {
+      "jour": null,
+      "Mois": null,
+      "Precision": null
+    },
+    "nombre_oeufs": {
+      "pondus": null,
+      "eclos": null,
+      "n_ecl": null
+    },
+    "nombre_poussins": {
+      "1/2": null,
+      "3/4": null,
+      "vol_t": null
+    }
+  },
+  "causes_echec": {
+    "causes_d_echec": null
+  }
+}
+```
