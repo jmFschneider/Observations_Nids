@@ -51,9 +51,17 @@ class ImportationService:
                     resultats['ignores'] += 1
                     continue
 
-                # Charger le contenu JSON
+                # Lire le contenu du fichier
                 with open(chemin_fichier, 'r', encoding='utf-8') as f:
-                    contenu_json = json.load(f)
+                    contenu = f.read()
+
+                # Supprimer les marqueurs Markdown si présents
+                # Version simplifiée
+                if contenu.startswith('```json') and contenu.endswith('```'):
+                    contenu = contenu[7:-3].strip()  # Enlever ```json au début (7 caractères) et ``` à la fin (3 caractères)
+
+                # Parser le JSON nettoyé
+                contenu_json = json.loads(contenu)
 
                 # Créer l'entrée dans TranscriptionBrute
                 TranscriptionBrute.objects.create(
@@ -61,9 +69,11 @@ class ImportationService:
                     json_brut=contenu_json
                 )
                 resultats['reussis'] += 1
+                logger.info(f"Fichier importé avec succès: {fichier}")
 
             except json.JSONDecodeError as e:
-                erreur = f"Erreur de format JSON dans {fichier}: {str(e)}"
+                # Afficher plus de détails sur l'erreur
+                erreur = f"Erreur de format JSON dans {fichier}: {str(e)}. Début du contenu: {contenu[:100] if 'contenu' in locals() else 'Non disponible'}"
                 logger.error(erreur)
                 resultats['erreurs'].append(erreur)
             except Exception as e:
@@ -144,25 +154,15 @@ class ImportationService:
 
     def _trouver_correspondance_observateur(self, observateur_candidat):
         """Tente de trouver une correspondance pour un observateur candidat"""
-        utilisateurs = Utilisateur.objects.filter(est_valide=True)
-        meilleure_correspondance = None
-        meilleur_score = 0
+        # Créer ou récupérer l'utilisateur
+        utilisateur = self.creer_ou_recuperer_utilisateur(observateur_candidat.nom_complet_transcrit)
 
-        for utilisateur in utilisateurs:
-            nom_complet = f"{utilisateur.first_name} {utilisateur.last_name}".strip()
-            score = SequenceMatcher(None, observateur_candidat.nom_complet_transcrit.lower(),
-                                    nom_complet.lower()).ratio()
+        # Associer l'utilisateur au candidat
+        observateur_candidat.utilisateur_valide = utilisateur
+        observateur_candidat.validation_manuelle = True
+        observateur_candidat.save()
 
-            if score > meilleur_score and score >= self.seuil_similarite:
-                meilleur_score = score
-                meilleure_correspondance = utilisateur
-
-        if meilleure_correspondance:
-            observateur_candidat.utilisateur_valide = meilleure_correspondance
-            observateur_candidat.save()
-            return True
-
-        return False
+        return True
 
     def preparer_importations(self):
         """Prépare les importations pour les transcriptions qui ont des candidats validés"""
@@ -207,6 +207,73 @@ class ImportationService:
                 continue
 
         return importations_creees
+
+    # Dans Importation/importation_service.py, ajoutez cette méthode à la classe ImportationService:
+
+    def creer_ou_recuperer_utilisateur(self, nom_observateur):
+        """Crée ou récupère un utilisateur à partir d'un nom d'observateur manuscrit"""
+        if not nom_observateur or nom_observateur.strip() == '':
+            prenom = "Obs"
+            nom = "Observateur"
+        else:
+            # Séparer le nom complet en prénom et nom
+            parts = nom_observateur.strip().split()
+
+            if len(parts) >= 2:
+                prenom = parts[0]
+                nom = ' '.join(parts[1:])
+            else:
+                # Un seul mot, on le duplique
+                prenom = parts[0]
+                nom = parts[0]
+
+        # Normaliser les valeurs (supprimer caractères spéciaux, etc.)
+        prenom = ''.join(c for c in prenom if c.isalnum() or c.isspace()).strip()
+        nom = ''.join(c for c in nom if c.isalnum() or c.isspace()).strip()
+
+        # Si après nettoyage on a des chaînes vides, revenir aux valeurs par défaut
+        if not prenom or not nom:
+            prenom = "Obs"
+            nom = "Observateur"
+
+        # Construire username et email
+        base_username = f"{prenom.lower()}.{nom.lower()}"
+        email = f"{prenom.lower()}.{nom.lower()}@transcription.trans"
+
+        # Créer un username unique
+        username = base_username
+        counter = 1
+
+        while Utilisateur.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+
+        # Vérifier si l'utilisateur existe déjà avec ce nom et prénom
+        try:
+            utilisateur = Utilisateur.objects.get(
+                first_name__iexact=prenom,
+                last_name__iexact=nom,
+                est_transcription=True
+            )
+            return utilisateur
+        except Utilisateur.DoesNotExist:
+            # Créer un nouvel utilisateur
+            utilisateur = Utilisateur.objects.create(
+                username=username,
+                email=email,
+                first_name=prenom,
+                last_name=nom,
+                est_transcription=True,
+                est_valide=True,  # Automatically validate transcription users
+                role='observateur'
+            )
+            # Définir un mot de passe aléatoire
+            password = Utilisateur.objects.make_random_password()
+            utilisateur.set_password(password)
+            utilisateur.save()
+
+            logger.info(f"Nouvel utilisateur créé depuis transcription: {utilisateur}")
+            return utilisateur
 
     @transaction.atomic
     def finaliser_importation(self, importation_id):

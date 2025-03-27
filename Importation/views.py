@@ -12,7 +12,7 @@ from .importation_service import ImportationService
 from .models import (
     TranscriptionBrute, EspeceCandidate, ObservateurCandidat, ImportationEnCours
 )
-from Observations.models import Espece, Utilisateur
+from Observations.models import Espece, Utilisateur, FicheObservation
 
 logger = logging.getLogger(__name__)
 
@@ -263,6 +263,8 @@ def valider_observateur(request, observateur_id):
     """Vue pour valider un observateur candidat"""
     if request.method == 'POST':
         observateur_candidat = get_object_or_404(ObservateurCandidat, id=observateur_id)
+
+        # Si un ID d'utilisateur est fourni, utiliser cet utilisateur
         utilisateur_valide_id = request.POST.get('utilisateur_valide')
 
         if utilisateur_valide_id:
@@ -279,7 +281,18 @@ def valider_observateur(request, observateur_id):
             except Utilisateur.DoesNotExist:
                 messages.error(request, "L'utilisateur sélectionné n'existe pas")
         else:
-            messages.error(request, "Veuillez sélectionner un utilisateur valide")
+            # Si aucun utilisateur spécifié, créer un nouvel utilisateur à partir de la transcription
+            service = ImportationService()
+            utilisateur = service.creer_ou_recuperer_utilisateur(observateur_candidat.nom_complet_transcrit)
+
+            observateur_candidat.utilisateur_valide = utilisateur
+            observateur_candidat.validation_manuelle = True
+            observateur_candidat.save()
+
+            messages.success(
+                request,
+                f"Nouvel utilisateur '{utilisateur.first_name} {utilisateur.last_name}' créé et associé à '{observateur_candidat.nom_complet_transcrit}'"
+            )
 
     return redirect('liste_observateurs_candidats')
 
@@ -294,6 +307,7 @@ def creer_nouvel_utilisateur(request):
         email = request.POST.get('email')
         username = request.POST.get('username')
         observateur_candidat_id = request.POST.get('observateur_candidat_id')
+        est_transcription = True  # Par défaut, les nouveaux utilisateurs créés ici sont des transcriptions
 
         if prenom and nom and email and username:
             # Vérifier si le nom d'utilisateur existe déjà
@@ -308,6 +322,7 @@ def creer_nouvel_utilisateur(request):
                 first_name=prenom,
                 last_name=nom,
                 est_valide=True,
+                est_transcription=est_transcription,
                 role='observateur'
             )
             utilisateur.set_password('password123')  # Mot de passe par défaut
@@ -417,6 +432,48 @@ def finaliser_importation(request, importation_id):
     return redirect('detail_importation', importation_id=importation_id)
 
 
+# Dans Importation/views.py, ajoutez:
+
+@login_required
+@user_passes_test(est_admin)
+def resume_importation(request):
+    """Vue pour afficher un résumé des importations"""
+    # Statistiques
+    total_transcriptions = TranscriptionBrute.objects.count()
+    transcriptions_traitees = TranscriptionBrute.objects.filter(traite=True).count()
+
+    # Espèces
+    especes_candidates = EspeceCandidate.objects.count()
+    especes_validees = EspeceCandidate.objects.exclude(espece_validee=None).count()
+
+    # Observateurs
+    observateurs_candidats = ObservateurCandidat.objects.count()
+    observateurs_valides = ObservateurCandidat.objects.exclude(utilisateur_valide=None).count()
+    observateurs_transcription = Utilisateur.objects.filter(est_transcription=True).count()
+
+    # Fiches
+    fiches_importees = FicheObservation.objects.filter(
+        observateur__est_transcription=True
+    ).count()
+
+    # Récentes importations
+    recentes_importations = ImportationEnCours.objects.filter(
+        statut='complete'
+    ).order_by('-date_creation')[:10]
+
+    context = {
+        'total_transcriptions': total_transcriptions,
+        'transcriptions_traitees': transcriptions_traitees,
+        'especes_candidates': especes_candidates,
+        'especes_validees': especes_validees,
+        'observateurs_candidats': observateurs_candidats,
+        'observateurs_valides': observateurs_valides,
+        'observateurs_transcription': observateurs_transcription,
+        'fiches_importees': fiches_importees,
+        'recentes_importations': recentes_importations,
+    }
+
+    return render(request, 'importation/resume_importation.html', context)
 # Ajout de cette nouvelle vue dans views.py
 
 @login_required

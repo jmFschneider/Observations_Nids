@@ -161,38 +161,49 @@
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
+                                        <!-- Dans templates/importation/observateurs_candidats.html, modifiez la modal pour créer un utilisateur -->
+
+                                        <!-- Remplacez la section du modal pour la création d'un utilisateur -->
                                         <div class="modal-body">
                                             <form method="post" action="{% url 'creer_nouvel_utilisateur' %}">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="observateur_candidat_id" value="{{ observateur.id }}">
-                                                
+
                                                 <!-- Essayer de diviser le nom transcrit en prénom et nom -->
                                                 {% with nom_complet=observateur.nom_complet_transcrit.split %}
                                                     <div class="form-group">
                                                         <label for="prenom{{ observateur.id }}">Prénom:</label>
-                                                        <input type="text" name="prenom" id="prenom{{ observateur.id }}" 
+                                                        <input type="text" name="prenom" id="prenom{{ observateur.id }}"
                                                             class="form-control" value="{{ nom_complet.0|default:'' }}" required>
                                                     </div>
-                                                    
+
                                                     <div class="form-group">
                                                         <label for="nom{{ observateur.id }}">Nom:</label>
-                                                        <input type="text" name="nom" id="nom{{ observateur.id }}" 
+                                                        <input type="text" name="nom" id="nom{{ observateur.id }}"
                                                             class="form-control" value="{{ nom_complet.1|default:'' }}" required>
                                                     </div>
                                                 {% endwith %}
-                                                
+
                                                 <div class="form-group">
                                                     <label for="email{{ observateur.id }}">Email:</label>
-                                                    <input type="email" name="email" id="email{{ observateur.id }}" 
+                                                    <input type="email" name="email" id="email{{ observateur.id }}"
                                                         class="form-control" required>
                                                 </div>
-                                                
+
                                                 <div class="form-group">
                                                     <label for="username{{ observateur.id }}">Nom d'utilisateur:</label>
-                                                    <input type="text" name="username" id="username{{ observateur.id }}" 
+                                                    <input type="text" name="username" id="username{{ observateur.id }}"
                                                         class="form-control" required>
                                                 </div>
-                                                
+
+                                                <div class="form-group form-check">
+                                                    <input type="checkbox" name="est_transcription" id="est_transcription{{ observateur.id }}"
+                                                        class="form-check-input" checked>
+                                                    <label class="form-check-label" for="est_transcription{{ observateur.id }}">
+                                                        Utilisateur issu d'une transcription manuscrite
+                                                    </label>
+                                                </div>
+
                                                 <div class="text-right">
                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
                                                     <button type="submit" class="btn btn-success">Créer</button>

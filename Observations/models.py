@@ -15,6 +15,7 @@ class Utilisateur(AbstractUser):  # On étend l'utilisateur Django
 
     role = models.CharField(max_length=15, choices=ROLES, default='observateur')
     est_valide = models.BooleanField(default=False)  # Validation par l'administrateur
+    est_transcription = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.get_role_display()})"

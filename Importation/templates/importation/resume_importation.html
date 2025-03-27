@@ -1,0 +1,154 @@
+```html
+<!-- templates/importation/resume_importation.html -->
+{% extends "base.html" %}
+
+{% block title %}Résumé des importations{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'accueil_importation' %}">Importation</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Résumé des importations</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">Résumé des importations de fiches transcrites</h1>
+
+    <div class="alert alert-info">
+        <p>Ce tableau de bord présente une vue d'ensemble des opérations d'importation des fiches manuscrites transcrites.</p>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Statistiques générales</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>Total des transcriptions:</th>
+                                    <td>{{ total_transcriptions }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Transcriptions traitées:</th>
+                                    <td>{{ transcriptions_traitees }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Fiches importées:</th>
+                                    <td>{{ fiches_importees }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Réconciliation des données</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>Espèces candidates:</th>
+                                    <td>{{ especes_candidates }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Espèces validées:</th>
+                                    <td>{{ especes_validees }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Observateurs candidats:</th>
+                                    <td>{{ observateurs_candidats }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Observateurs validés:</th>
+                                    <td>{{ observateurs_valides }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Utilisateurs créés par transcription:</th>
+                                    <td>{{ observateurs_transcription }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Dernières importations complétées</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fichier source</th>
+                            <th>Espèce</th>
+                            <th>Observateur</th>
+                            <th>Date d'importation</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for importation in recentes_importations %}
+                        <tr>
+                            <td>{{ importation.transcription.fichier_source }}</td>
+                            <td>
+                                {% if importation.espece_candidate and importation.espece_candidate.espece_validee %}
+                                    {{ importation.espece_candidate.espece_validee.nom }}
+                                {% else %}
+                                    <span class="text-muted">Non validée</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if importation.observateur_candidat and importation.observateur_candidat.utilisateur_valide %}
+                                    {{ importation.observateur_candidat.utilisateur_valide.first_name }}
+                                    {{ importation.observateur_candidat.utilisateur_valide.last_name }}
+                                    {% if importation.observateur_candidat.utilisateur_valide.est_transcription %}
+                                        <span class="badge badge-info">Transcription</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">Non validé</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ importation.date_creation|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if importation.fiche_observation %}
+                                    <a href="{% url 'fiche_observation' importation.fiche_observation.num_fiche %}"
+                                       class="btn btn-sm btn-primary">
+                                        Voir fiche #{{ importation.fiche_observation.num_fiche }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">Fiche non disponible</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune importation complétée récemment.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'accueil_importation' %}" class="btn btn-primary">Retour à l'accueil d'importation</a>
+    </div>
+</div>
+{% endblock %}
+```

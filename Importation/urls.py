@@ -25,6 +25,7 @@ urlpatterns = [
     path('importation/liste/', views.liste_importations, name='liste_importations'),
     path('importation/detail/<int:importation_id>/', views.detail_importation, name='detail_importation'),
     path('importation/finaliser/<int:importation_id>/', views.finaliser_importation, name='finaliser_importation'),
+    path('importation/resume/', views.resume_importation, name='resume_importation'),
 
     # Nouvelles routes pour la réinitialisation
     path('importation/reinitialiser/<int:importation_id>/', views.reinitialiser_importation, name='reinitialiser_importation'),
