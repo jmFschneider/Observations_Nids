@@ -14,12 +14,6 @@ urlpatterns = [
     path('importation/especes/<int:espece_id>/valider/', views.valider_espece, name='valider_espece'),
     path('importation/especes/creer/', views.creer_nouvelle_espece, name='creer_nouvelle_espece'),
 
-    # Gestion des observateurs candidats
-    path('importation/observateurs/', views.liste_observateurs_candidats, name='liste_observateurs_candidats'),
-    path('importation/observateurs/<int:observateur_id>/valider/', views.valider_observateur,
-         name='valider_observateur'),
-    path('importation/observateurs/creer/', views.creer_nouvel_utilisateur, name='creer_nouvel_utilisateur'),
-
     # Gestion des importations
     path('importation/preparer/', views.preparer_importations, name='preparer_importations'),
     path('importation/liste/', views.liste_importations, name='liste_importations'),
@@ -27,7 +21,7 @@ urlpatterns = [
     path('importation/finaliser/<int:importation_id>/', views.finaliser_importation, name='finaliser_importation'),
     path('importation/resume/', views.resume_importation, name='resume_importation'),
 
-    # Nouvelles routes pour la réinitialisation
+    # Réinitialisation
     path('importation/reinitialiser/<int:importation_id>/', views.reinitialiser_importation, name='reinitialiser_importation'),
     path('importation/reinitialiser-toutes/', views.reinitialiser_toutes_importations, name='reinitialiser_toutes_importations'),
 ]

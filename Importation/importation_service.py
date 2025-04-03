@@ -12,7 +12,7 @@ from Observations.models import (
     Nid, Observation, ResumeObservation, CausesEchec, Remarque
 )
 from .models import (
-    TranscriptionBrute, EspeceCandidate, ObservateurCandidat, ImportationEnCours
+    TranscriptionBrute, EspeceCandidate, ImportationEnCours
 )
 
 logger = logging.getLogger(__name__)
@@ -56,9 +56,8 @@ class ImportationService:
                     contenu = f.read()
 
                 # Supprimer les marqueurs Markdown si présents
-                # Version simplifiée
                 if contenu.startswith('```json') and contenu.endswith('```'):
-                    contenu = contenu[7:-3].strip()  # Enlever ```json au début (7 caractères) et ``` à la fin (3 caractères)
+                    contenu = contenu[7:-3].strip()
 
                 # Parser le JSON nettoyé
                 contenu_json = json.loads(contenu)
@@ -72,7 +71,6 @@ class ImportationService:
                 logger.info(f"Fichier importé avec succès: {fichier}")
 
             except json.JSONDecodeError as e:
-                # Afficher plus de détails sur l'erreur
                 erreur = f"Erreur de format JSON dans {fichier}: {str(e)}. Début du contenu: {contenu[:100] if 'contenu' in locals() else 'Non disponible'}"
                 logger.error(erreur)
                 resultats['erreurs'].append(erreur)
@@ -84,10 +82,10 @@ class ImportationService:
         return resultats
 
     def extraire_donnees_candidats(self):
-        """Extrait les espèces et observateurs candidats des transcriptions brutes"""
+        """Extrait les espèces et crée automatiquement les utilisateurs à partir des transcriptions brutes"""
         transcriptions = TranscriptionBrute.objects.filter(traite=False)
         especes_ajoutees = 0
-        observateurs_ajoutes = 0
+        utilisateurs_crees = 0
 
         for transcription in transcriptions:
             try:
@@ -107,19 +105,14 @@ class ImportationService:
                             # Tenter une correspondance automatique
                             self._trouver_correspondance_espece(espece)
 
-                # Extraire l'observateur
+                # Extraire et créer/récupérer l'observateur directement
                 if 'informations_generales' in donnees and 'observateur' in donnees['informations_generales']:
                     nom_observateur = donnees['informations_generales']['observateur']
                     if nom_observateur and isinstance(nom_observateur, str):
-                        # Vérifier si cet observateur existe déjà comme candidat
-                        observateur, created = ObservateurCandidat.objects.get_or_create(
-                            nom_complet_transcrit=nom_observateur
-                        )
-                        if created:
-                            observateurs_ajoutes += 1
-
-                            # Tenter une correspondance automatique
-                            self._trouver_correspondance_observateur(observateur)
+                        # Créer ou récupérer l'utilisateur automatiquement
+                        utilisateur = self.creer_ou_recuperer_utilisateur(nom_observateur)
+                        if utilisateur and getattr(utilisateur, '_created', False):
+                            utilisateurs_crees += 1
 
             except Exception as e:
                 logger.error(
@@ -128,7 +121,7 @@ class ImportationService:
 
         return {
             'especes_ajoutees': especes_ajoutees,
-            'observateurs_ajoutes': observateurs_ajoutes
+            'utilisateurs_crees': utilisateurs_crees
         }
 
     def _trouver_correspondance_espece(self, espece_candidate):
@@ -151,64 +144,6 @@ class ImportationService:
             return True
 
         return False
-
-    def _trouver_correspondance_observateur(self, observateur_candidat):
-        """Tente de trouver une correspondance pour un observateur candidat"""
-        # Créer ou récupérer l'utilisateur
-        utilisateur = self.creer_ou_recuperer_utilisateur(observateur_candidat.nom_complet_transcrit)
-
-        # Associer l'utilisateur au candidat
-        observateur_candidat.utilisateur_valide = utilisateur
-        observateur_candidat.validation_manuelle = True
-        observateur_candidat.save()
-
-        return True
-
-    def preparer_importations(self):
-        """Prépare les importations pour les transcriptions qui ont des candidats validés"""
-        transcriptions = TranscriptionBrute.objects.filter(traite=False)
-        importations_creees = 0
-
-        for transcription in transcriptions:
-            try:
-                # Vérifier si une importation existe déjà
-                if ImportationEnCours.objects.filter(transcription=transcription).exists():
-                    continue
-
-                donnees = transcription.json_brut
-
-                # Extraire et vérifier l'espèce
-                espece_candidate = None
-                if 'informations_generales' in donnees and 'espece' in donnees['informations_generales']:
-                    nom_espece = donnees['informations_generales']['espece']
-                    if nom_espece:
-                        espece_candidate = EspeceCandidate.objects.filter(nom_transcrit=nom_espece).first()
-
-                # Extraire et vérifier l'observateur
-                observateur_candidat = None
-                if 'informations_generales' in donnees and 'observateur' in donnees['informations_generales']:
-                    nom_observateur = donnees['informations_generales']['observateur']
-                    if nom_observateur:
-                        observateur_candidat = ObservateurCandidat.objects.filter(
-                            nom_complet_transcrit=nom_observateur).first()
-
-                # Créer l'importation en cours
-                ImportationEnCours.objects.create(
-                    transcription=transcription,
-                    espece_candidate=espece_candidate,
-                    observateur_candidat=observateur_candidat,
-                    statut='en_attente'
-                )
-                importations_creees += 1
-
-            except Exception as e:
-                logger.error(
-                    f"Erreur lors de la préparation de l'importation pour {transcription.fichier_source}: {str(e)}")
-                continue
-
-        return importations_creees
-
-    # Dans Importation/importation_service.py, ajoutez cette méthode à la classe ImportationService:
 
     def creer_ou_recuperer_utilisateur(self, nom_observateur):
         """Crée ou récupère un utilisateur à partir d'un nom d'observateur manuscrit"""
@@ -272,8 +207,54 @@ class ImportationService:
             utilisateur.set_password(password)
             utilisateur.save()
 
+            # Marquer l'utilisateur comme nouvellement créé pour les statistiques
+            utilisateur._created = True
+
             logger.info(f"Nouvel utilisateur créé depuis transcription: {utilisateur}")
             return utilisateur
+
+    def preparer_importations(self):
+        """Prépare les importations pour les transcriptions qui ont des candidats validés"""
+        transcriptions = TranscriptionBrute.objects.filter(traite=False)
+        importations_creees = 0
+
+        for transcription in transcriptions:
+            try:
+                # Vérifier si une importation existe déjà
+                if ImportationEnCours.objects.filter(transcription=transcription).exists():
+                    continue
+
+                donnees = transcription.json_brut
+
+                # Extraire et vérifier l'espèce
+                espece_candidate = None
+                if 'informations_generales' in donnees and 'espece' in donnees['informations_generales']:
+                    nom_espece = donnees['informations_generales']['espece']
+                    if nom_espece:
+                        espece_candidate = EspeceCandidate.objects.filter(nom_transcrit=nom_espece).first()
+
+                # Extraire et créer/récupérer l'observateur directement
+                utilisateur = None
+                if 'informations_generales' in donnees and 'observateur' in donnees['informations_generales']:
+                    nom_observateur = donnees['informations_generales']['observateur']
+                    if nom_observateur:
+                        utilisateur = self.creer_ou_recuperer_utilisateur(nom_observateur)
+
+                # Créer l'importation en cours
+                ImportationEnCours.objects.create(
+                    transcription=transcription,
+                    espece_candidate=espece_candidate,
+                    observateur=utilisateur,  # Utiliser directement l'utilisateur au lieu d'un candidat
+                    statut='en_attente'
+                )
+                importations_creees += 1
+
+            except Exception as e:
+                logger.error(
+                    f"Erreur lors de la préparation de l'importation pour {transcription.fichier_source}: {str(e)}")
+                continue
+
+        return importations_creees
 
     @transaction.atomic
     def finaliser_importation(self, importation_id):
@@ -281,16 +262,17 @@ class ImportationService:
         try:
             importation = ImportationEnCours.objects.select_for_update().get(id=importation_id)
 
-            # Vérifier si l'espèce et l'observateur sont validés
+            # Vérifier si l'espèce est validée
             if not importation.espece_candidate or not importation.espece_candidate.espece_validee:
                 importation.statut = 'erreur'
                 importation.save()
                 return False, "Espèce non validée"
 
-            if not importation.observateur_candidat or not importation.observateur_candidat.utilisateur_valide:
+            # Vérifier si l'observateur est présent
+            if not importation.observateur:
                 importation.statut = 'erreur'
                 importation.save()
-                return False, "Observateur non validé"
+                return False, "Observateur non trouvé"
 
             # Récupérer les données JSON
             donnees = importation.transcription.json_brut
@@ -304,7 +286,7 @@ class ImportationService:
 
             # Créer la fiche d'observation
             fiche = FicheObservation.objects.create(
-                observateur=importation.observateur_candidat.utilisateur_valide,
+                observateur=importation.observateur,
                 espece=importation.espece_candidate.espece_validee,
                 annee=annee,
                 chemin_image=importation.transcription.fichier_source
@@ -441,13 +423,6 @@ class ImportationService:
     def reinitialiser_importation(self, importation_id=None, fichier_source=None):
         """
         Réinitialise une importation pour permettre de recommencer le processus
-
-        Args:
-            importation_id: ID de l'importation à réinitialiser
-            fichier_source: Nom du fichier source à réinitialiser (alternative à importation_id)
-
-        Returns:
-            dict: Résultat de l'opération avec succès (bool) et message (str)
         """
         try:
             # Si un ID d'importation est fourni, on l'utilise

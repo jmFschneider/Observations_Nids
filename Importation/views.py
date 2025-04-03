@@ -1,16 +1,17 @@
-# views_importation.py
+# views.py
 import logging
+import os
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import JsonResponse
-from django.db.models import Q
-from django.urls import reverse
 from django.core.paginator import Paginator
+from django.db.models import Q
+from django.conf import settings
 
 from .importation_service import ImportationService
 from .models import (
-    TranscriptionBrute, EspeceCandidate, ObservateurCandidat, ImportationEnCours
+    TranscriptionBrute, EspeceCandidate, ImportationEnCours
 )
 from Observations.models import Espece, Utilisateur, FicheObservation
 
@@ -31,8 +32,7 @@ def accueil_importation(request):
     transcriptions_traitees = TranscriptionBrute.objects.filter(traite=True).count()
     especes_candidates = EspeceCandidate.objects.count()
     especes_validees = EspeceCandidate.objects.exclude(espece_validee=None).count()
-    observateurs_candidats = ObservateurCandidat.objects.count()
-    observateurs_valides = ObservateurCandidat.objects.exclude(utilisateur_valide=None).count()
+    observateurs_transcription = Utilisateur.objects.filter(est_transcription=True).count()
 
     importations_en_attente = ImportationEnCours.objects.filter(statut='en_attente').count()
     importations_erreur = ImportationEnCours.objects.filter(statut='erreur').count()
@@ -43,8 +43,7 @@ def accueil_importation(request):
         'transcriptions_traitees': transcriptions_traitees,
         'especes_candidates': especes_candidates,
         'especes_validees': especes_validees,
-        'observateurs_candidats': observateurs_candidats,
-        'observateurs_valides': observateurs_valides,
+        'observateurs_transcription': observateurs_transcription,
         'importations_en_attente': importations_en_attente,
         'importations_erreur': importations_erreur,
         'importations_completees': importations_completees,
@@ -56,9 +55,7 @@ def accueil_importation(request):
 @login_required
 @user_passes_test(est_admin)
 def importer_json(request):
-    import os
-    from django.conf import settings
-
+    """Vue pour importer des fichiers JSON depuis un répertoire"""
     # Chemin vers le répertoire de résultats de transcription
     base_dir = os.path.join(settings.MEDIA_ROOT, 'transcription_results')
 
@@ -71,9 +68,6 @@ def importer_json(request):
     directories = [d for d in os.listdir(base_dir)
                    if os.path.isdir(os.path.join(base_dir, d))]
 
-    logger.debug(f"Sous-répertoires trouvés: {directories}")
-
-    """Vue pour importer des fichiers JSON depuis un répertoire"""
     if request.method == 'POST':
         repertoire = request.POST.get('repertoire')
         if not repertoire:
@@ -102,7 +96,7 @@ def importer_json(request):
 @login_required
 @user_passes_test(est_admin)
 def extraire_candidats(request):
-    """Vue pour extraire les espèces et observateurs candidats"""
+    """Vue pour extraire les espèces et créer automatiquement les utilisateurs"""
     if request.method == 'POST':
         service = ImportationService()
         resultats = service.extraire_donnees_candidats()
@@ -110,7 +104,7 @@ def extraire_candidats(request):
         messages.success(
             request,
             f"Extraction terminée: {resultats['especes_ajoutees']} nouvelles espèces, "
-            f"{resultats['observateurs_ajoutes']} nouveaux observateurs"
+            f"{resultats['utilisateurs_crees']} nouveaux utilisateurs créés"
         )
 
         return redirect('accueil_importation')
@@ -222,136 +216,6 @@ def creer_nouvelle_espece(request):
 
 @login_required
 @user_passes_test(est_admin)
-def liste_observateurs_candidats(request):
-    """Vue pour afficher et gérer les observateurs candidats"""
-    # Filtre de recherche
-    recherche = request.GET.get('recherche', '')
-    statut = request.GET.get('statut', 'tous')
-
-    observateurs = ObservateurCandidat.objects.all()
-
-    # Appliquer les filtres
-    if recherche:
-        observateurs = observateurs.filter(nom_complet_transcrit__icontains=recherche)
-
-    if statut == 'valides':
-        observateurs = observateurs.exclude(utilisateur_valide=None)
-    elif statut == 'non_valides':
-        observateurs = observateurs.filter(utilisateur_valide=None)
-
-    # Pagination
-    paginator = Paginator(observateurs.order_by('nom_complet_transcrit'), 20)
-    page = request.GET.get('page', 1)
-    observateurs_page = paginator.get_page(page)
-
-    # Liste des utilisateurs validés pour le menu déroulant
-    utilisateurs_valides = Utilisateur.objects.filter(est_valide=True).order_by('last_name', 'first_name')
-
-    context = {
-        'observateurs': observateurs_page,
-        'recherche': recherche,
-        'statut': statut,
-        'utilisateurs_valides': utilisateurs_valides
-    }
-
-    return render(request, 'importation/liste_observateurs_candidats.html', context)
-
-
-@login_required
-@user_passes_test(est_admin)
-def valider_observateur(request, observateur_id):
-    """Vue pour valider un observateur candidat"""
-    if request.method == 'POST':
-        observateur_candidat = get_object_or_404(ObservateurCandidat, id=observateur_id)
-
-        # Si un ID d'utilisateur est fourni, utiliser cet utilisateur
-        utilisateur_valide_id = request.POST.get('utilisateur_valide')
-
-        if utilisateur_valide_id:
-            try:
-                utilisateur_valide = Utilisateur.objects.get(id=utilisateur_valide_id)
-                observateur_candidat.utilisateur_valide = utilisateur_valide
-                observateur_candidat.validation_manuelle = True
-                observateur_candidat.save()
-
-                messages.success(
-                    request,
-                    f"L'observateur '{observateur_candidat.nom_complet_transcrit}' a été associé à '{utilisateur_valide.first_name} {utilisateur_valide.last_name}'"
-                )
-            except Utilisateur.DoesNotExist:
-                messages.error(request, "L'utilisateur sélectionné n'existe pas")
-        else:
-            # Si aucun utilisateur spécifié, créer un nouvel utilisateur à partir de la transcription
-            service = ImportationService()
-            utilisateur = service.creer_ou_recuperer_utilisateur(observateur_candidat.nom_complet_transcrit)
-
-            observateur_candidat.utilisateur_valide = utilisateur
-            observateur_candidat.validation_manuelle = True
-            observateur_candidat.save()
-
-            messages.success(
-                request,
-                f"Nouvel utilisateur '{utilisateur.first_name} {utilisateur.last_name}' créé et associé à '{observateur_candidat.nom_complet_transcrit}'"
-            )
-
-    return redirect('liste_observateurs_candidats')
-
-
-@login_required
-@user_passes_test(est_admin)
-def creer_nouvel_utilisateur(request):
-    """Vue pour créer un nouvel utilisateur à partir d'une transcription"""
-    if request.method == 'POST':
-        prenom = request.POST.get('prenom')
-        nom = request.POST.get('nom')
-        email = request.POST.get('email')
-        username = request.POST.get('username')
-        observateur_candidat_id = request.POST.get('observateur_candidat_id')
-        est_transcription = True  # Par défaut, les nouveaux utilisateurs créés ici sont des transcriptions
-
-        if prenom and nom and email and username:
-            # Vérifier si le nom d'utilisateur existe déjà
-            if Utilisateur.objects.filter(username=username).exists():
-                messages.error(request, f"Le nom d'utilisateur '{username}' existe déjà")
-                return redirect('liste_observateurs_candidats')
-
-            # Créer le nouvel utilisateur
-            utilisateur = Utilisateur.objects.create(
-                username=username,
-                email=email,
-                first_name=prenom,
-                last_name=nom,
-                est_valide=True,
-                est_transcription=est_transcription,
-                role='observateur'
-            )
-            utilisateur.set_password('password123')  # Mot de passe par défaut
-            utilisateur.save()
-
-            # Si un observateur candidat est spécifié, l'associer
-            if observateur_candidat_id:
-                try:
-                    observateur_candidat = ObservateurCandidat.objects.get(id=observateur_candidat_id)
-                    observateur_candidat.utilisateur_valide = utilisateur
-                    observateur_candidat.validation_manuelle = True
-                    observateur_candidat.save()
-
-                    messages.success(
-                        request,
-                        f"Nouvel utilisateur '{prenom} {nom}' créé et associé à '{observateur_candidat.nom_complet_transcrit}'"
-                    )
-                except ObservateurCandidat.DoesNotExist:
-                    messages.success(request, f"Nouvel utilisateur '{prenom} {nom}' créé")
-            else:
-                messages.success(request, f"Nouvel utilisateur '{prenom} {nom}' créé")
-        else:
-            messages.error(request, "Veuillez remplir tous les champs requis")
-
-    return redirect('liste_observateurs_candidats')
-
-
-@login_required
-@user_passes_test(est_admin)
 def preparer_importations(request):
     """Vue pour préparer les importations des transcriptions"""
     if request.method == 'POST':
@@ -402,7 +266,6 @@ def detail_importation(request, importation_id):
     transcription = importation.transcription
 
     # Afficher le contenu JSON formaté
-    import json
     donnees_json = json.dumps(transcription.json_brut, indent=2, ensure_ascii=False)
 
     context = {
@@ -432,8 +295,6 @@ def finaliser_importation(request, importation_id):
     return redirect('detail_importation', importation_id=importation_id)
 
 
-# Dans Importation/views.py, ajoutez:
-
 @login_required
 @user_passes_test(est_admin)
 def resume_importation(request):
@@ -447,8 +308,6 @@ def resume_importation(request):
     especes_validees = EspeceCandidate.objects.exclude(espece_validee=None).count()
 
     # Observateurs
-    observateurs_candidats = ObservateurCandidat.objects.count()
-    observateurs_valides = ObservateurCandidat.objects.exclude(utilisateur_valide=None).count()
     observateurs_transcription = Utilisateur.objects.filter(est_transcription=True).count()
 
     # Fiches
@@ -466,15 +325,13 @@ def resume_importation(request):
         'transcriptions_traitees': transcriptions_traitees,
         'especes_candidates': especes_candidates,
         'especes_validees': especes_validees,
-        'observateurs_candidats': observateurs_candidats,
-        'observateurs_valides': observateurs_valides,
         'observateurs_transcription': observateurs_transcription,
         'fiches_importees': fiches_importees,
         'recentes_importations': recentes_importations,
     }
 
     return render(request, 'importation/resume_importation.html', context)
-# Ajout de cette nouvelle vue dans views.py
+
 
 @login_required
 @user_passes_test(est_admin)
@@ -495,7 +352,7 @@ def reinitialiser_importation(request, importation_id):
 @login_required
 @user_passes_test(est_admin)
 def reinitialiser_toutes_importations(request):
-    """Vue pour réinitialiser toutes les importations terminées ou en erreur"""
+    """Vue pour réinitialiser toutes les importations"""
     if request.method == 'POST':
         statut = request.POST.get('statut', 'all')
 
@@ -505,8 +362,10 @@ def reinitialiser_toutes_importations(request):
             query = Q(statut='complete')
         elif statut == 'erreur':
             query = Q(statut='erreur')
+        elif statut == 'en_attente':
+            query = Q(statut='en_attente')  # Ajout de cette option
         elif statut == 'all':
-            query = Q(statut='complete') | Q(statut='erreur')
+            query = Q(statut='complete') | Q(statut='erreur') | Q(statut='en_attente')  # Inclure 'en_attente'
 
         importations = ImportationEnCours.objects.filter(query)
         count = 0

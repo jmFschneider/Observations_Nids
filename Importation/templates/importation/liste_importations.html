@@ -13,12 +13,12 @@
     </nav>
 
     <h1 class="mb-4">Liste des importations en cours</h1>
-    
+
     <div class="alert alert-info">
         <p>Cette page affiche les importations préparées et leur statut. Cliquez sur "Voir détails" pour consulter
            les informations détaillées d'une importation et la finaliser.</p>
     </div>
-    
+
     <!-- Ajout d'une section pour réinitialiser en masse des importations -->
     <div class="card mb-4">
         <div class="card-header bg-warning text-white">
@@ -32,7 +32,8 @@
                 <div class="form-group">
                     <label for="statut_reinit">Réinitialiser les importations:</label>
                     <select name="statut" id="statut_reinit" class="form-control mb-2">
-                        <option value="all">Toutes (terminées et en erreur)</option>
+                        <option value="all">Toutes les importations</option>
+                        <option value="en_attente">En attente uniquement</option>
                         <option value="complete">Terminées uniquement</option>
                         <option value="erreur">En erreur uniquement</option>
                     </select>
@@ -106,17 +107,14 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if importation.observateur_candidat %}
-                                {% if importation.observateur_candidat.utilisateur_valide %}
-                                    <span class="text-success">
-                                        {{ importation.observateur_candidat.utilisateur_valide.first_name }}
-                                        {{ importation.observateur_candidat.utilisateur_valide.last_name }}
-                                    </span>
-                                {% else %}
-                                    <span class="text-warning">
-                                        {{ importation.observateur_candidat.nom_complet_transcrit }} (non validé)
-                                    </span>
-                                {% endif %}
+                            {% if importation.observateur %}
+                                <span class="text-success">
+                                    {{ importation.observateur.first_name }}
+                                    {{ importation.observateur.last_name }}
+                                    {% if importation.observateur.est_transcription %}
+                                        <span class="badge badge-info">Transcription</span>
+                                    {% endif %}
+                                </span>
                             {% else %}
                                 <span class="text-danger">Non trouvé</span>
                             {% endif %}
@@ -135,14 +133,14 @@
                             <a href="{% url 'detail_importation' importation.id %}" class="btn btn-sm btn-info">Voir détails</a>
 
                             {% if importation.statut == 'en_attente' %}
-                                {% if importation.espece_candidate.espece_validee and importation.observateur_candidat.utilisateur_valide %}
+                                {% if importation.espece_candidate.espece_validee and importation.observateur %}
                                     <form method="post" action="{% url 'finaliser_importation' importation.id %}" class="d-inline">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-sm btn-success">Finaliser</button>
                                     </form>
                                 {% else %}
                                     <button type="button" class="btn btn-sm btn-success" disabled
-                                            title="L'espèce et l'observateur doivent être validés">
+                                            title="L'espèce doit être validée">
                                         Finaliser
                                     </button>
                                 {% endif %}
@@ -189,13 +187,13 @@
                             <span class="page-link">Précédente</span>
                         </li>
                     {% endif %}
-                    
+
                     <li class="page-item active">
                         <span class="page-link">
                             Page {{ importations.number }} sur {{ importations.paginator.num_pages }}
                         </span>
                     </li>
-                    
+
                     {% if importations.has_next %}
                         <li class="page-item">
                             <a class="page-link" href="?page={{ importations.next_page_number }}&statut={{ statut }}">
@@ -220,7 +218,7 @@
         </div>
         {% endif %}
     </div>
-    
+
     <div class="mt-4">
         <a href="{% url 'preparer_importations' %}" class="btn btn-primary">Préparer de nouvelles importations</a>
     </div>

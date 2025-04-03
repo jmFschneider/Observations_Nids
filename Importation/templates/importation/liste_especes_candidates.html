@@ -13,12 +13,12 @@
     </nav>
 
     <h1 class="mb-4">Gestion des espèces candidates</h1>
-    
+
     <div class="alert alert-info">
         <p>Cette page permet de valider les noms d'espèces extraits des fiches transcrites et de les associer
            aux espèces existantes dans la base de données.</p>
     </div>
-    
+
     <!-- Filtres de recherche -->
     <div class="card mb-4">
         <div class="card-header bg-secondary text-white">
@@ -29,7 +29,7 @@
                 <div class="col-md-5">
                     <div class="form-group">
                         <label for="recherche">Recherche:</label>
-                        <input type="text" name="recherche" id="recherche" class="form-control" 
+                        <input type="text" name="recherche" id="recherche" class="form-control"
                                value="{{ recherche }}" placeholder="Nom d'espèce...">
                     </div>
                 </div>
@@ -49,14 +49,7 @@
             </form>
         </div>
     </div>
-    
-    <!-- Button to create a new species -->
-    <div class="mb-4">
-        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#creerEspeceModal">
-            <i class="fas fa-plus"></i> Créer une nouvelle espèce
-        </button>
-    </div>
-    
+
     <!-- Liste des espèces candidates -->
     <div class="card">
         <div class="card-header bg-primary text-white">
@@ -91,96 +84,35 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if not espece.espece_validee %}
-                                <button type="button" class="btn btn-sm btn-primary"
-                                        data-toggle="modal" data-target="#validerEspeceModal{{ espece.id }}">
-                                    Valider
-                                </button>
-                            {% else %}
-                                <button type="button" class="btn btn-sm btn-secondary"
-                                        data-toggle="modal" data-target="#validerEspeceModal{{ espece.id }}">
-                                    Modifier
-                                </button>
+                            {% if espece %}
+
+                                <form method="post" action="{% url 'valider_espece' espece.id %}" class="espece-form">
+                                    {% csrf_token %}
+
+                                    <div class="form-group mb-2">
+                                        <label>Nom proposé:</label>
+                                        <input type="text" name="nom_espece" id="nom_espece{{ espece.id }}" class="form-control"
+                                               value="{{ espece.nom_transcrit }}">
+                                    </div>
+
+                                    <div class="form-group mb-2">
+                                        <label>Ou sélectionner une espèce existante:</label>
+                                        <select name="espece_validee" id="espece_validee{{ espece.id }}" class="form-control">
+                                            <option value="">-- Sélectionnez une espèce --</option>
+                                            {% for esp in especes_validees %}
+                                                <option value="{{ esp.id }}"
+                                                    {% if espece.espece_validee and espece.espece_validee.id == esp.id %}selected{% endif %}>
+                                                    {{ esp.nom }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div class="mt-2">
+                                        <button type="submit" class="btn btn-primary btn-sm">Valider</button>
+                                    </div>
+                                </form>
                             {% endif %}
-                            
-                            <!-- Modal pour valider l'espèce -->
-                            <div class="modal fade" id="validerEspeceModal{{ espece.id }}" tabindex="-1" role="dialog" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">
-                                                {% if not espece.espece_validee %}
-                                                    Valider l'espèce
-                                                {% else %}
-                                                    Modifier la validation
-                                                {% endif %}
-                                            </h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form method="post" action="{% url 'valider_espece' espece.id %}">
-                                                {% csrf_token %}
-                                                <div class="form-group">
-                                                    <label for="espece_validee{{ espece.id }}">Sélectionnez l'espèce correspondante:</label>
-                                                    <select name="espece_validee" id="espece_validee{{ espece.id }}" class="form-control" required>
-                                                        <option value="">-- Sélectionnez une espèce --</option>
-                                                        {% for esp in especes_validees %}
-                                                            <option value="{{ esp.id }}" 
-                                                                {% if espece.espece_validee.id == esp.id %}selected{% endif %}>
-                                                                {{ esp.nom }}
-                                                            </option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-                                                
-                                                <div class="text-right">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                                                    <button type="submit" class="btn btn-primary">Valider</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Button to create new species from this candidate -->
-                            <button type="button" class="btn btn-sm btn-info"
-                                    data-toggle="modal" data-target="#creerDepuisEspeceModal{{ espece.id }}">
-                                Créer nouvelle
-                            </button>
-                            
-                            <!-- Modal to create new species from this candidate -->
-                            <div class="modal fade" id="creerDepuisEspeceModal{{ espece.id }}" tabindex="-1" role="dialog" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Créer une nouvelle espèce</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form method="post" action="{% url 'creer_nouvelle_espece' %}">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="espece_candidate_id" value="{{ espece.id }}">
-                                                
-                                                <div class="form-group">
-                                                    <label for="nom_espece{{ espece.id }}">Nom de l'espèce:</label>
-                                                    <input type="text" name="nom_espece" id="nom_espece{{ espece.id }}" 
-                                                        class="form-control" value="{{ espece.nom_transcrit }}" required>
-                                                </div>
-                                                
-                                                <div class="text-right">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                                                    <button type="submit" class="btn btn-success">Créer</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </td>
                     </tr>
                     {% empty %}
@@ -214,13 +146,13 @@
                             <span class="page-link">Précédente</span>
                         </li>
                     {% endif %}
-                    
+
                     <li class="page-item active">
                         <span class="page-link">
                             Page {{ especes.number }} sur {{ especes.paginator.num_pages }}
                         </span>
                     </li>
-                    
+
                     {% if especes.has_next %}
                         <li class="page-item">
                             <a class="page-link" href="?page={{ especes.next_page_number }}&recherche={{ recherche }}&statut={{ statut }}">
@@ -245,35 +177,41 @@
         </div>
         {% endif %}
     </div>
-    
-    <!-- Modal pour créer une nouvelle espèce -->
-    <div class="modal fade" id="creerEspeceModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Créer une nouvelle espèce</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="{% url 'creer_nouvelle_espece' %}">
-                        {% csrf_token %}
-                        
-                        <div class="form-group">
-                            <label for="nom_espece">Nom de l'espèce:</label>
-                            <input type="text" name="nom_espece" id="nom_espece" 
-                                   class="form-control" required>
-                        </div>
-                        
-                        <div class="text-right">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                            <button type="submit" class="btn btn-success">Créer</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
+
+ <script>
+document.addEventListener('DOMContentLoaded', function() {
+     debugger;  // ← Chrome s'arrêtera ici
+    // Pour chaque formulaire d'espèce
+    document.querySelectorAll('.espece-form').forEach(function(form) {
+        const nomInput = form.querySelector('[id^="nom_espece"]');
+        const especeSelect = form.querySelector('[id^="espece_validee"]');
+
+        // Quand l'utilisateur tape dans le champ nom
+        nomInput.addEventListener('input', function() {
+            // Si l'utilisateur entre un nom, on désélectionne l'espèce
+            if (this.value.trim() !== '') {
+                especeSelect.value = '';
+            }
+        });
+
+        // Quand l'utilisateur sélectionne une espèce
+        especeSelect.addEventListener('change', function() {
+            // Si l'utilisateur sélectionne une espèce, on efface le nom proposé
+            if (this.value !== '') {
+                nomInput.value = '';
+            }
+        });
+
+        // Au moment de l'envoi du formulaire
+        form.addEventListener('submit', function(event) {
+            // Si ni un nom ni une espèce n'est choisi, on empêche l'envoi
+            if (nomInput.value.trim() === '' && especeSelect.value === '') {
+                event.preventDefault();
+                alert('Veuillez soit entrer un nom, soit sélectionner une espèce.');
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

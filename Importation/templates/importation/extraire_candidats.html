@@ -1,32 +1,35 @@
 <!-- templates/importation/extraire_candidats.html -->
 {% extends "base.html" %}
 
-{% block title %}Extraire les candidats{% endblock %}
+{% block title %}Extraire les données{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'accueil_importation' %}">Importation</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Extraire les candidats</li>
+            <li class="breadcrumb-item active" aria-current="page">Extraire les données</li>
         </ol>
     </nav>
 
-    <h1 class="mb-4">Extraire les espèces et observateurs candidats</h1>
-    
+    <h1 class="mb-4">Extraire les espèces et créer les observateurs</h1>
+
     <div class="alert alert-info">
-        <p>Cette étape analyse les transcriptions brutes pour extraire les noms d'espèces et d'observateurs,
-           et tente de les associer automatiquement avec les entrées existantes dans la base de données.</p>
-        <p>Les correspondances incertaines devront être validées manuellement par la suite.</p>
+        <p>Cette étape analyse les transcriptions brutes pour:</p>
+        <ul>
+            <li>Extraire les noms d'espèces et tenter de les associer aux entrées existantes dans la base de données</li>
+            <li>Extraire les noms d'observateurs et créer ou récupérer automatiquement les utilisateurs correspondants</li>
+        </ul>
+        <p>Les correspondances incertaines pour les espèces devront être validées manuellement par la suite.</p>
     </div>
-    
+
     <div class="card">
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0">Extraction</h5>
         </div>
         <div class="card-body">
-            <p>Cliquez sur le bouton ci-dessous pour lancer l'extraction des candidats à partir des transcriptions non traitées:</p>
-            
+            <p>Cliquez sur le bouton ci-dessous pour lancer l'extraction des données à partir des transcriptions non traitées:</p>
+
             <form method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Lancer l'extraction</button>

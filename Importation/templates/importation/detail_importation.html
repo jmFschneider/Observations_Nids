@@ -66,19 +66,14 @@
 
                         <dt class="col-sm-4">Observateur:</dt>
                         <dd class="col-sm-8">
-                            {% if importation.observateur_candidat %}
-                                {% if importation.observateur_candidat.utilisateur_valide %}
-                                    <span class="text-success">
-                                        {{ importation.observateur_candidat.utilisateur_valide.first_name }}
-                                        {{ importation.observateur_candidat.utilisateur_valide.last_name }}
-                                    </span>
-                                {% else %}
-                                    <span class="text-warning">
-                                        {{ importation.observateur_candidat.nom_complet_transcrit }} (non validé)
-                                    </span>
-                                    <a href="{% url 'liste_observateurs_candidats' %}?recherche={{ importation.observateur_candidat.nom_complet_transcrit }}"
-                                       class="btn btn-sm btn-warning">Valider</a>
-                                {% endif %}
+                            {% if importation.observateur %}
+                                <span class="text-success">
+                                    {{ importation.observateur.first_name }}
+                                    {{ importation.observateur.last_name }}
+                                    {% if importation.observateur.est_transcription %}
+                                        <span class="badge badge-info">Transcription</span>
+                                    {% endif %}
+                                </span>
                             {% else %}
                                 <span class="text-danger">Non trouvé</span>
                             {% endif %}
@@ -99,7 +94,7 @@
                 </div>
             </div>
 
-            {% if importation.statut == 'en_attente' and importation.espece_candidate.espece_validee and importation.observateur_candidat.utilisateur_valide %}
+            {% if importation.statut == 'en_attente' and importation.espece_candidate.espece_validee and importation.observateur %}
                 <div class="mt-3">
                     <form method="post" action="{% url 'finaliser_importation' importation.id %}">
                         {% csrf_token %}

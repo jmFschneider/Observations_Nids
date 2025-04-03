@@ -1,4 +1,4 @@
-# models_transcription.py
+# models.py
 from django.db import models
 from Observations.models import Espece, Utilisateur, FicheObservation
 
@@ -25,23 +25,12 @@ class EspeceCandidate(models.Model):
         return self.nom_transcrit
 
 
-class ObservateurCandidat(models.Model):
-    """Modèle pour stocker les noms d'observateurs à réconcilier"""
-    nom_complet_transcrit = models.CharField(max_length=100, unique=True)
-    utilisateur_valide = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True, blank=True)
-    validation_manuelle = models.BooleanField(default=False)
-    score_similarite = models.FloatField(default=0.0, help_text="Score de similarité en pourcentage (0-100%)")
-
-    def __str__(self):
-        return self.nom_complet_transcrit
-
-
 class ImportationEnCours(models.Model):
     """Modèle pour suivre les importations en cours"""
     transcription = models.OneToOneField(TranscriptionBrute, on_delete=models.CASCADE)
     fiche_observation = models.OneToOneField(FicheObservation, on_delete=models.SET_NULL, null=True, blank=True)
     espece_candidate = models.ForeignKey(EspeceCandidate, on_delete=models.SET_NULL, null=True, blank=True)
-    observateur_candidat = models.ForeignKey(ObservateurCandidat, on_delete=models.SET_NULL, null=True, blank=True)
+    observateur = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True, blank=True)
     statut = models.CharField(max_length=20, choices=[
         ('en_attente', 'En attente de validation'),
         ('erreur', 'Erreur détectée'),
