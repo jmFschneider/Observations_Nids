@@ -25,9 +25,9 @@
         {% for fiche in fiches %}
         <tr>
             <td>{{ fiche.num_fiche }}</td>
-            <td>{{ fiche.date }}</td>
-            <td>{{ fiche.nombre_oeufs }}</td>
-            <td>{{ fiche.nombre_poussins }}</td>
+            <td>{{ fiche.annee }}</td>
+            <td>{{ fiche.resume.nombre_oeufs_pondus }}</td>
+            <td>{{ fiche.resume.nombre_poussins }}</td>
             <td><a href="{% url 'fiche_observation' fiche.num_fiche %}">Voir détails</a></td>
             <td><a href="{% url 'saisie_test_edit' fiche.num_fiche %}">Voir détails</a></td>
         </tr>

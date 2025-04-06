@@ -1,0 +1,45 @@
+{
+  "informations_generales": {
+    "n_fiche": "1",
+    "observateur": "Prénom Nom",
+    "n_espece": null,
+    "espece": "Nom d'espèce",
+    "annee": "2023"
+  },
+  "nid": {
+    "nid_prec_t_meme_c_ple": true,
+    "haut_nid": "120",
+    "h_c_vert": "140",
+    "nid": "Texte libre"
+  },
+  "localisation": {
+    "IGN_50000": "Texte",
+    "commune": "Texte",
+    "dep_t": "14",
+    "coordonnees_et_ou_lieu_dit": "Texte",
+    "altitude": "0m",
+    "paysage": "Texte",
+    "alentours": "Texte"
+  },
+  "tableau_donnees": [
+    {
+      "Jour": "01",
+      "Mois": "04",
+      "Heure": "14",
+      "Nombre_oeuf": "3",
+      "Nombre_pou": "2",
+      "age": "5",
+      "observations": "Texte"
+    }
+  ],
+  "tableau_donnees_2": {
+    "1er_o_pondu": { "jour": null, "Mois": null, "Precision": null },
+    "1er_p_eclos": { "jour": null, "Mois": null, "Precision": null },
+    "1er_p_volant": { "jour": null, "Mois": null, "Precision": null },
+    "nombre_oeufs": { "pondus": null, "eclos": null, "n_ecl": null },
+    "nombre_poussins": { "1/2": null, "3/4": null, "vol_t": null }
+  },
+  "causes_echec": {
+    "causes_d_echec": "Texte libre ou null"
+  }
+}

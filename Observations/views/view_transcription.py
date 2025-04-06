@@ -1,4 +1,7 @@
 # views.py
+import copy
+import json
+import logging
 import os
 import time
 import google.generativeai as genai
@@ -9,6 +12,11 @@ from django.http import JsonResponse
 from django.utils import timezone
 import datetime
 from dotenv import load_dotenv
+
+from Observations.json_rep.json_sanitizer import validate_json_structure, corriger_json
+
+
+logger = logging.getLogger(__name__)
 
 
 def select_directory(request):
@@ -75,48 +83,11 @@ def process_images(request):
     model = genai.GenerativeModel("gemini-2.0-flash")
 
     # Définir le prompt pour guider l'IA
-    prompt = """
-    Voici une fiche d'observation manuscrite avec un format structuré. 
-    Lis et extrais les informations suivantes :
+    def load_prompt(nom_fichier):
+        with open(os.path.join(settings.BASE_DIR, 'Observations', 'json_rep', nom_fichier), 'r', encoding='utf-8') as f:
+            return f.read()
 
-    1.  **Informations générales (dictionnaire JSON):**
-        - n° fiche
-        - observateur
-        - n° espéce
-        - espèce
-        - année
-        
-    2. **Nid ((dictionnaire JSON):**
-        - nid préc't même c'ple
-        - haut. nid
-        - h.c'vert
-        - nid
-
-    3. **Localisation (dictionnaire JSON):**
-        - IGN/50000
-        - commune
-        - dép't
-        - coordonées et/ou lieu-dit
-        - altitude	- 
-        - paysage (dans un rayon de 200 à 500 mètres)
-        - alentours (dans un rayon de 20 à 50 métres)
-
-    4.  **Tableau de données (intégré au JSON):**
-        - Structure JSON: un tableau d'objets, chaque objet représentant une ligne du tableau.
-        - Champs pour chaque objet: Jour, Mois, Heure, Nombre œuf, Nombre pou, age, observations (inclure les observations spécifiques à la ligne).
-        
-    5.  **Tableau de données (intégré au JSON):**
-        - Structure JSON: un tableau comportant 5 sous tableau
-        - Chaque sous tableau comporte une ligne avec l'objet, 1er o. pondu, 1er p. éclos, 1er p.volant, npmbre d'oeufs, nombre de poussins
-        - Les colonnes des trois premiers sous tableaus sont : jour, Mois, Précision
-        - Les colonnes quatriéme sous tableau sont : pondus, éclos, n.écl.
-        - les colonnes du cinquiéme sous tableau sont : 1/2, 3/4, vol't
-
-    5.	**Causes d'échec(dictionnaire JSON):**
-        - causes d'échec
-
-    Important: Fournis l'ensemble des données (informations générales et tableau) dans un seul objet JSON.
-    """
+    prompt = load_prompt("prompt_gemini_transcription.txt")
 
     # Limiter le nombre de fichiers à traiter en développement (commentez en production)
     # image_files = image_files[:5]
@@ -148,12 +119,36 @@ def process_images(request):
             response = model.generate_content([prompt, image])
             text_response = response.text.encode('utf-8').decode('utf-8')
 
-            # Enregistrer le résultat JSON
-            json_filename = f"{os.path.splitext(img_file)[0]}_result.json"
-            json_path = os.path.join(results_dir, json_filename)
+            # Nettoyage éventuel de markdown ```json
+            if text_response.startswith("```json"):
+                text_response = text_response[7:-3].strip()
 
-            with open(json_path, 'w', encoding='utf-8') as f:
-                f.write(text_response)
+            # Tenter de parser en JSON
+            try:
+                json_data = json.loads(text_response)
+            except json.JSONDecodeError as e:
+                json_data = None
+                logger.error(f"Erreur de JSON invalide pour {img_file} : {str(e)}")
+
+            if json_data:
+                # Vérification de la structure
+                erreurs = validate_json_structure(json_data)
+
+                if erreurs:
+                    json_data_raw = copy.deepcopy(json_data)  # sauvegarde avant correction
+                    json_data = corriger_json(json_data_raw)
+
+                    # Enregistrement du fichier brut si utile
+                    raw_path = os.path.join(results_dir, f"{os.path.splitext(img_file)[0]}_raw.json")
+                    with open(raw_path, 'w', encoding='utf-8') as f:
+                        json.dump(json_data_raw, f, indent=2, ensure_ascii=False)
+
+                # Enregistrement du fichier corrigé ou valide directement
+                json_filename = f"{os.path.splitext(img_file)[0]}_result.json"
+                json_path = os.path.join(results_dir, json_filename)
+
+                with open(json_path, 'w', encoding='utf-8') as f:
+                    json.dump(json_data, f, indent=2, ensure_ascii=False)
 
             # Calculer le temps de traitement pour ce fichier
             file_duration = time.time() - file_start_time

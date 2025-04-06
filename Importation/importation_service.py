@@ -256,46 +256,39 @@ class ImportationService:
 
         return importations_creees
 
+
     @transaction.atomic
     def finaliser_importation(self, importation_id):
-        """Finalise l'importation d'une transcription en créant les entrées dans les tables principales"""
         try:
             importation = ImportationEnCours.objects.select_for_update().get(id=importation_id)
 
-            # Vérifier si l'espèce est validée
             if not importation.espece_candidate or not importation.espece_candidate.espece_validee:
                 importation.statut = 'erreur'
                 importation.save()
                 return False, "Espèce non validée"
 
-            # Vérifier si l'observateur est présent
             if not importation.observateur:
                 importation.statut = 'erreur'
                 importation.save()
                 return False, "Observateur non trouvé"
 
-            # Récupérer les données JSON
             donnees = importation.transcription.json_brut
 
-            # Extraire l'année (utiliser l'année actuelle si non disponible)
             annee = timezone.now().year
-            if 'informations_generales' in donnees and 'année' in donnees['informations_generales']:
-                annee_str = donnees['informations_generales']['année']
-                if annee_str and annee_str.isdigit():
+            if 'informations_generales' in donnees:
+                annee_str = donnees['informations_generales'].get('annee')
+                if annee_str and str(annee_str).isdigit():
                     annee = int(annee_str)
 
-            # Créer la fiche d'observation
             fiche = FicheObservation.objects.create(
                 observateur=importation.observateur,
                 espece=importation.espece_candidate.espece_validee,
                 annee=annee,
                 chemin_image=importation.transcription.fichier_source
             )
-
-            # Enregistrer la référence à la fiche dans l'importation
             importation.fiche_observation = fiche
 
-            # Mettre à jour la localisation
+            # Localisation
             if 'localisation' in donnees:
                 loc = donnees['localisation']
                 Localisation.objects.filter(fiche=fiche).update(
@@ -307,106 +300,79 @@ class ImportationService:
                     alentours=loc.get('alentours') or 'Non spécifié'
                 )
 
-            # Mettre à jour les informations du nid
+            # Nid
             if 'nid' in donnees:
                 nid_data = donnees['nid']
-                nid_meme_couple = False
-                if nid_data.get('nid_prec_t_meme_c_ple') in ['oui', 'Oui', 'OUI', 'true', 'True', 'TRUE', '1']:
-                    nid_meme_couple = True
 
-                # Essayer de convertir la hauteur en entier
-                hauteur_nid = 0
-                hauteur_str = nid_data.get('haut_nid') or '0'
-                try:
-                    # Remplacer la virgule par un point si nécessaire
-                    hauteur_str = hauteur_str.replace(',', '.')
-                    hauteur_nid = int(float(hauteur_str))
-                except (ValueError, TypeError):
-                    pass
-
-                hauteur_couvert = 0
-                couvert_str = nid_data.get('h_c_vert') or '0'
-                try:
-                    couvert_str = couvert_str.replace(',', '.')
-                    hauteur_couvert = int(float(couvert_str))
-                except (ValueError, TypeError):
-                    pass
+                def safe_float_to_int(val):
+                    try:
+                        return int(float(str(val).replace(',', '.')))
+                    except:
+                        return 0
 
                 Nid.objects.filter(fiche=fiche).update(
-                    nid_prec_t_meme_couple=nid_meme_couple,
-                    hauteur_nid=hauteur_nid,
-                    hauteur_couvert=hauteur_couvert,
+                    nid_prec_t_meme_couple=bool(nid_data.get('nid_prec_t_meme_c_ple')),
+                    hauteur_nid=safe_float_to_int(nid_data.get('haut_nid')),
+                    hauteur_couvert=safe_float_to_int(nid_data.get('h_c_vert')),
                     details_nid=nid_data.get('nid') or 'Aucun détail'
                 )
 
-            # Créer les observations
+            # Observations
             if 'tableau_donnees' in donnees and isinstance(donnees['tableau_donnees'], list):
                 for obs in donnees['tableau_donnees']:
-                    # Essayer de construire une date valide
                     try:
                         jour = int(obs.get('Jour') or 1)
                         mois = int(obs.get('Mois') or 1)
-                        heure = int(obs.get('Heure') or 12)
-                        minute = 0
-
-                        date_obs = timezone.datetime(annee, mois, jour, heure, minute)
-
-                        # Convertir en format datetime-aware
-                        date_obs = timezone.make_aware(date_obs)
-
-                        nombre_oeufs = int(obs.get('Nombre_oeuf') or 0)
-                        nombre_poussins = int(obs.get('Nombre_pou') or 0)
+                        heure = int(str(obs.get('Heure') or 12).replace('e', ''))
+                        date_obs = timezone.make_aware(timezone.datetime(annee, mois, jour, heure, 0))
 
                         Observation.objects.create(
                             fiche=fiche,
                             date_observation=date_obs,
-                            nombre_oeufs=nombre_oeufs,
-                            nombre_poussins=nombre_poussins,
+                            nombre_oeufs=int(obs.get('Nombre_oeuf') or 0),
+                            nombre_poussins=int(obs.get('Nombre_pou') or 0),
                             observations=obs.get('observations') or ''
                         )
-                    except (ValueError, TypeError) as e:
-                        logger.warning(f"Impossible de créer l'observation pour la fiche {fiche.num_fiche}: {str(e)}")
-                        continue
+                    except Exception as e:
+                        logger.warning(f"Observation ignorée (fiche {fiche.num_fiche}) : {str(e)}")
 
-            # Mettre à jour le résumé de l'observation
+            # Résumé
             if 'tableau_donnees_2' in donnees:
-                resume_data = donnees['tableau_donnees_2']
-                nombre_poussins_data = None
+                resume = donnees['tableau_donnees_2']
 
-                if 'nombre_poussins' in resume_data and resume_data['nombre_poussins']:
-                    nombre_poussins_data = resume_data['nombre_poussins'][0] if resume_data['nombre_poussins'] else None
-
-                nombre_poussins_total = 0
-                if nombre_poussins_data:
-                    # Prendre la valeur 'vol_t' si disponible
-                    if 'vol_t' in nombre_poussins_data and nombre_poussins_data['vol_t']:
-                        try:
-                            nombre_poussins_total = int(nombre_poussins_data['vol_t'])
-                        except (ValueError, TypeError):
-                            pass
+                def safe_int(value):
+                    try:
+                        return int(value)
+                    except:
+                        return None
 
                 ResumeObservation.objects.filter(fiche=fiche).update(
-                    nombre_poussins=nombre_poussins_total
+                    premier_oeuf_pondu_jour=safe_int(resume.get('1er_o_pondu', {}).get('jour')),
+                    premier_oeuf_pondu_mois=safe_int(resume.get('1er_o_pondu', {}).get('Mois')),
+                    premier_poussin_eclos_jour=safe_int(resume.get('1er_p_eclos', {}).get('jour')),
+                    premier_poussin_eclos_mois=safe_int(resume.get('1er_p_eclos', {}).get('Mois')),
+                    premier_poussin_volant_jour=safe_int(resume.get('1er_p_volant', {}).get('jour')),
+                    premier_poussin_volant_mois=safe_int(resume.get('1er_p_volant', {}).get('Mois')),
+                    nombre_oeufs_pondus=safe_int(resume.get('nombre_oeufs', {}).get('pondus')) or 0,
+                    nombre_oeufs_eclos=safe_int(resume.get('nombre_oeufs', {}).get('eclos')) or 0,
+                    nombre_oeufs_non_eclos=safe_int(resume.get('nombre_oeufs', {}).get('n_ecl')) or 0,
+                    nombre_poussins=safe_int(resume.get('nombre_poussins', {}).get('vol_t')) or 0
                 )
 
-            # Ajouter causes d'échec si disponibles
-            if 'causes_echec' in donnees and donnees['causes_echec'].get('causes_d_echec'):
+            # Échec
+            if 'causes_echec' in donnees:
                 CausesEchec.objects.filter(fiche=fiche).update(
-                    description=donnees['causes_echec'].get('causes_d_echec')
+                    description=donnees['causes_echec'].get('causes_d_echec') or ''
                 )
 
-            # Ajouter une remarque avec le nom du fichier source
             Remarque.objects.create(
                 fiche=fiche,
                 remarque=f"Importé depuis le fichier {importation.transcription.fichier_source}"
             )
 
-            # Marquer l'importation comme terminée
             importation.statut = 'complete'
-            importation.save()
-
-            # Marquer la transcription comme traitée
             importation.transcription.traite = True
+            importation.save()
             importation.transcription.save()
 
             return True, f"Fiche d'observation #{fiche.num_fiche} créée avec succès"
@@ -414,11 +380,12 @@ class ImportationService:
         except ImportationEnCours.DoesNotExist:
             return False, "Importation non trouvée"
         except Exception as e:
-            logger.error(f"Erreur lors de la finalisation de l'importation {importation_id}: {str(e)}")
+            logger.error(f"Erreur lors de l'importation {importation_id}: {str(e)}")
             if 'importation' in locals():
                 importation.statut = 'erreur'
                 importation.save()
             return False, str(e)
+
 
     def reinitialiser_importation(self, importation_id=None, fichier_source=None):
         """

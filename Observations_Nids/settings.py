@@ -182,6 +182,15 @@ LOGGING = {
             'style': '{',
         },
     },
+    'filters': {
+        'ignore_debug_toolbar_errors': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': lambda record: not (
+                'django.template.base.VariableDoesNotExist' in record.getMessage()
+                and 'toolbar' in record.getMessage()
+            ),
+        },
+    },
     'handlers': {
         'file': {
             'level': 'DEBUG',
@@ -192,6 +201,7 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
+            'filters': ['ignore_debug_toolbar_errors'],
             'formatter': 'simple',
         },
     },
@@ -204,6 +214,11 @@ LOGGING = {
         'Observations': {  # Application principale
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['console'],
+            'level': 'INFO',  # Augmenter à INFO pour réduire les messages de debug inutiles
             'propagate': False,
         },
     },

@@ -151,12 +151,16 @@ def liste_especes_candidates(request):
 
 @login_required
 @user_passes_test(est_admin)
+@login_required
+@user_passes_test(est_admin)
 def valider_espece(request, espece_id):
     """Vue pour valider une espèce candidate"""
     if request.method == 'POST':
         espece_candidate = get_object_or_404(EspeceCandidate, id=espece_id)
         espece_validee_id = request.POST.get('espece_validee')
+        nom_espece = request.POST.get('nom_espece')
 
+        # Cas 1: Une espèce existante a été sélectionnée
         if espece_validee_id:
             try:
                 espece_validee = Espece.objects.get(id=espece_validee_id)
@@ -170,11 +174,45 @@ def valider_espece(request, espece_id):
                 )
             except Espece.DoesNotExist:
                 messages.error(request, "L'espèce sélectionnée n'existe pas")
+
+        # Cas 2: Un nouveau nom d'espèce a été saisi
+        elif nom_espece and nom_espece.strip():
+            try:
+                # Vérifier si l'espèce existe déjà avec ce nom
+                espece_existante = Espece.objects.filter(nom__iexact=nom_espece.strip()).first()
+
+                if espece_existante:
+                    # Si elle existe, l'utiliser
+                    espece_candidate.espece_validee = espece_existante
+                    espece_candidate.validation_manuelle = True
+                    espece_candidate.save()
+
+                    messages.success(
+                        request,
+                        f"L'espèce '{espece_candidate.nom_transcrit}' a été associée à l'espèce existante '{espece_existante.nom}'"
+                    )
+                else:
+                    # Sinon, créer une nouvelle espèce
+                    nouvelle_espece = Espece.objects.create(
+                        nom=nom_espece.strip(),
+                        valide_par_admin=True  # Validée par un admin
+                    )
+
+                    espece_candidate.espece_validee = nouvelle_espece
+                    espece_candidate.validation_manuelle = True
+                    espece_candidate.save()
+
+                    messages.success(
+                        request,
+                        f"Une nouvelle espèce '{nouvelle_espece.nom}' a été créée et associée à '{espece_candidate.nom_transcrit}'"
+                    )
+            except Exception as e:
+                messages.error(request, f"Erreur lors de la création de l'espèce: {str(e)}")
         else:
-            messages.error(request, "Veuillez sélectionner une espèce valide")
+            messages.error(request,
+                           "Veuillez soit sélectionner une espèce existante, soit saisir un nouveau nom d'espèce")
 
     return redirect('liste_especes_candidates')
-
 
 @login_required
 @user_passes_test(est_admin)
