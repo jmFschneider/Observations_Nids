@@ -13,16 +13,21 @@ from Observations.models import (Utilisateur,
 
 
 class FicheObservationForm(forms.ModelForm):
-    espece = forms.ModelChoiceField(queryset=Espece.objects.get_queryset(), empty_label="Sélectionnez une espèce",
-                                    label="Espèce observée")
-    annee = forms.IntegerField(initial=datetime.now().year, disabled=True, label="Année d'observation")
-
     class Meta:
         model = FicheObservation
-        fields = ["espece", "annee", "chemin_image"]
+        fields = ["observateur", "espece", "annee", "chemin_image"]
         widgets = {
-            "num_fiche": forms.TextInput(attrs={"readonly": True}),  # Rendre le champ num_fiche non modifiable
+            "observateur": forms.TextInput(attrs={"readonly": True}),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        # Désactiver le champ observateur sauf pour les admins et reviewers
+        if user and user.role not in ['administrateur', 'reviewer']:
+            self.fields["observateur"].disabled = True
+
 
 
 class LocalisationForm(forms.ModelForm):
