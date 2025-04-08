@@ -6,6 +6,17 @@
 {% endblock %}
 
 {% block content %}
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
     <h2>Saisie d'une nouvelle observation</h2>
     <form method="post">
         {% csrf_token %}
@@ -57,14 +68,15 @@
         <div class="localisation-container">
             <div class="localisation-left">
                 <div class="section-title">Paysage (200 à 500m)</div>
-                <textarea class="section-content" name="paysage" rows="2" aria-label="Paysage">{{ localisation_form.paysage.value|default_if_none:"" }}</textarea>
+                {{ localisation_form.paysage }}
             </div>
-            <!-- Partie droite : Paysage & Alentours -->
+        
             <div class="localisation-right">
                 <div class="section-title">Alentours (20 à 50m)</div>
-                <textarea class="section-content" name="paysage" rows="2" aria-label="Paysage">{{ localisation_form.alentours.value|default_if_none:"" }}</textarea>
-			</div>
-		</div>
+                {{ localisation_form.alentours }}
+            </div>
+        </div>
+
 
         <div class="nid">
             <h3>Description du Nid</h3>
@@ -75,36 +87,35 @@
                     <th>Hauteur du couvert (cm)</th>
                 </tr>
                 <tr>
-                    <td>
-                        {{ nid_form.nid_prec_t_meme_couple.errors }}
-                        {{ nid_form.nid_prec_t_meme_couple }}
-                    </td>
+                    <td>{{ nid_form.nid_prec_t_meme_couple }}</td>
                     <td>
                         <div class="form-field">
-                            {{ nid_form.hauteur_nid.errors }}
                             <label for="{{ nid_form.hauteur_nid.id_for_label }}">cm</label>
                             {{ nid_form.hauteur_nid }}
                         </div>
                     </td>
                     <td>
                         <div class="form-field">
-                            {{ nid_form.hauteur_couvert.errors }}
                             <label for="{{ nid_form.hauteur_couvert.id_for_label }}">cm</label>
                             {{ nid_form.hauteur_couvert }}
                         </div>
                     </td>
                 </tr>
             </table>
-
+        
             <div class="section-title">Détails du Nid</div>
-            <textarea class="section-content" name="details_nid" rows="2" aria-label="Paysage">{{ nid_form.details_nid.value|default_if_none:"" }}</textarea>
+            <div class="form-field">
+                {{ nid_form.details_nid }}
+            </div>
         </div>
+
 
         <!-- Résumé de l'observation en pleine largeur -->
                 <!-- Tableau des observations -->
 
         <div class="observations">
             <h3>Observations</h3>
+            {{ observation_formset.management_form }}
             <div class="observations-table">
                 <table>
                     <thead>
@@ -116,33 +127,23 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for observation in observations %}
+                        {% for form in observation_formset %}
                         <tr>
-                            <td>
-                                <input type="datetime-local" name="observation_date_{{ forloop.counter }}"
-                                       value="{{ observation.date_observation|date:'Y-m-d\TH:i' }}">
-                            </td>
-                            <td>
-                                <input type="number" name="observation_oeufs_{{ forloop.counter }}"
-                                       value="{{ observation.nombre_oeufs }}">
-                            </td>
-                            <td>
-                                <input type="number" name="observation_poussins_{{ forloop.counter }}"
-                                       value="{{ observation.nombre_poussins }}">
-                            </td>
-                            <td>
-                                <input type="text" name="observation_texte_{{ forloop.counter }}"
-                                       value="{{ observation.observations }}">
-                            </td>
+                            <!-- Ajouter les champs cachés nécessaires pour le formset -->
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            <td>{{ form.date_observation }}</td>
+                            <td>{{ form.nombre_oeufs }}</td>
+                            <td>{{ form.nombre_poussins }}</td>
+                            <td>{{ form.observations }}</td>
                         </tr>
-                        {% empty %}
-                        <tr><td colspan="4">Aucune observation enregistrée.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-
+    
 
         <div class="resume-container">
             <table>
@@ -231,23 +232,11 @@
 		<div class="causes-remarques-container">
 			<!-- Partie gauche : Causes de l'échec -->
 			<div class="remarques-container">
-				<table>
-					<thead>
-						<tr>
-							<th>Description des causes d'échec</th>
-						</tr>
-					</thead>
-					<tbody>
-							<tr>
-								<td>
-									<textarea class="section-content" name="paysage" rows="2" aria-label="Paysage">
-                                        {{ causes_echec_form.description.value|default_if_none:"non renseigné" }}
-                                    </textarea>
-								</td>
-							</tr>
-					</tbody>
-				</table>
-			</div>
+                <div class="section-title">Description des causes d'échec</div>
+                <div class="form-field">
+                    {{ causes_echec_form.description }}
+                </div>
+            </div>
 
 			<!-- Partie droite : Remarques -->
             <div class="remarques-container">

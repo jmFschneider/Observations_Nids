@@ -17,24 +17,56 @@ class FicheObservationForm(forms.ModelForm):
         model = FicheObservation
         fields = ["observateur", "espece", "annee", "chemin_image"]
         widgets = {
-            "observateur": forms.TextInput(attrs={"readonly": True}),
+            "observateur": forms.HiddenInput(),  # Changer pour HiddenInput
         }
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
-        # Désactiver le champ observateur sauf pour les admins et reviewers
-        if user and user.role not in ['administrateur', 'reviewer']:
-            self.fields["observateur"].disabled = True
+        if user:
+            # Définir l'observateur comme l'utilisateur actuel
+            if not self.instance.pk:  # Nouvelle instance
+                self.instance.observateur = user
 
+            # Toujours définir la valeur initiale
+            self.fields["observateur"].initial = user.id
+
+            # Pour les non-admins/reviewers, désactiver mais garder la valeur
+            if user.role not in ['administrateur', 'reviewer']:
+                self.fields["observateur"].disabled = True
 
 
 class LocalisationForm(forms.ModelForm):
     class Meta:
         model = Localisation
-        fields = ['commune', 'lieu_dit', 'departement', 'coordonnees',
-                  'latitude', 'longitude', 'altitude', 'paysage', 'alentours']  # Définissez les champs pertinents
+        fields = [
+            'commune',
+            'lieu_dit',
+            'departement',
+            'coordonnees',
+            'latitude',
+            'longitude',
+            'altitude',
+            'paysage',
+            'alentours'
+        ]
+        widgets = {
+            'commune': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Commune'}),
+            'lieu_dit': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Lieu-dit'}),
+            'departement': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Département'}),
+            'coordonnees': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Coordonnées'}),
+            'latitude': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Latitude'}),
+            'longitude': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Longitude'}),
+            'altitude': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Altitude'}),
+            'paysage': forms.Textarea(attrs={'class': 'section-content', 'rows': 2}),
+            'alentours': forms.Textarea(attrs={'class': 'section-content', 'rows': 2}),
+        }
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            if not self.instance.coordonnees:
+                self.fields['coordonnees'].initial = '0,0'
 
 
 class ObservationForm(forms.ModelForm):
@@ -74,7 +106,7 @@ class ResumeObservationForm(forms.ModelForm):
             'nombre_poussins': forms.NumberInput(attrs={'min': 0}),
         }
 
-
+# utilisation de la form Django personnalisé avec mon css
 class NidForm(forms.ModelForm):
     class Meta:
         model = Nid
@@ -85,10 +117,22 @@ class NidForm(forms.ModelForm):
             'details_nid',
         ]
         widgets = {
-            'nid_prec_t_meme_couple': forms.CheckboxInput(),
-            'hauteur_nid': forms.NumberInput(attrs={'placeholder': 'hauteur_nid', 'min': 0}),
-            'hauteur_couvert': forms.NumberInput(attrs={'placeholder': 'hauteur_couvert', 'min': 0}),
-            'details_nid': forms.Textarea(attrs={'placeholder': 'details_nid'}),
+            'nid_prec_t_meme_couple': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'hauteur_nid': forms.NumberInput(attrs={
+                'class': 'form-field',
+                'placeholder': 'hauteur_nid',
+                'min': 0
+            }),
+            'hauteur_couvert': forms.NumberInput(attrs={
+                'class': 'form-field',
+                'placeholder': 'hauteur_couvert',
+                'min': 0
+            }),
+            'details_nid': forms.Textarea(attrs={
+                'class': 'section-content',
+                'rows': 2,
+                'placeholder': 'Détails du nid'
+            }),
         }
 
 
