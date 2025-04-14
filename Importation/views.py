@@ -151,8 +151,6 @@ def liste_especes_candidates(request):
 
 @login_required
 @user_passes_test(est_admin)
-@login_required
-@user_passes_test(est_admin)
 def valider_espece(request, espece_id):
     """Vue pour valider une espèce candidate"""
     if request.method == 'POST':

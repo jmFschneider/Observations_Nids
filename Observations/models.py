@@ -37,17 +37,10 @@ class FicheObservation(models.Model):
     espece = models.ForeignKey(Espece, on_delete=models.PROTECT, related_name="observations")
     annee = models.IntegerField()
     chemin_image = models.CharField(max_length=255, blank=True, null=True)
-
+    chemin_json= models.CharField(max_length=255, blank=True, null=True)
+    transcription = models.BooleanField(default=False)
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if not hasattr(self, 'localisation'):
-            Localisation.objects.create(fiche=self)
-        if not hasattr(self, 'resume'):
-            ResumeObservation.objects.create(fiche=self)
-        if not hasattr(self, 'nid'):
-            Nid.objects.create(fiche=self)
-        if not hasattr(self, 'causes_echec'):
-            CausesEchec.objects.create(fiche=self)
 
     def __str__(self):
         return f"Fiche {self.num_fiche} - {self.annee} ({self.espece.nom})"

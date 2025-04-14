@@ -74,7 +74,13 @@ class ObservationForm(forms.ModelForm):
         model = Observation
         fields = ['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations']
         widgets = {
-            'date_observation': forms.DateTimeInput(attrs={'type': 'datetime-local'})
+            'date_observation': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'observations': forms.Textarea(attrs={
+                'class': 'section-content',
+                'rows': 1,
+                'placeholder': 'Observation',
+                'style': 'min-height: 30px; width: 250px; max-width: 100%; resize: vertical;'
+            }),
         }
 
 

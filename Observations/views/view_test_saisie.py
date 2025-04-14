@@ -55,13 +55,21 @@ def fiche_test_observation_view(request, fiche_id=None):
         # Assurez-vous que l'observateur est défini correctement
         post_data = request.POST.copy()
         if not post_data.get('observateur'):
-            post_data['observateur'] = request.user.id
+            # Si c'est une nouvelle fiche, utiliser l'utilisateur actuel
+            if not fiche_id:
+                post_data['observateur'] = request.user.id
+            # Si c'est une fiche existante, utiliser l'observateur original
+            else:
+                post_data['observateur'] = str(fiche_instance.observateur.id)
 
         # Si le champ coordonnees est vide, donnez-lui une valeur par défaut
         if not post_data.get('coordonnees'):
             post_data['coordonnees'] = '0,0'
 
+        # Note: Le paramètre user=request.user est également passé au formulaire pour
+        # contrôler les permissions et la présentation du champ observateur
         fiche_form = FicheObservationForm(post_data, request.FILES, instance=fiche_instance, user=request.user)
+
         localisation_form = LocalisationForm(post_data, instance=localisation_instance)
         resume_form = ResumeObservationForm(post_data, instance=resume_instance)
         nid_form = NidForm(post_data, instance=nid_instance)

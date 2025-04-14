@@ -3,6 +3,8 @@ import os
 import json
 import logging
 from difflib import SequenceMatcher
+from gzip import WRITE
+
 from django.db import transaction
 from django.conf import settings
 from django.utils import timezone
@@ -280,29 +282,39 @@ class ImportationService:
                 if annee_str and str(annee_str).isdigit():
                     annee = int(annee_str)
 
+            nom_fichier_json = importation.transcription.fichier_source  # Exemple : Image_1_result.json
+            nom_image = nom_fichier_json.replace('_result.json', '.jpg')  # Exemple : Image_1.jpg
+            chemin_image = os.path.join('Rep1', nom_image)  # Pour un usage via MEDIA_URL
+
             fiche = FicheObservation.objects.create(
                 observateur=importation.observateur,
                 espece=importation.espece_candidate.espece_validee,
                 annee=annee,
-                chemin_image=importation.transcription.fichier_source
+                chemin_image = chemin_image,
+                chemin_json= nom_fichier_json,
+                transcription = True
             )
             importation.fiche_observation = fiche
 
             # Localisation
             if 'localisation' in donnees:
                 loc = donnees['localisation']
-                Localisation.objects.filter(fiche=fiche).update(
-                    commune=loc.get('commune') or loc.get('IGN_50000') or 'Non spécifiée',
-                    lieu_dit=loc.get('coordonnees_et_ou_lieu_dit') or 'Non spécifiée',
-                    departement=loc.get('dep_t') or '00',
-                    altitude=loc.get('altitude') or '0',
-                    paysage=loc.get('paysage') or 'Non spécifié',
-                    alentours=loc.get('alentours') or 'Non spécifié'
-                )
+                # Créer l'objet Localisation s'il n'existe pas
+                localisation, created = Localisation.objects.get_or_create(fiche=fiche)
+                # Mettre à jour les champs
+                localisation.commune = loc.get('commune') or loc.get('IGN_50000') or 'Non spécifiée'
+                localisation.lieu_dit = loc.get('coordonnees_et_ou_lieu_dit') or 'Non spécifiée'
+                localisation.departement = loc.get('dep_t') or '00'
+                localisation.altitude = loc.get('altitude') or '0'
+                localisation.paysage = loc.get('paysage') or 'Non spécifié'
+                localisation.alentours = loc.get('alentours') or 'Non spécifié'
+                localisation.save()
 
             # Nid
             if 'nid' in donnees:
                 nid_data = donnees['nid']
+                # Créer l'objet Nid s'il n'existe pas
+                nid, created = Nid.objects.get_or_create(fiche=fiche)
 
                 def safe_float_to_int(val):
                     try:
@@ -310,35 +322,47 @@ class ImportationService:
                     except:
                         return 0
 
-                Nid.objects.filter(fiche=fiche).update(
-                    nid_prec_t_meme_couple=bool(nid_data.get('nid_prec_t_meme_c_ple')),
-                    hauteur_nid=safe_float_to_int(nid_data.get('haut_nid')),
-                    hauteur_couvert=safe_float_to_int(nid_data.get('h_c_vert')),
-                    details_nid=nid_data.get('nid') or 'Aucun détail'
-                )
+                # Mettre à jour les champs
+                nid.nid_prec_t_meme_couple = bool(nid_data.get('nid_prec_t_meme_c_ple'))
+                nid.hauteur_nid = safe_float_to_int(nid_data.get('haut_nid'))
+                nid.hauteur_couvert = safe_float_to_int(nid_data.get('h_c_vert'))
+                nid.details_nid = nid_data.get('nid') or 'Aucun détail'
+                nid.save()
 
-            # Observations
+            # Créer les observations
             if 'tableau_donnees' in donnees and isinstance(donnees['tableau_donnees'], list):
                 for obs in donnees['tableau_donnees']:
+                    # Essayer de construire une date valide
                     try:
                         jour = int(obs.get('Jour') or 1)
                         mois = int(obs.get('Mois') or 1)
-                        heure = int(str(obs.get('Heure') or 12).replace('e', ''))
-                        date_obs = timezone.make_aware(timezone.datetime(annee, mois, jour, heure, 0))
+                        heure = int(obs.get('Heure') or 12)
+                        minute = 0
+
+                        date_obs = timezone.datetime(annee, mois, jour, heure, minute)
+
+                        # Convertir en format datetime-aware
+                        date_obs = timezone.make_aware(date_obs)
+
+                        nombre_oeufs = int(obs.get('Nombre_oeuf') or 0)
+                        nombre_poussins = int(obs.get('Nombre_pou') or 0)
 
                         Observation.objects.create(
                             fiche=fiche,
                             date_observation=date_obs,
-                            nombre_oeufs=int(obs.get('Nombre_oeuf') or 0),
-                            nombre_poussins=int(obs.get('Nombre_pou') or 0),
+                            nombre_oeufs=nombre_oeufs,
+                            nombre_poussins=nombre_poussins,
                             observations=obs.get('observations') or ''
                         )
-                    except Exception as e:
-                        logger.warning(f"Observation ignorée (fiche {fiche.num_fiche}) : {str(e)}")
+                    except (ValueError, TypeError) as e:
+                        logger.warning(f"Impossible de créer l'observation pour la fiche {fiche.num_fiche}: {str(e)}")
+                        continue
 
             # Résumé
             if 'tableau_donnees_2' in donnees:
                 resume = donnees['tableau_donnees_2']
+                # Créer l'objet ResumeObservation s'il n'existe pas
+                resume_obj, created = ResumeObservation.objects.get_or_create(fiche=fiche)
 
                 def safe_int(value):
                     try:
@@ -346,29 +370,31 @@ class ImportationService:
                     except:
                         return None
 
-                ResumeObservation.objects.filter(fiche=fiche).update(
-                    premier_oeuf_pondu_jour=safe_int(resume.get('1er_o_pondu', {}).get('jour')),
-                    premier_oeuf_pondu_mois=safe_int(resume.get('1er_o_pondu', {}).get('Mois')),
-                    premier_poussin_eclos_jour=safe_int(resume.get('1er_p_eclos', {}).get('jour')),
-                    premier_poussin_eclos_mois=safe_int(resume.get('1er_p_eclos', {}).get('Mois')),
-                    premier_poussin_volant_jour=safe_int(resume.get('1er_p_volant', {}).get('jour')),
-                    premier_poussin_volant_mois=safe_int(resume.get('1er_p_volant', {}).get('Mois')),
-                    nombre_oeufs_pondus=safe_int(resume.get('nombre_oeufs', {}).get('pondus')) or 0,
-                    nombre_oeufs_eclos=safe_int(resume.get('nombre_oeufs', {}).get('eclos')) or 0,
-                    nombre_oeufs_non_eclos=safe_int(resume.get('nombre_oeufs', {}).get('n_ecl')) or 0,
-                    nombre_poussins=safe_int(resume.get('nombre_poussins', {}).get('vol_t')) or 0
-                )
+                # Mettre à jour les champs
+                resume_obj.premier_oeuf_pondu_jour = safe_int(resume.get('1er_o_pondu', {}).get('jour'))
+                resume_obj.premier_oeuf_pondu_mois = safe_int(resume.get('1er_o_pondu', {}).get('Mois'))
+                resume_obj.premier_poussin_eclos_jour = safe_int(resume.get('1er_p_eclos', {}).get('jour'))
+                resume_obj.premier_poussin_eclos_mois = safe_int(resume.get('1er_p_eclos', {}).get('Mois'))
+                resume_obj.premier_poussin_volant_jour = safe_int(resume.get('1er_p_volant', {}).get('jour'))
+                resume_obj.premier_poussin_volant_mois = safe_int(resume.get('1er_p_volant', {}).get('Mois'))
+                resume_obj.nombre_oeufs_pondus = safe_int(resume.get('nombre_oeufs', {}).get('pondus')) or 0
+                resume_obj.nombre_oeufs_eclos = safe_int(resume.get('nombre_oeufs', {}).get('eclos')) or 0
+                resume_obj.nombre_oeufs_non_eclos = safe_int(resume.get('nombre_oeufs', {}).get('n_ecl')) or 0
+                resume_obj.nombre_poussins = safe_int(resume.get('nombre_poussins', {}).get('vol_t')) or 0
+                resume_obj.save()
 
             # Échec
             if 'causes_echec' in donnees:
-                CausesEchec.objects.filter(fiche=fiche).update(
-                    description=donnees['causes_echec'].get('causes_d_echec') or ''
-                )
+                # Créer l'objet CausesEchec s'il n'existe pas
+                causes_echec, created = CausesEchec.objects.get_or_create(fiche=fiche)
+                causes_echec.description = donnees['causes_echec'].get('causes_d_echec') or ''
+                causes_echec.save()
 
-            Remarque.objects.create(
-                fiche=fiche,
-                remarque=f"Importé depuis le fichier {importation.transcription.fichier_source}"
-            )
+            if "remarque" in donnees:
+                Remarque.objects.update_or_create(
+                    fiche=fiche,
+                    defaults={"remarque": donnees["remarque"] or ""}
+                )
 
             importation.statut = 'complete'
             importation.transcription.traite = True

@@ -16,8 +16,35 @@
         {% endfor %}
     </div>
     {% endif %}
-    
-    <h2>Saisie d'une nouvelle observation</h2>
+    <div class="header-container">
+          <div class="header-section">
+            <h2>
+              {% if fiche_form.instance.pk %}
+                Edition d'une observation
+              {% else %}
+                Saisie d'une nouvelle observation
+              {% endif %}
+            </h2>
+          </div>
+
+          {% if fiche_form.instance.pk %}
+            <div class="header-section header-center">
+              {% if fiche_form.instance.chemin_image %}
+                <a href="{{ MEDIA_URL }}{{ fiche_form.instance.chemin_image }}" target="_blank" class="btn-link btn-image">
+                  <i class="fas fa-image"></i> Voir l'image
+                </a>
+              {% endif %}
+            </div>
+
+            <div class="header-section header-right">
+              {% if fiche_form.instance.chemin_json %}
+                <a href="{{ MEDIA_URL }}transcription_results/{{ fiche_form.instance.chemin_json }}" target="_blank" class="btn-link btn-json">
+                  <i class="fas fa-file-code"></i> Voir JSON
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+    </div>
     <form method="post">
         {% csrf_token %}
         <table class="fiche-table">
@@ -39,8 +66,6 @@
                 <td>{{ fiche_form.annee }}</td>
             </tr>
         </table>
-        {{ fiche_form.chemin_image.label_tag }} {{ fiche_form.chemin_image }}
-
 
         <div class="lieu">
             <table class="localisation-table">

@@ -360,3 +360,78 @@ main {
 .navbar-right form {
     margin-left: 10px;
 }
+
+.message-container {
+    margin: 1em auto;
+    max-width: 600px;
+    padding: 0 1em;
+}
+
+.message {
+    padding: 1em;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-bottom: 1em;
+    border: 1px solid transparent;
+}
+
+/* Styles par type de message Django : info, success, warning, error */
+
+.message.info {
+    background-color: #e0f3ff;
+    border-color: #90caff;
+    color: #1a3f5d;
+}
+
+.message.success {
+    background-color: #e6f9e6;
+    border-color: #6ac46a;
+    color: #1e4021;
+}
+
+.message.warning {
+    background-color: #fff9e5;
+    border-color: #ffd05a;
+    color: #665200;
+}
+
+.message.error, .message.danger {
+    background-color: #ffeaea;
+    border-color: #e06363;
+    color: #6d0000;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-section {
+  flex: 1;
+}
+
+.header-center {
+  text-align: center;
+}
+
+.header-right {
+  text-align: right;
+}
+
+.btn-link {
+  padding: 5px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-image {
+  border: 1px solid #17a2b8;
+  color: #17a2b8;
+}
+
+.btn-json {
+  border: 1px solid #6c757d;
+  color: #6c757d;
+}
