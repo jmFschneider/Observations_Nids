@@ -15,6 +15,7 @@ import os
 
 from django.template.context_processors import media
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,6 +28,15 @@ SECRET_KEY = 'django-insecure-^tzqm_vr2-7f#2p10rehlk4pr9!z8z^!3atbbwq@2!%h_$n2f0
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+# Surcharge via settings_local.py (facultatif)
+try:
+    from .settings_local import DEBUG as local_debug
+    DEBUG = local_debug
+except (ImportError, AttributeError):
+    pass
+
+
 AUTH_USER_MODEL = 'Observations.Utilisateur'
 LOGIN_REDIRECT_URL = '/'
 
@@ -46,7 +56,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
     'django_extensions',
     'Observations.apps.ObservationsConfig',
     'Importation.apps.ImportationConfig',
@@ -60,7 +69,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'Observations.middleware.SessionExpiryMiddleware',
 ]
 
@@ -80,7 +88,7 @@ DEBUG_TOOLBAR_CONFIG = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        'DIRS': [BASE_DIR / 'Observations' / 'templates']
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -236,3 +244,15 @@ try:
         VERSION = f.read().strip()
 except FileNotFoundError:
     VERSION = "0.0.0"  # Valeur par défaut en cas d'erreur
+
+# Active Debug Toolbar uniquement si défini dans settings_local
+try:
+    from .settings_local import USE_DEBUG_TOOLBAR
+except (ImportError, AttributeError):
+    USE_DEBUG_TOOLBAR = False
+
+# settings.py (à la toute fin)
+if USE_DEBUG_TOOLBAR:
+    INSTALLED_APPS += ['debug_toolbar']
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+    INTERNAL_IPS = ['127.0.0.1']

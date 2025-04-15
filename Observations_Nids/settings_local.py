@@ -1,0 +1,2 @@
+DEBUG = True
+USE_DEBUG_TOOLBAR = True
