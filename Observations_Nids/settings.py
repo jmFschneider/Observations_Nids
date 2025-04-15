@@ -44,7 +44,8 @@ LOGIN_REDIRECT_URL = '/'
 SESSION_COOKIE_AGE = 3600
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Déconnexion si l’utilisateur ferme son navigateur
 
-ALLOWED_HOSTS: list[str] = []
+A
+ALLOWED_HOSTS: list[str] = ['*', 'observation-nids.meteo-poelley50.fr', 'localhost', '127.0.0.1']
 
 
 # Application definition
