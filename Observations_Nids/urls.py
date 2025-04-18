@@ -22,6 +22,7 @@ from Observations_Nids import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('gestion/', include('Administration.urls')),  # Nouvelle URL pour votre application
     path('', include('Observations.urls')),  # Inclure les URLs de l'application Observations
     path('', include('Importation.urls')),  # Inclure les URLs de l'application Observations
 ]

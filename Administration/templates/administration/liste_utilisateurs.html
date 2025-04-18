@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Gestion des utilisateurs</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <a href="{% url 'creer_utilisateur' %}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> Nouvel utilisateur
+            </a>
+        </div>
+        <div class="col-md-6">
+            <form method="get" class="form-inline float-right">
+                <div class="input-group">
+                    <input type="text" name="recherche" class="form-control" placeholder="Rechercher..." value="{{ recherche }}">
+                    <select name="role" class="form-control ml-2">
+                        <option value="tous" {% if role == 'tous' %}selected{% endif %}>Tous les rôles</option>
+                        <option value="observateur" {% if role == 'observateur' %}selected{% endif %}>Observateurs</option>
+                        <option value="reviewer" {% if role == 'reviewer' %}selected{% endif %}>Reviewers</option>
+                        <option value="administrateur" {% if role == 'administrateur' %}selected{% endif %}>Administrateurs</option>
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="fas fa-search"></i> Rechercher
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nom d'utilisateur</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for utilisateur in utilisateurs %}
+                <tr>
+                    <td>{{ utilisateur.username }}</td>
+                    <td>{{ utilisateur.last_name }}</td>
+                    <td>{{ utilisateur.first_name }}</td>
+                    <td>{{ utilisateur.email }}</td>
+                    <td>{{ utilisateur.get_role_display }}</td>
+                    <td>
+                        {% if utilisateur.is_active %}
+                            <span class="badge badge-success">Actif</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactif</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'modifier_utilisateur' utilisateur.id %}" class="btn btn-sm btn-info">
+                                <i class="fas fa-edit"></i> Modifier
+                            </a>
+
+                            {% if utilisateur.is_active %}
+                                <form method="post" action="{% url 'desactiver_utilisateur' utilisateur.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Êtes-vous sûr de vouloir désactiver cet utilisateur ?');">
+                                        <i class="fas fa-user-slash"></i> Désactiver
+                                    </button>
+                                </form>
+                            {% else %}
+                                <form method="post" action="{% url 'activer_utilisateur' utilisateur.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Êtes-vous sûr de vouloir activer cet utilisateur ?');">
+                                        <i class="fas fa-user-check"></i> Activer
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">Aucun utilisateur trouvé</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if utilisateurs.has_other_pages %}
+    <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center">
+            {% if utilisateurs.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if recherche %}&recherche={{ recherche }}{% endif %}{% if role %}&role={{ role }}{% endif %}">Premier</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ utilisateurs.previous_page_number }}{% if recherche %}&recherche={{ recherche }}{% endif %}{% if role %}&role={{ role }}{% endif %}">Précédent</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Premier</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Précédent</span>
+                </li>
+            {% endif %}
+
+            {% for i in utilisateurs.paginator.page_range %}
+                {% if utilisateurs.number == i %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ i }}</span>
+                    </li>
+                {% elif i > utilisateurs.number|add:'-3' and i < utilisateurs.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ i }}{% if recherche %}&recherche={{ recherche }}{% endif %}{% if role %}&role={{ role }}{% endif %}">{{ i }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if utilisateurs.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ utilisateurs.next_page_number }}{% if recherche %}&recherche={{ recherche }}{% endif %}{% if role %}&role={{ role }}{% endif %}">Suivant</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ utilisateurs.paginator.num_pages }}{% if recherche %}&recherche={{ recherche }}{% endif %}{% if role %}&role={{ role }}{% endif %}">Dernier</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Suivant</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Dernier</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

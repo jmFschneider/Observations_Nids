@@ -1,6 +1,9 @@
-# models.py
+# Importation/models.py
 from django.db import models
-from Observations.models import Espece, Utilisateur, FicheObservation
+
+# Importer Utilisateur depuis Administration au lieu de Observations
+from Administration.models import Utilisateur
+from Observations.models import Espece, FicheObservation
 
 
 class TranscriptionBrute(models.Model):

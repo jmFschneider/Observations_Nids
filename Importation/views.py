@@ -1,4 +1,4 @@
-# views.py
+# Importation/views.py
 import logging
 import os
 import json
@@ -9,11 +9,13 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.conf import settings
 
+# Importer Utilisateur depuis Administration au lieu de Observations
+from Administration.models import Utilisateur
+from Observations.models import Espece, FicheObservation
 from .importation_service import ImportationService
 from .models import (
     TranscriptionBrute, EspeceCandidate, ImportationEnCours
 )
-from Observations.models import Espece, Utilisateur, FicheObservation
 
 logger = logging.getLogger(__name__)
 

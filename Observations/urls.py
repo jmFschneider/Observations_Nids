@@ -1,14 +1,14 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
 
-from Observations.views.view_test_saisie import fiche_test_observation_view, ajouter_observation
+from Observations.views.saisie_observation_view import fiche_test_observation_view, ajouter_observation
 from Observations.views.view_transcription import select_directory, process_images, check_progress, \
     transcription_results
 from Observations.views.views_home import home, user_list, user_detail, inscription, default_view
 from Observations.views.views_observation import (
     fiche_observation_view)
 
-from Observations.views.views_saisie import saisie_observation, traiter_saisie_observation
+from Observations.views.views_saisie_old import saisie_observation, traiter_saisie_observation
 
 urlpatterns = [
     path('', home, name='home'),

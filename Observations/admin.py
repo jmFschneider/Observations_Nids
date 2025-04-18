@@ -5,12 +5,6 @@ from .models import (
     HistoriqueModification, HistoriqueValidation, Remarque
 )
 
-@admin.register(Utilisateur)
-class UtilisateurAdmin(admin.ModelAdmin):
-    list_display = ("first_name", "last_name", "email", "role", "est_valide", "username")  # Correction ici
-    list_filter = ("role", "est_valide")
-    search_fields = ("first_name", "last_name", "email")  # Correction ici
-
 @admin.register(Espece)
 class EspeceAdmin(admin.ModelAdmin):
     list_display = ("nom", "valide_par_admin")

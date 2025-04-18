@@ -1,1 +1,5 @@
-2.001 mise en pla ce progressive de transcription et importation
+2.1 Modification de la gestion des utilisateurs,
+
+Création de l'application administration
+Transfert de la class Utilisateur vers l'application Administration
+Creation des vues, templates, etc

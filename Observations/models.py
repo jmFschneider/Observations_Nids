@@ -1,24 +1,13 @@
-from django.contrib.auth.models import AbstractUser
-from django.db import models
+# Observations/models.py
+from django.db import models, transaction
 from django.core.validators import MinValueValidator
 import logging
 
+# Importer le modèle Utilisateur depuis Administration
+from Administration.models import Utilisateur
+
 logger = logging.getLogger('Observations')
 
-
-class Utilisateur(AbstractUser):  # On étend l'utilisateur Django
-    ROLES = [
-        ('observateur', 'Observateur'),
-        ('reviewer', 'Reviewer'),
-        ('administrateur', 'Administrateur')
-    ]
-
-    role = models.CharField(max_length=15, choices=ROLES, default='observateur')
-    est_valide = models.BooleanField(default=False)  # Validation par l'administrateur
-    est_transcription = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.get_role_display()})"
 
 class Espece(models.Model):
     nom = models.CharField(max_length=100, unique=True)
@@ -37,13 +26,65 @@ class FicheObservation(models.Model):
     espece = models.ForeignKey(Espece, on_delete=models.PROTECT, related_name="observations")
     annee = models.IntegerField()
     chemin_image = models.CharField(max_length=255, blank=True, null=True)
-    chemin_json= models.CharField(max_length=255, blank=True, null=True)
+    chemin_json = models.CharField(max_length=255, blank=True, null=True)
     transcription = models.BooleanField(default=False)
+
+    @transaction.atomic
     def save(self, *args, **kwargs):
+        is_new = self.pk is None
         super().save(*args, **kwargs)
+
+        # Si c'est une nouvelle fiche, créer automatiquement les objets liés
+        if is_new:
+            # Créer l'objet Localisation s'il n'existe pas
+            Localisation.objects.get_or_create(
+                fiche=self,
+                defaults={
+                    'commune': 'Non spécifiée',
+                    'lieu_dit': 'Non spécifiée',
+                    'departement': '00',
+                    'coordonnees': '0,0',
+                    'altitude': '0',
+                    'paysage': 'Non spécifié',
+                    'alentours': 'Non spécifié'
+                }
+            )
+
+            # Créer l'objet Nid s'il n'existe pas
+            Nid.objects.get_or_create(
+                fiche=self,
+                defaults={
+                    'nid_prec_t_meme_couple': False,
+                    'hauteur_nid': 0,
+                    'hauteur_couvert': 0,
+                    'details_nid': 'Aucun détail'
+                }
+            )
+
+            # Créer l'objet ResumeObservation s'il n'existe pas
+            ResumeObservation.objects.get_or_create(
+                fiche=self,
+                defaults={
+                    'nombre_oeufs_pondus': 0,
+                    'nombre_oeufs_eclos': 0,
+                    'nombre_oeufs_non_eclos': 0,
+                    'nombre_poussins': 0
+                }
+            )
+
+            # Créer l'objet CausesEchec s'il n'existe pas
+            CausesEchec.objects.get_or_create(
+                fiche=self,
+                defaults={
+                    'description': 'Aucune cause identifiée'
+                }
+            )
+
+            logger.info(f"Fiche d'observation #{self.num_fiche} créée avec tous les objets liés")
 
     def __str__(self):
         return f"Fiche {self.num_fiche} - {self.annee} ({self.espece.nom})"
+
 
 class Localisation(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="localisation")
@@ -60,6 +101,7 @@ class Localisation(models.Model):
     def __str__(self):
         return f"Localisation {self.commune} ({self.departement})"
 
+
 class Nid(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="nid")
     nid_prec_t_meme_couple = models.BooleanField(default=False)
@@ -69,7 +111,6 @@ class Nid(models.Model):
 
     def __str__(self):
         return f"Nid de la fiche {self.fiche.num_fiche}"
-
 
 
 class Observation(models.Model):
@@ -85,6 +126,7 @@ class Observation(models.Model):
 
     def __str__(self):
         return f"Observation du {self.date_observation.strftime('%d/%m/%Y %H:%M')} (Fiche {self.fiche.num_fiche})"
+
 
 class ResumeObservation(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="resume")
@@ -102,6 +144,7 @@ class ResumeObservation(models.Model):
     def __str__(self):
         return f"Résumé Fiche {self.fiche.num_fiche}"
 
+
 class CausesEchec(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="causes_echec")
     description = models.TextField(blank=True, null=True, default='Aucune cause identifiée')
@@ -109,13 +152,14 @@ class CausesEchec(models.Model):
     def __str__(self):
         return f"Causes d'échec Fiche {self.fiche.num_fiche}"
 
-class Remarque(models.Model):  # Correction du nom (majuscule par convention)
+
+class Remarque(models.Model):
     fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="remarques")
-    remarque = models.CharField(max_length=200, default='RAS')  # Correction de la valeur par défaut
+    remarque = models.CharField(max_length=200, default='RAS')
     date_remarque = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        logger.info(f"Nouvelle remarque ajoutée : {self.remarque} à {self.date_remarque}")  # Correction ici
+        logger.info(f"Nouvelle remarque ajoutée : {self.remarque} à {self.date_remarque}")
         super().save(*args, **kwargs)
 
     def __str__(self):

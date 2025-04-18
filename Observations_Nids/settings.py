@@ -37,7 +37,7 @@ except (ImportError, AttributeError):
     pass
 
 
-AUTH_USER_MODEL = 'Observations.Utilisateur'
+AUTH_USER_MODEL = 'Administration.Utilisateur'
 LOGIN_REDIRECT_URL = '/'
 
 # Durée de session : 3600 secondes (1 heure)
@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'Administration.apps.AdministrationConfig',
     'Observations.apps.ObservationsConfig',
     'Importation.apps.ImportationConfig',
 ]
@@ -88,7 +89,7 @@ DEBUG_TOOLBAR_CONFIG = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'Observations' / 'templates']
+        'DIRS': [BASE_DIR / 'Observations' / 'Administration' / 'Importation' / 'templates']
         ,
         'APP_DIRS': True,
         'OPTIONS': {
