@@ -1,0 +1,32 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h5>Observations Nids</h5>
+            <p>Ce site permet d'enregistrer le suivi de la nidification de la création du nid à l'envol des poussins.</p>
+        </div>
+        <div class="col-md-3">
+            <h5>Liens utiles</h5>
+            <ul class="list-unstyled">
+                <li><a href="{% url 'home' %}">Accueil</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'administration:mon_profil' %}">Mon profil</a></li>
+                {% else %}
+                <li><a href="{% url 'login' %}">Connexion</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="col-md-3">
+            <h5>Contact</h5>
+            <address>
+                <strong>Observations Nids</strong><br>
+                Email: contact@observations-nids.fr<br>
+            </address>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <p>&copy; {% now "Y" %} Observations Nids. Tous droits réservés.</p>
+        </div>
+    </div>
+</div>
