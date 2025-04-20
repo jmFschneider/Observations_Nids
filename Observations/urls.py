@@ -2,14 +2,13 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
 
-from Observations.views.saisie_observation_view import fiche_test_observation_view, ajouter_observation
-from Observations.views.view_transcription import select_directory, process_images, check_progress, \
-    transcription_results
-from Observations.views.views_home import home, default_view
-from Observations.views.views_observation import (
-    fiche_observation_view)
-
-from Observations.views.views_saisie_old import saisie_observation, traiter_saisie_observation
+from Observations.views import (
+    home, default_view,
+    fiche_observation_view,
+    fiche_test_observation_view, ajouter_observation,
+    saisie_observation, traiter_saisie_observation,
+    select_directory, process_images, check_progress, transcription_results
+)
 
 urlpatterns = [
     # Routes principales
