@@ -1,13 +1,12 @@
-<h2>Détails de l'utilisateur</h2>
-<table class="table">
-    <tr><th>Nom</th><td>{{ utilisateur.last_name }}</td></tr>
-    <tr><th>Prénom</th><td>{{ utilisateur.first_name }}</td></tr>
-    <tr><th>Email</th><td>{{ utilisateur.email }}</td></tr>
-    <tr><th>Date d'inscription</th><td>{{ utilisateur.date_joined }}</td></tr>
-    <tr><th>Rôle</th><td>{{ utilisateur.get_role_display }}</td></tr>
-    <tr><th>Compte validé</th><td>{% if utilisateur.est_valide %} Oui {% else %} Non {% endif %}</td></tr>
-    <tr><th>Nombre de fiches d'observation</th><td>{{ observations_count }}</td></tr>
-</table>
+{% with user=utilisateur %}
+{% include "components/user_card.html" %}
+{% endwith %}
+
+<div class="mt-3">
+    <p><strong>Date d'inscription:</strong> {{ utilisateur.date_joined }}</p>
+    <p><strong>Compte validé:</strong> {% if utilisateur.est_valide %} Oui {% else %} Non {% endif %}</p>
+    <p><strong>Nombre de fiches d'observation:</strong> {{ observations_count }}</p>
+</div>
 
 {% if observations_count > 0 %}
 <h2>Fiches d'observation</h2>

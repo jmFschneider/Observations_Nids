@@ -2,6 +2,8 @@
 from django.urls import path
 from .views import auth
 
+app_name = 'administration'
+
 urlpatterns = [
     # Gestion des utilisateurs
     path('utilisateurs/', auth.ListeUtilisateursView.as_view(), name='liste_utilisateurs'),
@@ -10,6 +12,9 @@ urlpatterns = [
     path('utilisateurs/<int:user_id>/desactiver/', auth.desactiver_utilisateur, name='desactiver_utilisateur'),
     path('utilisateurs/<int:user_id>/activer/', auth.activer_utilisateur, name='activer_utilisateur'),
     path('utilisateurs/<int:user_id>/detail/', auth.detail_utilisateur, name='detail_utilisateur'),
+
+    # Profil utilisateur
+    path('mon-profil/', auth.mon_profil, name='mon_profil'),
 
     # Inscription publique
     path('inscription-publique/', auth.inscription_publique, name='inscription_publique'),

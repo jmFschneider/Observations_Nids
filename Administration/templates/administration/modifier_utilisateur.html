@@ -11,7 +11,7 @@
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
-                        
+
                         {% if form.non_field_errors %}
                         <div class="alert alert-danger">
                             {% for error in form.non_field_errors %}
@@ -19,7 +19,7 @@
                             {% endfor %}
                         </div>
                         {% endif %}
-                        
+
                         <div class="form-group row">
                             <label for="{{ form.username.id_for_label }}" class="col-sm-3 col-form-label">Nom d'utilisateur</label>
                             <div class="col-sm-9">
@@ -32,7 +32,7 @@
                                 <small class="form-text text-muted">Obligatoire. 150 caractères maximum.</small>
                             </div>
                         </div>
-                        
+
                         <div class="form-group row">
                             <label for="{{ form.first_name.id_for_label }}" class="col-sm-3 col-form-label">Prénom</label>
                             <div class="col-sm-9">
@@ -44,7 +44,7 @@
                                 {% endif %}
                             </div>
                         </div>
-                        
+
                         <div class="form-group row">
                             <label for="{{ form.last_name.id_for_label }}" class="col-sm-3 col-form-label">Nom</label>
                             <div class="col-sm-9">
@@ -56,7 +56,7 @@
                                 {% endif %}
                             </div>
                         </div>
-                        
+
                         <div class="form-group row">
                             <label for="{{ form.email.id_for_label }}" class="col-sm-3 col-form-label">Email</label>
                             <div class="col-sm-9">
@@ -68,7 +68,7 @@
                                 {% endif %}
                             </div>
                         </div>
-                        
+
                         <div class="form-group row">
                             <label for="{{ form.role.id_for_label }}" class="col-sm-3 col-form-label">Rôle</label>
                             <div class="col-sm-9">
@@ -80,7 +80,7 @@
                                 {% endif %}
                             </div>
                         </div>
-                        
+
                         <div class="form-group row">
                             <div class="col-sm-3">Validation</div>
                             <div class="col-sm-9">
@@ -92,7 +92,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-group row">
                             <div class="col-sm-3">Statut</div>
                             <div class="col-sm-9">
@@ -104,13 +104,13 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-group row">
                             <div class="col-sm-9 offset-sm-3">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save"></i> Enregistrer les modifications
                                 </button>
-                                <a href="{% url 'liste_utilisateurs' %}" class="btn btn-secondary">
+                                <a href="{% url 'administration:liste_utilisateurs' %}" class="btn btn-secondary">
                                     <i class="fas fa-times"></i> Annuler
                                 </a>
                             </div>

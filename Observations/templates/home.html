@@ -17,9 +17,9 @@
     <div class="card-body">
         <ul>
             <!-- Remplacer user_list par liste_utilisateurs -->
-            <li><a href="{% url 'liste_utilisateurs' %}">Liste des observateurs</a></li>
+            <li><a href="{% url 'administration:liste_utilisateurs' %}">Liste des observateurs</a></li>
             <!-- Remplacer user_create par creer_utilisateur -->
-            <li><a href="{% url 'creer_utilisateur' %}">Ajouter un observateur</a></li>
+            <li><a href="{% url 'administration:creer_utilisateur' %}">Ajouter un observateur</a></li>
             <li><a href="{% url 'saisie_observation' %}">Nouvelle observation</a></li>
             <li><a href="{% url 'observations_list' %}">Nouvelle observation V2</a></li>
         </ul>
@@ -45,8 +45,8 @@
     </div>
     <div class="card-body">
         <ul>
-            <li><a href="{% url 'liste_utilisateurs' %}">Gestion des utilisateurs</a></li>
-            <li><a href="{% url 'creer_utilisateur' %}">Créer un nouvel utilisateur</a></li>
+            <li><a href="{% url 'administration:liste_utilisateurs' %}">Gestion des utilisateurs</a></li>
+            <li><a href="{% url 'administration:creer_utilisateur' %}">Créer un nouvel utilisateur</a></li>
         </ul>
     </div>
 </div>
@@ -60,7 +60,7 @@
     <div class="card-body">
         <p><strong>Vous êtes un superutilisateur mais pas un administrateur dans le système de rôles.</strong></p>
         <p>Pour accéder aux fonctionnalités d'administration, vous devez d'abord vous promouvoir :</p>
-        <a href="{% url 'promouvoir_administrateur' %}" class="btn btn-danger">Promouvoir en administrateur</a>
+        <a href="{% url 'administration:promouvoir_administrateur' %}" class="btn btn-danger">Promouvoir en administrateur</a>
     </div>
 </div>
 {% endif %}

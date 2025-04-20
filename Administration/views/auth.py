@@ -31,15 +31,15 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'administration/liste_utilisateurs.html'
     context_object_name = 'utilisateurs'
     paginate_by = 20
-    
+
     def test_func(self):
         return est_admin(self.request.user)
-        
+
     def get_queryset(self):
         queryset = super().get_queryset()
         recherche = self.request.GET.get('recherche', '')
         role = self.request.GET.get('role', 'tous')
-        
+
         if recherche:
             queryset = queryset.filter(
                 Q(username__icontains=recherche) |
@@ -47,12 +47,12 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
                 Q(last_name__icontains=recherche) |
                 Q(email__icontains=recherche)
             )
-            
+
         if role != 'tous':
             queryset = queryset.filter(role=role)
-            
+
         return queryset.order_by('username')
-        
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['recherche'] = self.request.GET.get('recherche', '')
@@ -139,6 +139,22 @@ def detail_utilisateur(request, user_id):
         return render(request, 'administration/user_detail_partial.html', context)
 
     return render(request, 'administration/user_detail.html', context)
+
+
+@login_required
+def mon_profil(request):
+    """Vue pour afficher le profil de l'utilisateur connecté"""
+    utilisateur = request.user
+    fiches = list(FicheObservation.objects.filter(observateur=utilisateur).order_by('-num_fiche'))
+    observations_count = len(fiches)
+
+    context = {
+        'utilisateur': utilisateur,
+        'observations_count': observations_count,
+        'fiches': fiches
+    }
+
+    return render(request, 'administration/mon_profil.html', context)
 
 
 def inscription_publique(request):

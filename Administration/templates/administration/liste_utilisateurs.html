@@ -6,7 +6,7 @@
 
     <div class="row mb-4">
         <div class="col-md-6">
-            <a href="{% url 'creer_utilisateur' %}" class="btn btn-primary">
+            <a href="{% url 'administration:creer_utilisateur' %}" class="btn btn-primary">
                 <i class="fas fa-user-plus"></i> Nouvel utilisateur
             </a>
         </div>
@@ -60,19 +60,19 @@
                     </td>
                     <td>
                         <div class="btn-group" role="group">
-                            <a href="{% url 'modifier_utilisateur' utilisateur.id %}" class="btn btn-sm btn-info">
+                            <a href="{% url 'administration:modifier_utilisateur' utilisateur.id %}" class="btn btn-sm btn-info">
                                 <i class="fas fa-edit"></i> Modifier
                             </a>
 
                             {% if utilisateur.is_active %}
-                                <form method="post" action="{% url 'desactiver_utilisateur' utilisateur.id %}" style="display: inline;">
+                                <form method="post" action="{% url 'administration:desactiver_utilisateur' utilisateur.id %}" style="display: inline;">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Êtes-vous sûr de vouloir désactiver cet utilisateur ?');">
                                         <i class="fas fa-user-slash"></i> Désactiver
                                     </button>
                                 </form>
                             {% else %}
-                                <form method="post" action="{% url 'activer_utilisateur' utilisateur.id %}" style="display: inline;">
+                                <form method="post" action="{% url 'administration:activer_utilisateur' utilisateur.id %}" style="display: inline;">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Êtes-vous sûr de vouloir activer cet utilisateur ?');">
                                         <i class="fas fa-user-check"></i> Activer
@@ -91,55 +91,9 @@
         </table>
     </div>
 
-    {% if utilisateurs.has_other_pages %}
-    <nav aria-label="Pagination">
-        <ul class="pagination justify-content-center">
-            {% if utilisateurs.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1{% if recherche %}&recherche={{ recherche }}{% endif %}{% if role %}&role={{ role }}{% endif %}">Premier</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ utilisateurs.previous_page_number }}{% if recherche %}&recherche={{ recherche }}{% endif %}{% if role %}&role={{ role }}{% endif %}">Précédent</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled">
-                    <span class="page-link">Premier</span>
-                </li>
-                <li class="page-item disabled">
-                    <span class="page-link">Précédent</span>
-                </li>
-            {% endif %}
-
-            {% for i in utilisateurs.paginator.page_range %}
-                {% if utilisateurs.number == i %}
-                    <li class="page-item active">
-                        <span class="page-link">{{ i }}</span>
-                    </li>
-                {% elif i > utilisateurs.number|add:'-3' and i < utilisateurs.number|add:'3' %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ i }}{% if recherche %}&recherche={{ recherche }}{% endif %}{% if role %}&role={{ role }}{% endif %}">{{ i }}</a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-
-            {% if utilisateurs.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ utilisateurs.next_page_number }}{% if recherche %}&recherche={{ recherche }}{% endif %}{% if role %}&role={{ role }}{% endif %}">Suivant</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ utilisateurs.paginator.num_pages }}{% if recherche %}&recherche={{ recherche }}{% endif %}{% if role %}&role={{ role }}{% endif %}">Dernier</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled">
-                    <span class="page-link">Suivant</span>
-                </li>
-                <li class="page-item disabled">
-                    <span class="page-link">Dernier</span>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
-    {% endif %}
+    {% with page_obj=utilisateurs %}
+    {% include "components/pagination.html" %}
+    {% endwith %}
 </div>
 
 <div class="card mt-4">
