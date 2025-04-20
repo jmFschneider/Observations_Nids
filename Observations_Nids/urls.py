@@ -22,9 +22,9 @@ from Observations_Nids import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('gestion/', include('Administration.urls')),  # Nouvelle URL pour votre application
-    path('', include('Observations.urls')),  # Inclure les URLs de l'application Observations
-    path('', include('Importation.urls')),  # Inclure les URLs de l'application Observations
+    path('gestion/', include('Administration.urls')),  # URLs pour l'application Administration
+    path('', include('Observations.urls')),  # URLs pour l'application Observations (routes principales)
+    path('importation/', include('Importation.urls')),  # URLs pour l'application Importation avec préfixe
 ]
 
 if settings.DEBUG:

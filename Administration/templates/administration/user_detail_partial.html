@@ -30,7 +30,7 @@
             <td>{{ fiche.resume.nombre_poussins }}</td>
             <td>
                 <a href="{% url 'fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Voir détails</a>
-                <a href="{% url 'saisie_test_edit' fiche.num_fiche %}" class="btn btn-sm btn-primary">Modifier</a>
+                <a href="{% url 'modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-primary">Modifier</a>
             </td>
         </tr>
         {% empty %}

@@ -156,7 +156,7 @@ def fiche_test_observation_view(request, fiche_id=None):
                     messages.success(request, "Fiche d'observation sauvegardée avec succès!")
 
                     # Redirection vers la page d'édition
-                    return redirect('saisie_test_edit', fiche_id=fiche.pk)
+                    return redirect('modifier_observation', fiche_id=fiche.pk)
 
             except Exception as e:
                 logger.exception(f"Erreur lors de la sauvegarde: {e}")
@@ -190,7 +190,7 @@ def ajouter_observation(request, fiche_id):
             observation = form.save(commit=False)
             observation.fiche = fiche
             observation.save()
-            return redirect('saisie_test_edit', fiche_id=fiche_id)
+            return redirect('modifier_observation', fiche_id=fiche_id)
     else:
         form = ObservationForm()
     return render(request, 'saisie/ajouter_observation.html', {'form': form, 'fiche': fiche})
@@ -205,7 +205,7 @@ def ajouter_remarque(request, fiche_id):
             remarque = form.save(commit=False)
             remarque.fiche = fiche
             remarque.save()
-            return redirect('saisie_test_edit', fiche_id=fiche_id)
+            return redirect('modifier_observation', fiche_id=fiche_id)
     else:
         form = RemarqueForm(initial={'fiche': fiche})
     return render(request, 'saisie/ajouter_remarque.html', {'form': form})

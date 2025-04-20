@@ -12,24 +12,25 @@ from Observations.views.views_observation import (
 from Observations.views.views_saisie_old import saisie_observation, traiter_saisie_observation
 
 urlpatterns = [
+    # Routes principales
     path('', home, name='home'),
-    path('default/', default_view, name='default'),
+    path('tableau-de-bord/', default_view, name='default'),
 
-    # Routes d'authentification - à conserver
-    path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
-    path('login/', LoginView.as_view(template_name='login.html'), name='login'),
+    # Routes d'authentification
+    path('auth/logout/', LogoutView.as_view(next_page='home'), name='logout'),
+    path('auth/login/', LoginView.as_view(template_name='login.html'), name='login'),
 
     # Routes d'observations
-    path('fiche/<int:fiche_id>/', fiche_observation_view, name='fiche_observation'),
+    path('observations/', fiche_test_observation_view, name='observations_list'),
+    path('observations/<int:fiche_id>/', fiche_observation_view, name='fiche_observation'),
     path('observations/nouvelle/', saisie_observation, name='saisie_observation'),
     path('observations/sauvegarde/', traiter_saisie_observation, name='traiter_saisie_observation'),
-    path('observations/saisie/', fiche_test_observation_view, name='saisie_test_new'),
-    path('observations/saisie/<int:fiche_id>/', fiche_test_observation_view, name='saisie_test_edit'),
-    path('observations/ajoutobservation/<int:fiche_id>/', ajouter_observation, name='saisie_observation'),
+    path('observations/modifier/<int:fiche_id>/', fiche_test_observation_view, name='modifier_observation'),
+    path('observations/ajouter/<int:fiche_id>/', ajouter_observation, name='ajouter_observation'),
 
     # Routes de transcription
-    path('select-directory/', select_directory, name='select_directory'),
-    path('process-images/', process_images, name='process_images'),
-    path('check-progress/', check_progress, name='check_progress'),
-    path('transcription-results/', transcription_results, name='transcription_results'),
+    path('transcription/selection-repertoire/', select_directory, name='select_directory'),
+    path('transcription/traiter-images/', process_images, name='process_images'),
+    path('transcription/verifier-progression/', check_progress, name='check_progress'),
+    path('transcription/resultats/', transcription_results, name='transcription_results'),
 ]
