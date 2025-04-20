@@ -16,8 +16,10 @@
     </div>
     <div class="card-body">
         <ul>
-            <li><a href="{% url 'user_list' %}">Liste des observateurs</a></li>
-            <li><a href="{% url 'user_create' %}">Ajouter un observateur</a></li>
+            <!-- Remplacer user_list par liste_utilisateurs -->
+            <li><a href="{% url 'liste_utilisateurs' %}">Liste des observateurs</a></li>
+            <!-- Remplacer user_create par creer_utilisateur -->
+            <li><a href="{% url 'creer_utilisateur' %}">Ajouter un observateur</a></li>
             <li><a href="{% url 'saisie_observation' %}">Nouvelle observation</a></li>
             <li><a href="{% url 'saisie_test_new' %}">Nouvelle observation V2</a></li>
         </ul>
@@ -63,4 +65,3 @@
 </div>
 {% endif %}
 {% endblock %}
-

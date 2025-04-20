@@ -1,10 +1,9 @@
 # views_home.py
-from django.contrib.auth import login
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from Observations.models import Utilisateur, Observation, FicheObservation
-from Observations.forms import UtilisateurForm, InscriptionForm
+from Administration.models import Utilisateur  # Importation mise à jour
+from Observations.models import Observation, FicheObservation
 import logging
 logger = logging.getLogger('Observations')
 
@@ -31,31 +30,3 @@ def home(request):
 
 def default_view(request):
     return render(request, 'access_restricted.html')
-
-def user_list(request):
-    users = Utilisateur.objects.all()
-    return render(request, 'user_list.html', {'users': users})
-
-def user_detail(request, user_id):
-    user = get_object_or_404(Utilisateur, id=user_id)
-    fiches = list(FicheObservation.objects.filter(observateur=user).order_by('-num_fiche'))
-    observations_count = len(fiches)  # Pas besoin d'une requête supplémentaire
-
-    return render(request, 'user_detail.html', {
-        'user': user,
-        'observations_count': observations_count,
-        'fiches': fiches
-    })
-
-
-def inscription(request):
-    if request.method == "POST":
-        form = InscriptionForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)  # Connexion automatique après inscription
-            return redirect('home')  # Redirige vers l'accueil
-    else:
-        form = InscriptionForm()
-
-    return render(request, 'user_inscription.html', {'form': form})

@@ -6,6 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.core.paginator import Paginator
+
+from Observations.models import FicheObservation
 from .models import Utilisateur
 from .forms import UtilisateurCreationForm, UtilisateurChangeForm
 
@@ -111,3 +113,48 @@ def activer_utilisateur(request, user_id):
         messages.success(request, f"L'utilisateur {utilisateur.username} a été activé")
 
     return redirect('liste_utilisateurs')
+
+
+@login_required
+@user_passes_test(est_admin)
+def detail_utilisateur(request, user_id):
+    """Vue pour afficher les détails d'un utilisateur"""
+    utilisateur = get_object_or_404(Utilisateur, id=user_id)
+    fiches = list(FicheObservation.objects.filter(observateur=utilisateur).order_by('-num_fiche'))
+    observations_count = len(fiches)
+
+    context = {
+        'utilisateur': utilisateur,
+        'observations_count': observations_count,
+        'fiches': fiches
+    }
+
+    # Si c'est une requête AJAX, renvoyer uniquement le contenu du détail
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render(request, 'administration/user_detail_partial.html', context)
+
+    return render(request, 'administration/user_detail.html', context)
+
+
+# Administration/views.py (ajout)
+
+def inscription_publique(request):
+    """Vue pour l'inscription publique des utilisateurs (sans authentification requise)"""
+    if request.method == 'POST':
+        form = UtilisateurCreationForm(request.POST)
+        if form.is_valid():
+            # Créer l'utilisateur mais le marquer comme non validé
+            utilisateur = form.save(commit=False)
+            utilisateur.est_valide = False  # Nécessite approbation par un admin
+            utilisateur.role = 'observateur'  # Rôle par défaut
+            utilisateur.save()
+
+            messages.success(
+                request,
+                "Votre demande d'inscription a été enregistrée. Un administrateur devra l'approuver avant que vous puissiez vous connecter."
+            )
+            return redirect('login')
+    else:
+        form = UtilisateurCreationForm()
+
+    return render(request, 'administration/inscription_publique.html', {'form': form})

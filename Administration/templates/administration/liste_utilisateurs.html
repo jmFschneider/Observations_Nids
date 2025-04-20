@@ -45,7 +45,7 @@
             </thead>
             <tbody>
                 {% for utilisateur in utilisateurs %}
-                <tr>
+                <tr id="user-row-{{ utilisateur.id }}" onclick="loadUserDetail({{ utilisateur.id }})" style="cursor: pointer;">
                     <td>{{ utilisateur.username }}</td>
                     <td>{{ utilisateur.last_name }}</td>
                     <td>{{ utilisateur.first_name }}</td>
@@ -141,4 +141,39 @@
     </nav>
     {% endif %}
 </div>
+
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Détails de l'utilisateur sélectionné</h5>
+    </div>
+    <div class="card-body" id="user-detail-container">
+        <p class="text-muted">Sélectionnez un utilisateur dans la liste pour voir ses détails.</p>
+    </div>
+</div>
+
+<script>
+function loadUserDetail(userId) {
+    // Ajouter une classe active à la ligne sélectionnée
+    document.querySelectorAll('table tbody tr').forEach(row => {
+        row.classList.remove('table-active');
+    });
+    document.getElementById('user-row-' + userId).classList.add('table-active');
+
+    // Charger les détails via AJAX
+    fetch(`/gestion/utilisateurs/${userId}/detail/`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.text())
+    .then(html => {
+        document.getElementById('user-detail-container').innerHTML = html;
+    })
+    .catch(error => {
+        console.error('Erreur lors du chargement des détails:', error);
+        document.getElementById('user-detail-container').innerHTML =
+            '<div class="alert alert-danger">Erreur lors du chargement des détails</div>';
+    });
+}
+</script>
 {% endblock %}

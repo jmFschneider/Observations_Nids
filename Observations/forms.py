@@ -161,16 +161,16 @@ class RemarqueForm(forms.ModelForm):
             'remarque': forms.TextInput(attrs={'placeholder': 'Entrez une remarque'}),
         }
 
-
-class UtilisateurForm(forms.ModelForm):
-    class Meta:
-        model = Utilisateur
-        fields = ['first_name', 'last_name', 'email']  # Correction ici
-
-
-class InscriptionForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-
-    class Meta:
-        model = Utilisateur
-        fields = ['username', 'email', 'password1', 'password2']
+#
+# class UtilisateurForm(forms.ModelForm):
+#     class Meta:
+#         model = Utilisateur
+#         fields = ['first_name', 'last_name', 'email']  # Correction ici
+#
+#
+# class InscriptionForm(UserCreationForm):
+#     email = forms.EmailField(required=True)
+#
+#     class Meta:
+#         model = Utilisateur
+#         fields = ['username', 'email', 'password1', 'password2']

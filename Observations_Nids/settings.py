@@ -14,7 +14,16 @@ from pathlib import Path
 import os
 
 from django.template.context_processors import media
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
+
+# Import Pydantic settings
+from .config import get_settings
+
+# Get settings from environment variables
+settings = get_settings()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,10 +33,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^tzqm_vr2-7f#2p10rehlk4pr9!z8z^!3atbbwq@2!%h_$n2f0'
+SECRET_KEY = settings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = settings.DEBUG
 
 # Surcharge via settings_local.py (facultatif)
 try:
@@ -41,10 +50,10 @@ AUTH_USER_MODEL = 'Administration.Utilisateur'
 LOGIN_REDIRECT_URL = '/'
 
 # Durée de session : 3600 secondes (1 heure)
-SESSION_COOKIE_AGE = 3600
+SESSION_COOKIE_AGE = settings.SESSION_COOKIE_AGE
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Déconnexion si l’utilisateur ferme son navigateur
 
-ALLOWED_HOSTS: list[str] = ['*', 'observation-nids.meteo-poelley50.fr', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS: list[str] = settings.ALLOWED_HOSTS
 
 
 # Application definition
@@ -110,16 +119,7 @@ WSGI_APPLICATION = 'Observations_Nids.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'NidsObservation',  # Nom de ta base de données
-        'USER': 'jms',      # Nom d'utilisateur MariaDB
-        'PASSWORD': 'pointeur', # Mot de passe MariaDB
-        'HOST': '192.168.1.176',    # Adresse IP du Raspberry Pi
-        'PORT': '3306',             # Port par défaut de MariaDB
-    }
-}
+DATABASES = settings.get_database_config()
 
 
 # Password validation
@@ -144,9 +144,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'fr-fr'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Paris'
 
 USE_I18N = True
 
@@ -246,11 +246,11 @@ try:
 except FileNotFoundError:
     VERSION = "0.0.0"  # Valeur par défaut en cas d'erreur
 
-# Active Debug Toolbar uniquement si défini dans settings_local
+# Active Debug Toolbar uniquement si défini dans settings_local ou .env
 try:
     from .settings_local import USE_DEBUG_TOOLBAR
 except (ImportError, AttributeError):
-    USE_DEBUG_TOOLBAR = False
+    USE_DEBUG_TOOLBAR = settings.USE_DEBUG_TOOLBAR
 
 # settings.py (à la toute fin)
 if USE_DEBUG_TOOLBAR:
