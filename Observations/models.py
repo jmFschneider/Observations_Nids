@@ -22,12 +22,17 @@ class Espece(models.Model):
 class FicheObservation(models.Model):
     num_fiche = models.AutoField(primary_key=True)
     date_creation = models.DateTimeField(auto_now_add=True)
-    observateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name="fiches")
+    observateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name="fiches", db_index=True)
     espece = models.ForeignKey(Espece, on_delete=models.PROTECT, related_name="observations")
     annee = models.IntegerField()
     chemin_image = models.CharField(max_length=255, blank=True, null=True)
     chemin_json = models.CharField(max_length=255, blank=True, null=True)
     transcription = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['observateur', 'date_creation']),
+        ]
 
     @transaction.atomic
     def save(self, *args, **kwargs):
@@ -115,7 +120,7 @@ class Nid(models.Model):
 
 class Observation(models.Model):
     fiche = models.ForeignKey('FicheObservation', on_delete=models.CASCADE, related_name="observations")
-    date_observation = models.DateTimeField(blank=False, null=False)
+    date_observation = models.DateTimeField(blank=False, null=False, db_index=True)
     nombre_oeufs = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     nombre_poussins = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     observations = models.TextField(blank=True, null=True, default='Aucune observation')

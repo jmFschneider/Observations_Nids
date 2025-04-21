@@ -74,7 +74,10 @@ class ObservationForm(forms.ModelForm):
         model = Observation
         fields = ['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations']
         widgets = {
-            'date_observation': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'date_observation': forms.DateTimeInput(
+                attrs={'type': 'datetime-local'}, 
+                format='%Y-%m-%dT%H:%M'
+            ),
             'observations': forms.Textarea(attrs={
                 'class': 'section-content',
                 'rows': 1,
@@ -82,6 +85,23 @@ class ObservationForm(forms.ModelForm):
                 'style': 'min-height: 30px; width: 250px; max-width: 100%; resize: vertical;'
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make sure date_observation is properly formatted for the datetime-local input
+        if self.instance.pk and self.instance.date_observation:
+            # Format the existing date for the datetime-local input
+            self.initial['date_observation'] = self.instance.date_observation.strftime('%Y-%m-%dT%H:%M')
+
+    def clean_date_observation(self):
+        """
+        Ensure the date_observation field is properly processed.
+        This method is called during form validation.
+        """
+        date_observation = self.cleaned_data.get('date_observation')
+        if not date_observation:
+            raise forms.ValidationError("Ce champ est obligatoire.")
+        return date_observation
 
 
 class ResumeObservationForm(forms.ModelForm):

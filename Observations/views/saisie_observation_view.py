@@ -46,7 +46,10 @@ def fiche_test_observation_view(request, fiche_id=None):
         form=ObservationForm,
         fields=['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations'],
         extra=1,
-        can_delete=False
+        can_delete=False,
+        validate_min=False,  # Ne pas valider les formulaires vides
+        can_order=False,
+        min_num=0,  # Pas de minimum requis
     )
 
     if request.method == "POST":
@@ -100,9 +103,10 @@ def fiche_test_observation_view(request, fiche_id=None):
 
         if not observation_formset.is_valid():
             logger.error(f"Erreurs dans le formset d'observations: {observation_formset.errors}")
-            for i, errors in enumerate(observation_formset.errors):
-                if errors:
-                    validation_errors.append(f"Erreurs dans l'observation #{i + 1}: {errors}")
+            for i, form in enumerate(observation_formset):
+                # Ne vérifier les erreurs que si le formulaire n'est pas vide
+                if form.has_changed() and form.errors:
+                    validation_errors.append(f"Erreurs dans l'observation #{i + 1}: {form.errors}")
             if observation_formset.non_form_errors():
                 validation_errors.append(f"Erreurs globales d'observations: {observation_formset.non_form_errors()}")
 
@@ -145,7 +149,20 @@ def fiche_test_observation_view(request, fiche_id=None):
 
                     # Sauvegarde des observations
                     observation_formset.instance = fiche
-                    observation_formset.save()
+                    # Ne sauvegarder que les formulaires qui ont été modifiés et qui sont valides
+                    for form in observation_formset:
+                        # Vérifier si le formulaire a été modifié
+                        if form.has_changed():
+                            # Vérifier si la date d'observation est renseignée
+                            if form.cleaned_data.get('date_observation'):
+                                try:
+                                    form.save()
+                                    logger.info(f"Observation sauvegardée avec date: {form.cleaned_data.get('date_observation')}")
+                                except Exception as e:
+                                    logger.error(f"Erreur lors de la sauvegarde de l'observation: {e}")
+                            else:
+                                logger.warning("Formulaire d'observation modifié mais sans date d'observation")
+                    # observation_formset.save()
 
                     # Remarque initiale pour nouvelle fiche
                     if not fiche_id:

@@ -69,7 +69,7 @@ def creer_utilisateur(request):
         if form.is_valid():
             utilisateur = form.save()
             messages.success(request, f"L'utilisateur {utilisateur.username} a été créé avec succès")
-            return redirect('liste_utilisateurs')
+            return redirect('administration:liste_utilisateurs')
     else:
         form = UtilisateurCreationForm()
 
@@ -87,7 +87,7 @@ def modifier_utilisateur(request, user_id):
         if form.is_valid():
             form.save()
             messages.success(request, f"L'utilisateur {utilisateur.username} a été modifié avec succès")
-            return redirect('liste_utilisateurs')
+            return redirect('administration:liste_utilisateurs')
     else:
         form = UtilisateurChangeForm(instance=utilisateur)
 
@@ -104,7 +104,7 @@ def desactiver_utilisateur(request, user_id):
         utilisateur.save()
         messages.success(request, f"L'utilisateur {utilisateur.username} a été désactivé")
 
-    return redirect('liste_utilisateurs')
+    return redirect('administration:liste_utilisateurs')
 
 
 @login_required
@@ -117,7 +117,7 @@ def activer_utilisateur(request, user_id):
         utilisateur.save()
         messages.success(request, f"L'utilisateur {utilisateur.username} a été activé")
 
-    return redirect('liste_utilisateurs')
+    return redirect('administration:liste_utilisateurs')
 
 
 @login_required
@@ -189,7 +189,7 @@ def promouvoir_administrateur(request):
             utilisateur.role = 'administrateur'
             utilisateur.save()
             messages.success(request, f"L'utilisateur {utilisateur.username} a été promu administrateur avec succès")
-            return redirect('liste_utilisateurs')
+            return redirect('administration:liste_utilisateurs')
 
     # Récupérer tous les utilisateurs qui ne sont pas déjà administrateurs
     utilisateurs = Utilisateur.objects.exclude(role='administrateur')

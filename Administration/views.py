@@ -120,13 +120,17 @@ def activer_utilisateur(request, user_id):
 def detail_utilisateur(request, user_id):
     """Vue pour afficher les détails d'un utilisateur"""
     utilisateur = get_object_or_404(Utilisateur, id=user_id)
-    fiches = list(FicheObservation.objects.filter(observateur=utilisateur).order_by('-num_fiche'))
-    observations_count = len(fiches)
+    fiches = FicheObservation.objects.filter(observateur=utilisateur).order_by('-num_fiche')
+
+    paginator = Paginator(fiches, 10)
+    page = request.GET.get('page', 1)
+    fiches_page = paginator.get_page(page)
 
     context = {
         'utilisateur': utilisateur,
-        'observations_count': observations_count,
-        'fiches': fiches
+        'observations_count': fiches.count(),  # More efficient than len()
+        'fiches': fiches_page,
+        'page_obj': fiches_page  # For pagination template
     }
 
     # Si c'est une requête AJAX, renvoyer uniquement le contenu du détail

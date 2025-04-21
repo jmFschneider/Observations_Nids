@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-    
+
     {% if messages %}
     <div class="messages">
         {% for message in messages %}
@@ -95,7 +95,7 @@
                 <div class="section-title">Paysage (200 à 500m)</div>
                 {{ localisation_form.paysage }}
             </div>
-        
+
             <div class="localisation-right">
                 <div class="section-title">Alentours (20 à 50m)</div>
                 {{ localisation_form.alentours }}
@@ -127,7 +127,7 @@
                     </td>
                 </tr>
             </table>
-        
+
             <div class="section-title">Détails du Nid</div>
             <div class="form-field">
                 {{ nid_form.details_nid }}
@@ -158,17 +158,37 @@
                             {% for hidden in form.hidden_fields %}
                                 {{ hidden }}
                             {% endfor %}
-                            <td>{{ form.date_observation }}</td>
-                            <td>{{ form.nombre_oeufs }}</td>
-                            <td>{{ form.nombre_poussins }}</td>
-                            <td>{{ form.observations }}</td>
+                            <td>
+                                {% if form.date_observation.errors %}
+                                <div class="error">{{ form.date_observation.errors }}</div>
+                                {% endif %}
+                                {{ form.date_observation }}
+                            </td>
+                            <td>
+                                {% if form.nombre_oeufs.errors %}
+                                <div class="error">{{ form.nombre_oeufs.errors }}</div>
+                                {% endif %}
+                                {{ form.nombre_oeufs }}
+                            </td>
+                            <td>
+                                {% if form.nombre_poussins.errors %}
+                                <div class="error">{{ form.nombre_poussins.errors }}</div>
+                                {% endif %}
+                                {{ form.nombre_poussins }}
+                            </td>
+                            <td>
+                                {% if form.observations.errors %}
+                                <div class="error">{{ form.observations.errors }}</div>
+                                {% endif %}
+                                {{ form.observations }}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-    
+
 
         <div class="resume-container">
             <table>
