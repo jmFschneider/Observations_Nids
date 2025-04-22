@@ -1,5 +1,10 @@
-# le 21 avril 2025
+# le 22 avril 2025
+# V 1.0.1 
 
+1. Correction de different bug css et js
+2. Correction du traitement du lien "montrer l'Image" de la page saisie correctionn fiche observation
+
+# le 21 avril 2025
 # V 1.0.0
 
 1. **Mise en place versioning** avec la variable  settings.VERSION

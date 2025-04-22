@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 
-{% block head %}
+{% block extra_css %}
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+    <!-- The openResizableImageWindow function has been moved to main.js -->
 {% endblock %}
 
 {% block content %}
@@ -30,7 +34,7 @@
           {% if fiche_form.instance.pk %}
             <div class="header-section header-center">
               {% if fiche_form.instance.chemin_image %}
-                <a href="{{ MEDIA_URL }}{{ fiche_form.instance.chemin_image }}" target="_blank" class="btn-link btn-image">
+                <a href="javascript:void(0);" onclick="openResizableImageWindow('{{ MEDIA_URL|escapejs }}{{ fiche_form.instance.chemin_image|escapejs }}')" class="btn-link btn-image">
                   <i class="fas fa-image"></i> Voir l'image
                 </a>
               {% endif %}

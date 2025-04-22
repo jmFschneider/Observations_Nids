@@ -122,6 +122,12 @@ def fiche_test_observation_view(request, fiche_id=None):
                     fiche = fiche_form.save(commit=False)
                     if not fiche_id:  # Nouvelle fiche
                         fiche.annee = datetime.now().year
+                    else:
+                        # Préserver le chemin de l'image si le champ n'est pas dans le formulaire
+                        # ou s'il est vide dans le formulaire mais existait avant
+                        original_fiche = FicheObservation.objects.get(pk=fiche_id)
+                        if original_fiche.chemin_image and not fiche.chemin_image:
+                            fiche.chemin_image = original_fiche.chemin_image
 
                     # S'assurer que l'observateur est défini
                     if not hasattr(fiche, 'observateur') or not fiche.observateur:
