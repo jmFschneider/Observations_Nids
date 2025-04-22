@@ -118,6 +118,20 @@ def fiche_test_observation_view(request, fiche_id=None):
                 with transaction.atomic():
                     logger.info("Tous les formulaires sont valides, sauvegarde...")
 
+                    # Si c'est une modification, récupérer les instances avant modification
+                    if fiche_id:
+                        fiche_avant = FicheObservation.objects.select_related().get(pk=fiche_id)
+                        localisation_avant = fiche_avant.localisation
+                        resume_avant = fiche_avant.resume
+                        nid_avant = fiche_avant.nid
+                        causes_echec_avant = fiche_avant.causes_echec
+                    else:
+                        fiche_avant = None
+                        localisation_avant = None
+                        resume_avant = None
+                        nid_avant = None
+                        causes_echec_avant = None
+
                     # Sauvegarde de la fiche principale
                     fiche = fiche_form.save(commit=False)
                     if not fiche_id:  # Nouvelle fiche
@@ -134,24 +148,74 @@ def fiche_test_observation_view(request, fiche_id=None):
                         fiche.observateur = request.user
 
                     fiche.save()
-                    logger.info(f"Fiche sauvegardée avec ID: {fiche.pk}")
+
+                    # Si c'est une modification, enregistrer les changements dans l'historique
+                    if fiche_id and fiche_avant:
+                        enregistrer_modifications_historique(
+                            fiche=fiche,
+                            ancienne_instance=fiche_avant,
+                            nouvelle_instance=fiche,
+                            categorie='fiche',
+                            modifie_par=request.user
+                        )
 
                     # Sauvegarde des sous-formulaires
                     localisation = localisation_form.save(commit=False)
                     localisation.fiche = fiche
                     localisation.save()
 
+                    if fiche_id and localisation_avant:
+                        enregistrer_modifications_historique(
+                            fiche=fiche,
+                            ancienne_instance=localisation_avant,
+                            nouvelle_instance=localisation,
+                            categorie='localisation',
+                            modifie_par=request.user
+                        )
+
                     resume = resume_form.save(commit=False)
                     resume.fiche = fiche
                     resume.save()
+
+                    if fiche_id and resume_avant:
+                        enregistrer_modifications_historique(
+                            fiche=fiche,
+                            ancienne_instance=resume_avant,
+                            nouvelle_instance=resume,
+                            categorie='resume_observation',
+                            modifie_par=request.user
+                        )
 
                     nid = nid_form.save(commit=False)
                     nid.fiche = fiche
                     nid.save()
 
+                    if fiche_id and nid_avant:
+                        enregistrer_modifications_historique(
+                            fiche=fiche,
+                            ancienne_instance=nid_avant,
+                            nouvelle_instance=nid,
+                            categorie='nid',
+                            modifie_par=request.user
+                        )
+
                     causes_echec = causes_echec_form.save(commit=False)
                     causes_echec.fiche = fiche
                     causes_echec.save()
+
+                    if fiche_id and causes_echec_avant:
+                        enregistrer_modifications_historique(
+                            fiche=fiche,
+                            ancienne_instance=causes_echec_avant,
+                            nouvelle_instance=causes_echec,
+                            categorie='causes_echec',
+                            modifie_par=request.user
+                        )
+
+                    # Gestion des observations - nécessite une approche différente car c'est un formset
+                    if fiche_id:
+                        # Récupérer les observations existantes avant modification pour comparaison
+                        observations_avant = {obs.id: obs for obs in Observation.objects.filter(fiche=fiche_id)}
 
                     # Sauvegarde des observations
                     observation_formset.instance = fiche
@@ -162,13 +226,27 @@ def fiche_test_observation_view(request, fiche_id=None):
                             # Vérifier si la date d'observation est renseignée
                             if form.cleaned_data.get('date_observation'):
                                 try:
-                                    form.save()
-                                    logger.info(f"Observation sauvegardée avec date: {form.cleaned_data.get('date_observation')}")
+                                    # S'il s'agit d'une mise à jour d'une observation existante
+                                    if form.instance.pk and form.instance.pk in observations_avant:
+                                        ancienne_obs = observations_avant[form.instance.pk]
+                                        nouvelle_obs = form.save()
+                                        enregistrer_modifications_historique(
+                                            fiche=fiche,
+                                            ancienne_instance=ancienne_obs,
+                                            nouvelle_instance=nouvelle_obs,
+                                            categorie='observation',
+                                            modifie_par=request.user
+                                        )
+                                    else:
+                                        # Nouvelle observation, pas d'historique à enregistrer
+                                        form.save()
+
+                                    logger.info(
+                                        f"Observation sauvegardée avec date: {form.cleaned_data.get('date_observation')}")
                                 except Exception as e:
                                     logger.error(f"Erreur lors de la sauvegarde de l'observation: {e}")
                             else:
                                 logger.warning("Formulaire d'observation modifié mais sans date d'observation")
-                    # observation_formset.save()
 
                     # Remarque initiale pour nouvelle fiche
                     if not fiche_id:
@@ -184,6 +262,8 @@ def fiche_test_observation_view(request, fiche_id=None):
             except Exception as e:
                 logger.exception(f"Erreur lors de la sauvegarde: {e}")
                 messages.error(request, f"Une erreur est survenue lors de la sauvegarde: {str(e)}")
+
+    # ... reste du code existant ...
 
     else:
         # GET request - affichage du formulaire
@@ -203,6 +283,7 @@ def fiche_test_observation_view(request, fiche_id=None):
         'observation_formset': observation_formset,
         'remarques': remarques,
     })
+
 
 @login_required
 def ajouter_observation(request, fiche_id):
@@ -232,3 +313,74 @@ def ajouter_remarque(request, fiche_id):
     else:
         form = RemarqueForm(initial={'fiche': fiche})
     return render(request, 'saisie/ajouter_remarque.html', {'form': form})
+
+
+@login_required
+def historique_modifications(request, fiche_id):
+    """
+    Affiche l'historique des modifications d'une fiche d'observation.
+    """
+    from Observations.models import HistoriqueModification
+
+    fiche = get_object_or_404(FicheObservation, pk=fiche_id)
+    modifications = HistoriqueModification.objects.filter(fiche=fiche).order_by('-date_modification')
+
+    return render(request, 'saisie/historique_modifications.html', {
+        'fiche': fiche,
+        'modifications': modifications
+    })
+
+
+def enregistrer_modifications_historique(fiche, ancienne_instance, nouvelle_instance, categorie, modifie_par):
+    """
+    Enregistre les modifications entre deux instances dans l'historique.
+
+    Args:
+        fiche: L'instance de FicheObservation concernée
+        ancienne_instance: L'instance avant modification
+        nouvelle_instance: L'instance après modification
+        categorie: Le type d'objet modifié (fiche, localisation, nid, etc.)
+        modifie_par: L'utilisateur qui a effectué la modification
+    """
+    from django.forms.models import model_to_dict
+    from Observations.models import HistoriqueModification
+
+    if not ancienne_instance or not nouvelle_instance:
+        return
+
+    # Convertir les instances en dictionnaires pour faciliter la comparaison
+    ancien_dict = model_to_dict(ancienne_instance)
+    nouveau_dict = model_to_dict(nouvelle_instance)
+
+    # Ignorer certains champs système qui ne doivent pas être trackés
+    champs_ignores = ['id', 'fiche']
+
+    # Comparer les champs et enregistrer les différences
+    for champ, ancienne_valeur in ancien_dict.items():
+        if champ in champs_ignores:
+            continue
+
+        nouvelle_valeur = nouveau_dict.get(champ)
+
+        # Vérifier s'il y a eu un changement
+        if ancienne_valeur != nouvelle_valeur:
+            # Convertir en chaîne pour stocker dans la base
+            ancienne_valeur_str = str(ancienne_valeur) if ancienne_valeur is not None else ""
+            nouvelle_valeur_str = str(nouvelle_valeur) if nouvelle_valeur is not None else ""
+
+            # Créer l'entrée d'historique
+            HistoriqueModification.objects.create(
+                fiche=fiche,
+                champ_modifie=champ,
+                ancienne_valeur=ancienne_valeur_str,
+                nouvelle_valeur=nouvelle_valeur_str,
+                categorie=categorie
+            )
+
+            # Journalisation pour le suivi
+            logger.info(
+                f"Modification sur {categorie}, champ '{champ}', "
+                f"ancienne valeur: '{ancienne_valeur_str}', "
+                f"nouvelle valeur: '{nouvelle_valeur_str}', "
+                f"par {modifie_par.username}"
+            )

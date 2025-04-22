@@ -5,10 +5,11 @@ from django.urls import path
 from Observations.views import (
     home, default_view,
     fiche_observation_view,
-    fiche_test_observation_view, ajouter_observation,
+    fiche_test_observation_view, ajouter_observation, ajouter_remarque,
     saisie_observation, traiter_saisie_observation,
     select_directory, process_images, check_progress, transcription_results
 )
+from Observations.views import saisie_observation_view
 
 urlpatterns = [
     # Routes principales
@@ -32,4 +33,7 @@ urlpatterns = [
     path('transcription/traiter-images/', process_images, name='process_images'),
     path('transcription/verifier-progression/', check_progress, name='check_progress'),
     path('transcription/resultats/', transcription_results, name='transcription_results'),
+
+    # Route pour l'historique des modifications
+    path('observations/historique/<int:fiche_id>/', saisie_observation_view.historique_modifications, name='historique_modifications'),
 ]

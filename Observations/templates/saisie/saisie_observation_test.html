@@ -334,6 +334,11 @@
                 </script>
 		</div>
 
-        <button type="submit">Enregistrer</button>
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            {% if fiche_form.instance.pk %}
+                <a href="{% url 'historique_modifications' fiche_id=fiche_form.instance.pk %}" class="btn btn-info" target="_blank">Historique</a>
+            {% endif %}
+        </div>
     </form>
 {% endblock %}
