@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     STATIC_ROOT: str = str(BASE_DIR / "static")
     
     # Version
-    VERSION: str = "1.0.1"
+    VERSION: str = "1.0.2"
     
     #Project settings loaded from environment variables.
     # Autres paramètres...

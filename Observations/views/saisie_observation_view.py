@@ -238,8 +238,20 @@ def fiche_test_observation_view(request, fiche_id=None):
                                             modifie_par=request.user
                                         )
                                     else:
-                                        # Nouvelle observation, pas d'historique à enregistrer
-                                        form.save()
+                                        # Nouvelle observation, enregistrer dans l'historique
+                                        nouvelle_obs = form.save()
+                                        # Enregistrer l'ajout dans l'historique des modifications
+                                        from Observations.models import HistoriqueModification
+                                        for field_name in ['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations']:
+                                            if field_name in form.cleaned_data and form.cleaned_data[field_name]:
+                                                HistoriqueModification.objects.create(
+                                                    fiche=fiche,
+                                                    champ_modifie=field_name,
+                                                    ancienne_valeur="",
+                                                    nouvelle_valeur=str(form.cleaned_data[field_name]),
+                                                    categorie='observation',
+                                                    modifie_par=request.user
+                                                )
 
                                     logger.info(
                                         f"Observation sauvegardée avec date: {form.cleaned_data.get('date_observation')}")
@@ -294,6 +306,25 @@ def ajouter_observation(request, fiche_id):
             observation = form.save(commit=False)
             observation.fiche = fiche
             observation.save()
+
+            # Enregistrer l'ajout dans l'historique des modifications
+            from Observations.models import HistoriqueModification
+            for field_name in ['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations']:
+                if field_name in form.cleaned_data and form.cleaned_data[field_name]:
+                    HistoriqueModification.objects.create(
+                        fiche=fiche,
+                        champ_modifie=field_name,
+                        ancienne_valeur="",
+                        nouvelle_valeur=str(form.cleaned_data[field_name]),
+                        categorie='observation',
+                        modifie_par=request.user
+                    )
+                    logger.info(
+                        f"Ajout d'observation, champ '{field_name}', "
+                        f"nouvelle valeur: '{form.cleaned_data[field_name]}', "
+                        f"par {request.user.username}"
+                    )
+
             return redirect('modifier_observation', fiche_id=fiche_id)
     else:
         form = ObservationForm()
@@ -332,18 +363,10 @@ def historique_modifications(request, fiche_id):
 
 
 def enregistrer_modifications_historique(fiche, ancienne_instance, nouvelle_instance, categorie, modifie_par):
-    """
-    Enregistre les modifications entre deux instances dans l'historique.
-
-    Args:
-        fiche: L'instance de FicheObservation concernée
-        ancienne_instance: L'instance avant modification
-        nouvelle_instance: L'instance après modification
-        categorie: Le type d'objet modifié (fiche, localisation, nid, etc.)
-        modifie_par: L'utilisateur qui a effectué la modification
-    """
     from django.forms.models import model_to_dict
     from Observations.models import HistoriqueModification
+    from django.utils import timezone
+    import datetime
 
     if not ancienne_instance or not nouvelle_instance:
         return
@@ -355,15 +378,53 @@ def enregistrer_modifications_historique(fiche, ancienne_instance, nouvelle_inst
     # Ignorer certains champs système qui ne doivent pas être trackés
     champs_ignores = ['id', 'fiche']
 
+    # Journalisation pour le débogage
+    logger.info(f"Début de la comparaison pour {categorie}, classe: {ancienne_instance.__class__.__name__}")
+    logger.info(f"Champs disponibles: {list(ancien_dict.keys())}")
+
     # Comparer les champs et enregistrer les différences
     for champ, ancienne_valeur in ancien_dict.items():
         if champ in champs_ignores:
             continue
 
         nouvelle_valeur = nouveau_dict.get(champ)
+        logger.info(f"Comparaison du champ '{champ}': ancienne valeur = {ancienne_valeur}, nouvelle valeur = {nouvelle_valeur}")
 
-        # Vérifier s'il y a eu un changement
-        if ancienne_valeur != nouvelle_valeur:
+        # Variable pour suivre si un changement a été détecté
+        changement_detecte = False
+
+        # Normaliser les valeurs datetime pour la comparaison
+        if isinstance(ancienne_valeur, datetime.datetime) and isinstance(nouvelle_valeur, datetime.datetime):
+            logger.info(f"  Champ '{champ}' est un datetime, normalisation...")
+            # Convertir les deux valeurs en UTC pour une comparaison équitable
+            if timezone.is_aware(ancienne_valeur):
+                ancienne_valeur = ancienne_valeur.astimezone(timezone.utc)
+            if timezone.is_aware(nouvelle_valeur):
+                nouvelle_valeur = nouvelle_valeur.astimezone(timezone.utc)
+
+            # Comparer uniquement les composantes date et heure, pas les informations de fuseau horaire
+            ancienne_valeur_normalisee = ancienne_valeur.replace(tzinfo=None)
+            nouvelle_valeur_normalisee = nouvelle_valeur.replace(tzinfo=None)
+
+            logger.info(f"  Après normalisation: ancienne = {ancienne_valeur_normalisee}, nouvelle = {nouvelle_valeur_normalisee}")
+
+            # Utiliser ces valeurs normalisées pour la comparaison
+            if ancienne_valeur_normalisee != nouvelle_valeur_normalisee:
+                logger.info(f"  Changement détecté pour le champ '{champ}' après normalisation")
+                changement_detecte = True
+            else:
+                logger.info(f"  Pas de changement pour le champ '{champ}' après normalisation")
+        else:
+            logger.info(f"  Champ '{champ}' n'est pas un datetime, comparaison directe")
+            # Pour les champs non-datetime, faire une comparaison directe
+            if ancienne_valeur != nouvelle_valeur:
+                logger.info(f"  Changement détecté pour le champ '{champ}'")
+                changement_detecte = True
+            else:
+                logger.info(f"  Pas de changement pour le champ '{champ}'")
+
+        # Si un changement a été détecté, enregistrer dans l'historique
+        if changement_detecte:
             # Convertir en chaîne pour stocker dans la base
             ancienne_valeur_str = str(ancienne_valeur) if ancienne_valeur is not None else ""
             nouvelle_valeur_str = str(nouvelle_valeur) if nouvelle_valeur is not None else ""
@@ -374,7 +435,8 @@ def enregistrer_modifications_historique(fiche, ancienne_instance, nouvelle_inst
                 champ_modifie=champ,
                 ancienne_valeur=ancienne_valeur_str,
                 nouvelle_valeur=nouvelle_valeur_str,
-                categorie=categorie
+                categorie=categorie,
+                modifie_par=modifie_par
             )
 
             # Journalisation pour le suivi
@@ -384,3 +446,5 @@ def enregistrer_modifications_historique(fiche, ancienne_instance, nouvelle_inst
                 f"nouvelle valeur: '{nouvelle_valeur_str}', "
                 f"par {modifie_par.username}"
             )
+
+    logger.info(f"Fin de la comparaison pour {categorie}")

@@ -1,5 +1,6 @@
 <!-- templates/importation/liste_especes_candidates.html -->
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Gestion des espèces candidates{% endblock %}
 
@@ -214,4 +215,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<script src="{% static 'js/species-matcher.js' %}"></script>
+
 {% endblock %}

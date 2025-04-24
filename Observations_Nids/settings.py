@@ -161,7 +161,7 @@ LOGIN_URL = '/login/'
 STATIC_URL = '/static/'
 # Dossier où Django trouvera les fichiers statiques de l'application
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "Observations", "static"),  # Corrige ici
+    os.path.join(BASE_DIR, "Observations", "static", 'Importation'),  # Corrige ici
 ]
 
 # Dossier où Django collectera tous les fichiers statiques pour la mise en production

@@ -9,8 +9,29 @@ from Administration.models import Utilisateur
 logger = logging.getLogger('Observations')
 
 
-class Espece(models.Model):
+class Ordre(models.Model):
     nom = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.nom
+
+
+class Famille(models.Model):
+    nom = models.CharField(max_length=100, unique=True)
+    ordre = models.ForeignKey(Ordre, on_delete=models.CASCADE, related_name='familles')
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.nom
+
+
+class Espece(models.Model):
+    nom = models.CharField(max_length=100, unique=True)  # Remplace 'nom_français'
+    nom_anglais = models.CharField(max_length=100, blank=True, null=True)
+    nom_scientifique = models.CharField(max_length=100, blank=True, null=True)
+    statut = models.CharField(max_length=50, blank=True, null=True)
+    famille = models.ForeignKey(Famille, on_delete=models.SET_NULL, null=True, related_name='especes')
     commentaire = models.TextField(blank=True, null=True)
     lien_oiseau_net = models.URLField(blank=True, null=True)
     valide_par_admin = models.BooleanField(default=False)
@@ -225,6 +246,7 @@ class HistoriqueModification(models.Model):
     ancienne_valeur = models.TextField()
     nouvelle_valeur = models.TextField()
     date_modification = models.DateTimeField(auto_now_add=True)
+    modifie_par = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True, blank=True)
 
     CATEGORIES = [
         ('fiche', 'Fiche Observation'),
@@ -243,4 +265,5 @@ class HistoriqueModification(models.Model):
         ordering = ['-date_modification']
 
     def __str__(self):
-        return f"Modification {self.champ_modifie} ({self.date_modification})"
+        modifie_par_str = f" par {self.modifie_par.username}" if self.modifie_par else ""
+        return f"Modification {self.champ_modifie} ({self.date_modification}){modifie_par_str}"
