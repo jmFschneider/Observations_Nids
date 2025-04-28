@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<!-- The openResizableImageWindow function has been moved to main.js -->
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+<div class="messages">
+{% for message in messages %}
+<div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+{{ message }}
+</div>
+{% endfor %}
+</div>
+{% endif %}
+
+<div class="header-container">
+    <div class="header-section">
+        <h2>
+          {% if fiche_form.instance.pk %}
+            Edition d'une observation
+          {% else %}
+            Saisie d'une nouvelle observation
+          {% endif %}
+        </h2>
+    </div>
+
+    {% if fiche_form.instance.pk %}
+        <div class="header-section header-center">
+          {% if fiche_form.instance.chemin_image %}
+            <a href="javascript:void(0);" onclick="openResizableImageWindow('{{ MEDIA_URL|escapejs }}{{ fiche_form.instance.chemin_image|escapejs }}')" class="btn-link btn-image">
+              <i class="fas fa-image"></i> Voir l'image
+            </a>
+          {% endif %}
+        </div>
+
+        <div class="header-section header-right">
+          {% if fiche_form.instance.chemin_json %}
+            <a href="{{ MEDIA_URL }}transcription_results/{{ fiche_form.instance.chemin_json }}" target="_blank" class="btn-link btn-json">
+              <i class="fas fa-file-code"></i> Voir JSON
+            </a>
+          {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    <!-- Section d'informations générales -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Informations générales</h5>
+        </div>
+        <div class="card-body">
+            <table class="fiche-table">
+                <tr>
+                    <th>N° Fiche</th>
+                    <th>Observateur</th>
+                    <th>Espèce</th>
+                    <th>Année</th>
+                </tr>
+                <tr>
+                    <td>
+                        {% if fiche_form.instance.pk %}
+                            {{ fiche_form.instance.pk }}
+                        {% else %}
+                            À définir
+                        {% endif %}
+                    </td>
+                    <td>{{ fiche_form.instance.observateur.first_name }} {{ fiche_form.instance.observateur.last_name }}</td>
+                    <td>{{ fiche_form.espece }}</td>
+                    <td>{{ fiche_form.annee }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section de localisation -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Localisation</h5>
+        </div>
+        <div class="card-body">
+            <div class="lieu">
+                <table class="localisation-table">
+                    <tr>
+                        <th>Commune</th>
+                        <td>{{localisation_form.commune}}</td>
+                        <th>Département</th>
+                        <td>{{localisation_form.departement}}</td>
+                    </tr>
+                    <tr>
+                        <th>Lieu-dit</th>
+                        <td>{{localisation_form.lieu_dit}}</td>
+                        <th>Altitude</th>
+                        <td>{{localisation_form.altitude}}</td>
+                    </tr>
+                    <tr>
+                        <th>Latitude</th>
+                        <td>{{localisation_form.latitude}}</td>
+                        <th>Longitude</th>
+                        <td>{{localisation_form.longitude}}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="localisation-container">
+                <div class="localisation-left">
+                    <div class="section-title">Paysage (200 à 500m)</div>
+                    {{ localisation_form.paysage }}
+                </div>
+
+                <div class="localisation-right">
+                    <div class="section-title">Alentours (20 à 50m)</div>
+                    {{ localisation_form.alentours }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section du nid -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Description du Nid</h5>
+        </div>
+        <div class="card-body">
+            <table class="nid-table">
+                <tr>
+                    <th>Utilisé par le même couple</th>
+                    <th>Hauteur du nid (cm)</th>
+                    <th>Hauteur du couvert (cm)</th>
+                </tr>
+                <tr>
+                    <td>{{ nid_form.nid_prec_t_meme_couple }}</td>
+                    <td>
+                        <div class="form-field">
+                            <label for="{{ nid_form.hauteur_nid.id_for_label }}">cm</label>
+                            {{ nid_form.hauteur_nid }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-field">
+                            <label for="{{ nid_form.hauteur_couvert.id_for_label }}">cm</label>
+                            {{ nid_form.hauteur_couvert }}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="section-title">Détails du Nid</div>
+            <div class="form-field">
+                {{ nid_form.details_nid }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Section des observations -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">Observations</h5>
+        </div>
+        <div class="card-body">
+            {{ observation_formset.management_form }}
+            <div class="observations-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Nombre d'œufs</th>
+                            <th>Nombre de poussins</th>
+                            <th>Observations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for form in observation_formset %}
+                        <tr>
+                            <!-- Ajouter les champs cachés nécessaires pour le formset -->
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            <td>
+                                {% if form.date_observation.errors %}
+                                <div class="error">{{ form.date_observation.errors }}</div>
+                                {% endif %}
+                                {{ form.date_observation }}
+                            </td>
+                            <td>
+                                {% if form.nombre_oeufs.errors %}
+                                <div class="error">{{ form.nombre_oeufs.errors }}</div>
+                                {% endif %}
+                                {{ form.nombre_oeufs }}
+                            </td>
+                            <td>
+                                {% if form.nombre_poussins.errors %}
+                                <div class="error">{{ form.nombre_poussins.errors }}</div>
+                                {% endif %}
+                                {{ form.nombre_poussins }}
+                            </td>
+                            <td>
+                                {% if form.observations.errors %}
+                                <div class="error">{{ form.observations.errors }}</div>
+                                {% endif %}
+                                {{ form.observations }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if fiche_form.instance.pk %}
+            <div class="mt-3">
+                <a href="{% url 'ajouter_observation_optimisee' fiche_id=fiche_form.instance.pk %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> Ajouter une observation
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Section résumé de l'observation -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Résumé de l'observation</h5>
+        </div>
+        <div class="card-body">
+            <div class="resume-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Premier œuf pondu</th>
+                            <th>Premier poussin éclos</th>
+                            <th>Premier poussin volant</th>
+                            <th>Œufs pondus</th>
+                            <th>Œufs éclos</th>
+                            <th>Œufs non éclos</th>
+                            <th>Nombre de poussins</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="form-field">
+                                    {{ resume_form.premier_oeuf_pondu_jour.errors }}
+                                    <label for="{{ resume_form.premier_oeuf_pondu_jour.id_for_label }}">Jour</label>
+                                    {{ resume_form.premier_oeuf_pondu_jour }}
+                                </div>
+                                <div class="form-field">
+                                    {{ resume_form.premier_oeuf_pondu_mois.errors }}
+                                    <label for="{{ resume_form.premier_oeuf_pondu_mois.id_for_label }}">Mois</label>
+                                    {{ resume_form.premier_oeuf_pondu_mois }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-field">
+                                    {{ resume_form.premier_poussin_eclos_jour.errors }}
+                                    <label for="{{ resume_form.premier_poussin_eclos_jour.id_for_label }}">Jour</label>
+                                    {{ resume_form.premier_poussin_eclos_jour }}
+                                </div>
+                                <div class="form-field">
+                                    {{ resume_form.premier_poussin_eclos_mois.errors }}
+                                    <label for="{{ resume_form.premier_poussin_eclos_mois.id_for_label }}">Mois</label>
+                                    {{ resume_form.premier_poussin_eclos_mois }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-field">
+                                    {{ resume_form.premier_poussin_volant_jour.errors }}
+                                    <label for="{{ resume_form.premier_poussin_volant_jour.id_for_label }}">Jour</label>
+                                    {{ resume_form.premier_poussin_volant_jour }}
+                                </div>
+                                <div class="form-field">
+                                    {{ resume_form.premier_poussin_volant_mois.errors }}
+                                    <label for="{{ resume_form.premier_poussin_volant_mois.id_for_label }}">Mois</label>
+                                    {{ resume_form.premier_poussin_volant_mois }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-field">
+                                    {{ resume_form.nombre_oeufs_pondus.errors }}
+                                    <label for="{{ resume_form.nombre_oeufs_pondus.id_for_label }}"></label>
+                                    {{ resume_form.nombre_oeufs_pondus }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-field">
+                                    {{ resume_form.nombre_oeufs_eclos.errors }}
+                                    <label for="{{ resume_form.nombre_oeufs_eclos.id_for_label }}"></label>
+                                    {{ resume_form.nombre_oeufs_eclos }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-field">
+                                    {{ resume_form.nombre_oeufs_non_eclos.errors }}
+                                    <label for="{{ resume_form.nombre_oeufs_non_eclos.id_for_label }}"></label>
+                                    {{ resume_form.nombre_oeufs_non_eclos }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-field">
+                                    {{ resume_form.nombre_poussins.errors }}
+                                    {{ resume_form.nombre_poussins }}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section causes d'échec et remarques -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Causes d'échec et remarques</h5>
+        </div>
+        <div class="card-body">
+            <div class="causes-remarques-container">
+                <!-- Partie gauche : Causes de l'échec -->
+                <div class="remarques-container">
+                    <div class="section-title">Description des causes d'échec</div>
+                    <div class="form-field">
+                        {{ causes_echec_form.description }}
+                    </div>
+                </div>
+
+                <!-- Partie droite : Remarques -->
+                <div class="remarques-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Remarque</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for remarque in remarques %}
+                                <tr>
+                                    <td>{{ remarque.date_remarque|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ remarque.remarque }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" id="aucune-remarque">Aucune remarque trouvée.</td>
+                                </tr>
+                            {% endfor %}
+                            <tr id="ligne-remarque-initiale" style="display:none;">
+                                <td>À la création</td>
+                                <td>
+                                    <textarea id="remarque-initiale" placeholder="Ajouter une remarque initiale"></textarea>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <input type="hidden" name="remarque-initiale" id="remarque-initiale-field" value="">
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Use a proper JavaScript comparison that handles None values
+                    {% if fiche_form.instance.pk %}
+                        // We have a pk, so we're editing an existing fiche
+                        console.log("Editing existing fiche: {{ fiche_form.instance.pk }}");
+                    {% else %}
+                        // No pk, we're creating a new fiche
+                        console.log("Creating new fiche");
+                        document.getElementById('aucune-remarque').style.display = 'none';
+                        document.getElementById('ligne-remarque-initiale').style.display = '';
+
+                        // Capture la saisie de la remarque initiale et met à jour le champ caché
+                        var remarqueTextarea = document.getElementById('remarque-initiale');
+                        var remarqueField = document.getElementById('remarque-initiale-field');
+
+                        remarqueTextarea.addEventListener('input', function() {
+                            remarqueField.value = this.value;
+                        });
+                    {% endif %}
+                });
+            </script>
+        </div>
+    </div>
+
+    <!-- Boutons de formulaire -->
+    <div class="form-buttons">
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        {% if fiche_form.instance.pk %}
+            <a href="{% url 'historique_modifications_optimisee' fiche_id=fiche_form.instance.pk %}" class="btn btn-info" target="_blank">Historique</a>
+            <a href="{% url 'fiche_observation' fiche_id=fiche_form.instance.pk %}" class="btn btn-secondary">Voir détails</a>
+            <a href="{% url 'observations_list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
+        {% else %}
+            <a href="{% url 'observations_list' %}" class="btn btn-outline-secondary">Annuler</a>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}
+

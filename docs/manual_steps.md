@@ -44,7 +44,7 @@ Après avoir effectué ces modifications, vous devriez vérifier que l'applicati
 
 1. Installer les dépendances :
    ```bash
-   pip install -r requirements.txt
+   pip install -r requirements V1.1.txt
    ```
 
 2. Lancer le serveur de développement :

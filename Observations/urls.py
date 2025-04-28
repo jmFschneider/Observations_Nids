@@ -6,8 +6,10 @@ from Observations.views import (
     home, default_view,
     fiche_observation_view,
     fiche_test_observation_view, ajouter_observation, ajouter_remarque,
-    saisie_observation, traiter_saisie_observation,
+#    saisie_observation, traiter_saisie_observation,
 )
+from Observations.views.saisie_observation_optimClaude import saisie_observation_optimisee, \
+    ajouter_observation_optimisee, historique_modifications_optimisee
 from Observations.views.view_transcription import (
     select_directory, process_images, check_progress,
     transcription_results, start_transcription_view
@@ -26,8 +28,8 @@ urlpatterns = [
     # Routes d'observations
     path('observations/', fiche_test_observation_view, name='observations_list'),
     path('observations/<int:fiche_id>/', fiche_observation_view, name='fiche_observation'),
-    path('observations/nouvelle/', saisie_observation, name='saisie_observation'),
-    path('observations/sauvegarde/', traiter_saisie_observation, name='traiter_saisie_observation'),
+#    path('observations/nouvelle/', saisie_observation, name='saisie_observation'),
+#    path('observations/sauvegarde/', traiter_saisie_observation, name='traiter_saisie_observation'),
     path('observations/modifier/<int:fiche_id>/', fiche_test_observation_view, name='modifier_observation'),
     path('observations/ajouter/<int:fiche_id>/', ajouter_observation, name='ajouter_observation'),
 
@@ -40,4 +42,13 @@ urlpatterns = [
 
     # Route pour l'historique des modifications
     path('observations/historique/<int:fiche_id>/', saisie_observation_view.historique_modifications, name='historique_modifications'),
+]
+
+# Ajoutez ces URLs à votre liste urlpatterns existante
+urlpatterns += [
+    # Routes pour la version optimisée
+    path('observations/saisie-optimisee/', saisie_observation_optimisee, name='saisie_observation_optimisee'),
+    path('observations/saisie-optimisee/<int:fiche_id>/', saisie_observation_optimisee, name='saisie_observation_optimisee'),
+    path('observations/ajouter-optimisee/<int:fiche_id>/', ajouter_observation_optimisee, name='ajouter_observation_optimisee'),
+    path('observations/historique-optimisee/<int:fiche_id>/', historique_modifications_optimisee, name='historique_modifications_optimisee'),
 ]

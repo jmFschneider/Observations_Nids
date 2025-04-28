@@ -1,6 +1,4 @@
-# Observations/views/view_transcription.py
-import copy
-import json
+from django.contrib import messages
 import logging
 import os
 from django.shortcuts import render, redirect
@@ -48,11 +46,29 @@ def select_directory(request):
     return render(request, 'transcription/upload_files.html', {'directories': directories})
 
 
+def is_celery_operational():
+    """Vérifie si Celery est opérationnel en essayant de contacter les workers"""
+    try:
+        # Essayer de ping les workers Celery
+        response = app.control.ping(timeout=1.0)
+        # Si aucun worker ne répond, Celery n'est pas opérationnel
+        return len(response) > 0
+    except Exception as e:
+        logger.error(f"Erreur lors de la vérification de Celery: {str(e)}")
+        return False
+
+
 def process_images(request):
     """Vue pour démarrer le traitement des images via Celery"""
     directory = request.session.get('processing_directory')
     if not directory:
         # Rediriger vers la sélection de répertoire si aucun n'est défini
+        return redirect('select_directory')
+
+    # Vérifier si Celery est opérationnel
+    if not is_celery_operational():
+        # Si Celery n'est pas opérationnel, ajouter un message d'erreur et rediriger
+        messages.error(request, "Celery n'est pas en fonction sur le serveur")
         return redirect('select_directory')
 
     # Créer le répertoire de résultats
@@ -160,11 +176,19 @@ def transcription_results(request):
 
 
 # Vue pour démarrer la transcription (utilisation de l'API AJAX)
+
 def start_transcription_view(request):
     """API pour démarrer le traitement des images via AJAX"""
     directory = request.session.get('processing_directory')
     if not directory:
         return JsonResponse({'error': 'Aucun répertoire sélectionné'}, status=400)
+
+    # Vérifier si Celery est opérationnel
+    if not is_celery_operational():
+        return JsonResponse({
+            'error': "Celery n'est pas en fonction sur le serveur",
+            'celery_error': True
+        }, status=503)  # 503 Service Unavailable
 
     task = process_images_task.delay(directory)
     request.session['task_id'] = task.id

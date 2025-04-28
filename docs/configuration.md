@@ -55,7 +55,7 @@ Ce fichier contient le modèle Pydantic pour la validation des paramètres de co
 ### Installation des dépendances
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements V1.1.txt
 ```
 
 ### Configuration de l'environnement

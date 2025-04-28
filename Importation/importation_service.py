@@ -240,8 +240,8 @@ class ImportationService:
                 utilisateur = None
                 if 'informations_generales' in donnees and 'observateur' in donnees['informations_generales']:
                     nom_observateur = donnees['informations_generales']['observateur']
-                    if nom_observateur:
-                        utilisateur = self.creer_ou_recuperer_utilisateur(nom_observateur)
+                    # if nom_observateur:
+                    utilisateur = self.creer_ou_recuperer_utilisateur(nom_observateur)
 
                 # Créer l'importation en cours
                 ImportationEnCours.objects.create(
