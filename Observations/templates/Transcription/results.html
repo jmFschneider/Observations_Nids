@@ -1,5 +1,6 @@
 <!-- templates/transcription/results.html -->
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-4">
@@ -64,7 +65,12 @@
                         <td>{{ result.duration }} secondes</td>
                         <td>
                             {% if result.status == 'success' %}
-                            <a href="{{ result.json_path }}" class="btn btn-sm btn-outline-primary" target="_blank">Voir JSON</a>
+                                {% if result.json_url %}
+                                <a href="{{ result.json_url }}" class="btn btn-sm btn-outline-primary" target="_blank">Voir JSON</a>
+                                {% else %}
+                                <!-- Utiliser le chemin absolu donné par la vue -->
+                                <a href="{{ media_url }}transcription_results/{{ directory }}/{{ result.json_path|default:result.filename|cut:'.jpg'|cut:'.jpeg'|add:'_result.json' }}" class="btn btn-sm btn-outline-primary" target="_blank">Voir JSON</a>
+                                {% endif %}
                             {% else %}
                             <span class="text-danger">{{ result.error }}</span>
                             {% endif %}

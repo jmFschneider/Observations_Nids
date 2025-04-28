@@ -1,4 +1,4 @@
-<!-- select_directory.html -->
+<!-- templates/transcription/upload_files.html -->
 {% extends "base.html" %}
 
 {% block content %}
@@ -47,11 +47,17 @@ document.getElementById('directory-form').addEventListener('submit', function(e)
             document.getElementById('file-count').textContent = data.file_count;
 
             // Ajouter un bouton pour commencer le traitement
+            const startButtonsContainer = document.createElement('div');
+            startButtonsContainer.className = "mt-3";
+
+            // Option 1: Commencer immédiatement (redirection vers process_images)
             const startButton = document.createElement('a');
             startButton.href = "{% url 'process_images' %}";
-            startButton.className = "btn btn-success mt-3";
-            startButton.textContent = "Commencer la transcription des images";
-            form.appendChild(startButton);
+            startButton.className = "btn btn-success";
+            startButton.textContent = "Commencer la transcription";
+            startButtonsContainer.appendChild(startButton);
+
+            form.appendChild(startButtonsContainer);
         } else {
             alert("Erreur: " + data.error);
         }
