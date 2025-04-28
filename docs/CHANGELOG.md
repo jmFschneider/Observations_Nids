@@ -1,3 +1,9 @@
+# le 28 avril 2025
+# V 1.1.0 
+
+1. Mise en place de Celery pour réaliser le traitement des transcriptions et modification du suivi de cette opération
+2. Redis est utilisé pour la communication entre Celery et Django
+
 # le 22 avril 2025
 # V 1.0.1 
 

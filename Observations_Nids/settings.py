@@ -56,6 +56,18 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Déconnexion si l’utilisateur ferme 
 ALLOWED_HOSTS: list[str] = settings.ALLOWED_HOSTS
 
 
+# Celery Configuration - utilise les paramètres de pydantic
+# Celery Configuration - utilise les paramètres de pydantic
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0' # settings.celery.broker_url
+# CELERY_RESULT_BACKEND = settings.celery.result_backend
+# CELERY_ACCEPT_CONTENT = settings.celery.accept_content
+# CELERY_TASK_SERIALIZER = settings.celery.task_serializer
+# CELERY_RESULT_SERIALIZER = settings.celery.result_serializer
+# CELERY_TIMEZONE = settings.celery.timezone
+# CELERY_TASK_TRACK_STARTED = settings.celery.task_track_started
+# CELERY_TASK_TIME_LIMIT = settings.celery.task_time_limit
+# CELERY_WORKER_HIJACK_ROOT_LOGGER = settings.celery.worker_hijack_root_logger
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -114,7 +126,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Observations_Nids.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
