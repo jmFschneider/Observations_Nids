@@ -1,4 +1,4 @@
-<!-- templates/importation/liste_especes_candidates.html -->
+<!-- templates/importation/liste_especes_candidates.html (optimisé sans cases à cocher) -->
 {% extends "base.html" %}
 {% load static %}
 
@@ -51,6 +51,23 @@
         </div>
     </div>
 
+    <!-- Validation multiple -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Validation multiple</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div id="selected-count" class="alert alert-info mb-0" style="display: none;">
+                    0 espèce(s) prête(s) pour validation multiple
+                </div>
+                <button id="submit-multiple-btn" type="button" class="btn btn-success" disabled>
+                    Valider les espèces sélectionnées
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Liste des espèces candidates -->
     <div class="card">
         <div class="card-header bg-primary text-white">
@@ -68,7 +85,7 @@
                 </thead>
                 <tbody>
                     {% for espece in especes %}
-                    <tr>
+                    <tr class="espece-row" data-id="{{ espece.id }}">
                         <td>{{ espece.nom_transcrit }}</td>
                         <td>
                             {% if espece.espece_validee %}
@@ -85,34 +102,39 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if espece %}
-
-                                <form method="post" action="{% url 'valider_espece' espece.id %}" class="espece-form">
+                            {% if not espece.espece_validee %}
+                                <!-- Un seul formulaire par ligne, utilisé pour validation individuelle ET multiple -->
+                                <form method="post" action="{% url 'valider_espece' espece.id %}" class="espece-form" data-id="{{ espece.id }}">
                                     {% csrf_token %}
 
                                     <div class="form-group mb-2">
                                         <label>Nom proposé:</label>
-                                        <input type="text" name="nom_espece" id="nom_espece{{ espece.id }}" class="form-control"
+                                        <input type="text" name="nom_espece" id="nom_espece{{ espece.id }}" class="form-control nom-input"
                                                value="{{ espece.nom_transcrit }}">
                                     </div>
 
                                     <div class="form-group mb-2">
                                         <label>Ou sélectionner une espèce existante:</label>
-                                        <select name="espece_validee" id="espece_validee{{ espece.id }}" class="form-control">
+                                        <select name="espece_validee" id="espece_validee{{ espece.id }}" class="form-control espece-select">
                                             <option value="">-- Sélectionnez une espèce --</option>
                                             {% for esp in especes_validees %}
-                                                <option value="{{ esp.id }}"
-                                                    {% if espece.espece_validee and espece.espece_validee.id == esp.id %}selected{% endif %}>
-                                                    {{ esp.nom }}
-                                                </option>
+                                                <option value="{{ esp.id }}">{{ esp.nom }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
 
-                                    <div class="mt-2">
-                                        <button type="submit" class="btn btn-primary btn-sm">Valider</button>
+                                    <div class="mt-2 d-flex">
+                                        <!-- Bouton pour validation individuelle -->
+                                        <button type="submit" class="btn btn-primary btn-sm validate-individual-btn me-2">Valider</button>
+
+                                        <!-- Bouton pour validation multiple -->
+                                        <button type="button" class="btn btn-success btn-sm validate-multiple-btn">
+                                            Ajouter à la validation multiple
+                                        </button>
                                     </div>
                                 </form>
+                            {% else %}
+                                <span class="text-muted">Déjà validée</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -178,15 +200,20 @@
         </div>
         {% endif %}
     </div>
+
+    <!-- Formulaire caché pour la validation multiple -->
+    <form id="validation-multiple-form" method="post" action="{% url 'valider_especes_multiples' %}" style="display: none;">
+        {% csrf_token %}
+        <div id="multiple-validation-data"></div>
+    </form>
 </div>
 
- <script>
+<script>
 document.addEventListener('DOMContentLoaded', function() {
-     debugger;  // ← Chrome s'arrêtera ici
     // Pour chaque formulaire d'espèce
     document.querySelectorAll('.espece-form').forEach(function(form) {
-        const nomInput = form.querySelector('[id^="nom_espece"]');
-        const especeSelect = form.querySelector('[id^="espece_validee"]');
+        const nomInput = form.querySelector('.nom-input');
+        const especeSelect = form.querySelector('.espece-select');
 
         // Quand l'utilisateur tape dans le champ nom
         nomInput.addEventListener('input', function() {
@@ -204,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Au moment de l'envoi du formulaire
+        // Validation individuelle
         form.addEventListener('submit', function(event) {
             // Si ni un nom ni une espèce n'est choisi, on empêche l'envoi
             if (nomInput.value.trim() === '' && especeSelect.value === '') {
@@ -212,6 +239,87 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Veuillez soit entrer un nom, soit sélectionner une espèce.');
             }
         });
+
+        // Bouton pour ajouter à la validation multiple
+        const multipleBtn = form.querySelector('.validate-multiple-btn');
+        if (multipleBtn) {
+            multipleBtn.addEventListener('click', function() {
+                const especeId = form.dataset.id;
+                addToMultipleValidation(especeId, nomInput.value, especeSelect.value);
+                // Indiquer visuellement que cette ligne est ajoutée à la validation multiple
+                form.closest('.espece-row').classList.add('bg-light');
+                multipleBtn.textContent = 'Ajouté à la validation multiple';
+                multipleBtn.classList.remove('btn-success');
+                multipleBtn.classList.add('btn-secondary');
+            });
+        }
+    });
+
+    // Store des espèces à valider en multiple
+    const multipleValidationStore = new Map();
+
+    // Fonction pour ajouter une espèce à la validation multiple
+    function addToMultipleValidation(especeId, nomEspece, especeValideeId) {
+        if (nomEspece.trim() === '' && especeValideeId === '') {
+            alert('Veuillez soit entrer un nom, soit sélectionner une espèce avant d\'ajouter à la validation multiple.');
+            return;
+        }
+
+        multipleValidationStore.set(especeId, {
+            nomEspece: nomEspece,
+            especeValideeId: especeValideeId
+        });
+        updateMultipleValidationForm();
+    }
+
+    // Mettre à jour le formulaire caché avec les données pour la validation multiple
+    function updateMultipleValidationForm() {
+        const dataContainer = document.getElementById('multiple-validation-data');
+        dataContainer.innerHTML = '';
+
+        multipleValidationStore.forEach((data, especeId) => {
+            const especeInput = document.createElement('input');
+            especeInput.type = 'hidden';
+            especeInput.name = 'selected_especes';
+            especeInput.value = especeId;
+            dataContainer.appendChild(especeInput);
+
+            if (data.nomEspece) {
+                const nomInput = document.createElement('input');
+                nomInput.type = 'hidden';
+                nomInput.name = `nom_espece_multiple_${especeId}`;
+                nomInput.value = data.nomEspece;
+                dataContainer.appendChild(nomInput);
+            }
+
+            if (data.especeValideeId) {
+                const valideeInput = document.createElement('input');
+                valideeInput.type = 'hidden';
+                valideeInput.name = `espece_validee_multiple_${especeId}`;
+                valideeInput.value = data.especeValideeId;
+                dataContainer.appendChild(valideeInput);
+            }
+        });
+
+        // Activer/désactiver le bouton de validation multiple
+        const submitMultipleBtn = document.getElementById('submit-multiple-btn');
+        submitMultipleBtn.disabled = multipleValidationStore.size === 0;
+
+        // Mettre à jour le compteur
+        const selectedCountElement = document.getElementById('selected-count');
+        selectedCountElement.textContent = multipleValidationStore.size + ' espèce(s) prête(s) pour validation multiple';
+        selectedCountElement.style.display = multipleValidationStore.size > 0 ? 'block' : 'none';
+    }
+
+    // Bouton de validation multiple
+    const submitMultipleBtn = document.getElementById('submit-multiple-btn');
+    submitMultipleBtn.addEventListener('click', function() {
+        if (multipleValidationStore.size === 0) {
+            alert('Veuillez d\'abord ajouter des espèces à la validation multiple.');
+            return;
+        }
+
+        document.getElementById('validation-multiple-form').submit();
     });
 });
 </script>

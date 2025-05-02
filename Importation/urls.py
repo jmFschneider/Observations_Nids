@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import home, importation, especes
+from .views import home, importation, especes, valider_especes_multiples
 
 urlpatterns = [
     # Accueil et importation initiale
@@ -11,6 +11,7 @@ urlpatterns = [
 
     # Gestion des espèces candidates
     path('especes/', especes.liste_especes_candidates, name='liste_especes_candidates'),
+path('especes/valider-multiples/', valider_especes_multiples, name='valider_especes_multiples'),
     path('especes/<int:espece_id>/valider/', especes.valider_espece, name='valider_espece'),
     path('especes/creer/', especes.creer_nouvelle_espece, name='creer_nouvelle_espece'),
 

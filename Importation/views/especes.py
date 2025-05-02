@@ -117,6 +117,96 @@ def valider_espece(request, espece_id):
 
 @login_required
 @user_passes_test(est_admin)
+def valider_especes_multiples(request):
+    """Vue pour valider plusieurs espèces candidates à la fois avec des valeurs individuelles"""
+    if request.method == 'POST':
+        selected_especes = request.POST.getlist('selected_especes')
+
+        if not selected_especes:
+            messages.error(request, "Aucune espèce n'a été sélectionnée.")
+            return redirect('liste_especes_candidates')
+
+        count_success = 0
+        count_error = 0
+
+        for espece_id in selected_especes:
+            try:
+                espece_candidate = EspeceCandidate.objects.get(id=espece_id)
+
+                # Vérifier que l'espèce n'est pas déjà validée
+                if espece_candidate.espece_validee:
+                    continue
+
+                # Récupérer les données de cette espèce
+                nom_espece = request.POST.get(f'nom_espece_multiple_{espece_id}', '').strip()
+                espece_validee_id = request.POST.get(f'espece_validee_multiple_{espece_id}', '')
+
+                # Cas 1: Une espèce existante a été sélectionnée
+                if espece_validee_id:
+                    try:
+                        espece_validee = Espece.objects.get(id=espece_validee_id)
+                        espece_candidate.espece_validee = espece_validee
+                        espece_candidate.validation_manuelle = True
+                        espece_candidate.save()
+                        count_success += 1
+                    except Espece.DoesNotExist:
+                        count_error += 1
+                        continue
+
+                # Cas 2: Un nouveau nom d'espèce a été saisi
+                elif nom_espece:
+                    try:
+                        # Vérifier si l'espèce existe déjà avec ce nom
+                        espece_existante = Espece.objects.filter(nom__iexact=nom_espece).first()
+
+                        if espece_existante:
+                            # Si elle existe, l'utiliser
+                            espece_candidate.espece_validee = espece_existante
+                            espece_candidate.validation_manuelle = True
+                            espece_candidate.save()
+                            count_success += 1
+                        else:
+                            # Sinon, créer une nouvelle espèce
+                            nouvelle_espece = Espece.objects.create(
+                                nom=nom_espece,
+                                valide_par_admin=True  # Validée par un admin
+                            )
+
+                            espece_candidate.espece_validee = nouvelle_espece
+                            espece_candidate.validation_manuelle = True
+                            espece_candidate.save()
+                            count_success += 1
+                    except Exception as e:
+                        count_error += 1
+                        logger.error(f"Erreur lors de la création de l'espèce: {str(e)}")
+                        continue
+                else:
+                    # Ni nom ni espèce n'a été fourni
+                    count_error += 1
+                    continue
+
+            except EspeceCandidate.DoesNotExist:
+                count_error += 1
+                continue
+
+        # Message de résultat
+        if count_success > 0:
+            messages.success(
+                request,
+                f"{count_success} espèce(s) candidate(s) ont été validées avec succès."
+            )
+
+        if count_error > 0:
+            messages.warning(
+                request,
+                f"{count_error} espèce(s) n'ont pas pu être validées. Vérifiez les données saisies."
+            )
+
+    return redirect('liste_especes_candidates')
+
+
+@login_required
+@user_passes_test(est_admin)
 def creer_nouvelle_espece(request):
     """Vue pour créer une nouvelle espèce à partir d'une transcription"""
     if request.method == 'POST':
