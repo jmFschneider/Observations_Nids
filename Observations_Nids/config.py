@@ -125,12 +125,17 @@ def get_settings() -> Settings:
     #     # Les autres paramètres ont des valeurs par défaut dans la classe
     # )
 
+    # Get ALLOWED_HOSTS from environment and process it directly
+    allowed_hosts = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1")
+
     return Settings(
         DATABASE=database_settings,
         SECRET_KEY=os.environ.get("SECRET_KEY", "django-insecure-^tzqm_vr2-7f#2p10rehlk4pr9!z8z^!3atbbwq@2!%h_$n2f0"),
         DEBUG=os.environ.get("DEBUG", "False").lower() in ("true", "1", "t"),
         USE_DEBUG_TOOLBAR=os.environ.get("USE_DEBUG_TOOLBAR", "False").lower() in ("true", "1", "t"),
         gemini_api_key=os.environ.get("GEMINI_API_KEY", None),
+        # Explicitly set ALLOWED_HOSTS to avoid JSON parsing issues
+        ALLOWED_HOSTS=allowed_hosts,
         # Ajouter les paramètres Celery
         celery=celery_settings,
     )
