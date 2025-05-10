@@ -9,28 +9,26 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
 from pathlib import Path
 import os
+import json
 
-from django.template.context_processors import media
 from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
-
-# Import Pydantic settings
-from .config import get_settings
-
-# Get settings from environment variables
-settings = get_settings()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ✅ Load environment variables from .env file
+load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+# ✅ Import Pydantic settings
+from .config import get_settings
+
+# ✅ Get settings from environment variables
+settings = get_settings()
+
+# ALLOWED_HOSTS
+ALLOWED_HOSTS = json.loads(os.getenv("ALLOWED_HOSTS", "[]"))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = settings.SECRET_KEY
@@ -52,9 +50,6 @@ LOGIN_REDIRECT_URL = '/'
 # Durée de session : 3600 secondes (1 heure)
 SESSION_COOKIE_AGE = settings.SESSION_COOKIE_AGE
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Déconnexion si l’utilisateur ferme son navigateur
-
-ALLOWED_HOSTS: list[str] = settings.ALLOWED_HOSTS
-
 
 # Celery Configuration - utilise les paramètres de pydantic
 # Celery Configuration - utilise les paramètres de pydantic

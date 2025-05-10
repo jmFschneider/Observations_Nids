@@ -1,3 +1,8 @@
+# le 9 mai 2025
+1. début de déploiement sur le serveur de production. 
+2. Ajout du fichier "mise_a_jour.sh" à la racine de mon dossier perso
+3. modification du fichier setting.py pour avoir une lecture correct du fichier .env
+
 # le 28 avril 2025
 # V 1.1.0 
 
