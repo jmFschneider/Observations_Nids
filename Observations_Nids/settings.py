@@ -28,7 +28,8 @@ from .config import get_settings
 settings = get_settings()
 
 # ALLOWED_HOSTS
-ALLOWED_HOSTS = json.loads(os.getenv("ALLOWED_HOSTS", "[]"))
+# Use ALLOWED_HOSTS from settings object which is loaded from config.py
+ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = settings.SECRET_KEY
