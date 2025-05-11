@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, validator
 from pydantic_settings import BaseSettings
 import os
 from pathlib import Path
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,13 +32,13 @@ class CelerySettings(BaseSettings):
     task_track_started: bool = True
     task_time_limit: int = 30 * 60  # 30 minutes
     worker_hijack_root_logger: bool = False
-    # Configuration spécifique à Windows pour Celery
+    # Configuration spÃ©cifique Ã  Windows pour Celery
     if os.name == 'nt':
         CELERY_WORKER_CONCURRENCY: int = 1
         CELERY_WORKER_POOL: str = 'solo'
 
     class Config:
-        env_prefix = "CELERY_"  # Chercher les variables préfixées par CELERY_
+        env_prefix = "CELERY_"  # Chercher les variables prÃ©fixÃ©es par CELERY_
         extra = "ignore"  # Ignore extra fields not defined in the model
 
 class Settings(BaseSettings):
@@ -94,14 +95,13 @@ class Settings(BaseSettings):
 
     @validator("ALLOWED_HOSTS", pre=True)
     def validate_allowed_hosts(cls, v):
-        """Valider et nettoyer les valeurs de ALLOWED_HOSTS."""
         if isinstance(v, str):
-            # Si c'est une chaîne, la diviser par des virgules
-            hosts = [host.strip() for host in v.split(",") if host.strip()]
-            return hosts if hosts else ["localhost", "127.0.0.1"]
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return [host.strip() for host in v.split(",") if host.strip()]
         elif isinstance(v, list):
-            # Si c'est déjà une liste, nettoyer chaque élément
-            return [str(host).strip() for host in v if str(host).strip()]
+            return [str(host).strip() for host in v]
         return ["localhost", "127.0.0.1"]
 
 def get_settings() -> Settings:
@@ -122,7 +122,7 @@ def get_settings() -> Settings:
     celery_settings = CelerySettings()
     #     broker_url=os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0"),
     #     result_backend=os.environ.get("CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/0"),
-    #     # Les autres paramètres ont des valeurs par défaut dans la classe
+    #     # Les autres paramÃ¨tres ont des valeurs par dÃ©faut dans la classe
     # )
 
     # Get ALLOWED_HOSTS from environment and process it directly
@@ -136,6 +136,6 @@ def get_settings() -> Settings:
         gemini_api_key=os.environ.get("GEMINI_API_KEY", None),
         # Explicitly set ALLOWED_HOSTS to avoid JSON parsing issues
         ALLOWED_HOSTS=allowed_hosts,
-        # Ajouter les paramètres Celery
+        # Ajouter les paramÃ¨tres Celery
         celery=celery_settings,
     )

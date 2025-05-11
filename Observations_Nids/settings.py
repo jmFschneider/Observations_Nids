@@ -18,13 +18,13 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ✅ Load environment variables from .env file
+# âœ… Load environment variables from .env file
 load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
 
-# ✅ Import Pydantic settings
+# âœ… Import Pydantic settings
 from .config import get_settings
 
-# ✅ Get settings from environment variables
+# âœ… Get settings from environment variables
 settings = get_settings()
 
 # ALLOWED_HOSTS
@@ -48,12 +48,12 @@ except (ImportError, AttributeError):
 AUTH_USER_MODEL = 'Administration.Utilisateur'
 LOGIN_REDIRECT_URL = '/'
 
-# Durée de session : 3600 secondes (1 heure)
+# DurÃ©e de session : 3600 secondes (1 heure)
 SESSION_COOKIE_AGE = settings.SESSION_COOKIE_AGE
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Déconnexion si l’utilisateur ferme son navigateur
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # DÃ©connexion si lâ€™utilisateur ferme son navigateur
 
-# Celery Configuration - utilise les paramètres de pydantic
-# Celery Configuration - utilise les paramètres de pydantic
+# Celery Configuration - utilise les paramÃ¨tres de pydantic
+# Celery Configuration - utilise les paramÃ¨tres de pydantic
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0' # settings.celery.broker_url
 # CELERY_RESULT_BACKEND = settings.celery.result_backend
 # CELERY_ACCEPT_CONTENT = settings.celery.accept_content
@@ -93,14 +93,14 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'Observations_Nids.urls'
 
 
-# Configurez les adresses IP autorisées à voir la toolbar
+# Configurez les adresses IP autorisÃ©es Ã  voir la toolbar
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
 # Configuration optionnelle
 DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': lambda request: True,  # Affiche toujours la toolbar en développement
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,  # Affiche toujours la toolbar en dÃ©veloppement
 }
 
 TEMPLATES = [
@@ -166,15 +166,15 @@ USE_TZ = True
 LOGIN_URL = '/login/'
 
 STATIC_URL = '/static/'
-# Dossier où Django trouvera les fichiers statiques de l'application
+# Dossier oÃ¹ Django trouvera les fichiers statiques de l'application
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "Observations", "static", 'Importation'),  # Corrige ici
+    os.path.join(BASE_DIR, "Observations", "static"),
 ]
 
-# Dossier où Django collectera tous les fichiers statiques pour la mise en production
+# Dossier oÃ¹ Django collectera tous les fichiers statiques pour la mise en production
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-# Dossier où seront stocké les fichiers jpg
+# Dossier oÃ¹ seront stockÃ© les fichiers jpg
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # Default primary key field type
@@ -185,7 +185,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Chemin du dossier logs dans l'application Observations
 LOG_DIR = os.path.join(BASE_DIR, 'Observations', 'logs')
 
-# Création du dossier logs s'il n'existe pas
+# CrÃ©ation du dossier logs s'il n'existe pas
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
@@ -238,7 +238,7 @@ LOGGING = {
         },
         'django.template': {
             'handlers': ['console'],
-            'level': 'INFO',  # Augmenter à INFO pour réduire les messages de debug inutiles
+            'level': 'INFO',  # Augmenter Ã  INFO pour rÃ©duire les messages de debug inutiles
             'propagate': False,
         },
     },
@@ -251,15 +251,15 @@ try:
     with open(VERSION_FILE, "r") as f:
         VERSION = f.read().strip()
 except FileNotFoundError:
-    VERSION = "0.0.0"  # Valeur par défaut en cas d'erreur
+    VERSION = "0.0.0"  # Valeur par dÃ©faut en cas d'erreur
 
-# Active Debug Toolbar uniquement si défini dans settings_local ou .env
+# Active Debug Toolbar uniquement si dÃ©fini dans settings_local ou .env
 try:
     from .settings_local import USE_DEBUG_TOOLBAR
 except (ImportError, AttributeError):
     USE_DEBUG_TOOLBAR = settings.USE_DEBUG_TOOLBAR
 
-# settings.py (à la toute fin)
+# settings.py (Ã  la toute fin)
 if USE_DEBUG_TOOLBAR:
     INSTALLED_APPS += ['debug_toolbar']
     MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
