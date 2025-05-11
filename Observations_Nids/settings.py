@@ -169,6 +169,8 @@ STATIC_URL = '/static/'
 # Dossier oÃ¹ Django trouvera les fichiers statiques de l'application
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "Observations", "static"),
+    os.path.join(BASE_DIR, "Importation", "static"),
+    os.path.join(BASE_DIR, "Administration", "static"),
 ]
 
 # Dossier oÃ¹ Django collectera tous les fichiers statiques pour la mise en production
@@ -238,7 +240,7 @@ LOGGING = {
         },
         'django.template': {
             'handlers': ['console'],
-            'level': 'INFO',  # Augmenter Ã  INFO pour rÃ©duire les messages de debug inutiles
+            'level': 'INFO',  # Augmenter À  INFO pour rÃ©duire les messages de debug inutiles
             'propagate': False,
         },
     },
@@ -259,7 +261,7 @@ try:
 except (ImportError, AttributeError):
     USE_DEBUG_TOOLBAR = settings.USE_DEBUG_TOOLBAR
 
-# settings.py (Ã  la toute fin)
+# settings.py (Ã la toute fin)
 if USE_DEBUG_TOOLBAR:
     INSTALLED_APPS += ['debug_toolbar']
     MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
