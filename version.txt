@@ -1,5 +1,1 @@
-2.1 Modification de la gestion des utilisateurs,
-
-Création de l'application administration
-Transfert de la class Utilisateur vers l'application Administration
-Creation des vues, templates, etc
+2.1 Modification de la gestion des utilisateurs

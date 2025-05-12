@@ -221,15 +221,15 @@ def fiche_test_observation_view(request, fiche_id=None):
                     observation_formset.instance = fiche
                     # Ne sauvegarder que les formulaires qui ont été modifiés et qui sont valides
                     for form in observation_formset:
-                        # Vérifier si le formulaire a été modifié
                         if form.has_changed():
-                            # Vérifier si la date d'observation est renseignée
                             if form.cleaned_data.get('date_observation'):
                                 try:
-                                    # S'il s'agit d'une mise à jour d'une observation existante
                                     if form.instance.pk and form.instance.pk in observations_avant:
+                                        # Préparer la nouvelle observation sans la sauvegarder tout de suite
+                                        nouvelle_obs = form.save(commit=False)
                                         ancienne_obs = observations_avant[form.instance.pk]
-                                        nouvelle_obs = form.save()
+
+                                        # Comparer avec les anciennes valeurs avant de sauvegarder
                                         enregistrer_modifications_historique(
                                             fiche=fiche,
                                             ancienne_instance=ancienne_obs,
@@ -237,12 +237,15 @@ def fiche_test_observation_view(request, fiche_id=None):
                                             categorie='observation',
                                             modifie_par=request.user
                                         )
+
+                                        # Sauvegarde effective après la comparaison
+                                        nouvelle_obs.save()
                                     else:
-                                        # Nouvelle observation, enregistrer dans l'historique
+                                        # Cas d'une nouvelle observation
                                         nouvelle_obs = form.save()
-                                        # Enregistrer l'ajout dans l'historique des modifications
                                         from Observations.models import HistoriqueModification
-                                        for field_name in ['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations']:
+                                        for field_name in ['date_observation', 'nombre_oeufs', 'nombre_poussins',
+                                                           'observations']:
                                             if field_name in form.cleaned_data and form.cleaned_data[field_name]:
                                                 HistoriqueModification.objects.create(
                                                     fiche=fiche,
@@ -252,7 +255,6 @@ def fiche_test_observation_view(request, fiche_id=None):
                                                     categorie='observation',
                                                     modifie_par=request.user
                                                 )
-
                                     logger.info(
                                         f"Observation sauvegardée avec date: {form.cleaned_data.get('date_observation')}")
                                 except Exception as e:
@@ -366,6 +368,7 @@ def enregistrer_modifications_historique(fiche, ancienne_instance, nouvelle_inst
     from django.forms.models import model_to_dict
     from Observations.models import HistoriqueModification
     from django.utils import timezone
+    from datetime import timezone as dt_timezone
     import datetime
 
     if not ancienne_instance or not nouvelle_instance:
@@ -398,9 +401,9 @@ def enregistrer_modifications_historique(fiche, ancienne_instance, nouvelle_inst
             logger.info(f"  Champ '{champ}' est un datetime, normalisation...")
             # Convertir les deux valeurs en UTC pour une comparaison équitable
             if timezone.is_aware(ancienne_valeur):
-                ancienne_valeur = ancienne_valeur.astimezone(timezone.utc)
+                ancienne_valeur = ancienne_valeur.astimezone(dt_timezone.utc)
             if timezone.is_aware(nouvelle_valeur):
-                nouvelle_valeur = nouvelle_valeur.astimezone(timezone.utc)
+                nouvelle_valeur = nouvelle_valeur.astimezone(dt_timezone.utc)
 
             # Comparer uniquement les composantes date et heure, pas les informations de fuseau horaire
             ancienne_valeur_normalisee = ancienne_valeur.replace(tzinfo=None)
