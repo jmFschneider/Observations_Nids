@@ -18,11 +18,15 @@
                     <form method="post">
                         {% csrf_token %}
 
-                        {% if form.non_field_errors %}
+                        {% if form.errors %}
                         <div class="alert alert-danger">
-                            {% for error in form.non_field_errors %}
-                            {{ error }}
-                            {% endfor %}
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li><strong>{{ field|title }} :</strong> {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
                         </div>
                         {% endif %}
 

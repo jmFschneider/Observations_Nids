@@ -147,17 +147,19 @@ def inscription_publique(request):
     if request.method == 'POST':
         form = UtilisateurCreationForm(request.POST)
         if form.is_valid():
-            # Créer l'utilisateur mais le marquer comme non validé
             utilisateur = form.save(commit=False)
-            utilisateur.est_valide = False  # Nécessite approbation par un admin
-            utilisateur.role = 'observateur'  # Rôle par défaut
+            utilisateur.est_valide = False
+            utilisateur.role = 'observateur'
             utilisateur.save()
+            logger.info(f"Nouvelle demande d'inscription reçue : {utilisateur.username} ({utilisateur.email})")
 
             messages.success(
                 request,
                 "Votre demande d'inscription a été enregistrée. Un administrateur devra l'approuver avant que vous puissiez vous connecter."
             )
-            return redirect('login')
+            return redirect('accueil')  # ou '/' selon ta configuration
+        else:
+            logger.warning(f"Formulaire invalide : {form.errors}")  # 👈 AJOUT ESSENTIEL
     else:
         form = UtilisateurCreationForm()
 

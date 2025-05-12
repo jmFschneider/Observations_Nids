@@ -11,21 +11,22 @@
             </a>
         </div>
         <div class="col-md-6">
-            <form method="get" class="form-inline float-right">
-                <div class="input-group">
-                    <input type="text" name="recherche" class="form-control" placeholder="Rechercher..." value="{{ recherche }}">
-                    <select name="role" class="form-control ml-2">
-                        <option value="tous" {% if role == 'tous' %}selected{% endif %}>Tous les rôles</option>
-                        <option value="observateur" {% if role == 'observateur' %}selected{% endif %}>Observateurs</option>
-                        <option value="reviewer" {% if role == 'reviewer' %}selected{% endif %}>Reviewers</option>
-                        <option value="administrateur" {% if role == 'administrateur' %}selected{% endif %}>Administrateurs</option>
-                    </select>
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="submit">
-                            <i class="fas fa-search"></i> Rechercher
-                        </button>
-                    </div>
-                </div>
+            <form method="get" class="form-inline mb-3">
+                <input type="text" name="recherche" placeholder="Rechercher" value="{{ recherche }}" class="form-control mr-2">
+
+                <select name="role" class="form-control mr-2">
+                    <option value="tous" {% if role == 'tous' %}selected{% endif %}>Tous les rôles</option>
+                    <option value="observateur" {% if role == 'observateur' %}selected{% endif %}>Observateurs</option>
+                    <option value="administrateur" {% if role == 'administrateur' %}selected{% endif %}>Administrateurs</option>
+                </select>
+
+                <select name="valide" class="form-control mr-2">
+                    <option value="tous" {% if valide == 'tous' %}selected{% endif %}>Tous</option>
+                    <option value="oui" {% if valide == 'oui' %}selected{% endif %}>Validés</option>
+                    <option value="non" {% if valide == 'non' %}selected{% endif %}>En attente</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary">Filtrer</button>
             </form>
         </div>
     </div>
@@ -86,6 +87,12 @@
                 <tr>
                     <td colspan="7" class="text-center">Aucun utilisateur trouvé</td>
                 </tr>
+                    {% if not utilisateur.est_valide %}
+                        <form method="post" action="{% url 'administration:valider_utilisateur' utilisateur.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success">Valider</button>
+                        </form>
+                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>

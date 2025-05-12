@@ -57,6 +57,7 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['recherche'] = self.request.GET.get('recherche', '')
         context['role'] = self.request.GET.get('role', 'tous')
+        context['valide'] = self.request.GET.get('valide', 'tous')
         return context
 
 
@@ -167,6 +168,7 @@ def inscription_publique(request):
             utilisateur.est_valide = False  # Nécessite approbation par un admin
             utilisateur.role = 'observateur'  # Rôle par défaut
             utilisateur.save()
+            logger.info(f"Nouvelle demande d'inscription reçue : {utilisateur.username} ({utilisateur.email})")
 
             messages.success(
                 request,
@@ -195,3 +197,13 @@ def promouvoir_administrateur(request):
     utilisateurs = Utilisateur.objects.exclude(role='administrateur')
 
     return render(request, 'administration/promouvoir_admin.html', {'utilisateurs': utilisateurs})
+
+
+@login_required
+@user_passes_test(est_admin)
+def valider_utilisateur(request, user_id):
+    utilisateur = get_object_or_404(Utilisateur, id=user_id)
+    utilisateur.est_valide = True
+    utilisateur.save()
+    messages.success(request, f"L'utilisateur {utilisateur.username} a été validé.")
+    return redirect('administration:liste_utilisateurs')
