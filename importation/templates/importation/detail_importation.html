@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+<!-- templates/importation/detail_importation.html -->
+
+{% block title %}Détail de l'importation{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'accueil_importation' %}">Importation</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'liste_importations' %}">Liste des importations</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Détail de l'importation</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">Détail de l'importation</h1>
+
+    <!-- Informations générales -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Informations générales</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Fichier source:</dt>
+                        <dd class="col-sm-8">{{ transcription.fichier_source }}</dd>
+
+                        <dt class="col-sm-4">Date d'importation:</dt>
+                        <dd class="col-sm-8">{{ transcription.date_importation|date:"d/m/Y H:i" }}</dd>
+
+                        <dt class="col-sm-4">Statut:</dt>
+                        <dd class="col-sm-8">
+                            {% if importation.statut == 'en_attente' %}
+                                <span class="badge badge-warning">En attente</span>
+                            {% elif importation.statut == 'erreur' %}
+                                <span class="badge badge-danger">Erreur</span>
+                            {% elif importation.statut == 'complete' %}
+                                <span class="badge badge-success">Terminée</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Espèce:</dt>
+                        <dd class="col-sm-8">
+                            {% if importation.espece_candidate %}
+                                {% if importation.espece_candidate.espece_validee %}
+                                    <span class="text-success">
+                                        {{ importation.espece_candidate.espece_validee.nom }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-warning">
+                                        {{ importation.espece_candidate.nom_transcrit }} (non validée)
+                                    </span>
+                                    <a href="{% url 'liste_especes_candidates' %}?recherche={{ importation.espece_candidate.nom_transcrit }}"
+                                       class="btn btn-sm btn-warning">Valider</a>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-danger">Non trouvée</span>
+                            {% endif %}
+                        </dd>
+
+                        <dt class="col-sm-4">Observateur:</dt>
+                        <dd class="col-sm-8">
+                            {% if importation.observateur %}
+                                <span class="text-success">
+                                    {{ importation.observateur.first_name }}
+                                    {{ importation.observateur.last_name }}
+                                    {% if importation.observateur.est_transcription %}
+                                        <span class="badge badge-info">Transcription</span>
+                                    {% endif %}
+                                </span>
+                            {% else %}
+                                <span class="text-danger">Non trouvé</span>
+                            {% endif %}
+                        </dd>
+
+                        <dt class="col-sm-4">Fiche observation:</dt>
+                        <dd class="col-sm-8">
+                            {% if importation.fiche_observation %}
+                                <a href="{% url 'fiche_observation' importation.fiche_observation.num_fiche %}"
+                                   class="btn btn-sm btn-success">
+                                    Voir fiche #{{ importation.fiche_observation.num_fiche }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">Non créée</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            {% if importation.statut == 'en_attente' and importation.espece_candidate.espece_validee and importation.observateur %}
+                <div class="mt-3">
+                    <form method="post" action="{% url 'finaliser_importation' importation.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Finaliser l'importation</button>
+                    </form>
+                </div>
+            {% elif importation.statut == 'complete' or importation.statut == 'erreur' %}
+                <div class="mt-3">
+                    <form method="post" action="{% url 'reinitialiser_importation' importation.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning" onclick="return confirm('Êtes-vous sûr de vouloir réinitialiser cette importation ? Cette action supprimera la fiche d\'observation associée et ne peut pas être annulée.')">
+                            Réinitialiser l'importation
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Contenu JSON -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Données JSON transcrites</h5>
+        </div>
+        <div class="card-body">
+            <pre class="bg-light p-3 border rounded"><code>{{ donnees_json }}</code></pre>
+        </div>
+    </div>
+</div>
+{% endblock %}

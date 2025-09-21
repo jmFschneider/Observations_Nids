@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<table>
+    <tbody>
+        <tr>
+            <td>
+                {% if fiche.causes_echec.description %}
+                    {{ fiche.causes_echec.description }}
+                {% else %}
+                    Non renseigné
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock %}

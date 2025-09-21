@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% with user=utilisateur %}
+{% include "components/user_card.html" %}
+{% endwith %}
+
+<div class="mt-3">
+    <p><strong>Date d'inscription:</strong> {{ utilisateur.date_joined }}</p>
+    <p><strong>Compte validé:</strong> {% if utilisateur.est_valide %} Oui {% else %} Non {% endif %}</p>
+    <p><strong>Nombre de fiches d'observation:</strong> {{ observations_count }}</p>
+</div>
+
+{% if observations_count > 0 %}
+<h2>Fiches d'observation</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Numéro de Fiche</th>
+            <th>Date</th>
+            <th>Nombre d'œufs</th>
+            <th>Nombre de poussins</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fiche in fiches %}
+        <tr>
+            <td>{{ fiche.num_fiche }}</td>
+            <td>{{ fiche.annee }}</td>
+            <td>{{ fiche.resume.nombre_oeufs_pondus }}</td>
+            <td>{{ fiche.resume.nombre_poussins }}</td>
+            <td>
+                <a href="{% url 'fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Voir détails</a>
+                <a href="{% url 'modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-primary">Modifier</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">Aucune fiche d'observation enregistrée.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% include "components/pagination.html" %}
+{% endif %}
+
+{% endblock %}

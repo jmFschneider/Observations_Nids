@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+<!-- templates/importation/preparer_importations.html -->
+
+{% block title %}Préparer les importations{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'accueil_importation' %}">Importation</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Préparer les importations</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">Préparer les importations</h1>
+    
+    <div class="alert alert-info">
+        <p>Cette étape prépare les importations pour les transcriptions dont les espèces et observateurs
+           ont été extraits. Elle crée des entrées dans la table des importations en cours pour faciliter
+           la gestion des importations.</p>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Préparation</h5>
+        </div>
+        <div class="card-body">
+            <p>Cliquez sur le bouton ci-dessous pour préparer les importations à partir des transcriptions non traitées:</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Préparer les importations</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

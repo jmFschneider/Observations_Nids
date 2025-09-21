@@ -1,0 +1,54 @@
+[tool.black]
+line-length = 100
+target-version = ["py311", "py312"]
+skip-string-normalization = true
+
+[tool.ruff]
+# Ruff = linter ultra-rapide (remplace flake8 + isort + pyupgrade + bugbear + django)
+target-version = "py311"
+line-length = 100
+extend-exclude = ["migrations", "venv", ".venv", ".git", ".mypy_cache", ".ruff_cache"]
+
+[tool.ruff.lint]
+# Règles utiles pour Django + qualité
+select = [
+  "E", "F",        # Pyflakes/Pycodestyle de base
+  "I",             # Import order (isort intégré)
+  "UP",            # Pyupgrade (modernise le code)
+  "B",             # flake8-bugbear (pièges courants)
+  "SIM",           # simplifications
+  "N",             # pep8-naming
+  "DJ",            # plugin Django
+  "PL",            # pylint (sous-ensemble pertinent)
+]
+ignore = [
+  "E203",  # compatibles avec Black
+  "E501",      # lignes longues : géré par Black
+  "PLR2004",   # 'magic values' (trop bavard)
+  "PLR0912",   # too-many-branches (on traitera au cas par cas)
+  "PLR0915",   # too-many-statements (idem)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Les tests tolèrent parfois plus de liberté
+"manage.py" = ["PLC0415"]
+"tests/**/*.py" = ["S101"]  # exemple : autoriser assert (si tu ajoutes la règle S plus tard)
+
+[tool.ruff.format]
+# On laisse Black s’occuper du formatage.
+quote-style = "preserve"
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_return_any = true
+no_implicit_optional = true
+check_untyped_defs = true
+disallow_any_generics = true
+ignore_missing_imports = true
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "observations_nids.settings"

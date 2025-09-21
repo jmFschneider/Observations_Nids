@@ -1,28 +1,37 @@
 # reset_et_jeu_test.py
 import os
-import django
+import sys
 from datetime import datetime
+
+import django
 from django.utils import timezone
 
-# Initialisation Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Observations_Nids.settings')
-django.setup()
-
 # Imports des modèles
-from Observations.models import (
-    FicheObservation, Observation, ResumeObservation, Nid,
-    Localisation, CausesEchec, Remarque, Validation,
-    HistoriqueModification, HistoriqueValidation, Utilisateur, Espece
+from importation.models import EspeceCandidate, ImportationEnCours, TranscriptionBrute
+from observations.models import (
+    CausesEchec,
+    Espece,
+    FicheObservation,
+    HistoriqueModification,
+    HistoriqueValidation,
+    Localisation,
+    Nid,
+    Observation,
+    Remarque,
+    ResumeObservation,
+    Utilisateur,
+    Validation,
 )
-from Importation.models import (
-    TranscriptionBrute, EspeceCandidate, ImportationEnCours
-)
+
+# Initialisation Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
+django.setup()
 
 # Confirmation
 confirmation = input("⚠️ Cette opération va supprimer toutes les données ET recréer un jeu de test.\nSouhaitez-vous continuer ? (oui/non) : ")
 if confirmation.lower() != "oui":
     print("❌ Opération annulée.")
-    exit()
+    sys.exit()
 
 # Étapes de suppression
 print("🧹 Suppression des anciennes données...")

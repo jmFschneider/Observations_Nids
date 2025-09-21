@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<table>
+    <thead>
+        <tr>
+            <th>Premier œuf pondu</th>
+            <th>Premier poussin éclos</th>
+            <th>Premier poussin volant</th>
+            <th>Œufs pondus</th>
+            <th>Œufs éclos</th>
+            <th>Œufs non éclos</th>
+            <th>Poussins</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                {% if fiche.resume.premier_oeuf_pondu_jour and fiche.resume.premier_oeuf_pondu_mois %}
+                    {{ fiche.resume.premier_oeuf_pondu_jour }}/{{ fiche.resume.premier_oeuf_pondu_mois }}
+                {% else %}
+                    Non renseigné
+                {% endif %}
+            </td>
+            <td>
+                {% if fiche.resume.premier_poussin_eclos_jour and fiche.resume.premier_poussin_eclos_mois %}
+                    {{ fiche.resume.premier_poussin_eclos_jour }}/{{ fiche.resume.premier_poussin_eclos_mois }}
+                {% else %}
+                    Non renseigné
+                {% endif %}
+            </td>
+            <td>
+                {% if fiche.resume.premier_poussin_volant_jour and fiche.resume.premier_poussin_volant_mois %}
+                    {{ fiche.resume.premier_poussin_volant_jour }}/{{ fiche.resume.premier_poussin_volant_mois }}
+                {% else %}
+                    Non renseigné
+                {% endif %}
+            </td>
+            <td>{{ fiche.resume.nombre_oeufs_pondus }}</td>
+            <td>{{ fiche.resume.nombre_oeufs_eclos }}</td>
+            <td>{{ fiche.resume.nombre_oeufs_non_eclos }}</td>
+            <td>{{ fiche.resume.nombre_poussins }}</td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock %}

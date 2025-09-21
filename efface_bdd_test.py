@@ -1,27 +1,34 @@
 # efface_bdd_test.py
 import os
+import sys
+
 import django
 
-# Initialisation de l'environnement Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Observations_Nids.settings')
-django.setup()
-
 # Imports des modèles
-from Observations.models import (
-    FicheObservation, Observation, ResumeObservation, Nid,
-    Localisation, CausesEchec, Remarque, Validation,
-    HistoriqueModification, HistoriqueValidation, Utilisateur
-)
-from Importation.models import (
-    TranscriptionBrute, EspeceCandidate, ImportationEnCours
+from importation.models import EspeceCandidate, ImportationEnCours, TranscriptionBrute
+from observations.models import (
+    CausesEchec,
+    FicheObservation,
+    HistoriqueModification,
+    HistoriqueValidation,
+    Localisation,
+    Nid,
+    Observation,
+    Remarque,
+    ResumeObservation,
+    Utilisateur,
+    Validation,
 )
 
+# Initialisation de l'environnement Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
+django.setup()
 # Confirmation de l'utilisateur
 confirmation = input("⚠️ Cette opération va supprimer TOUTES les données liées aux fiches d'observation, aux transcriptions, et aux utilisateurs de test.\nSouhaitez-vous vraiment continuer ? (oui/non) : ")
 
 if confirmation.lower() != "oui":
     print("❌ Opération annulée.")
-    exit()
+    sys.exit()
 
 # Suppression des utilisateurs créés pour la transcription
 nb_users = Utilisateur.objects.filter(est_transcription=True).count()

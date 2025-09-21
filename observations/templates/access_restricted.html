@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accès restreint</title>
+</head>
+<body>
+    <h2>Bienvenue sur notre site</h2>
+<!-- Dans Observations/templates/access_restricted.html -->
+<p>Vous devez être connecté pour accéder à cette page.</p>
+<p><a href="{% url 'login' %}">Se connecter</a></p>
+<p>Pas encore de compte? <a href="{% url 'administration:inscription_publique' %}">Demander un compte</a></p>
+</body>
+</html>
+
+{% endblock %}

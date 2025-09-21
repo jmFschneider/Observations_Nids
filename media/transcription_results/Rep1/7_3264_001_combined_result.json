@@ -1,0 +1,147 @@
+{
+  "informations_generales": {
+    "n_fiche": "1",
+    "observateur": "C. JACOB",
+    "n_espece": null,
+    "espece": "Moineau domestique",
+    "annee": "19202"
+  },
+  "nid": {
+    "nid_prec_t_meme_c_ple": null,
+    "haut_nid": "5",
+    "h_c_vert": "7",
+    "nid": "ancien trou de Boulin refermé mais avec une entree face à l'est (maison à volets verts"
+  },
+  "localisation": {
+    "IGN_50000": "Biéville. Beuville",
+    "commune": "Biéville. Beuville",
+    "dep_t": "14",
+    "coordonnees_et_ou_lieu_dit": "Bouville",
+    "altitude": "20m",
+    "paysage": "Bourg",
+    "alentours": "route maisons Jardins"
+  },
+  "tableau_donnees": [
+    {
+      "Jour": 1,
+      "Mois": 3,
+      "Heure": null,
+      "Nombre_oeuf": null,
+      "Nombre_pou": null,
+      "age": null,
+      "observations": "♂ l'entrée du trou"
+    },
+    {
+      "Jour": 2,
+      "Mois": 3,
+      "Heure": null,
+      "Nombre_oeuf": null,
+      "Nombre_pou": null,
+      "age": null,
+      "observations": "♀ l'entrée du trou"
+    },
+    {
+      "Jour": 23,
+      "Mois": 3,
+      "Heure": 10,
+      "Nombre_oeuf": null,
+      "Nombre_pou": null,
+      "age": null,
+      "observations": "E/S d'adulte"
+    },
+    {
+      "Jour": 30,
+      "Mois": 3,
+      "Heure": null,
+      "Nombre_oeuf": null,
+      "Nombre_pou": null,
+      "age": null,
+      "observations": "♂ à l'entrée"
+    },
+    {
+      "Jour": 31,
+      "Mois": 5,
+      "Heure": 1,
+      "Nombre_oeuf": null,
+      "Nombre_pou": null,
+      "age": null,
+      "observations": "presence"
+    },
+    {
+      "Jour": 5,
+      "Mois": 5,
+      "Heure": 1,
+      "Nombre_oeuf": null,
+      "Nombre_pou": null,
+      "age": null,
+      "observations": "Entrée de nid"
+    },
+    {
+      "Jour": 6,
+      "Mois": 5,
+      "Heure": 1,
+      "Nombre_oeuf": null,
+      "Nombre_pou": null,
+      "age": null,
+      "observations": "et bordure du Ti ba l'adulte"
+    },
+    {
+      "Jour": 19,
+      "Mois": 5,
+      "Heure": 1,
+      "Nombre_oeuf": null,
+      "Nombre_pou": null,
+      "age": null,
+      "observations": null
+    },
+    {
+      "Jour": 17,
+      "Mois": 5,
+      "Heure": 1,
+      "Nombre_oeuf": null,
+      "Nombre_pou": null,
+      "age": null,
+      "observations": "coquille d'oeuf"
+    },
+    {
+      "Jour": 20,
+      "Mois": 5,
+      "Heure": 14,
+      "Nombre_oeuf": null,
+      "Nombre_pou": null,
+      "age": "30",
+      "observations": "mâle à l'entrée"
+    }
+  ],
+  "tableau_donnees_2": {
+    "1er_o_pondu": {
+      "jour": null,
+      "Mois": null,
+      "Precision": null
+    },
+    "1er_p_eclos": {
+      "jour": null,
+      "Mois": null,
+      "Precision": null
+    },
+    "1er_p_volant": {
+      "jour": null,
+      "Mois": null,
+      "Precision": null
+    },
+    "nombre_oeufs": {
+      "pondus": null,
+      "eclos": null,
+      "n_ecl": null
+    },
+    "nombre_poussins": {
+      "1/2": null,
+      "3/4": null,
+      "vol_t": null
+    }
+  },
+  "causes_echec": {
+    "causes_d_echec": null
+  },
+  "remarque": "pas de suivi au mois d'avril voir fiche n° 4\nmanque de suivi pour cause d'absences"
+}

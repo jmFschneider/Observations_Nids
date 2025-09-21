@@ -1,0 +1,16 @@
+localhost:3306/NidsObservation/django_migrations/		http://192.168.1.176/phpmyadmin/index.php?route=/database/sql&db=NidsObservation
+
+   Affichage des lignes 0 -  6 (total de 7, traitement en 0.0003 seconde(s).) [app: ADMIN... - SESSIONS...]
+
+
+SELECT DISTINCT app FROM django_migrations ORDER BY app;
+
+
+app   	
+admin	
+Administration	
+auth	
+contenttypes	
+Importation	
+Observations	
+sessions	

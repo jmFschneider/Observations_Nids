@@ -1,5 +1,5 @@
 /**
- * Main JavaScript file for the Observations Nids application
+ * Main JavaScript file for the observations Nids application
  */
 
 // Document ready function

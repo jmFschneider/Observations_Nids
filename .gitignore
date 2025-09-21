@@ -1,3 +1,3 @@
 # .gitignore
 .env
-Observations_Nids/settings_local.py
+observations_nids/settings_local.py

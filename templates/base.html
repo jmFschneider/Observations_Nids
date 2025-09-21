@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Observations Nids{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'Observations/css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'Observations/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'Observations/css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% include "components/navbar.html" %}
+
+    <main class="container mt-4">
+        {% include "components/messages.html" %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="mt-5">
+        {% include "components/footer.html" %}
+    </footer>
+
+    <script src="{% static 'Observations/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'Observations/js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

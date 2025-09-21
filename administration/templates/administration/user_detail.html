@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<h2>Détails de l'utilisateur</h2>
+<table>
+    <tr><th>Nom</th><td>{{ utilisateur.last_name }}</td></tr>
+    <tr><th>Prénom</th><td>{{ utilisateur.first_name }}</td></tr>
+    <tr><th>Email</th><td>{{ utilisateur.email }}</td></tr>
+    <tr><th>Date d'inscription</th><td>{{ utilisateur.date_joined }}</td></tr>
+    <tr><th>Rôle</th><td>{{ utilisateur.role }}</td></tr>
+    <tr><th>Compte validé</th><td>{% if utilisateur.est_valide %} Oui {% else %} Non {% endif %}</td></tr>
+    <tr><th>Nombre de fiches d'observation</th><td>{{ observations_count }}</td></tr>
+</table>
+
+<h2>Fiches d'observation</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Numéro de Fiche</th>
+            <th>Date</th>
+            <th>Nombre d'œufs</th>
+            <th>Nombre de poussins</th>
+            <th>Actions</th>
+            <th>Actions test</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fiche in fiches %}
+        <tr>
+            <td>{{ fiche.num_fiche }}</td>
+            <td>{{ fiche.annee }}</td>
+            <td>{{ fiche.resume.nombre_oeufs_pondus }}</td>
+            <td>{{ fiche.resume.nombre_poussins }}</td>
+            <td><a href="{% url 'fiche_observation' fiche.num_fiche %}">Voir détails</a></td>
+            <td><a href="{% url 'modifier_observation' fiche.num_fiche %}">Voir détails</a></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">Aucune fiche d'observation enregistrée.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% include "components/pagination.html" %}
+
+{% endblock %}
