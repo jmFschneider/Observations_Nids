@@ -1,0 +1,20 @@
+# Dépendances de développement uniquement
+# Pour installer : pip install -r requirements-dev.txt
+
+# Outils de qualité de code
+black==25.1.0
+ruff==0.12.12
+mypy==1.17.1
+django-stubs==5.2.2
+django-stubs-ext==5.2.2
+
+# Outils de débogage
+django-debug-toolbar==5.1.0
+django-extensions==3.2.3
+
+# Analyse de code
+pyan3==1.2.0
+pygraphviz==1.14
+
+# Gestion des dépendances
+pip-tools==7.4.1
