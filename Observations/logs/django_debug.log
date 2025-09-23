@@ -1,654 +1,135 @@
-INFO 2025-09-16 22:13:33,077 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-16 22:13:58,873 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-17 10:02:00,368 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-17 10:03:38,877 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-17 20:53:50,622 [autoreload] C:\Projets\observations_nids\observations\urls.py changed, reloading.
-INFO 2025-09-17 20:53:53,324 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-17 21:01:10,918 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-18 10:12:28,187 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-18 10:12:54,020 [views_home] Accueil visité
-DEBUG 2025-09-18 10:12:54,397 [views_home] Visite anonyme - Redirection vers access_restricted.html
-INFO 2025-09-18 10:12:54,445 [basehttp] "GET / HTTP/1.1" 200 13829
-INFO 2025-09-18 10:12:57,572 [basehttp] "GET /auth/login/ HTTP/1.1" 200 16125
-INFO 2025-09-18 10:12:57,607 [basehttp] "GET /static/Observations/css/normalize.css HTTP/1.1" 200 6485
-INFO 2025-09-18 10:12:57,609 [basehttp] "GET /static/Observations/css/bootstrap.min.css HTTP/1.1" 200 3918
-INFO 2025-09-18 10:12:57,610 [basehttp] "GET /static/Observations/js/bootstrap.bundle.min.js HTTP/1.1" 200 494
-INFO 2025-09-18 10:12:57,610 [basehttp] "GET /static/Observations/js/main.js HTTP/1.1" 200 5707
-INFO 2025-09-18 10:12:57,611 [basehttp] "GET /static/Observations/css/styles.css HTTP/1.1" 200 11439
-INFO 2025-09-18 10:13:06,464 [basehttp] "POST /auth/login/ HTTP/1.1" 200 13882
-INFO 2025-09-18 10:13:15,235 [views_home] Accueil visité
-ERROR 2025-09-18 10:13:15,362 [log] Internal Server Error: /
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-               ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\observations\views\views_home.py", line 25, in home
-    return render(request, 'home.html', {
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
-    return template.render(context, request)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
-    return self.template.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 171, in render
-    return self._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 65, in render
-    result = block.nodelist.render(context)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
-    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\urls\base.py", line 88, in reverse
-    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
-    raise NoReverseMatch(msg)
-django.urls.exceptions.NoReverseMatch: Reverse for 'saisie_observation_optimisee' not found. 'saisie_observation_optimisee' is not a valid view function or pattern name.
-ERROR 2025-09-18 10:13:15,448 [basehttp] "GET / HTTP/1.1" 500 177770
-INFO 2025-09-18 10:37:39,442 [autoreload] C:\Projets\observations_nids\observations\views\saisie_observation_view.py changed, reloading.
-INFO 2025-09-18 10:37:41,265 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-18 14:55:48,256 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-18 14:58:59,644 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-18 14:59:06,810 [views_home] Accueil visité
-DEBUG 2025-09-18 14:59:07,038 [views_home] Visite anonyme - Redirection vers access_restricted.html
-INFO 2025-09-18 14:59:07,082 [basehttp] "GET / HTTP/1.1" 200 13829
-INFO 2025-09-18 14:59:10,877 [basehttp] "GET /auth/login/ HTTP/1.1" 200 16125
-INFO 2025-09-18 14:59:18,945 [basehttp] "POST /auth/login/ HTTP/1.1" 200 13882
-INFO 2025-09-18 14:59:21,065 [views_home] Accueil visité
-ERROR 2025-09-18 14:59:21,163 [log] Internal Server Error: /
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-               ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\observations\views\views_home.py", line 25, in home
-    return render(request, 'home.html', {
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
-    return template.render(context, request)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
-    return self.template.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 171, in render
-    return self._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 65, in render
-    result = block.nodelist.render(context)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
-    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\urls\base.py", line 88, in reverse
-    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
-    raise NoReverseMatch(msg)
-django.urls.exceptions.NoReverseMatch: Reverse for 'saisie_observation_optimisee' not found. 'saisie_observation_optimisee' is not a valid view function or pattern name.
-ERROR 2025-09-18 14:59:21,242 [basehttp] "GET / HTTP/1.1" 500 177770
-INFO 2025-09-19 09:52:01,230 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-19 09:58:50,747 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-19 09:59:03,960 [views_home] Accueil visité
-DEBUG 2025-09-19 09:59:04,221 [views_home] Visite anonyme - Redirection vers access_restricted.html
-INFO 2025-09-19 09:59:04,313 [basehttp] "GET / HTTP/1.1" 200 13829
-INFO 2025-09-19 09:59:07,251 [basehttp] "GET /auth/login/ HTTP/1.1" 200 16125
-INFO 2025-09-19 09:59:07,283 [basehttp] "GET /static/Observations/js/main.js HTTP/1.1" 304 0
-INFO 2025-09-19 09:59:14,319 [basehttp] "POST /auth/login/ HTTP/1.1" 200 13882
-INFO 2025-09-19 09:59:19,017 [views_home] Accueil visité
-INFO 2025-09-19 09:59:19,109 [basehttp] "GET / HTTP/1.1" 200 17335
-INFO 2025-09-19 09:59:29,736 [basehttp] "GET /gestion/urgence/promouvoir-administrateur/ HTTP/1.1" 200 17036
-INFO 2025-09-19 09:59:35,358 [basehttp] "POST /gestion/urgence/promouvoir-administrateur/ HTTP/1.1" 200 13970
-INFO 2025-09-19 09:59:42,635 [basehttp] "GET /gestion/utilisateurs/ HTTP/1.1" 200 20556
-INFO 2025-09-19 11:06:43,727 [basehttp] "GET /gestion/utilisateurs/1/modifier/ HTTP/1.1" 200 14014
-INFO 2025-09-19 11:06:43,730 [basehttp] "GET /gestion/utilisateurs/1/detail/ HTTP/1.1" 200 14006
-INFO 2025-09-19 11:06:46,912 [basehttp] "GET /auth/login/?next=/gestion/utilisateurs/1/modifier/ HTTP/1.1" 200 16164
-INFO 2025-09-19 11:06:54,006 [basehttp] "POST /auth/login/?next=/gestion/utilisateurs/1/modifier/ HTTP/1.1" 200 13985
-INFO 2025-09-19 11:06:56,021 [basehttp] "GET /gestion/utilisateurs/1/modifier/ HTTP/1.1" 200 20655
-INFO 2025-09-19 11:07:06,441 [basehttp] "POST /gestion/utilisateurs/1/modifier/ HTTP/1.1" 200 13956
-INFO 2025-09-19 11:07:08,425 [basehttp] "GET /gestion/utilisateurs/ HTTP/1.1" 200 20543
-INFO 2025-09-19 13:50:36,549 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-19 13:50:44,214 [views_home] Accueil visité
-DEBUG 2025-09-19 13:50:44,478 [views_home] Visite anonyme - Redirection vers access_restricted.html
-ERROR 2025-09-19 13:50:44,531 [log] Internal Server Error: /
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
-    return self.template.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 171, in render
-    return self._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 134, in render
-    compiled_parent = self.get_parent(context)
-                      ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 131, in get_parent
-    return self.find_template(parent, context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 109, in find_template
-    template, origin = context.template.engine.find_template(
-                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\engine.py", line 163, in find_template
-    raise TemplateDoesNotExist(name, tried=tried)
-django.template.exceptions.TemplateDoesNotExist: base.html
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-               ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\observations\views\views_home.py", line 17, in home
-    return render(request, 'access_restricted.html')
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
-    return template.render(context, request)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 109, in render
-    reraise(exc, self.backend)
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 130, in reraise
-    raise new from exc
-django.template.exceptions.TemplateDoesNotExist: base.html
-ERROR 2025-09-19 13:50:44,634 [basehttp] "GET / HTTP/1.1" 500 187875
-INFO 2025-09-19 13:51:16,362 [views_home] Accueil visité
-DEBUG 2025-09-19 13:51:16,362 [views_home] Visite anonyme - Redirection vers access_restricted.html
-ERROR 2025-09-19 13:51:16,389 [log] Internal Server Error: /
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
-    return self.template.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 171, in render
-    return self._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 134, in render
-    compiled_parent = self.get_parent(context)
-                      ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 131, in get_parent
-    return self.find_template(parent, context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 109, in find_template
-    template, origin = context.template.engine.find_template(
-                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\engine.py", line 163, in find_template
-    raise TemplateDoesNotExist(name, tried=tried)
-django.template.exceptions.TemplateDoesNotExist: base.html
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-               ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\observations\views\views_home.py", line 17, in home
-    return render(request, 'access_restricted.html')
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
-    return template.render(context, request)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 109, in render
-    reraise(exc, self.backend)
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 130, in reraise
-    raise new from exc
-django.template.exceptions.TemplateDoesNotExist: base.html
-ERROR 2025-09-19 13:51:16,433 [basehttp] "GET / HTTP/1.1" 500 187860
-INFO 2025-09-19 16:55:00,629 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-19 16:55:11,326 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-19 16:55:20,418 [views_home] Accueil visité
-DEBUG 2025-09-19 16:55:20,418 [views_home] Visite anonyme - Redirection vers access_restricted.html
-ERROR 2025-09-19 16:55:20,470 [log] Internal Server Error: /
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
-    return self.template.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 171, in render
-    return self._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 134, in render
-    compiled_parent = self.get_parent(context)
-                      ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 131, in get_parent
-    return self.find_template(parent, context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 109, in find_template
-    template, origin = context.template.engine.find_template(
-                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\engine.py", line 163, in find_template
-    raise TemplateDoesNotExist(name, tried=tried)
-django.template.exceptions.TemplateDoesNotExist: base.html
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-               ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\observations\views\views_home.py", line 17, in home
-    return render(request, 'access_restricted.html')
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
-    return template.render(context, request)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 109, in render
-    reraise(exc, self.backend)
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 130, in reraise
-    raise new from exc
-django.template.exceptions.TemplateDoesNotExist: base.html
-ERROR 2025-09-19 16:55:20,542 [basehttp] "GET / HTTP/1.1" 500 206533
-INFO 2025-09-20 11:15:56,981 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-20 11:16:04,750 [views_home] Accueil visité
-DEBUG 2025-09-20 11:16:04,750 [views_home] Visite anonyme - Redirection vers access_restricted.html
-ERROR 2025-09-20 11:16:04,801 [log] Internal Server Error: /
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
-    return self.template.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 171, in render
-    return self._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 134, in render
-    compiled_parent = self.get_parent(context)
-                      ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 131, in get_parent
-    return self.find_template(parent, context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 109, in find_template
-    template, origin = context.template.engine.find_template(
-                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\engine.py", line 163, in find_template
-    raise TemplateDoesNotExist(name, tried=tried)
-django.template.exceptions.TemplateDoesNotExist: base.html
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-               ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\observations\views\views_home.py", line 17, in home
-    return render(request, 'access_restricted.html')
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
-    return template.render(context, request)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 109, in render
-    reraise(exc, self.backend)
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 130, in reraise
-    raise new from exc
-django.template.exceptions.TemplateDoesNotExist: base.html
-ERROR 2025-09-20 11:16:04,872 [basehttp] "GET / HTTP/1.1" 500 206224
-INFO 2025-09-20 11:25:53,560 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-20 11:25:59,094 [views_home] Accueil visité
-DEBUG 2025-09-20 11:25:59,094 [views_home] Visite anonyme - Redirection vers access_restricted.html
-ERROR 2025-09-20 11:25:59,156 [log] Internal Server Error: /
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
-    return self.template.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 171, in render
-    return self._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
-    return compiled_parent._render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
-    return self.nodelist.render(context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 134, in render
-    compiled_parent = self.get_parent(context)
-                      ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 131, in get_parent
-    return self.find_template(parent, context)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader_tags.py", line 109, in find_template
-    template, origin = context.template.engine.find_template(
-                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\engine.py", line 163, in find_template
-    raise TemplateDoesNotExist(name, tried=tried)
-django.template.exceptions.TemplateDoesNotExist: base.html
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-               ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\observations\views\views_home.py", line 17, in home
-    return render(request, 'access_restricted.html')
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
-    return template.render(context, request)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 109, in render
-    reraise(exc, self.backend)
-  File "C:\Projets\Observations_Nids\.venv\Lib\site-packages\django\template\backends\django.py", line 130, in reraise
-    raise new from exc
-django.template.exceptions.TemplateDoesNotExist: base.html
-ERROR 2025-09-20 11:25:59,268 [basehttp] "GET / HTTP/1.1" 500 170449
-INFO 2025-09-20 11:28:34,636 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-20 11:31:15,623 [views_home] Accueil visité
-DEBUG 2025-09-20 11:31:15,624 [views_home] Visite anonyme - Redirection vers access_restricted.html
-INFO 2025-09-20 11:31:15,662 [basehttp] "GET / HTTP/1.1" 200 13826
-INFO 2025-09-20 11:31:15,724 [views_home] Accueil visité
-DEBUG 2025-09-20 11:31:15,724 [views_home] Visite anonyme - Redirection vers access_restricted.html
-INFO 2025-09-20 11:31:15,739 [basehttp] "GET / HTTP/1.1" 200 13826
-INFO 2025-09-20 11:31:24,096 [basehttp] "GET /auth/login/ HTTP/1.1" 200 16125
-INFO 2025-09-20 11:31:24,134 [basehttp] "GET /static/Observations/js/main.js HTTP/1.1" 304 0
-INFO 2025-09-20 11:32:01,426 [basehttp] "POST /auth/login/ HTTP/1.1" 200 13882
-INFO 2025-09-20 11:32:03,644 [views_home] Accueil visité
-INFO 2025-09-20 11:32:03,727 [basehttp] "GET / HTTP/1.1" 200 17201
-INFO 2025-09-20 11:32:15,989 [basehttp] "GET /gestion/utilisateurs/ HTTP/1.1" 200 20250
-INFO 2025-09-20 11:32:19,301 [basehttp] "GET /gestion/utilisateurs/1/detail/ HTTP/1.1" 200 907
-INFO 2025-09-20 11:32:19,316 [basehttp] "GET /gestion/utilisateurs/1/modifier/ HTTP/1.1" 200 20662
-INFO 2025-09-20 11:32:39,168 [basehttp] "POST /gestion/utilisateurs/1/modifier/ HTTP/1.1" 200 13955
-INFO 2025-09-20 11:32:41,417 [basehttp] "GET /gestion/utilisateurs/ HTTP/1.1" 200 20571
-INFO 2025-09-20 11:32:51,667 [basehttp] "GET /gestion/utilisateurs/1/detail/ HTTP/1.1" 200 936
-INFO 2025-09-20 11:32:51,885 [basehttp] "GET /__debug__/history_sidebar/?store_id=575eccaabfc74495b035ac50909ae928 HTTP/1.1" 200 10208
-INFO 2025-09-20 11:33:05,396 [basehttp] "GET /gestion/utilisateurs/creer/ HTTP/1.1" 200 21129
-INFO 2025-09-20 11:33:08,985 [views_home] Accueil visité
-INFO 2025-09-20 11:33:09,045 [basehttp] "GET / HTTP/1.1" 200 17201
-INFO 2025-09-20 11:37:50,984 [autoreload] Watching for file changes with StatReloader
-INFO 2025-09-20 11:37:57,176 [views_home] Accueil visité
-INFO 2025-09-20 11:37:57,673 [basehttp] "GET / HTTP/1.1" 200 17274
-WARNING 2025-09-20 11:37:57,787 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
-INFO 2025-09-20 11:38:01,131 [views_home] Accueil visité
-INFO 2025-09-20 11:38:01,250 [basehttp] "GET / HTTP/1.1" 200 17274
-WARNING 2025-09-20 11:38:01,292 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
-INFO 2025-09-20 11:38:09,729 [basehttp] "GET /observations/ HTTP/1.1" 200 32470
-WARNING 2025-09-20 11:38:09,806 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
-INFO 2025-09-20 11:38:13,455 [views_home] Accueil visité
-INFO 2025-09-20 11:38:13,545 [basehttp] "GET / HTTP/1.1" 200 17273
-WARNING 2025-09-20 11:38:13,598 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
-INFO 2025-09-20 11:38:15,980 [basehttp] "GET /observations/ HTTP/1.1" 200 32470
-WARNING 2025-09-20 11:38:16,012 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
-INFO 2025-09-20 11:38:18,654 [views_home] Accueil visité
-INFO 2025-09-20 11:38:18,738 [basehttp] "GET / HTTP/1.1" 200 17273
-WARNING 2025-09-20 11:38:18,765 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
-INFO 2025-09-20 11:38:20,681 [basehttp] "GET /observations/ HTTP/1.1" 200 32470
-WARNING 2025-09-20 11:38:20,709 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
-INFO 2025-09-20 11:38:24,824 [basehttp] "GET /transcription/selection-repertoire/ HTTP/1.1" 200 18230
-INFO 2025-09-20 11:47:04,328 [views_home] Accueil visité
-INFO 2025-09-20 11:47:04,483 [basehttp] "GET / HTTP/1.1" 200 17274
-WARNING 2025-09-20 11:47:04,540 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
-INFO 2025-09-20 11:47:09,038 [basehttp] "GET /gestion/utilisateurs/ HTTP/1.1" 200 20279
-INFO 2025-09-20 11:47:13,297 [basehttp] "GET /gestion/utilisateurs/1/detail/ HTTP/1.1" 200 16702
-INFO 2025-09-20 11:47:13,309 [basehttp] "GET /gestion/utilisateurs/1/modifier/ HTTP/1.1" 200 20711
-INFO 2025-09-20 11:47:18,733 [views_home] Accueil visité
-INFO 2025-09-20 11:47:18,813 [basehttp] "GET / HTTP/1.1" 200 17273
-WARNING 2025-09-20 11:47:18,842 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
-INFO 2025-09-20 11:47:22,280 [basehttp] "GET /gestion/utilisateurs/creer/ HTTP/1.1" 200 21129
-INFO 2025-09-20 11:47:24,489 [basehttp] "GET /gestion/utilisateurs/ HTTP/1.1" 200 20278
-INFO 2025-09-20 11:47:37,663 [views_home] Accueil visité
-INFO 2025-09-20 11:47:37,747 [basehttp] "GET / HTTP/1.1" 200 17273
-WARNING 2025-09-20 11:47:37,777 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
-INFO 2025-09-20 11:47:54,589 [basehttp] "GET /transcription/selection-repertoire/ HTTP/1.1" 200 18230
-INFO 2025-09-20 11:47:58,596 [views_home] Accueil visité
-INFO 2025-09-20 11:47:58,676 [basehttp] "GET / HTTP/1.1" 200 17273
-WARNING 2025-09-20 11:47:58,707 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
-INFO 2025-09-20 11:48:01,230 [basehttp] "GET /importation/ HTTP/1.1" 200 20330
-INFO 2025-09-20 11:48:42,122 [basehttp] "GET /gestion/utilisateurs/ HTTP/1.1" 200 20278
+INFO 2025-09-23 19:05:15,732 [autoreload] Watching for file changes with StatReloader
+INFO 2025-09-23 19:05:25,121 [views_home] Accueil visité
+DEBUG 2025-09-23 19:05:25,472 [views_home] Visite anonyme - Redirection vers access_restricted.html
+INFO 2025-09-23 19:05:25,552 [basehttp] "GET / HTTP/1.1" 200 15802
+WARNING 2025-09-23 19:05:25,754 [log] Not Found: /favicon.ico
+WARNING 2025-09-23 19:05:25,755 [basehttp] "GET /favicon.ico HTTP/1.1" 404 20082
+INFO 2025-09-23 19:05:30,913 [basehttp] "GET /auth/login/ HTTP/1.1" 200 16107
+INFO 2025-09-23 19:05:36,148 [basehttp] "POST /auth/login/ HTTP/1.1" 302 0
+INFO 2025-09-23 19:05:36,154 [views_home] Accueil visité
+INFO 2025-09-23 19:05:36,262 [basehttp] "GET / HTTP/1.1" 200 17257
+WARNING 2025-09-23 19:05:36,291 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
+INFO 2025-09-23 19:05:43,481 [basehttp] "GET /gestion/utilisateurs/ HTTP/1.1" 200 28023
+INFO 2025-09-23 19:05:45,414 [basehttp] "GET /gestion/utilisateurs/3/detail/ HTTP/1.1" 200 17356
+INFO 2025-09-23 19:05:45,636 [basehttp] "GET /__debug__/history_sidebar/?store_id=190861e9b45a4ffd8862bbb4eafdae0c HTTP/1.1" 200 10185
+INFO 2025-09-23 19:05:51,723 [basehttp] "GET /observations/4/ HTTP/1.1" 200 20042
+WARNING 2025-09-23 19:05:51,751 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
+INFO 2025-09-23 19:06:04,386 [basehttp] "GET /observations/modifier/4/ HTTP/1.1" 200 44648
+WARNING 2025-09-23 19:06:04,413 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
+WARNING 2025-09-23 19:06:07,417 [log] Not Found: /media/transcription_results/3_3264_001_combined_result.json
+WARNING 2025-09-23 19:06:07,417 [basehttp] "GET /media/transcription_results/3_3264_001_combined_result.json HTTP/1.1" 404 20360
+INFO 2025-09-23 19:06:15,282 [basehttp] "GET /media/Rep1/3_3264_001_combined.jpg HTTP/1.1" 200 804025
+INFO 2025-09-23 19:09:56,634 [autoreload] Watching for file changes with StatReloader
+INFO 2025-09-23 19:25:46,300 [autoreload] Watching for file changes with StatReloader
+INFO 2025-09-23 19:25:58,222 [views_home] Accueil visité
+INFO 2025-09-23 19:25:58,954 [basehttp] "GET / HTTP/1.1" 200 17257
+WARNING 2025-09-23 19:25:58,987 [basehttp] "GET /static/css/styles.css HTTP/1.1" 404 1856
+INFO 2025-09-23 19:26:04,853 [basehttp] "GET /transcription/selection-repertoire/ HTTP/1.1" 200 18306
+INFO 2025-09-23 19:26:13,367 [basehttp] "POST /transcription/selection-repertoire/ HTTP/1.1" 200 55
+INFO 2025-09-23 19:26:13,594 [basehttp] "GET /__debug__/history_sidebar/?store_id=1c6d46e1cce64967b5a8891c0df1d915 HTTP/1.1" 200 10128
+INFO 2025-09-23 19:26:19,976 [tasks] Début du traitement de 5 images dans Rep1
+INFO 2025-09-23 19:26:19,976 [tasks] Traitement de l'image 1/5: 1_3264_001_combined.jpg
+INFO 2025-09-23 19:26:20,016 [basehttp] "GET /transcription/traiter-images/ HTTP/1.1" 200 26348
+DEBUG 2025-09-23 19:26:20,064 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:20,066 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 0, 'total': 5, 'current_file': '1_3264_001_combined.jpg', 'percent': 0, 'recent_results': [], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:20,087 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 217
+DEBUG 2025-09-23 19:26:22,097 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:22,100 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 0, 'total': 5, 'current_file': '1_3264_001_combined.jpg', 'percent': 0, 'recent_results': [], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:22,112 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 217
+INFO 2025-09-23 19:26:22,334 [basehttp] "GET /__debug__/history_sidebar/?store_id=c34058d367cd423abd01fa420087fe44 HTTP/1.1" 200 10125
+DEBUG 2025-09-23 19:26:24,081 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:24,081 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 0, 'total': 5, 'current_file': '1_3264_001_combined.jpg', 'percent': 0, 'recent_results': [], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:24,092 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 217
+INFO 2025-09-23 19:26:24,302 [basehttp] "GET /__debug__/history_sidebar/?store_id=ae9260400ff34da192d3019ef39ac97e HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:26,060 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:26,061 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 0, 'total': 5, 'current_file': '1_3264_001_combined.jpg', 'percent': 0, 'recent_results': [], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:26,072 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 217
+INFO 2025-09-23 19:26:26,291 [basehttp] "GET /__debug__/history_sidebar/?store_id=2360a69cb7564abb8c4cab22835e57fb HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:27,908 [tasks] JSON correctement parsé pour 1_3264_001_combined.jpg
+INFO 2025-09-23 19:26:27,910 [tasks] Transcription réussie pour 1_3264_001_combined.jpg, durée: 7.93s
+INFO 2025-09-23 19:26:27,910 [tasks] Traitement de l'image 2/5: 3_3264_001_combined.jpg
+DEBUG 2025-09-23 19:26:28,119 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:28,121 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 1, 'total': 5, 'current_file': '3_3264_001_combined.jpg', 'percent': 20, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:28,153 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 344
+INFO 2025-09-23 19:26:28,363 [basehttp] "GET /__debug__/history_sidebar/?store_id=e2ab1d8d1d53479db74e4211d311f03b HTTP/1.1" 200 10125
+DEBUG 2025-09-23 19:26:30,066 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:30,068 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 1, 'total': 5, 'current_file': '3_3264_001_combined.jpg', 'percent': 20, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:30,080 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 344
+INFO 2025-09-23 19:26:30,299 [basehttp] "GET /__debug__/history_sidebar/?store_id=665663d6474544d18153ee1f8a7672bf HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:32,053 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:32,054 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 1, 'total': 5, 'current_file': '3_3264_001_combined.jpg', 'percent': 20, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:32,065 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 344
+INFO 2025-09-23 19:26:32,275 [basehttp] "GET /__debug__/history_sidebar/?store_id=568d86fb3d344f8a97d10cc4b07b50c4 HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:34,073 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:34,076 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 1, 'total': 5, 'current_file': '3_3264_001_combined.jpg', 'percent': 20, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:34,089 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 344
+INFO 2025-09-23 19:26:34,311 [basehttp] "GET /__debug__/history_sidebar/?store_id=d3f1612cdbb94b25863a046c7a09b742 HTTP/1.1" 200 10125
+DEBUG 2025-09-23 19:26:36,057 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:36,058 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 1, 'total': 5, 'current_file': '3_3264_001_combined.jpg', 'percent': 20, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:36,070 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 344
+INFO 2025-09-23 19:26:36,288 [basehttp] "GET /__debug__/history_sidebar/?store_id=8eca144614424221977bcbe15280bf95 HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:36,970 [tasks] JSON correctement parsé pour 3_3264_001_combined.jpg
+INFO 2025-09-23 19:26:36,972 [tasks] Transcription réussie pour 3_3264_001_combined.jpg, durée: 9.06s
+INFO 2025-09-23 19:26:36,973 [tasks] Traitement de l'image 3/5: 5_3264_001_combined.jpg
+DEBUG 2025-09-23 19:26:38,103 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:38,105 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 2, 'total': 5, 'current_file': '5_3264_001_combined.jpg', 'percent': 40, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:38,149 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 472
+INFO 2025-09-23 19:26:38,358 [basehttp] "GET /__debug__/history_sidebar/?store_id=a12281edc2d643388178a56213771347 HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:40,809 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:40,811 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 2, 'total': 5, 'current_file': '5_3264_001_combined.jpg', 'percent': 40, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:40,830 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 472
+INFO 2025-09-23 19:26:41,781 [basehttp] "GET /__debug__/history_sidebar/?store_id=eba9bb110a734064917a0d1983ead6c1 HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:42,837 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:42,841 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 2, 'total': 5, 'current_file': '5_3264_001_combined.jpg', 'percent': 40, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:42,851 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 472
+INFO 2025-09-23 19:26:43,794 [basehttp] "GET /__debug__/history_sidebar/?store_id=586cc495d6ce4440b4680ef14d71bcf7 HTTP/1.1" 200 10125
+DEBUG 2025-09-23 19:26:44,707 [tasks] JSON correctement parsé pour 5_3264_001_combined.jpg
+INFO 2025-09-23 19:26:44,709 [tasks] Transcription réussie pour 5_3264_001_combined.jpg, durée: 7.74s
+INFO 2025-09-23 19:26:44,709 [tasks] Traitement de l'image 4/5: 7_3264_001_combined.jpg
+DEBUG 2025-09-23 19:26:44,835 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:44,837 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 3, 'total': 5, 'current_file': '7_3264_001_combined.jpg', 'percent': 60, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}, {'filename': '5_3264_001_combined.jpg', 'status': 'success', 'json_path': '5_3264_001_combined_result.json', 'duration': 7.74}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:44,852 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 600
+INFO 2025-09-23 19:26:45,784 [basehttp] "GET /__debug__/history_sidebar/?store_id=e700d279045c43c1b83b0e8c85d4da4d HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:46,833 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:46,834 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 3, 'total': 5, 'current_file': '7_3264_001_combined.jpg', 'percent': 60, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}, {'filename': '5_3264_001_combined.jpg', 'status': 'success', 'json_path': '5_3264_001_combined_result.json', 'duration': 7.74}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:46,846 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 600
+INFO 2025-09-23 19:26:47,786 [basehttp] "GET /__debug__/history_sidebar/?store_id=3a633163e52f4c1d97f840b7f1ceb47a HTTP/1.1" 200 10125
+DEBUG 2025-09-23 19:26:48,824 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:48,825 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 3, 'total': 5, 'current_file': '7_3264_001_combined.jpg', 'percent': 60, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}, {'filename': '5_3264_001_combined.jpg', 'status': 'success', 'json_path': '5_3264_001_combined_result.json', 'duration': 7.74}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:48,839 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 600
+INFO 2025-09-23 19:26:49,796 [basehttp] "GET /__debug__/history_sidebar/?store_id=3914927b75344fa19634afa125ffb0e0 HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:50,827 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:50,828 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 3, 'total': 5, 'current_file': '7_3264_001_combined.jpg', 'percent': 60, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}, {'filename': '5_3264_001_combined.jpg', 'status': 'success', 'json_path': '5_3264_001_combined_result.json', 'duration': 7.74}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:50,838 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 600
+INFO 2025-09-23 19:26:51,782 [basehttp] "GET /__debug__/history_sidebar/?store_id=6339cb2fd6014c80aa71ae190811fe23 HTTP/1.1" 200 10125
+DEBUG 2025-09-23 19:26:52,827 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:52,828 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 3, 'total': 5, 'current_file': '7_3264_001_combined.jpg', 'percent': 60, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}, {'filename': '5_3264_001_combined.jpg', 'status': 'success', 'json_path': '5_3264_001_combined_result.json', 'duration': 7.74}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:52,840 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 600
+INFO 2025-09-23 19:26:53,794 [basehttp] "GET /__debug__/history_sidebar/?store_id=55e2bf74c5a44dd6bf909a85e5a9239d HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:54,673 [tasks] JSON correctement parsé pour 7_3264_001_combined.jpg
+INFO 2025-09-23 19:26:54,674 [tasks] Transcription réussie pour 7_3264_001_combined.jpg, durée: 9.96s
+INFO 2025-09-23 19:26:54,674 [tasks] Traitement de l'image 5/5: 9_3264_001_combined.jpg
+DEBUG 2025-09-23 19:26:54,807 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:54,809 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 4, 'total': 5, 'current_file': '9_3264_001_combined.jpg', 'percent': 80, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}, {'filename': '5_3264_001_combined.jpg', 'status': 'success', 'json_path': '5_3264_001_combined_result.json', 'duration': 7.74}, {'filename': '7_3264_001_combined.jpg', 'status': 'success', 'json_path': '7_3264_001_combined_result.json', 'duration': 9.96}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:54,830 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 728
+INFO 2025-09-23 19:26:55,782 [basehttp] "GET /__debug__/history_sidebar/?store_id=d403f7c337d54da2a322d21943091b75 HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:56,806 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:56,808 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 4, 'total': 5, 'current_file': '9_3264_001_combined.jpg', 'percent': 80, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}, {'filename': '5_3264_001_combined.jpg', 'status': 'success', 'json_path': '5_3264_001_combined_result.json', 'duration': 7.74}, {'filename': '7_3264_001_combined.jpg', 'status': 'success', 'json_path': '7_3264_001_combined_result.json', 'duration': 9.96}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:56,822 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 728
+INFO 2025-09-23 19:26:57,785 [basehttp] "GET /__debug__/history_sidebar/?store_id=e032ec9164194a7a90bf3ffd3b7e48aa HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:26:58,830 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:26:58,831 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 4, 'total': 5, 'current_file': '9_3264_001_combined.jpg', 'percent': 80, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}, {'filename': '5_3264_001_combined.jpg', 'status': 'success', 'json_path': '5_3264_001_combined_result.json', 'duration': 7.74}, {'filename': '7_3264_001_combined.jpg', 'status': 'success', 'json_path': '7_3264_001_combined_result.json', 'duration': 9.96}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:26:58,843 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 728
+INFO 2025-09-23 19:26:59,787 [basehttp] "GET /__debug__/history_sidebar/?store_id=8dd223ae6951425f9f4dea9191428d8b HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:27:00,823 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=PROGRESS
+DEBUG 2025-09-23 19:27:00,825 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'PROGRESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'processed': 4, 'total': 5, 'current_file': '9_3264_001_combined.jpg', 'percent': 80, 'recent_results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}, {'filename': '5_3264_001_combined.jpg', 'status': 'success', 'json_path': '5_3264_001_combined_result.json', 'duration': 7.74}, {'filename': '7_3264_001_combined.jpg', 'status': 'success', 'json_path': '7_3264_001_combined_result.json', 'duration': 9.96}], 'message': 'Traitement en cours...'}
+INFO 2025-09-23 19:27:00,843 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 728
+DEBUG 2025-09-23 19:27:01,638 [tasks] JSON correctement parsé pour 9_3264_001_combined.jpg
+INFO 2025-09-23 19:27:01,640 [tasks] Transcription réussie pour 9_3264_001_combined.jpg, durée: 6.97s
+INFO 2025-09-23 19:27:01,640 [tasks] Task completed successfully, returning: {'status': 'SUCCESS', 'results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}, {'filename': '5_3264_001_combined.jpg', 'status': 'success', 'json_path': '5_3264_001_combined_result.json', 'duration': 7.74}, {'filename': '7_3264_001_combined.jpg', 'status': 'success', 'json_path': '7_3264_001_combined_result.json', 'duration': 9.96}, {'filename': '9_3264_001_combined.jpg', 'status': 'success', 'json_path': '9_3264_001_combined_result.json', 'duration': 6.97}], 'directory': 'Rep1', 'duration': 41.66, 'processed': 5, 'total': 5, 'success_count': 5, 'success_rate': 100.0}
+INFO 2025-09-23 19:27:01,791 [basehttp] "GET /__debug__/history_sidebar/?store_id=58953020d7ea49758a98486057251ddc HTTP/1.1" 200 10124
+DEBUG 2025-09-23 19:27:02,828 [view_transcription] check_progress for task e276adc0-8879-444d-96c0-95516d287cef: status=SUCCESS
+INFO 2025-09-23 19:27:02,829 [view_transcription] Task e276adc0-8879-444d-96c0-95516d287cef completed successfully. Sending redirect to /transcription/resultats/ with force_redirect flag
+DEBUG 2025-09-23 19:27:02,830 [view_transcription] check_progress response for task e276adc0-8879-444d-96c0-95516d287cef: {'status': 'SUCCESS', 'task_id': 'e276adc0-8879-444d-96c0-95516d287cef', 'results': [{'filename': '1_3264_001_combined.jpg', 'status': 'success', 'json_path': '1_3264_001_combined_result.json', 'duration': 7.93}, {'filename': '3_3264_001_combined.jpg', 'status': 'success', 'json_path': '3_3264_001_combined_result.json', 'duration': 9.06}, {'filename': '5_3264_001_combined.jpg', 'status': 'success', 'json_path': '5_3264_001_combined_result.json', 'duration': 7.74}, {'filename': '7_3264_001_combined.jpg', 'status': 'success', 'json_path': '7_3264_001_combined_result.json', 'duration': 9.96}, {'filename': '9_3264_001_combined.jpg', 'status': 'success', 'json_path': '9_3264_001_combined_result.json', 'duration': 6.97}], 'directory': 'Rep1', 'duration': 41.66, 'processed': 5, 'total': 5, 'success_count': 5, 'success_rate': 100.0, 'percent': 100, 'redirect': '/transcription/resultats/', 'force_redirect': True}
+INFO 2025-09-23 19:27:02,868 [basehttp] "GET /transcription/verifier-progression/ HTTP/1.1" 200 917
+INFO 2025-09-23 19:27:02,956 [basehttp] "GET /transcription/resultats/ HTTP/1.1" 200 21203

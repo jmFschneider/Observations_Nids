@@ -9,16 +9,16 @@
   "nid": {
     "nid_prec_t_meme_c_ple": true,
     "haut_nid": "6",
-    "h_c_vert": "1.42",
-    "nid": "Dimension?\nExt. 10 cm\nInt. 5cm\nhaut: 6 cm\ncoupe exterieure: Grindilles\n+ interieur: mousse or poils d'animaux"
+    "h_c_vert": "142",
+    "nid": "Dimension?\nExt. 10 cm\nInt. 5cm\nhaut : 6 cm\ncoupe exterieure: Grindille \nintérieur: mousse or poils d'animal"
   },
   "localisation": {
-    "IGN_50000": "101215/0000",
+    "IGN_50000": null,
     "commune": "Blonville s/mer",
     "dep_t": "14",
     "coordonnees_et_ou_lieu_dit": "Lieu Hallet",
     "altitude": "00m",
-    "paysage": "lotissement et campagne",
+    "paysage": "lotissement\net campagne",
     "alentours": "Jardin"
   },
   "tableau_donnees": [
@@ -116,5 +116,5 @@
   "causes_echec": {
     "causes_d_echec": null
   },
-  "remarque": "Nid situé dans une haie de lonicera nitida,\ntaillée régulièrement.\nPrésence permanente de l'acc. toute l'année dans le jardin."
+  "remarque": "Nid situé dans une haie\nde lonicera nitida,\ntaillée régulièrement.\nPrésence permanente de l'acc.\ntoute l'année dans le jardin."
 }

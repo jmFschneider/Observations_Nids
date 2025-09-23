@@ -32,6 +32,8 @@
       <list>
         <option value="$MODULE_DIR$/templates" />
         <option value="$MODULE_DIR$/observations/templates" />
+        <option value="$MODULE_DIR$/importation/templates" />
+        <option value="$MODULE_DIR$/administration/templates" />
       </list>
     </option>
   </component>

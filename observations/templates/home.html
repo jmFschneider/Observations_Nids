@@ -16,10 +16,6 @@
     </div>
     <div class="card-body">
         <ul>
-            <!-- Remplacer user_list par liste_utilisateurs -->
-            <li><a href="{% url 'administration:liste_utilisateurs' %}">Liste des observateurs</a></li>
-            <!-- Remplacer user_create par creer_utilisateur -->
-            <li><a href="{% url 'administration:creer_utilisateur' %}">Ajouter un observateur</a></li>
             <li><a href="{% url 'observations_list' %}">Nouvelle observation</a></li>
             <li><a href="{% url 'observations_list' %}">Nouvelle observation V2</a></li>
         </ul>
@@ -45,6 +41,10 @@
     </div>
     <div class="card-body">
         <ul>
+            <!-- Remplacer user_list par liste_utilisateurs -->
+            <li><a href="{% url 'administration:liste_utilisateurs' %}">Liste des observateurs</a></li>
+            <!-- Remplacer user_create par creer_utilisateur -->
+            <li><a href="{% url 'administration:creer_utilisateur' %}">Ajouter un observateur</a></li>
             <li><a href="{% url 'administration:liste_utilisateurs' %}">Gestion des utilisateurs</a></li>
             <li><a href="{% url 'administration:creer_utilisateur' %}">Créer un nouvel utilisateur</a></li>
         </ul>

@@ -1,7 +1,7 @@
 {
   "informations_generales": {
     "n_fiche": "1",
-    "observateur": "Alexandre Delasalle",
+    "observateur": "Alexandrin Delasalle",
     "n_espece": null,
     "espece": "Gobemouche gris",
     "annee": "2011"
@@ -10,23 +10,23 @@
     "nid_prec_t_meme_c_ple": true,
     "haut_nid": "1,5",
     "h_c_vert": null,
-    "nid": "Nid disposé dans 1 coupe de géranium suspendue à 1,5m à un abri de jardin Composé uniquement de mousses scie la terre"
+    "nid": "Nid disposé dans 1 coupe de geranium suspendue à 1,5m à un abri de jardin Composé uniquement de mousses et un peu de terre"
   },
   "localisation": {
-    "IGN_50000": "BLONVILLE s/mer",
-    "commune": "BLONVILLE s/mer",
+    "IGN_50000": "BLONVILLE s/Mer",
+    "commune": "BLONVILLE s/Mer",
     "dep_t": "14",
-    "coordonnees_et_ou_lieu_dit": "Le Pré Le Houx",
+    "coordonnees_et_ou_lieu_dit": "Le Pré le Houx",
     "altitude": "0,0m",
-    "paysage": "Campagne-",
-    "alentours": "Jardin paysage."
+    "paysage": "Campagne",
+    "alentours": "Jardin - paysage"
   },
   "tableau_donnees": [
     {
       "Jour": 17,
       "Mois": 7,
       "Heure": 12,
-      "Nombre_oeuf": null,
+      "Nombre_oeuf": 0,
       "Nombre_pou": 3,
       "age": null,
       "observations": null
@@ -34,8 +34,8 @@
     {
       "Jour": 21,
       "Mois": 7,
-      "Heure": 18,
-      "Nombre_oeuf": null,
+      "Heure": 19,
+      "Nombre_oeuf": 0,
       "Nombre_pou": 3,
       "age": null,
       "observations": null
@@ -44,10 +44,10 @@
       "Jour": 26,
       "Mois": 7,
       "Heure": 18,
-      "Nombre_oeuf": null,
+      "Nombre_oeuf": 0,
       "Nombre_pou": 3,
       "age": null,
-      "observations": "Les Zigeunos sortent du Nid et volent dans les arbres -\n1 reste au nid"
+      "observations": "Les jeunes sortent du nid et volent dans les arbres - 1 reste au nid"
     }
   ],
   "tableau_donnees_2": {
@@ -80,5 +80,5 @@
   "causes_echec": {
     "causes_d_echec": null
   },
-  "remarque": "Le 26/7 = 1 jeune resté au nid\n1 jeune déjà sorti du nid\n1 j. ont sorti à mon arrivée\nBancs fixés à proximité."
+  "remarque": "Le 26/7 = 1 jeune resté au nid\n1 jeune déjà sorti du nid\n1 j. ont sorti à mon arrivée\narbres fixés à proximité"
 }

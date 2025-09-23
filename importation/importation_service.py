@@ -364,17 +364,47 @@ class ImportationService:
                         return None
 
                 resume = ResumeObservation.objects.get(fiche=fiche)
+
+                # Récupération des valeurs
+                nombre_oeufs_pondus = safe_int(resume_data.get('nombre_oeufs', {}).get('pondus')) or 0
+                nombre_oeufs_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('eclos')) or 0
+                nombre_oeufs_non_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('n_ecl')) or 0
+                nombre_poussins = safe_int(resume_data.get('nombre_poussins', {}).get('vol_t')) or 0
+
+                # Log des valeurs pour debugging
+                logger.info(f"Fiche {fiche.num_fiche} - Valeurs résumé: pondus={nombre_oeufs_pondus}, "
+                           f"éclos={nombre_oeufs_eclos}, non_éclos={nombre_oeufs_non_eclos}, poussins={nombre_poussins}")
+
+                # Validation et correction automatique des contraintes
+                # Si on a des poussins mais pas d'œufs éclos renseignés, on déduit le minimum d'œufs éclos
+                if nombre_poussins > 0 and nombre_oeufs_eclos == 0:
+                    nombre_oeufs_eclos = nombre_poussins
+                    logger.warning(f"Fiche {fiche.num_fiche}: Correction automatique - œufs éclos ajusté à {nombre_oeufs_eclos} pour cohérence avec {nombre_poussins} poussins")
+
+                # Si on a plus de poussins que d'œufs éclos, ajuster les œufs éclos
+                if nombre_poussins > nombre_oeufs_eclos:
+                    nombre_oeufs_eclos = nombre_poussins
+                    logger.warning(f"Fiche {fiche.num_fiche}: Correction automatique - œufs éclos ajusté de à {nombre_oeufs_eclos} pour respecter la contrainte")
+
+                # Si on a des œufs éclos mais pas d'œufs pondus renseignés, ajuster
+                if nombre_oeufs_eclos > nombre_oeufs_pondus:
+                    nombre_oeufs_pondus = nombre_oeufs_eclos + nombre_oeufs_non_eclos
+                    logger.warning(f"Fiche {fiche.num_fiche}: Correction automatique - œufs pondus ajusté à {nombre_oeufs_pondus} pour cohérence")
+
+                # Attribution des valeurs validées
                 resume.premier_oeuf_pondu_jour = safe_int(resume_data.get('1er_o_pondu', {}).get('jour'))
                 resume.premier_oeuf_pondu_mois = safe_int(resume_data.get('1er_o_pondu', {}).get('Mois'))
                 resume.premier_poussin_eclos_jour = safe_int(resume_data.get('1er_p_eclos', {}).get('jour'))
                 resume.premier_poussin_eclos_mois = safe_int(resume_data.get('1er_p_eclos', {}).get('Mois'))
                 resume.premier_poussin_volant_jour = safe_int(resume_data.get('1er_p_volant', {}).get('jour'))
                 resume.premier_poussin_volant_mois = safe_int(resume_data.get('1er_p_volant', {}).get('Mois'))
-                resume.nombre_oeufs_pondus = safe_int(resume_data.get('nombre_oeufs', {}).get('pondus')) or 0
-                resume.nombre_oeufs_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('eclos')) or 0
-                resume.nombre_oeufs_non_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('n_ecl')) or 0
-                resume.nombre_poussins = safe_int(resume_data.get('nombre_poussins', {}).get('vol_t')) or 0
+                resume.nombre_oeufs_pondus = nombre_oeufs_pondus
+                resume.nombre_oeufs_eclos = nombre_oeufs_eclos
+                resume.nombre_oeufs_non_eclos = nombre_oeufs_non_eclos
+                resume.nombre_poussins = nombre_poussins
+
                 resume.save()
+                logger.info(f"Fiche {fiche.num_fiche}: Résumé sauvegardé avec succès")
 
             # Mise à jour de l'objet CausesEchec qui existe déjà
             if 'causes_echec' in donnees:

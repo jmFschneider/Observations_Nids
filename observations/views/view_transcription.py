@@ -1,10 +1,12 @@
+# imports utiles en haut de view_transcription.py
 import logging
 import os
+from typing import Any, TypedDict, cast
 
 from celery.result import AsyncResult
 from django.conf import settings
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
@@ -98,59 +100,104 @@ def process_images(request):
     })
 
 
-def check_progress(request):
+# Décrit la métadonnée de progression que tes tâches mettent dans update_state(meta=...)
+class ProgressMeta(TypedDict, total=False):
+    total: int
+    processed: int
+    message: str  # optionnel si tu l’utilises côté tâche
+
+
+# Décrit le résultat “SUCCESS” renvoyé par ta tâche (adapte au besoin)
+class SuccessPayload(TypedDict, total=False):
+    directory: str
+    duration: float
+    results: list[Any]
+    total: int
+    success_count: int
+    success_rate: float
+
+
+def check_progress(request: HttpRequest) -> JsonResponse:
     """Endpoint AJAX pour vérifier la progression du traitement"""
-    task_id = request.session.get('task_id')
+    task_id = request.session.get("task_id")
     if not task_id:
         logger.warning("check_progress called with no task_id in session")
-        return JsonResponse({'status': 'NO_TASK'})
+        return JsonResponse({"status": "NO_TASK"})
 
-    result = AsyncResult(task_id, app=app)
-    logger.debug(f"check_progress for task {task_id}: status={result.status}")
+    # NOTE: si tu n'as pas d'objet 'app' dédié, supprime `app=app`
+    result = AsyncResult(task_id)  # ou AsyncResult(task_id, app=app)
+    logger.debug("check_progress for task %s: status=%s", task_id, result.status)
 
-    response = {
-        'status': result.status,
-        'task_id': task_id,
+    response: dict[str, Any] = {
+        "status": result.status,
+        "task_id": task_id,
     }
 
-    # Ajouter les informations de progression si disponibles
-    if result.status == 'PENDING':
+    # ---- États Celery : PENDING / STARTED / RETRY / PROGRESS (custom) / SUCCESS / FAILURE ----
+    if result.status == "PENDING":
         # La tâche est en attente de démarrage
-        response['message'] = 'Tâche en attente de démarrage...'
-    elif result.status == 'PROGRESS' and result.info:
-        # La tâche est en cours, ajouter les informations de progression
-        response.update(result.info)
-        # Calculer le pourcentage de progression
-        if 'total' in result.info and result.info['total'] > 0:
-            response['percent'] = int((result.info.get('processed', 0) / result.info['total']) * 100)
-        else:
-            response['percent'] = 0
-    elif result.status == 'SUCCESS':
+        response["message"] = "Tâche en attente de démarrage..."
+
+    elif result.status in ("STARTED", "RETRY", "PROGRESS"):
+        # Info de progression possible dans result.info
+        raw_info: Any = result.info  # peut être dict | Exception | None
+        info: ProgressMeta = cast(ProgressMeta, raw_info if isinstance(raw_info, dict) else {})
+
+        # Si tu veux remonter tout le dict de progression côté client :
+        if info:
+            response.update(info)
+
+        total = int(info.get("total", 0) or 0)
+        processed = int(info.get("processed", 0) or 0)
+
+        response["percent"] = int(processed * 100 / total) if total > 0 else 0
+
+        # Message par défaut si rien fourni par la tâche
+        response.setdefault("message", "Traitement en cours...")
+
+    elif result.status == "SUCCESS":
         # La tâche est terminée avec succès
-        response.update(result.result)
+        raw_ok: Any = result.result  # souvent un dict que tu renvoies depuis la tâche
+        ok: SuccessPayload = cast(SuccessPayload, raw_ok if isinstance(raw_ok, dict) else {})
+
+        response.update(ok)
+        response["percent"] = 100
+
         # Stocker les résultats en session pour référence ultérieure
-        request.session['transcription_results'] = {
-            'directory': result.result.get('directory', request.session.get('processing_directory')),
-            'total_duration': result.result.get('duration', 0),
-            'results': result.result.get('results', []),
-            'total_files': result.result.get('total', 0),
-            'successful_files': result.result.get('success_count', 0),
-            'error_files': result.result.get('total', 0) - result.result.get('success_count', 0),
-            'success_rate': result.result.get('success_rate', 0),
-            'timestamp': timezone.now().isoformat()
+        processing_dir = request.session.get("processing_directory")
+        request.session["transcription_results"] = {
+            "directory": ok.get("directory", processing_dir),
+            "total_duration": ok.get("duration", 0),
+            "results": ok.get("results", []),
+            "total_files": ok.get("total", 0),
+            "successful_files": ok.get("success_count", 0),
+            "error_files": ok.get("total", 0) - ok.get("success_count", 0),
+            "success_rate": ok.get("success_rate", 0),
+            "timestamp": timezone.now().isoformat(),
         }
-        # Rediriger vers les résultats
-        response['redirect'] = '/transcription/resultats/'
-        response['force_redirect'] = True  # Ajouter un flag pour forcer la redirection
-        logger.info(f"Task {task_id} completed successfully. Sending redirect to /transcription/resultats/ with force_redirect flag")
-    elif result.status == 'FAILURE':
-        # La tâche a échoué
-        response['error'] = str(result.result)
-        response['message'] = "Une erreur s'est produite lors du traitement."
 
-    logger.debug(f"check_progress response for task {task_id}: {response}")
+        # Redirection côté client
+        response["redirect"] = "/transcription/resultats/"
+        response["force_redirect"] = True
+        logger.info(
+            "Task %s completed successfully. Sending redirect to /transcription/resultats/ with force_redirect flag",
+            task_id,
+        )
+
+    elif result.status == "FAILURE":
+        # La tâche a échoué ; result.info est souvent l'exception
+        response["percent"] = 0
+        # str(result.result) donne le message de l'exception
+        response["error"] = str(result.result)
+        response["message"] = "Une erreur s'est produite lors du traitement."
+
+    else:
+        # État inattendu, on reste défensif
+        response.setdefault("message", f"État de tâche : {result.status}")
+        response.setdefault("percent", 0)
+
+    logger.debug("check_progress response for task %s: %s", task_id, response)
     return JsonResponse(response)
-
 
 def transcription_results(request):
     """Vue pour afficher les résultats de la transcription"""

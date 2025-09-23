@@ -10,10 +10,10 @@
     "nid_prec_t_meme_c_ple": null,
     "haut_nid": null,
     "h_c_vert": null,
-    "nid": "Dans du lieue retombaul. d'une clôture"
+    "nid": "Dans du lieue retombau\nl d'une cloture"
   },
   "localisation": {
-    "IGN_50000": null,
+    "IGN_50000": "CROCY",
     "commune": "CROCY",
     "dep_t": "14",
     "coordonnees_et_ou_lieu_dit": "La VALLEE",
@@ -24,7 +24,7 @@
   "tableau_donnees": [
     {
       "Jour": 19,
-      "Mois": 10,
+      "Mois": 5,
       "Heure": null,
       "Nombre_oeuf": 3,
       "Nombre_pou": null,
@@ -33,7 +33,7 @@
     },
     {
       "Jour": 23,
-      "Mois": 10,
+      "Mois": 5,
       "Heure": 12,
       "Nombre_oeuf": 5,
       "Nombre_pou": null,
@@ -42,8 +42,8 @@
     },
     {
       "Jour": 26,
-      "Mois": 10,
-      "Heure": 18,
+      "Mois": 5,
+      "Heure": 19,
       "Nombre_oeuf": 5,
       "Nombre_pou": null,
       "age": null,
@@ -51,7 +51,7 @@
     },
     {
       "Jour": 28,
-      "Mois": 10,
+      "Mois": 5,
       "Heure": 25,
       "Nombre_oeuf": 5,
       "Nombre_pou": null,
@@ -60,12 +60,12 @@
     },
     {
       "Jour": 30,
-      "Mois": 10,
+      "Mois": 5,
       "Heure": null,
       "Nombre_oeuf": 5,
       "Nombre_pou": null,
       "age": null,
-      "observations": "œufs froids"
+      "observations": "oeufs froids"
     }
   ],
   "tableau_donnees_2": {

@@ -1,8 +1,9 @@
 # observations/models.py
 import logging
 
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
+from django.db.models import Q
 
 # Importer le modèle Utilisateur depuis administration
 from administration.models import Utilisateur
@@ -160,19 +161,88 @@ class Observation(models.Model):
 
 
 class ResumeObservation(models.Model):
-    fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="resume")
-    premier_oeuf_pondu_jour = models.IntegerField(blank=True, null=True)
-    premier_oeuf_pondu_mois = models.IntegerField(blank=True, null=True)
-    premier_poussin_eclos_jour = models.IntegerField(blank=True, null=True)
-    premier_poussin_eclos_mois = models.IntegerField(blank=True, null=True)
-    premier_poussin_volant_jour = models.IntegerField(blank=True, null=True)
-    premier_poussin_volant_mois = models.IntegerField(blank=True, null=True)
-    nombre_oeufs_pondus = models.IntegerField(default=0)
-    nombre_oeufs_eclos = models.IntegerField(default=0)
-    nombre_oeufs_non_eclos = models.IntegerField(default=0)
-    nombre_poussins = models.IntegerField(default=0)
+    fiche = models.OneToOneField(
+        FicheObservation, on_delete=models.CASCADE, related_name="resume"
+    )
 
-    def __str__(self):
+    # Dates partielles (jour/mois) : valeurs optionnelles + bornes
+    premier_oeuf_pondu_jour = models.PositiveSmallIntegerField(
+        blank=True, null=True, validators=[MinValueValidator(1), MaxValueValidator(31)]
+    )
+    premier_oeuf_pondu_mois = models.PositiveSmallIntegerField(
+        blank=True, null=True, validators=[MinValueValidator(1), MaxValueValidator(12)]
+    )
+
+    premier_poussin_eclos_jour = models.PositiveSmallIntegerField(
+        blank=True, null=True, validators=[MinValueValidator(1), MaxValueValidator(31)]
+    )
+    premier_poussin_eclos_mois = models.PositiveSmallIntegerField(
+        blank=True, null=True, validators=[MinValueValidator(1), MaxValueValidator(12)]
+    )
+
+    premier_poussin_volant_jour = models.PositiveSmallIntegerField(
+        blank=True, null=True, validators=[MinValueValidator(1), MaxValueValidator(31)]
+    )
+    premier_poussin_volant_mois = models.PositiveSmallIntegerField(
+        blank=True, null=True, validators=[MinValueValidator(1), MaxValueValidator(12)]
+    )
+
+    # Compteurs (toujours non négatifs)
+    nombre_oeufs_pondus = models.PositiveSmallIntegerField(default=0)
+    nombre_oeufs_eclos = models.PositiveSmallIntegerField(default=0)
+    nombre_oeufs_non_eclos = models.PositiveSmallIntegerField(default=0)
+    nombre_poussins = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            # Paires jour/mois : soit les deux NULL, soit les deux renseignés
+            models.CheckConstraint(
+                name="resume_premier_oeuf_pondu_jour_mois_both_or_none",
+                check=(
+                    (Q(premier_oeuf_pondu_jour__isnull=True) & Q(premier_oeuf_pondu_mois__isnull=True)) |
+                    (Q(premier_oeuf_pondu_jour__isnull=False) & Q(premier_oeuf_pondu_mois__isnull=False))
+                ),
+            ),
+            models.CheckConstraint(
+                name="resume_premier_poussin_eclos_jour_mois_both_or_none",
+                check=(
+                    (Q(premier_poussin_eclos_jour__isnull=True) & Q(premier_poussin_eclos_mois__isnull=True)) |
+                    (Q(premier_poussin_eclos_jour__isnull=False) & Q(premier_poussin_eclos_mois__isnull=False))
+                ),
+            ),
+            models.CheckConstraint(
+                name="resume_premier_poussin_volant_jour_mois_both_or_none",
+                check=(
+                    (Q(premier_poussin_volant_jour__isnull=True) & Q(premier_poussin_volant_mois__isnull=True)) |
+                    (Q(premier_poussin_volant_jour__isnull=False) & Q(premier_poussin_volant_mois__isnull=False))
+                ),
+            ),
+
+            # Compteurs cohérents
+            models.CheckConstraint(
+                name="resume_counts_non_negative",
+                check=(
+                    Q(nombre_oeufs_pondus__gte=0) &
+                    Q(nombre_oeufs_eclos__gte=0) &
+                    Q(nombre_oeufs_non_eclos__gte=0) &
+                    Q(nombre_poussins__gte=0)
+                ),
+            ),
+            models.CheckConstraint(
+                name="resume_eclos_le_pondus",
+                check=Q(nombre_oeufs_eclos__lte=models.F("nombre_oeufs_pondus")),
+            ),
+            models.CheckConstraint(
+                name="resume_non_eclos_le_pondus",
+                check=Q(nombre_oeufs_non_eclos__lte=models.F("nombre_oeufs_pondus")),
+            ),
+            models.CheckConstraint(
+                name="resume_poussins_le_eclos",
+                check=Q(nombre_poussins__lte=models.F("nombre_oeufs_eclos")),
+            ),
+        ]
+
+    def __str__(self) -> str:
         return f"Résumé Fiche {self.fiche.num_fiche}"
 
 

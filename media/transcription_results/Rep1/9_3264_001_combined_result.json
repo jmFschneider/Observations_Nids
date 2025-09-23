@@ -10,14 +10,14 @@
     "nid_prec_t_meme_c_ple": null,
     "haut_nid": null,
     "h_c_vert": null,
-    "nid": "321x230\n318 x 230\n327 x 235\n11 Jaune (P)\n170 Jaune (N)\nSE24916\nSE 24917"
+    "nid": "321x230\n318 x 230\n327 x 235\nSE24 916\nSE 24 917"
   },
   "localisation": {
     "IGN_50000": null,
     "commune": null,
     "dep_t": "14",
     "coordonnees_et_ou_lieu_dit": "Breche Pearson gauche",
-    "altitude": "0m",
+    "altitude": "0 m",
     "paysage": null,
     "alentours": null
   },
@@ -37,8 +37,8 @@
       "Heure": null,
       "Nombre_oeuf": 3,
       "Nombre_pou": null,
-      "age": "D",
-      "observations": "170 Jaune P\n11 Jaune A"
+      "age": "10",
+      "observations": "170 Jaune\n11 Jaune"
     },
     {
       "Jour": 2,
@@ -47,7 +47,7 @@
       "Nombre_oeuf": null,
       "Nombre_pou": 3,
       "age": null,
-      "observations": "1 matau nid\npaysage"
+      "observations": "1 mat au nid\nPaysage"
     }
   ],
   "tableau_donnees_2": {
@@ -80,5 +80,5 @@
   "causes_echec": {
     "causes_d_echec": null
   },
-  "remarque": "Eclaran le jour de la Canicule\nΠ mat insolation? proximiti\nplagiste"
+  "remarque": "Eclaron le jour de la Canicule\nㅠmat insolation? proximiti plagiste"
 }
