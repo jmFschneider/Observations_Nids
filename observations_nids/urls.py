@@ -24,8 +24,12 @@ from observations_nids import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('gestion/', include('administration.urls')),  # URLs pour l'application administration
-    path('', include('observations.urls')),  # URLs pour l'application observations (routes principales)
-    path('importation/', include('importation.urls')),  # URLs pour l'application importation avec préfixe
+    path(
+        '', include('observations.urls')
+    ),  # URLs pour l'application observations (routes principales)
+    path(
+        'importation/', include('importation.urls')
+    ),  # URLs pour l'application importation avec préfixe
 ]
 
 if settings.DEBUG:
@@ -33,4 +37,5 @@ if settings.DEBUG:
 
 if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
+
     urlpatterns += [path('__debug__/', include(debug_toolbar.urls))]

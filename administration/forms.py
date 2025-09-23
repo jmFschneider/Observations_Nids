@@ -20,6 +20,7 @@ class UtilisateurCreationForm(UserCreationForm):
             user.save()
         return user
 
+
 class UtilisateurChangeForm(UserChangeForm):
     """Formulaire de modification d'utilisateur personnalisé"""
 

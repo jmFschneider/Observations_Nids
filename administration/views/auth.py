@@ -41,10 +41,10 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
         if recherche:
             queryset = queryset.filter(
-                Q(username__icontains=recherche) |
-                Q(first_name__icontains=recherche) |
-                Q(last_name__icontains=recherche) |
-                Q(email__icontains=recherche)
+                Q(username__icontains=recherche)
+                | Q(first_name__icontains=recherche)
+                | Q(last_name__icontains=recherche)
+                | Q(email__icontains=recherche)
             )
 
         if role != 'tous':
@@ -68,7 +68,9 @@ def creer_utilisateur(request):
         form = UtilisateurCreationForm(request.POST)
         if form.is_valid():
             utilisateur = form.save()
-            messages.success(request, f"L'utilisateur {utilisateur.username} a été créé avec succès")
+            messages.success(
+                request, f"L'utilisateur {utilisateur.username} a été créé avec succès"
+            )
             return redirect('administration:liste_utilisateurs')
     else:
         form = UtilisateurCreationForm()
@@ -86,12 +88,18 @@ def modifier_utilisateur(request, user_id):
         form = UtilisateurChangeForm(request.POST, instance=utilisateur)
         if form.is_valid():
             form.save()
-            messages.success(request, f"L'utilisateur {utilisateur.username} a été modifié avec succès")
+            messages.success(
+                request, f"L'utilisateur {utilisateur.username} a été modifié avec succès"
+            )
             return redirect('administration:liste_utilisateurs')
     else:
         form = UtilisateurChangeForm(instance=utilisateur)
 
-    return render(request, 'administration/modifier_utilisateur.html', {'form': form, 'utilisateur': utilisateur})
+    return render(
+        request,
+        'administration/modifier_utilisateur.html',
+        {'form': form, 'utilisateur': utilisateur},
+    )
 
 
 @login_required
@@ -131,7 +139,7 @@ def detail_utilisateur(request, user_id):
     context = {
         'utilisateur': utilisateur,
         'observations_count': observations_count,
-        'fiches': fiches
+        'fiches': fiches,
     }
 
     # Si c'est une requête AJAX, renvoyer uniquement le contenu du détail
@@ -151,7 +159,7 @@ def mon_profil(request):
     context = {
         'utilisateur': utilisateur,
         'observations_count': observations_count,
-        'fiches': fiches
+        'fiches': fiches,
     }
 
     return render(request, 'administration/mon_profil.html', context)
@@ -167,11 +175,13 @@ def inscription_publique(request):
             utilisateur.est_valide = False  # Nécessite approbation par un admin
             utilisateur.role = 'observateur'  # Rôle par défaut
             utilisateur.save()
-            logger.info(f"Nouvelle demande d'inscription reçue : {utilisateur.username} ({utilisateur.email})")
+            logger.info(
+                f"Nouvelle demande d'inscription reçue : {utilisateur.username} ({utilisateur.email})"
+            )
 
             messages.success(
                 request,
-                "Votre demande d'inscription a été enregistrée. Un administrateur devra l'approuver avant que vous puissiez vous connecter."
+                "Votre demande d'inscription a été enregistrée. Un administrateur devra l'approuver avant que vous puissiez vous connecter.",
             )
             return redirect('login')
     else:
@@ -189,7 +199,10 @@ def promouvoir_administrateur(request):
             utilisateur = get_object_or_404(Utilisateur, id=user_id)
             utilisateur.role = 'administrateur'
             utilisateur.save()
-            messages.success(request, f"L'utilisateur {utilisateur.username} a été promu administrateur avec succès")
+            messages.success(
+                request,
+                f"L'utilisateur {utilisateur.username} a été promu administrateur avec succès",
+            )
             return redirect('administration:liste_utilisateurs')
 
     # Récupérer tous les utilisateurs qui ne sont pas déjà administrateurs

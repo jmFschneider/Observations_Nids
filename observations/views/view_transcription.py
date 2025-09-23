@@ -30,21 +30,23 @@ def select_directory(request):
 
             # Compter les fichiers pour donner un aperçu à l'utilisateur
             full_path = os.path.join(base_dir, selected_dir)
-            file_count = len([f for f in os.listdir(full_path)
-                              if os.path.isfile(os.path.join(full_path, f))
-                              and f.lower().endswith(('.jpg', '.jpeg'))])
+            file_count = len(
+                [
+                    f
+                    for f in os.listdir(full_path)
+                    if os.path.isfile(os.path.join(full_path, f))
+                    and f.lower().endswith(('.jpg', '.jpeg'))
+                ]
+            )
 
-            return JsonResponse({
-                'success': True,
-                'file_count': file_count,
-                'directory': selected_dir
-            })
+            return JsonResponse(
+                {'success': True, 'file_count': file_count, 'directory': selected_dir}
+            )
 
         return JsonResponse({'success': False, 'error': 'Répertoire invalide'})
 
     # Récupérer la liste des répertoires disponibles
-    directories = [d for d in os.listdir(base_dir)
-                   if os.path.isdir(os.path.join(base_dir, d))]
+    directories = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
 
     return render(request, 'transcription/upload_files.html', {'directories': directories})
 
@@ -89,15 +91,14 @@ def process_images(request):
     progress_data = {
         'task_id': task_id,
         'directory': directory,
-        'start_time': timezone.now().isoformat()
+        'start_time': timezone.now().isoformat(),
     }
     request.session['processing_progress'] = progress_data
 
     # Rendu de la page de suivi
-    return render(request, 'transcription/processing.html', {
-        'task_id': task_id,
-        'directory': directory
-    })
+    return render(
+        request, 'transcription/processing.html', {'task_id': task_id, 'directory': directory}
+    )
 
 
 # Décrit la métadonnée de progression que tes tâches mettent dans update_state(meta=...)
@@ -199,6 +200,7 @@ def check_progress(request: HttpRequest) -> JsonResponse:
     logger.debug("check_progress response for task %s: %s", task_id, response)
     return JsonResponse(response)
 
+
 def transcription_results(request):
     """Vue pour afficher les résultats de la transcription"""
     # Récupérer les résultats stockés en session
@@ -213,8 +215,9 @@ def transcription_results(request):
         for result in results.get('results', []):
             if result.get('status') == 'success' and 'json_path' in result:
                 # Ajouter le préfixe MEDIA_URL pour les liens
-                result[
-                    'json_url'] = f"{settings.MEDIA_URL}transcription_results/{results.get('directory')}/{result['json_path']}"
+                result['json_url'] = (
+                    f"{settings.MEDIA_URL}transcription_results/{results.get('directory')}/{result['json_path']}"
+                )
 
     # Ajouter MEDIA_URL au contexte
     context = results.copy()
@@ -225,6 +228,7 @@ def transcription_results(request):
 
 # Vue pour démarrer la transcription (utilisation de l'API AJAX)
 
+
 def start_transcription_view(request):
     """API pour démarrer le traitement des images via AJAX"""
     directory = request.session.get('processing_directory')
@@ -233,16 +237,18 @@ def start_transcription_view(request):
 
     # Vérifier si Celery est opérationnel
     if not is_celery_operational():
-        return JsonResponse({
-            'error': "Celery n'est pas en fonction sur le serveur",
-            'celery_error': True
-        }, status=503)  # 503 Service Unavailable
+        return JsonResponse(
+            {'error': "Celery n'est pas en fonction sur le serveur", 'celery_error': True},
+            status=503,
+        )  # 503 Service Unavailable
 
     task = process_images_task.delay(directory)
     request.session['task_id'] = task.id
 
-    return JsonResponse({
-        'task_id': task.id,
-        'message': 'Traitement démarré',
-        'processing_url': '/transcription/verifier-progression/'
-    })
+    return JsonResponse(
+        {
+            'task_id': task.id,
+            'message': 'Traitement démarré',
+            'processing_url': '/transcription/verifier-progression/',
+        }
+    )

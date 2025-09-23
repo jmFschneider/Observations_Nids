@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+
 import os
 from pathlib import Path
 from types import ModuleType
@@ -61,7 +62,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # DÃ©connexion si lâ€™utilisateur
 
 # Celery Configuration - utilise les paramÃ¨tres de pydantic
 # Celery Configuration - utilise les paramÃ¨tres de pydantic
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0' # settings.celery.broker_url
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'  # settings.celery.broker_url
 # CELERY_RESULT_BACKEND = settings.celery.result_backend
 # CELERY_ACCEPT_CONTENT = settings.celery.accept_content
 # CELERY_TASK_SERIALIZER = settings.celery.task_serializer
@@ -115,8 +116,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             BASE_DIR / "templates",
-        ]
-        ,
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -226,8 +226,8 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(LOG_DIR, 'django_debug.log'),
-            'maxBytes': 5 * 1024 * 1024,   # 5 Mo max
-            'backupCount': 5,              # 5 fichiers de rotation
+            'maxBytes': 5 * 1024 * 1024,  # 5 Mo max
+            'backupCount': 5,  # 5 fichiers de rotation
             'formatter': 'verbose',
         },
         'console': {
@@ -240,7 +240,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['file', 'console'],
-            'level': 'INFO',   # moins verbeux que DEBUG
+            'level': 'INFO',  # moins verbeux que DEBUG
             'propagate': True,
         },
         'observations': {

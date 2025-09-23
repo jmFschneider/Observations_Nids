@@ -2,6 +2,7 @@
 Configuration module for observations_nids project.
 Uses Pydantic for settings validation and python-dotenv for environment variables.
 """
+
 import json
 import os
 from pathlib import Path
@@ -12,15 +13,18 @@ from pydantic_settings import BaseSettings
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # Dans config.py, modifiez la classe DatabaseSettings et la fonction get_settings
 class DatabaseSettings(BaseModel):
     """Database configuration settings."""
+
     engine: str = "django.db.backends.mysql"
     name: str
     user: str
     password: str
     host: str
     port: str = "3306"
+
 
 class CelerySettings(BaseSettings):
     broker_url: str = "redis://127.0.0.1:6379/0"
@@ -41,6 +45,7 @@ class CelerySettings(BaseSettings):
         env_prefix = "CELERY_"  # Chercher les variables prÃ©fixÃ©es par CELERY_
         extra = "ignore"  # Ignore extra fields not defined in the model
 
+
 class Settings(BaseSettings):
     """
     Project settings loaded from environment variables.
@@ -48,6 +53,7 @@ class Settings(BaseSettings):
     This class uses Pydantic to validate settings and provide default values.
     Environment variables are loaded using python-dotenv.
     """
+
     # Core Django settings
     SECRET_KEY: str
     DEBUG: bool = False
@@ -88,6 +94,7 @@ class Settings(BaseSettings):
 
     class Config:
         """Pydantic config for environment variables."""
+
         env_file = ".env"
         env_file_encoding = "utf-8"
         env_nested_delimiter = "__"
@@ -103,6 +110,7 @@ class Settings(BaseSettings):
         elif isinstance(v, list):
             return [str(host).strip() for host in v]
         return ["localhost", "127.0.0.1"]
+
 
 def get_settings() -> Settings:
     """
@@ -130,9 +138,12 @@ def get_settings() -> Settings:
 
     return Settings(
         DATABASE=database_settings,
-        SECRET_KEY=os.environ.get("SECRET_KEY", "django-insecure-^tzqm_vr2-7f#2p10rehlk4pr9!z8z^!3atbbwq@2!%h_$n2f0"),
+        SECRET_KEY=os.environ.get(
+            "SECRET_KEY", "django-insecure-^tzqm_vr2-7f#2p10rehlk4pr9!z8z^!3atbbwq@2!%h_$n2f0"
+        ),
         DEBUG=os.environ.get("DEBUG", "False").lower() in ("true", "1", "t"),
-        USE_DEBUG_TOOLBAR=os.environ.get("USE_DEBUG_TOOLBAR", "False").lower() in ("true", "1", "t"),
+        USE_DEBUG_TOOLBAR=os.environ.get("USE_DEBUG_TOOLBAR", "False").lower()
+        in ("true", "1", "t"),
         gemini_api_key=os.environ.get("GEMINI_API_KEY", None),
         # Explicitly set ALLOWED_HOSTS to avoid JSON parsing issues
         ALLOWED_HOSTS=allowed_hosts,

@@ -2,6 +2,7 @@
 """
 Script d'importation des espèces depuis un fichier CSV
 """
+
 import csv
 import os
 import sys
@@ -15,7 +16,6 @@ from observations.models import Espece, Famille, Ordre
 # Configurer l'environnement Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
 django.setup()
-
 
 
 def importer_especes(fichier_csv):
@@ -32,7 +32,12 @@ def importer_especes(fichier_csv):
     especes_existantes = 0
 
     # Nettoyer la base si nécessaire
-    if input("Voulez-vous supprimer toutes les espèces existantes avant l'importation? (o/n): ").lower() == 'o':
+    if (
+        input(
+            "Voulez-vous supprimer toutes les espèces existantes avant l'importation? (o/n): "
+        ).lower()
+        == 'o'
+    ):
         print("Suppression des données existantes...")
         Espece.objects.all().delete()
         Famille.objects.all().delete()
@@ -66,15 +71,21 @@ def importer_especes(fichier_csv):
                 famille_key = f"{nom_ordre}|{nom_famille}"
                 if famille_key not in familles:
                     famille, created = Famille.objects.get_or_create(
-                        nom=nom_famille,
-                        defaults={'ordre': ordre}
+                        nom=nom_famille, defaults={'ordre': ordre}
                     )
                     if created:
                         print(f"Nouvelle famille créée: {nom_famille} (Ordre: {nom_ordre})")
                     elif famille.ordre != ordre:
-                        print(f"ATTENTION: La famille {nom_famille} existe déjà avec un ordre différent!")
+                        print(
+                            f"ATTENTION: La famille {nom_famille} existe déjà avec un ordre différent!"
+                        )
                         # Mettre à jour l'ordre si nécessaire
-                        if input(f"Mettre à jour l'ordre de {nom_famille} vers {nom_ordre}? (o/n): ").lower() == 'o':
+                        if (
+                            input(
+                                f"Mettre à jour l'ordre de {nom_famille} vers {nom_ordre}? (o/n): "
+                            ).lower()
+                            == 'o'
+                        ):
                             famille.ordre = ordre
                             famille.save()
 
@@ -90,8 +101,8 @@ def importer_especes(fichier_csv):
                             'nom_anglais': nom_anglais,
                             'nom_scientifique': nom_scientifique,
                             'statut': statut,
-                            'famille': famille
-                        }
+                            'famille': famille,
+                        },
                     )
 
                     # Mettre à jour les champs si l'espèce existe déjà
@@ -122,7 +133,9 @@ def importer_especes(fichier_csv):
         for ordre_nom, familles_dict in stats.items():
             total_especes = sum(familles_dict.values())
             print(f"\nOrdre: {ordre_nom} ({total_especes} espèces)")
-            for famille_nom, nb_especes in sorted(familles_dict.items(), key=lambda x: x[1], reverse=True):
+            for famille_nom, nb_especes in sorted(
+                familles_dict.items(), key=lambda x: x[1], reverse=True
+            ):
                 print(f"  - {famille_nom}: {nb_especes} espèces")
 
     except Exception as e:

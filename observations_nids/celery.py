@@ -25,11 +25,9 @@ app.conf.update(
     task_track_started=settings.celery.task_track_started,
     task_time_limit=settings.celery.task_time_limit,
     worker_hijack_root_logger=settings.celery.worker_hijack_root_logger,
-
     # --- Améliorations robustesse ---
     task_acks_late=True,
     task_default_retry_delay=30,  # 30s avant un retry automatique
-
     # --- Routage par files (désactivé pour l’instant) ---
     # task_routes={
     #     "importation.tasks.*": {"queue": "import"},
@@ -40,6 +38,7 @@ app.conf.update(
 
 # Charger automatiquement les tâches des applications Django installées
 app.autodiscover_tasks()
+
 
 @app.task(bind=True, ignore_result=True)
 def debug_task(self):

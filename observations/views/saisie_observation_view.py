@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from administration.models import Utilisateur  # <-- adapte le chemin
 
-#from django.utils import timezone
+# from django.utils import timezone
 from observations.forms import (
     CausesEchecForm,
     FicheObservationForm,
@@ -51,6 +51,7 @@ def fiche_observation_view(request, fiche_id):
         'remarques': remarques,
     }
     return render(request, 'fiche_observation.html', context)
+
 
 def saisie_observation(request, fiche_id=None):
     """
@@ -337,7 +338,12 @@ def ajouter_observation(request, fiche_id):
             observation.save()
 
             # Enregistrer l'ajout dans l'historique des modifications
-            for field_name in ['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations']:
+            for field_name in [
+                'date_observation',
+                'nombre_oeufs',
+                'nombre_poussins',
+                'observations',
+            ]:
                 if field_name in form.cleaned_data and form.cleaned_data[field_name]:
                     HistoriqueModification.objects.create(
                         fiche=fiche,
@@ -345,7 +351,7 @@ def ajouter_observation(request, fiche_id):
                         ancienne_valeur="",
                         nouvelle_valeur=str(form.cleaned_data[field_name]),
                         categorie='observation',
-                        modifie_par=request.user
+                        modifie_par=request.user,
                     )
                     logger.info(
                         f"Ajout d'observation, champ '{field_name}', "
@@ -380,15 +386,20 @@ def historique_modifications(request, fiche_id):
     Affiche l'historique des modifications d'une fiche d'observation.
     """
     fiche = get_object_or_404(FicheObservation, pk=fiche_id)
-    modifications = HistoriqueModification.objects.filter(fiche=fiche).order_by('-date_modification')
+    modifications = HistoriqueModification.objects.filter(fiche=fiche).order_by(
+        '-date_modification'
+    )
 
-    return render(request, 'saisie/historique_modifications.html', {
-        'fiche': fiche,
-        'modifications': modifications
-    })
+    return render(
+        request,
+        'saisie/historique_modifications.html',
+        {'fiche': fiche, 'modifications': modifications},
+    )
 
 
-def enregistrer_modifications_historique(fiche, ancienne_instance, nouvelle_instance, categorie, modifie_par):
+def enregistrer_modifications_historique(
+    fiche, ancienne_instance, nouvelle_instance, categorie, modifie_par
+):
     if not ancienne_instance or not nouvelle_instance:
         return
 
@@ -410,13 +421,12 @@ def enregistrer_modifications_historique(fiche, ancienne_instance, nouvelle_inst
                 ancienne_valeur=str(ancienne_valeur) if ancienne_valeur is not None else "",
                 nouvelle_valeur=str(nouvelle_valeur) if nouvelle_valeur is not None else "",
                 categorie=categorie,
-                modifie_par=modifie_par
+                modifie_par=modifie_par,
             )
             logger.info(
                 f"Modification sur {categorie}, champ '{champ}', "
                 f"ancienne: '{ancienne_valeur}', nouvelle: '{nouvelle_valeur}', par {modifie_par.username}"
             )
-
 
 
 @login_required

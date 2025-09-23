@@ -39,9 +39,11 @@ def process_images_task(self, directory):
     os.makedirs(results_dir, exist_ok=True)
 
     # Récupérer la liste des fichiers image
-    image_files = [f for f in os.listdir(base_dir)
-                   if os.path.isfile(os.path.join(base_dir, f))
-                   and f.lower().endswith(('.jpg', '.jpeg'))]
+    image_files = [
+        f
+        for f in os.listdir(base_dir)
+        if os.path.isfile(os.path.join(base_dir, f)) and f.lower().endswith(('.jpg', '.jpeg'))
+    ]
 
     if not image_files:
         logger.warning(f"Aucune image trouvée dans {base_dir}")
@@ -57,7 +59,9 @@ def process_images_task(self, directory):
     model = genai.GenerativeModel("gemini-2.0-flash")
 
     # Charger le prompt
-    prompt_path = os.path.join(settings.BASE_DIR, 'observations', 'json_rep', 'prompt_gemini_transcription.txt')
+    prompt_path = os.path.join(
+        settings.BASE_DIR, 'observations', 'json_rep', 'prompt_gemini_transcription.txt'
+    )
     try:
         with open(prompt_path, encoding='utf-8') as f:
             prompt = f.read()
@@ -86,8 +90,8 @@ def process_images_task(self, directory):
                 'total': total_files,
                 'current_file': current_file,
                 'percent': int((index / total_files) * 100),
-                'recent_results': results[-5:] if results else []
-            }
+                'recent_results': results[-5:] if results else [],
+            },
         )
 
         try:
@@ -114,12 +118,16 @@ def process_images_task(self, directory):
                 # Validation et correction
                 erreurs = validate_json_structure(json_data)
                 if erreurs:
-                    logger.warning(f"Structure JSON invalide pour {img_file}, correction en cours. Erreurs: {erreurs}")
+                    logger.warning(
+                        f"Structure JSON invalide pour {img_file}, correction en cours. Erreurs: {erreurs}"
+                    )
                     json_data_raw = copy.deepcopy(json_data)
                     json_data = corriger_json(json_data_raw)
 
                     # Enregistrement du JSON brut
-                    raw_path = os.path.join(results_dir, f"{os.path.splitext(img_file)[0]}_raw.json")
+                    raw_path = os.path.join(
+                        results_dir, f"{os.path.splitext(img_file)[0]}_raw.json"
+                    )
                     with open(raw_path, 'w', encoding='utf-8') as f:
                         json.dump(json_data_raw, f, indent=2, ensure_ascii=False)
 
@@ -130,14 +138,16 @@ def process_images_task(self, directory):
                 with open(json_path, 'w', encoding='utf-8') as f:
                     json.dump(json_data, f, indent=2, ensure_ascii=False)
 
-                logger.info(f"Transcription réussie pour {img_file}, durée: {round(time.time() - file_start, 2)}s")
+                logger.info(
+                    f"Transcription réussie pour {img_file}, durée: {round(time.time() - file_start, 2)}s"
+                )
 
                 # Résultat pour cette image
                 file_result = {
                     'filename': img_file,
                     'status': 'success',
                     'json_path': json_filename,
-                    'duration': round(time.time() - file_start, 2)
+                    'duration': round(time.time() - file_start, 2),
                 }
             else:
                 raise ValueError("Données JSON vides ou invalides")
@@ -148,7 +158,7 @@ def process_images_task(self, directory):
                 'filename': img_file,
                 'status': 'error',
                 'error': str(e),
-                'duration': round(time.time() - file_start, 2)
+                'duration': round(time.time() - file_start, 2),
             }
 
         results.append(file_result)
@@ -165,7 +175,7 @@ def process_images_task(self, directory):
         'processed': total_files,
         'total': total_files,
         'success_count': success_count,
-        'success_rate': round((success_count / total_files) * 100, 1) if total_files > 0 else 0
+        'success_rate': round((success_count / total_files) * 100, 1) if total_files > 0 else 0,
     }
     logger.info(f"Task completed successfully, returning: {final_result}")
     return final_result

@@ -7,8 +7,17 @@ from .models import Utilisateur
 
 class UtilisateurAdmin(UserAdmin):
     """administration personnalisée pour le modèle Utilisateur"""
+
     list_display = (
-    'username', 'email', 'first_name', 'last_name', 'role', 'est_valide', 'est_transcription', 'is_active')
+        'username',
+        'email',
+        'first_name',
+        'last_name',
+        'role',
+        'est_valide',
+        'est_transcription',
+        'is_active',
+    )
     list_filter = ('role', 'est_valide', 'est_transcription', 'is_active')
     search_fields = ('username', 'email', 'first_name', 'last_name')
 

@@ -33,11 +33,9 @@ class Espece(models.Model):
     nom_anglais = models.CharField(max_length=100, blank=True)
     nom_scientifique = models.CharField(max_length=100, blank=True)
     statut = models.CharField(max_length=50, blank=True)
-    famille = models.ForeignKey(Famille,
-                                on_delete=models.SET_NULL,
-                                blank=True,
-                                null=True,
-                                related_name='especes')
+    famille = models.ForeignKey(
+        Famille, on_delete=models.SET_NULL, blank=True, null=True, related_name='especes'
+    )
     commentaire = models.TextField(blank=True, default="")
     lien_oiseau_net = models.URLField(blank=True)
     valide_par_admin = models.BooleanField(default=False)
@@ -49,7 +47,9 @@ class Espece(models.Model):
 class FicheObservation(models.Model):
     num_fiche = models.AutoField(primary_key=True)
     date_creation = models.DateTimeField(auto_now_add=True)
-    observateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name="fiches", db_index=True)
+    observateur = models.ForeignKey(
+        Utilisateur, on_delete=models.CASCADE, related_name="fiches", db_index=True
+    )
     espece = models.ForeignKey(Espece, on_delete=models.PROTECT, related_name="observations")
     annee = models.IntegerField()
     chemin_image = models.CharField(max_length=255, blank=True)
@@ -81,8 +81,8 @@ class FicheObservation(models.Model):
                     'coordonnees': '0,0',
                     'altitude': '0',
                     'paysage': 'Non spécifié',
-                    'alentours': 'Non spécifié'
-                }
+                    'alentours': 'Non spécifié',
+                },
             )
 
             # Créer l'objet Nid s'il n'existe pas
@@ -92,8 +92,8 @@ class FicheObservation(models.Model):
                     'nid_prec_t_meme_couple': False,
                     'hauteur_nid': 0,
                     'hauteur_couvert': 0,
-                    'details_nid': 'Aucun détail'
-                }
+                    'details_nid': 'Aucun détail',
+                },
             )
 
             # Créer l'objet ResumeObservation s'il n'existe pas
@@ -103,23 +103,22 @@ class FicheObservation(models.Model):
                     'nombre_oeufs_pondus': 0,
                     'nombre_oeufs_eclos': 0,
                     'nombre_oeufs_non_eclos': 0,
-                    'nombre_poussins': 0
-                }
+                    'nombre_poussins': 0,
+                },
             )
 
             # Créer l'objet CausesEchec s'il n'existe pas
             CausesEchec.objects.get_or_create(
-                fiche=self,
-                defaults={
-                    'description': 'Aucune cause identifiée'
-                }
+                fiche=self, defaults={'description': 'Aucune cause identifiée'}
             )
 
             logger.info(f"Fiche d'observation #{self.num_fiche} créée avec tous les objets liés")
 
 
 class Localisation(models.Model):
-    fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="localisation")
+    fiche = models.OneToOneField(
+        FicheObservation, on_delete=models.CASCADE, related_name="localisation"
+    )
     commune = models.CharField(max_length=30, default='Non spécifiée')
     lieu_dit = models.CharField(max_length=30, default='Non spécifiée')
     departement = models.CharField(max_length=5, default='00')
@@ -146,7 +145,9 @@ class Nid(models.Model):
 
 
 class Observation(models.Model):
-    fiche = models.ForeignKey('FicheObservation', on_delete=models.CASCADE, related_name="observations")
+    fiche = models.ForeignKey(
+        'FicheObservation', on_delete=models.CASCADE, related_name="observations"
+    )
     date_observation = models.DateTimeField(blank=False, null=False, db_index=True)
     nombre_oeufs = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     nombre_poussins = models.IntegerField(default=0, validators=[MinValueValidator(0)])
@@ -156,14 +157,14 @@ class Observation(models.Model):
         return f"Observation du {self.date_observation.strftime('%d/%m/%Y %H:%M')} (Fiche {self.fiche.num_fiche})"
 
     def save(self, *args, **kwargs):
-        logger.info(f"Nouvelle observation ajoutée : Fiche {self.fiche.num_fiche} à {self.date_observation}")
+        logger.info(
+            f"Nouvelle observation ajoutée : Fiche {self.fiche.num_fiche} à {self.date_observation}"
+        )
         super().save(*args, **kwargs)
 
 
 class ResumeObservation(models.Model):
-    fiche = models.OneToOneField(
-        FicheObservation, on_delete=models.CASCADE, related_name="resume"
-    )
+    fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="resume")
 
     # Dates partielles (jour/mois) : valeurs optionnelles + bornes
     premier_oeuf_pondu_jour = models.PositiveSmallIntegerField(
@@ -199,33 +200,50 @@ class ResumeObservation(models.Model):
             models.CheckConstraint(
                 name="resume_premier_oeuf_pondu_jour_mois_both_or_none",
                 check=(
-                    (Q(premier_oeuf_pondu_jour__isnull=True) & Q(premier_oeuf_pondu_mois__isnull=True)) |
-                    (Q(premier_oeuf_pondu_jour__isnull=False) & Q(premier_oeuf_pondu_mois__isnull=False))
+                    (
+                        Q(premier_oeuf_pondu_jour__isnull=True)
+                        & Q(premier_oeuf_pondu_mois__isnull=True)
+                    )
+                    | (
+                        Q(premier_oeuf_pondu_jour__isnull=False)
+                        & Q(premier_oeuf_pondu_mois__isnull=False)
+                    )
                 ),
             ),
             models.CheckConstraint(
                 name="resume_premier_poussin_eclos_jour_mois_both_or_none",
                 check=(
-                    (Q(premier_poussin_eclos_jour__isnull=True) & Q(premier_poussin_eclos_mois__isnull=True)) |
-                    (Q(premier_poussin_eclos_jour__isnull=False) & Q(premier_poussin_eclos_mois__isnull=False))
+                    (
+                        Q(premier_poussin_eclos_jour__isnull=True)
+                        & Q(premier_poussin_eclos_mois__isnull=True)
+                    )
+                    | (
+                        Q(premier_poussin_eclos_jour__isnull=False)
+                        & Q(premier_poussin_eclos_mois__isnull=False)
+                    )
                 ),
             ),
             models.CheckConstraint(
                 name="resume_premier_poussin_volant_jour_mois_both_or_none",
                 check=(
-                    (Q(premier_poussin_volant_jour__isnull=True) & Q(premier_poussin_volant_mois__isnull=True)) |
-                    (Q(premier_poussin_volant_jour__isnull=False) & Q(premier_poussin_volant_mois__isnull=False))
+                    (
+                        Q(premier_poussin_volant_jour__isnull=True)
+                        & Q(premier_poussin_volant_mois__isnull=True)
+                    )
+                    | (
+                        Q(premier_poussin_volant_jour__isnull=False)
+                        & Q(premier_poussin_volant_mois__isnull=False)
+                    )
                 ),
             ),
-
             # Compteurs cohérents
             models.CheckConstraint(
                 name="resume_counts_non_negative",
                 check=(
-                    Q(nombre_oeufs_pondus__gte=0) &
-                    Q(nombre_oeufs_eclos__gte=0) &
-                    Q(nombre_oeufs_non_eclos__gte=0) &
-                    Q(nombre_poussins__gte=0)
+                    Q(nombre_oeufs_pondus__gte=0)
+                    & Q(nombre_oeufs_eclos__gte=0)
+                    & Q(nombre_oeufs_non_eclos__gte=0)
+                    & Q(nombre_poussins__gte=0)
                 ),
             ),
             models.CheckConstraint(
@@ -247,7 +265,9 @@ class ResumeObservation(models.Model):
 
 
 class CausesEchec(models.Model):
-    fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="causes_echec")
+    fiche = models.OneToOneField(
+        FicheObservation, on_delete=models.CASCADE, related_name="causes_echec"
+    )
     description = models.TextField(blank=True, default='Aucune cause identifiée')
 
     def __str__(self):
@@ -268,20 +288,19 @@ class Remarque(models.Model):
 
 
 class Validation(models.Model):
-    fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="validations")
+    fiche = models.ForeignKey(
+        FicheObservation, on_delete=models.CASCADE, related_name="validations"
+    )
     reviewer = models.ForeignKey(
         Utilisateur, on_delete=models.CASCADE, limit_choices_to={'role': 'reviewer'}
     )
 
-    STATUTS = [
-        ('en_cours', 'En cours'),
-        ('validee', 'Validée'),
-        ('rejete', 'Rejetée')
-    ]
+    STATUTS = [('en_cours', 'En cours'), ('validee', 'Validée'), ('rejete', 'Rejetée')]
 
     statut = models.CharField(max_length=10, choices=STATUTS, default='en_cours')
 
     date_modification = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         ordering = ['-date_modification']  # Les plus récentes en premier
 
@@ -297,11 +316,10 @@ class Validation(models.Model):
                     validation=self,
                     ancien_statut=ancienne_instance.statut,
                     nouveau_statut=self.statut,
-                    modifie_par=self.reviewer
+                    modifie_par=self.reviewer,
                 )
 
         super().save(*args, **kwargs)
-
 
 
 class HistoriqueValidation(models.Model):
@@ -319,7 +337,9 @@ class HistoriqueValidation(models.Model):
 
 
 class HistoriqueModification(models.Model):
-    fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="modifications")
+    fiche = models.ForeignKey(
+        FicheObservation, on_delete=models.CASCADE, related_name="modifications"
+    )
     champ_modifie = models.CharField(max_length=100)
     ancienne_valeur = models.TextField()
     nouvelle_valeur = models.TextField()
@@ -333,7 +353,7 @@ class HistoriqueModification(models.Model):
         ('localisation', 'Localisation'),
         ('nid', 'Nid'),
         ('resume_observation', 'Résumé Observation'),
-        ('causes_echec', 'Causes d’échec')
+        ('causes_echec', 'Causes d’échec'),
     ]
     categorie = models.CharField(max_length=20, choices=CATEGORIES, default='fiche', db_index=True)
 

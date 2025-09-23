@@ -68,8 +68,7 @@ def importer_json(request):
         logger.info(f"Répertoire créé: {base_dir}")
 
     # Liste tous les sous-répertoires (pas les fichiers)
-    directories = [d for d in os.listdir(base_dir)
-                   if os.path.isdir(os.path.join(base_dir, d))]
+    directories = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
 
     if request.method == 'POST':
         repertoire = request.POST.get('repertoire')
@@ -88,7 +87,7 @@ def importer_json(request):
             request,
             f"Importation terminée: {resultats['reussis']} fichiers importés, "
             f"{resultats['ignores']} fichiers ignorés (déjà importés), "
-            f"{len(resultats['erreurs'])} erreurs"
+            f"{len(resultats['erreurs'])} erreurs",
         )
 
         return redirect('accueil_importation')
@@ -107,7 +106,7 @@ def extraire_candidats(request):
         messages.success(
             request,
             f"Extraction terminée: {resultats['especes_ajoutees']} nouvelles espèces, "
-            f"{resultats['utilisateurs_crees']} nouveaux utilisateurs créés"
+            f"{resultats['utilisateurs_crees']} nouveaux utilisateurs créés",
         )
 
         return redirect('accueil_importation')
@@ -146,7 +145,7 @@ def liste_especes_candidates(request):
         'especes': especes_page,
         'recherche': recherche,
         'statut': statut,
-        'especes_validees': especes_validees
+        'especes_validees': especes_validees,
     }
 
     return render(request, 'importation/liste_especes_candidates.html', context)
@@ -171,7 +170,7 @@ def valider_espece(request, espece_id):
 
                 messages.success(
                     request,
-                    f"L'espèce '{espece_candidate.nom_transcrit}' a été associée à '{espece_validee.nom}'"
+                    f"L'espèce '{espece_candidate.nom_transcrit}' a été associée à '{espece_validee.nom}'",
                 )
             except Espece.DoesNotExist:
                 messages.error(request, "L'espèce sélectionnée n'existe pas")
@@ -190,13 +189,13 @@ def valider_espece(request, espece_id):
 
                     messages.success(
                         request,
-                        f"L'espèce '{espece_candidate.nom_transcrit}' a été associée à l'espèce existante '{espece_existante.nom}'"
+                        f"L'espèce '{espece_candidate.nom_transcrit}' a été associée à l'espèce existante '{espece_existante.nom}'",
                     )
                 else:
                     # Sinon, créer une nouvelle espèce
                     nouvelle_espece = Espece.objects.create(
                         nom=nom_espece.strip(),
-                        valide_par_admin=True  # Validée par un admin
+                        valide_par_admin=True,  # Validée par un admin
                     )
 
                     espece_candidate.espece_validee = nouvelle_espece
@@ -205,15 +204,18 @@ def valider_espece(request, espece_id):
 
                     messages.success(
                         request,
-                        f"Une nouvelle espèce '{nouvelle_espece.nom}' a été créée et associée à '{espece_candidate.nom_transcrit}'"
+                        f"Une nouvelle espèce '{nouvelle_espece.nom}' a été créée et associée à '{espece_candidate.nom_transcrit}'",
                     )
             except Exception as e:
                 messages.error(request, f"Erreur lors de la création de l'espèce: {str(e)}")
         else:
-            messages.error(request,
-                           "Veuillez soit sélectionner une espèce existante, soit saisir un nouveau nom d'espèce")
+            messages.error(
+                request,
+                "Veuillez soit sélectionner une espèce existante, soit saisir un nouveau nom d'espèce",
+            )
 
     return redirect('liste_especes_candidates')
+
 
 @login_required
 @user_passes_test(est_admin)
@@ -225,10 +227,7 @@ def creer_nouvelle_espece(request):
 
         if nom_espece:
             # Créer la nouvelle espèce
-            espece = Espece.objects.create(
-                nom=nom_espece,
-                valide_par_admin=True
-            )
+            espece = Espece.objects.create(nom=nom_espece, valide_par_admin=True)
 
             # Si une espèce candidate est spécifiée, l'associer
             if espece_candidate_id:
@@ -240,7 +239,7 @@ def creer_nouvelle_espece(request):
 
                     messages.success(
                         request,
-                        f"Nouvelle espèce '{nom_espece}' créée et associée à '{espece_candidate.nom_transcrit}'"
+                        f"Nouvelle espèce '{nom_espece}' créée et associée à '{espece_candidate.nom_transcrit}'",
                     )
                 except EspeceCandidate.DoesNotExist:
                     messages.success(request, f"Nouvelle espèce '{nom_espece}' créée")
@@ -261,10 +260,7 @@ def preparer_importations(request):
         service = ImportationService()
         importations_creees = service.preparer_importations()
 
-        messages.success(
-            request,
-            f"{importations_creees} importations préparées pour traitement"
-        )
+        messages.success(request, f"{importations_creees} importations préparées pour traitement")
 
         return redirect('liste_importations')
 
@@ -289,10 +285,7 @@ def liste_importations(request):
     page = request.GET.get('page', 1)
     importations_page = paginator.get_page(page)
 
-    context = {
-        'importations': importations_page,
-        'statut': statut
-    }
+    context = {'importations': importations_page, 'statut': statut}
 
     return render(request, 'importation/liste_importations.html', context)
 
@@ -310,7 +303,7 @@ def detail_importation(request, importation_id):
     context = {
         'importation': importation,
         'transcription': transcription,
-        'donnees_json': donnees_json
+        'donnees_json': donnees_json,
     }
 
     return render(request, 'importation/detail_importation.html', context)
@@ -350,14 +343,12 @@ def resume_importation(request):
     observateurs_transcription = Utilisateur.objects.filter(est_transcription=True).count()
 
     # Fiches
-    fiches_importees = FicheObservation.objects.filter(
-        observateur__est_transcription=True
-    ).count()
+    fiches_importees = FicheObservation.objects.filter(observateur__est_transcription=True).count()
 
     # Récentes importations
-    recentes_importations = ImportationEnCours.objects.filter(
-        statut='complete'
-    ).order_by('-date_creation')[:10]
+    recentes_importations = ImportationEnCours.objects.filter(statut='complete').order_by(
+        '-date_creation'
+    )[:10]
 
     context = {
         'total_transcriptions': total_transcriptions,
@@ -404,7 +395,9 @@ def reinitialiser_toutes_importations(request):
         elif statut == 'en_attente':
             query = Q(statut='en_attente')  # Ajout de cette option
         elif statut == 'all':
-            query = Q(statut='complete') | Q(statut='erreur') | Q(statut='en_attente')  # Inclure 'en_attente'
+            query = (
+                Q(statut='complete') | Q(statut='erreur') | Q(statut='en_attente')
+            )  # Inclure 'en_attente'
 
         importations = ImportationEnCours.objects.filter(query)
         count = 0

@@ -4,5 +4,5 @@ from django.apps import AppConfig
 
 class AdministrationConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'administration'              # chemin du package (minuscule)
+    name = 'administration'  # chemin du package (minuscule)
     verbose_name = "administration des utilisateurs"

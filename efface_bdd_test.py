@@ -24,7 +24,9 @@ from observations.models import (
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
 django.setup()
 # Confirmation de l'utilisateur
-confirmation = input("⚠️ Cette opération va supprimer TOUTES les données liées aux fiches d'observation, aux transcriptions, et aux utilisateurs de test.\nSouhaitez-vous vraiment continuer ? (oui/non) : ")
+confirmation = input(
+    "⚠️ Cette opération va supprimer TOUTES les données liées aux fiches d'observation, aux transcriptions, et aux utilisateurs de test.\nSouhaitez-vous vraiment continuer ? (oui/non) : "
+)
 
 if confirmation.lower() != "oui":
     print("❌ Opération annulée.")

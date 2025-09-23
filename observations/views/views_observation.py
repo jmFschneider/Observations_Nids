@@ -7,6 +7,7 @@ from observations.models import FicheObservation
 
 logger = logging.getLogger('observations')
 
+
 def fiche_observation_view(request, fiche_id):
     fiche = get_object_or_404(FicheObservation, pk=fiche_id)
     localisation = fiche.localisation

@@ -8,6 +8,7 @@ from observations.models import Observation
 
 logger = logging.getLogger('observations')
 
+
 def home(request):
     logger.info("Accueil visité")
 
@@ -22,11 +23,15 @@ def home(request):
     users_count = Utilisateur.objects.count()
     observations_count = Observation.objects.count()
 
-    return render(request, 'home.html', {
-        'user': user,  # Renommé pour éviter la confusion avec le modèle
-        'users_count': users_count,
-        'observations_count': observations_count
-    })
+    return render(
+        request,
+        'home.html',
+        {
+            'user': user,  # Renommé pour éviter la confusion avec le modèle
+            'users_count': users_count,
+            'observations_count': observations_count,
+        },
+    )
 
 
 def default_view(request):

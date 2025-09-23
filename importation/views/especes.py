@@ -45,7 +45,7 @@ def liste_especes_candidates(request):
         'especes': especes_page,
         'recherche': recherche,
         'statut': statut,
-        'especes_validees': especes_validees
+        'especes_validees': especes_validees,
     }
 
     return render(request, 'importation/liste_especes_candidates.html', context)
@@ -70,7 +70,7 @@ def valider_espece(request, espece_id):
 
                 messages.success(
                     request,
-                    f"L'espèce '{espece_candidate.nom_transcrit}' a été associée à '{espece_validee.nom}'"
+                    f"L'espèce '{espece_candidate.nom_transcrit}' a été associée à '{espece_validee.nom}'",
                 )
             except Espece.DoesNotExist:
                 messages.error(request, "L'espèce sélectionnée n'existe pas")
@@ -89,13 +89,13 @@ def valider_espece(request, espece_id):
 
                     messages.success(
                         request,
-                        f"L'espèce '{espece_candidate.nom_transcrit}' a été associée à l'espèce existante '{espece_existante.nom}'"
+                        f"L'espèce '{espece_candidate.nom_transcrit}' a été associée à l'espèce existante '{espece_existante.nom}'",
                     )
                 else:
                     # Sinon, créer une nouvelle espèce
                     nouvelle_espece = Espece.objects.create(
                         nom=nom_espece.strip(),
-                        valide_par_admin=True  # Validée par un admin
+                        valide_par_admin=True,  # Validée par un admin
                     )
 
                     espece_candidate.espece_validee = nouvelle_espece
@@ -104,13 +104,15 @@ def valider_espece(request, espece_id):
 
                     messages.success(
                         request,
-                        f"Une nouvelle espèce '{nouvelle_espece.nom}' a été créée et associée à '{espece_candidate.nom_transcrit}'"
+                        f"Une nouvelle espèce '{nouvelle_espece.nom}' a été créée et associée à '{espece_candidate.nom_transcrit}'",
                     )
             except Exception as e:
                 messages.error(request, f"Erreur lors de la création de l'espèce: {str(e)}")
         else:
-            messages.error(request,
-                           "Veuillez soit sélectionner une espèce existante, soit saisir un nouveau nom d'espèce")
+            messages.error(
+                request,
+                "Veuillez soit sélectionner une espèce existante, soit saisir un nouveau nom d'espèce",
+            )
 
     return redirect('liste_especes_candidates')
 
@@ -169,7 +171,7 @@ def valider_especes_multiples(request):
                             # Sinon, créer une nouvelle espèce
                             nouvelle_espece = Espece.objects.create(
                                 nom=nom_espece,
-                                valide_par_admin=True  # Validée par un admin
+                                valide_par_admin=True,  # Validée par un admin
                             )
 
                             espece_candidate.espece_validee = nouvelle_espece
@@ -192,14 +194,13 @@ def valider_especes_multiples(request):
         # Message de résultat
         if count_success > 0:
             messages.success(
-                request,
-                f"{count_success} espèce(s) candidate(s) ont été validées avec succès."
+                request, f"{count_success} espèce(s) candidate(s) ont été validées avec succès."
             )
 
         if count_error > 0:
             messages.warning(
                 request,
-                f"{count_error} espèce(s) n'ont pas pu être validées. Vérifiez les données saisies."
+                f"{count_error} espèce(s) n'ont pas pu être validées. Vérifiez les données saisies.",
             )
 
     return redirect('liste_especes_candidates')
@@ -215,10 +216,7 @@ def creer_nouvelle_espece(request):
 
         if nom_espece:
             # Créer la nouvelle espèce
-            espece = Espece.objects.create(
-                nom=nom_espece,
-                valide_par_admin=True
-            )
+            espece = Espece.objects.create(nom=nom_espece, valide_par_admin=True)
 
             # Si une espèce candidate est spécifiée, l'associer
             if espece_candidate_id:
@@ -230,7 +228,7 @@ def creer_nouvelle_espece(request):
 
                     messages.success(
                         request,
-                        f"Nouvelle espèce '{nom_espece}' créée et associée à '{espece_candidate.nom_transcrit}'"
+                        f"Nouvelle espèce '{nom_espece}' créée et associée à '{espece_candidate.nom_transcrit}'",
                     )
                 except EspeceCandidate.DoesNotExist:
                     messages.success(request, f"Nouvelle espèce '{nom_espece}' créée")

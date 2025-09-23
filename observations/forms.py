@@ -49,13 +49,17 @@ class LocalisationForm(forms.ModelForm):
             'longitude',
             'altitude',
             'paysage',
-            'alentours'
+            'alentours',
         ]
         widgets = {
             'commune': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Commune'}),
             'lieu_dit': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Lieu-dit'}),
-            'departement': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Département'}),
-            'coordonnees': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Coordonnées'}),
+            'departement': forms.TextInput(
+                attrs={'class': 'form-field', 'placeholder': 'Département'}
+            ),
+            'coordonnees': forms.TextInput(
+                attrs={'class': 'form-field', 'placeholder': 'Coordonnées'}
+            ),
             'latitude': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Latitude'}),
             'longitude': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Longitude'}),
             'altitude': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Altitude'}),
@@ -75,15 +79,16 @@ class ObservationForm(forms.ModelForm):
         fields = ['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations']
         widgets = {
             'date_observation': forms.DateTimeInput(
-                attrs={'type': 'datetime-local'}, 
-                format='%Y-%m-%dT%H:%M'
+                attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'
             ),
-            'observations': forms.Textarea(attrs={
-                'class': 'section-content',
-                'rows': 1,
-                'placeholder': 'Observation',
-                'style': 'min-height: 30px; width: 250px; max-width: 100%; resize: vertical;'
-            }),
+            'observations': forms.Textarea(
+                attrs={
+                    'class': 'section-content',
+                    'rows': 1,
+                    'placeholder': 'Observation',
+                    'style': 'min-height: 30px; width: 250px; max-width: 100%; resize: vertical;',
+                }
+            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -91,7 +96,9 @@ class ObservationForm(forms.ModelForm):
         # Make sure date_observation is properly formatted for the datetime-local input
         if self.instance.pk and self.instance.date_observation:
             # Format the existing date for the datetime-local input
-            self.initial['date_observation'] = self.instance.date_observation.strftime('%Y-%m-%dT%H:%M')
+            self.initial['date_observation'] = self.instance.date_observation.strftime(
+                '%Y-%m-%dT%H:%M'
+            )
 
     def clean_date_observation(self):
         """
@@ -120,17 +127,30 @@ class ResumeObservationForm(forms.ModelForm):
             'nombre_poussins',
         ]
         widgets = {
-            'premier_oeuf_pondu_jour': forms.NumberInput(attrs={'placeholder': 'Jour', 'min': 1, 'max': 31}),
-            'premier_oeuf_pondu_mois': forms.NumberInput(attrs={'placeholder': 'Mois', 'min': 1, 'max': 12}),
-            'premier_poussin_eclos_jour': forms.NumberInput(attrs={'placeholder': 'Jour', 'min': 1, 'max': 31}),
-            'premier_poussin_eclos_mois': forms.NumberInput(attrs={'placeholder': 'Mois', 'min': 1, 'max': 12}),
-            'premier_poussin_volant_jour': forms.NumberInput(attrs={'placeholder': 'Jour', 'min': 1, 'max': 31}),
-            'premier_poussin_volant_mois': forms.NumberInput(attrs={'placeholder': 'Mois', 'min': 1, 'max': 12}),
+            'premier_oeuf_pondu_jour': forms.NumberInput(
+                attrs={'placeholder': 'Jour', 'min': 1, 'max': 31}
+            ),
+            'premier_oeuf_pondu_mois': forms.NumberInput(
+                attrs={'placeholder': 'Mois', 'min': 1, 'max': 12}
+            ),
+            'premier_poussin_eclos_jour': forms.NumberInput(
+                attrs={'placeholder': 'Jour', 'min': 1, 'max': 31}
+            ),
+            'premier_poussin_eclos_mois': forms.NumberInput(
+                attrs={'placeholder': 'Mois', 'min': 1, 'max': 12}
+            ),
+            'premier_poussin_volant_jour': forms.NumberInput(
+                attrs={'placeholder': 'Jour', 'min': 1, 'max': 31}
+            ),
+            'premier_poussin_volant_mois': forms.NumberInput(
+                attrs={'placeholder': 'Mois', 'min': 1, 'max': 12}
+            ),
             'nombre_oeufs_pondus': forms.NumberInput(attrs={'min': 0}),
             'nombre_oeufs_eclos': forms.NumberInput(attrs={'min': 0}),
             'nombre_oeufs_non_eclos': forms.NumberInput(attrs={'min': 0}),
             'nombre_poussins': forms.NumberInput(attrs={'min': 0}),
         }
+
 
 # utilisation de la form Django personnalisé avec mon css
 class NidForm(forms.ModelForm):
@@ -144,21 +164,15 @@ class NidForm(forms.ModelForm):
         ]
         widgets = {
             'nid_prec_t_meme_couple': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'hauteur_nid': forms.NumberInput(attrs={
-                'class': 'form-field',
-                'placeholder': 'hauteur_nid',
-                'min': 0
-            }),
-            'hauteur_couvert': forms.NumberInput(attrs={
-                'class': 'form-field',
-                'placeholder': 'hauteur_couvert',
-                'min': 0
-            }),
-            'details_nid': forms.Textarea(attrs={
-                'class': 'section-content',
-                'rows': 2,
-                'placeholder': 'Détails du nid'
-            }),
+            'hauteur_nid': forms.NumberInput(
+                attrs={'class': 'form-field', 'placeholder': 'hauteur_nid', 'min': 0}
+            ),
+            'hauteur_couvert': forms.NumberInput(
+                attrs={'class': 'form-field', 'placeholder': 'hauteur_couvert', 'min': 0}
+            ),
+            'details_nid': forms.Textarea(
+                attrs={'class': 'section-content', 'rows': 2, 'placeholder': 'Détails du nid'}
+            ),
         }
 
 
@@ -180,6 +194,7 @@ class RemarqueForm(forms.ModelForm):
         widgets = {
             'remarque': forms.TextInput(attrs={'placeholder': 'Entrez une remarque'}),
         }
+
 
 #
 # class UtilisateurForm(forms.ModelForm):

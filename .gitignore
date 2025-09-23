@@ -1,3 +1,50 @@
 # .gitignore
+
+# Environnement et configuration
 .env
 observations_nids/settings_local.py
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Fichiers de backup
+*.bak
+*~
+*.swp
+*.swo
+.DS_Store
+
+# Environnements virtuels
+venv/
+.venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/media/
+
+# Cache et compilation
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.cover
+*.coverage
+htmlcov/
+
+# OS
+Thumbs.db
+.DS_Store

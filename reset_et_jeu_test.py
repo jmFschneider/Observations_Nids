@@ -28,7 +28,9 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
 django.setup()
 
 # Confirmation
-confirmation = input("⚠️ Cette opération va supprimer toutes les données ET recréer un jeu de test.\nSouhaitez-vous continuer ? (oui/non) : ")
+confirmation = input(
+    "⚠️ Cette opération va supprimer toutes les données ET recréer un jeu de test.\nSouhaitez-vous continuer ? (oui/non) : "
+)
 if confirmation.lower() != "oui":
     print("❌ Opération annulée.")
     sys.exit()
@@ -64,8 +66,8 @@ user, created = Utilisateur.objects.get_or_create(
         'email': 'test@exemple.com',
         'role': 'observateur',
         'est_valide': True,
-        'est_transcription': True
-    }
+        'est_transcription': True,
+    },
 )
 if created:
     user.set_password('mdptest')
@@ -76,10 +78,7 @@ espece, _ = Espece.objects.get_or_create(nom="Mésange charbonnière", valide_pa
 print("🕊️ Espèce : Mésange charbonnière")
 
 fiche = FicheObservation.objects.create(
-    observateur=user,
-    espece=espece,
-    annee=2023,
-    chemin_image="test.jpg"
+    observateur=user, espece=espece, annee=2023, chemin_image="test.jpg"
 )
 print("📄 Fiche d’observation créée.")
 
@@ -101,7 +100,7 @@ Observation.objects.create(
     date_observation=timezone.make_aware(datetime(2023, 4, 15, 10, 0)),
     nombre_oeufs=6,
     nombre_poussins=4,
-    observations="Nourrissage actif"
+    observations="Nourrissage actif",
 )
 
 fiche.resume.nombre_oeufs_pondus = 6

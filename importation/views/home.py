@@ -58,14 +58,12 @@ def resume_importation(request):
     observateurs_transcription = Utilisateur.objects.filter(est_transcription=True).count()
 
     # Fiches
-    fiches_importees = FicheObservation.objects.filter(
-        observateur__est_transcription=True
-    ).count()
+    fiches_importees = FicheObservation.objects.filter(observateur__est_transcription=True).count()
 
     # Récentes importations
-    recentes_importations = ImportationEnCours.objects.filter(
-        statut='complete'
-    ).order_by('-date_creation')[:10]
+    recentes_importations = ImportationEnCours.objects.filter(statut='complete').order_by(
+        '-date_creation'
+    )[:10]
 
     context = {
         'total_transcriptions': total_transcriptions,

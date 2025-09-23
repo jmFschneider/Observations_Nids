@@ -32,10 +32,10 @@ def liste_utilisateurs(request):
     # Appliquer les filtres
     if recherche:
         utilisateurs = utilisateurs.filter(
-        Q(username__icontains=recherche) |
-        Q(first_name__icontains=recherche) |
-        Q(last_name__icontains=recherche) |
-        Q(email__icontains=recherche)
+            Q(username__icontains=recherche)
+            | Q(first_name__icontains=recherche)
+            | Q(last_name__icontains=recherche)
+            | Q(email__icontains=recherche)
         )
 
     if role != 'tous':
@@ -63,7 +63,9 @@ def creer_utilisateur(request):
         form = UtilisateurCreationForm(request.POST)
         if form.is_valid():
             utilisateur = form.save()
-            messages.success(request, f"L'utilisateur {utilisateur.username} a été créé avec succès")
+            messages.success(
+                request, f"L'utilisateur {utilisateur.username} a été créé avec succès"
+            )
             return redirect('liste_utilisateurs')
     else:
         form = UtilisateurCreationForm()
@@ -81,12 +83,18 @@ def modifier_utilisateur(request, user_id):
         form = UtilisateurChangeForm(request.POST, instance=utilisateur)
         if form.is_valid():
             form.save()
-            messages.success(request, f"L'utilisateur {utilisateur.username} a été modifié avec succès")
+            messages.success(
+                request, f"L'utilisateur {utilisateur.username} a été modifié avec succès"
+            )
             return redirect('liste_utilisateurs')
     else:
         form = UtilisateurChangeForm(instance=utilisateur)
 
-    return render(request, 'administration/modifier_utilisateur.html', {'form': form, 'utilisateur': utilisateur})
+    return render(
+        request,
+        'administration/modifier_utilisateur.html',
+        {'form': form, 'utilisateur': utilisateur},
+    )
 
 
 @login_required
@@ -130,7 +138,7 @@ def detail_utilisateur(request, user_id):
         'utilisateur': utilisateur,
         'observations_count': fiches.count(),  # More efficient than len()
         'fiches': fiches_page,
-        'page_obj': fiches_page  # For pagination template
+        'page_obj': fiches_page,  # For pagination template
     }
 
     # Si c'est une requête AJAX, renvoyer uniquement le contenu du détail
@@ -142,6 +150,7 @@ def detail_utilisateur(request, user_id):
 
 # administration/admin_views.py (ajout)
 
+
 def inscription_publique(request):
     """Vue pour l'inscription publique des utilisateurs (sans authentification requise)"""
     if request.method == 'POST':
@@ -151,11 +160,13 @@ def inscription_publique(request):
             utilisateur.est_valide = False
             utilisateur.role = 'observateur'
             utilisateur.save()
-            logger.info(f"Nouvelle demande d'inscription reçue : {utilisateur.username} ({utilisateur.email})")
+            logger.info(
+                f"Nouvelle demande d'inscription reçue : {utilisateur.username} ({utilisateur.email})"
+            )
 
             messages.success(
                 request,
-                "Votre demande d'inscription a été enregistrée. Un administrateur devra l'approuver avant que vous puissiez vous connecter."
+                "Votre demande d'inscription a été enregistrée. Un administrateur devra l'approuver avant que vous puissiez vous connecter.",
             )
             return redirect('accueil')  # ou '/' selon ta configuration
         else:

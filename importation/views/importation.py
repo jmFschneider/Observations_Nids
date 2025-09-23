@@ -31,8 +31,7 @@ def importer_json(request):
         logger.info(f"Répertoire créé: {base_dir}")
 
     # Liste tous les sous-répertoires (pas les fichiers)
-    directories = [d for d in os.listdir(base_dir)
-                   if os.path.isdir(os.path.join(base_dir, d))]
+    directories = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
 
     if request.method == 'POST':
         repertoire = request.POST.get('repertoire')
@@ -51,7 +50,7 @@ def importer_json(request):
             request,
             f"Importation terminée: {resultats['reussis']} fichiers importés, "
             f"{resultats['ignores']} fichiers ignorés (déjà importés), "
-            f"{len(resultats['erreurs'])} erreurs"
+            f"{len(resultats['erreurs'])} erreurs",
         )
 
         return redirect('accueil_importation')
@@ -70,7 +69,7 @@ def extraire_candidats(request):
         messages.success(
             request,
             f"Extraction terminée: {resultats['especes_ajoutees']} nouvelles espèces, "
-            f"{resultats['utilisateurs_crees']} nouveaux utilisateurs créés"
+            f"{resultats['utilisateurs_crees']} nouveaux utilisateurs créés",
         )
 
         return redirect('accueil_importation')
@@ -86,10 +85,7 @@ def preparer_importations(request):
         service = ImportationService()
         importations_creees = service.preparer_importations()
 
-        messages.success(
-            request,
-            f"{importations_creees} importations préparées pour traitement"
-        )
+        messages.success(request, f"{importations_creees} importations préparées pour traitement")
 
         return redirect('liste_importations')
 
@@ -114,10 +110,7 @@ def liste_importations(request):
     page = request.GET.get('page', 1)
     importations_page = paginator.get_page(page)
 
-    context = {
-        'importations': importations_page,
-        'statut': statut
-    }
+    context = {'importations': importations_page, 'statut': statut}
 
     return render(request, 'importation/liste_importations.html', context)
 
@@ -135,7 +128,7 @@ def detail_importation(request, importation_id):
     context = {
         'importation': importation,
         'transcription': transcription,
-        'donnees_json': donnees_json
+        'donnees_json': donnees_json,
     }
 
     return render(request, 'importation/detail_importation.html', context)
@@ -191,7 +184,9 @@ def reinitialiser_toutes_importations(request):
         elif statut == 'en_attente':
             query = Q(statut='en_attente')  # Ajout de cette option
         elif statut == 'all':
-            query = Q(statut='complete') | Q(statut='erreur') | Q(statut='en_attente')  # Inclure 'en_attente'
+            query = (
+                Q(statut='complete') | Q(statut='erreur') | Q(statut='en_attente')
+            )  # Inclure 'en_attente'
 
         importations = ImportationEnCours.objects.filter(query)
         count = 0
