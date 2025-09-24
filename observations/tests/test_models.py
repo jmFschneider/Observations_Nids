@@ -1,13 +1,10 @@
 """Tests des modèles du module observations."""
 import pytest
 from django.core.exceptions import ValidationError
+
 from observations.models import (
-    CausesEchec,
     FicheObservation,
-    Localisation,
-    Nid,
     Observation,
-    ResumeObservation,
 )
 
 

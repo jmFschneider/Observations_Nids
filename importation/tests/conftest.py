@@ -1,6 +1,7 @@
 """Fixtures spécifiques au module importation."""
 import pytest
-from importation.models import TranscriptionBrute, EspeceCandidate
+
+from importation.models import EspeceCandidate, TranscriptionBrute
 
 
 @pytest.fixture

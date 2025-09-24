@@ -1,7 +1,8 @@
 """Tests du service d'importation."""
 import pytest
+
 from importation.importation_service import ImportationService
-from importation.models import EspeceCandidate, ImportationEnCours, TranscriptionBrute
+from importation.models import EspeceCandidate, ImportationEnCours
 
 
 @pytest.mark.django_db

@@ -1,6 +1,7 @@
 """Fixtures spécifiques au module observations."""
 import pytest
-from observations.models import Espece, FicheObservation, Famille
+
+from observations.models import Espece, Famille, FicheObservation
 
 
 @pytest.fixture

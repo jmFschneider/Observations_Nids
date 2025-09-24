@@ -20,6 +20,11 @@ $FlowerPort   = 5555
 # Nom du module Celery (projet)
 $CeleryApp    = "observations_nids"
 
+$script:PidFile = Join-Path $env:TEMP "nids-devstack.pids"
+# Réinitialiser le fichier PID à chaque démarrage
+Set-Content -Path $script:PidFile -Value "" -Encoding ASCII -Force
+
+
 # === FONCTIONS ===
 
 function Wait-PortReady {
@@ -48,16 +53,23 @@ function Start-Window {
         [Parameter(Mandatory=$true)][string]$Command,
         [string]$WorkingDirectory = $ProjectDir
     )
-    # Nouvelle fenêtre PowerShell : on active le venv puis on exécute la commande
     $full = @"
 `$Host.UI.RawUI.WindowTitle = '$Title';
 if (Test-Path '$VenvActivate') { . '$VenvActivate' };
 $Command
 "@
-    Start-Process -FilePath "powershell.exe" `
+
+    # IMPORTANT: -PassThru pour récupérer l'objet Process et donc le PID
+    $proc = Start-Process -FilePath "powershell.exe" `
         -ArgumentList "-NoLogo","-NoExit","-ExecutionPolicy","Bypass","-Command",$full `
-        -WorkingDirectory $WorkingDirectory | Out-Null
+        -WorkingDirectory $WorkingDirectory -PassThru
+
+    # Enregistrer le PID pour l'arrêt
+    if ($script:PidFile) { Add-Content -Path $script:PidFile -Value $proc.Id }
+
+    return $proc
 }
+
 
 # === DÉBUT ===
 
