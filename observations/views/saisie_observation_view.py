@@ -1,18 +1,17 @@
 # observations/views/saisie_observation_view.py
 import logging
-from datetime import datetime  # import datetime as dt
+from datetime import datetime
 from typing import cast
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.forms import inlineformset_factory
-from django.forms.models import model_to_dict
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from administration.models import Utilisateur  # <-- adapte le chemin
-
-# from django.utils import timezone
+from accounts.models import Utilisateur
+from audit.models import HistoriqueModification
 from observations.forms import (
     CausesEchecForm,
     FicheObservationForm,
@@ -22,13 +21,100 @@ from observations.forms import (
     RemarqueForm,
     ResumeObservationForm,
 )
-from observations.models import FicheObservation, HistoriqueModification, Observation, Remarque
-
-# from observations.views.ajouter_observation import ajouter_observation
+from observations.models import FicheObservation, Observation, Remarque
 
 logger = logging.getLogger('observations')
 
 
+def handle_remarques_update(request, fiche_instance, remarqueformset):
+    """
+    Traite uniquement la mise à jour des remarques via AJAX.
+    """
+    try:
+        with transaction.atomic():
+            # Créer le formset avec les données POST
+            remarque_formset = remarqueformset(request.POST, instance=fiche_instance)
+
+            if remarque_formset.is_valid():
+                # Récupérer les remarques avant modification pour l'historique
+                remarques_avant = {r.id: r for r in fiche_instance.remarques.all()}
+
+                # Tracer les modifications avant sauvegarde
+                for form in remarque_formset:
+                    if form.cleaned_data:
+                        remarque_id = form.cleaned_data.get('id')
+                        remarque_text = form.cleaned_data.get('remarque', '')
+                        is_deleted = form.cleaned_data.get('DELETE', False)
+
+                        if remarque_id and is_deleted:
+                            # Remarque supprimée
+                            if remarque_id.id in remarques_avant:
+                                HistoriqueModification.objects.create(
+                                    fiche=fiche_instance,
+                                    champ_modifie='remarque_supprimee',
+                                    ancienne_valeur=remarques_avant[remarque_id.id].remarque,
+                                    nouvelle_valeur="",
+                                    categorie='remarque',
+                                    modifie_par=request.user,
+                                )
+                        elif remarque_id and not is_deleted:
+                            # Remarque modifiée
+                            if remarque_id.id in remarques_avant and remarques_avant[remarque_id.id].remarque != remarque_text:
+                                HistoriqueModification.objects.create(
+                                    fiche=fiche_instance,
+                                    champ_modifie='remarque_modifiee',
+                                    ancienne_valeur=remarques_avant[remarque_id.id].remarque,
+                                    nouvelle_valeur=remarque_text,
+                                    categorie='remarque',
+                                    modifie_par=request.user,
+                                )
+                        elif not remarque_id and remarque_text.strip():
+                            # Nouvelle remarque
+                            HistoriqueModification.objects.create(
+                                fiche=fiche_instance,
+                                champ_modifie='remarque_ajoutee',
+                                ancienne_valeur="",
+                                nouvelle_valeur=remarque_text,
+                                categorie='remarque',
+                                modifie_par=request.user,
+                            )
+
+                # Sauvegarder le formset (gère automatiquement les suppressions)
+                remarque_formset.save()
+
+                return JsonResponse({'status': 'success'})
+            else:
+                logger.error(f"Erreurs dans le formset de remarques: {remarque_formset.errors}")
+                return JsonResponse({'status': 'error', 'errors': remarque_formset.errors}, status=400)
+
+    except Exception as e:
+        logger.error(f"Erreur lors de la mise à jour des remarques: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+def handle_get_remarques(request, fiche_instance):
+    """
+    Retourne les remarques d'une fiche au format JSON.
+    """
+    try:
+        if fiche_instance:
+            remarques = []
+            for remarque in fiche_instance.remarques.all():
+                remarques.append({
+                    'id': remarque.id,
+                    'remarque': remarque.remarque,
+                    'date_remarque': remarque.date_remarque.strftime('%d/%m/%Y %H:%M'),
+                    'toDelete': False
+                })
+            return JsonResponse({'remarques': remarques})
+        else:
+            return JsonResponse({'remarques': []})
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des remarques: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
 def fiche_observation_view(request, fiche_id):
     fiche = get_object_or_404(FicheObservation, pk=fiche_id)
     localisation = fiche.localisation
@@ -53,6 +139,7 @@ def fiche_observation_view(request, fiche_id):
     return render(request, 'fiche_observation.html', context)
 
 
+@login_required
 def saisie_observation(request, fiche_id=None):
     """
     Vue optimisée pour la saisie d'une nouvelle observation ou la modification d'une existante.
@@ -85,16 +172,38 @@ def saisie_observation(request, fiche_id=None):
         Observation,
         form=ObservationForm,
         fields=['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations'],
-        extra=1,
-        can_delete=True,  # Mettre True si vous voulez pouvoir supprimer des observations via le formset
+        extra=0,
+        can_delete=True,
+        validate_min=False,
+        can_order=False,
+        min_num=0,
+        max_num=None,  # Pas de limite sur le nombre max
+    )
+
+    # Définir le formset pour les remarques
+    remarqueformset = inlineformset_factory(
+        FicheObservation,
+        Remarque,
+        form=RemarqueForm,
+        fields=['remarque'],
+        extra=1,  # Une ligne vide pour ajouter
+        can_delete=True,
         validate_min=False,
         can_order=False,
         min_num=0,
     )
 
     if request.method == "POST":
-        logger.info("Formulaire soumis en POST")
 
+        # Traitement spécial pour la mise à jour des remarques uniquement (via AJAX)
+        if request.POST.get('action') == 'update_remarques':
+            return handle_remarques_update(request, fiche_instance, remarqueformset)
+
+    # Traitement spécial pour récupérer les remarques via AJAX (GET)
+    if request.GET.get('get_remarques') == '1' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return handle_get_remarques(request, fiche_instance)
+
+    if request.method == "POST":
         # Préparer les données POST pour s'assurer que l'observateur est correctement défini
         post_data = request.POST.copy()
         if not post_data.get('observateur'):
@@ -115,7 +224,9 @@ def saisie_observation(request, fiche_id=None):
         nid_form = NidForm(post_data, instance=nid_instance)
         resume_form = ResumeObservationForm(post_data, instance=resume_instance)
         causes_echec_form = CausesEchecForm(post_data, instance=causes_echec_instance)
-        observation_formset = observationformset(post_data, instance=fiche_instance)
+
+        observation_formset = observationformset(post_data, request.FILES, instance=fiche_instance)
+        remarque_formset = remarqueformset(post_data, instance=fiche_instance)
 
         # Validation des formulaires
         validation_errors = []
@@ -163,11 +274,21 @@ def saisie_observation(request, fiche_id=None):
                 )
             forms_valid = False
 
+        if not remarque_formset.is_valid():
+            logger.error(f"Erreurs dans le formset de remarques: {remarque_formset.errors}")
+            for i, form in enumerate(remarque_formset):
+                if form.has_changed() and form.errors:
+                    validation_errors.append(f"Erreurs dans la remarque #{i + 1}: {form.errors}")
+            if remarque_formset.non_form_errors():
+                validation_errors.append(
+                    f"Erreurs globales de remarques: {remarque_formset.non_form_errors()}"
+                )
+            forms_valid = False
+
         # Si tous les formulaires sont valides, procéder à la sauvegarde
         if forms_valid:
             try:
                 with transaction.atomic():
-                    logger.info("Tous les formulaires sont valides, sauvegarde en cours...")
 
                     # Récupérer les anciennes instances pour l'historique
                     if fiche_id:
@@ -200,7 +321,7 @@ def saisie_observation(request, fiche_id=None):
 
                     if fiche_id and fiche_avant:
                         enregistrer_modifications_historique(
-                            fiche, fiche_avant, fiche, 'fiche', request.user
+                            fiche, fiche_avant, fiche, 'fiche', request.user, fiche_form.changed_data
                         )
 
                     # Sauvegarder les objets liés
@@ -209,7 +330,7 @@ def saisie_observation(request, fiche_id=None):
                     localisation.save()
                     if fiche_id and localisation_avant:
                         enregistrer_modifications_historique(
-                            fiche, localisation_avant, localisation, 'localisation', request.user
+                            fiche, localisation_avant, localisation, 'localisation', request.user, localisation_form.changed_data
                         )
 
                     resume = resume_form.save(commit=False)
@@ -217,7 +338,7 @@ def saisie_observation(request, fiche_id=None):
                     resume.save()
                     if fiche_id and resume_avant:
                         enregistrer_modifications_historique(
-                            fiche, resume_avant, resume, 'resume_observation', request.user
+                            fiche, resume_avant, resume, 'resume_observation', request.user, resume_form.changed_data
                         )
 
                     nid = nid_form.save(commit=False)
@@ -225,7 +346,7 @@ def saisie_observation(request, fiche_id=None):
                     nid.save()
                     if fiche_id and nid_avant:
                         enregistrer_modifications_historique(
-                            fiche, nid_avant, nid, 'nid', request.user
+                            fiche, nid_avant, nid, 'nid', request.user, nid_form.changed_data
                         )
 
                     causes_echec = causes_echec_form.save(commit=False)
@@ -233,7 +354,7 @@ def saisie_observation(request, fiche_id=None):
                     causes_echec.save()
                     if fiche_id and causes_echec_avant:
                         enregistrer_modifications_historique(
-                            fiche, causes_echec_avant, causes_echec, 'causes_echec', request.user
+                            fiche, causes_echec_avant, causes_echec, 'causes_echec', request.user, causes_echec_form.changed_data
                         )
 
                     # Gérer les observations
@@ -242,59 +363,106 @@ def saisie_observation(request, fiche_id=None):
                             obs.id: obs for obs in Observation.objects.filter(fiche=fiche_id)
                         }
 
-                    observation_formset.instance = fiche
+                    # Sauvegarder le formset d'observations avec gestion manuelle des suppressions
+                    saved_observations = observation_formset.save(commit=False)
+
+                    # Utiliser uniquement deleted_objects du formset pour gérer les suppressions
+                    observations_a_supprimer = list(observation_formset.deleted_objects)
+
+                    # Sauvegarder les observations modifiées/nouvelles
+                    for obs in saved_observations:
+                        obs.fiche = fiche
+                        obs.save()
+
+                    # Gérer l'historique pour les observations modifiées
                     for form in observation_formset:
-                        if form.has_changed():
-                            if form.cleaned_data.get('date_observation'):
-                                try:
-                                    if form.instance.pk and form.instance.pk in observations_avant:
-                                        # *** MODIFICATION APPLIQUÉE ICI ***
-                                        # Mise à jour d'une observation existante (méthode robuste)
-                                        nouvelle_obs = form.save(commit=False)
-                                        ancienne_obs = observations_avant[form.instance.pk]
-                                        enregistrer_modifications_historique(
-                                            fiche,
-                                            ancienne_obs,
-                                            nouvelle_obs,
-                                            'observation',
-                                            request.user,
-                                        )
-                                        nouvelle_obs.save()  # Sauvegarde après l'historique
-                                    else:
-                                        # Nouvelle observation
-                                        nouvelle_obs = form.save()
-                                        for field_name in [
-                                            'date_observation',
-                                            'nombre_oeufs',
-                                            'nombre_poussins',
-                                            'observations',
-                                        ]:
-                                            if (
-                                                field_name in form.cleaned_data
-                                                and form.cleaned_data[field_name]
-                                            ):
-                                                HistoriqueModification.objects.create(
-                                                    fiche=fiche,
-                                                    champ_modifie=field_name,
-                                                    ancienne_valeur="",
-                                                    nouvelle_valeur=str(
-                                                        form.cleaned_data[field_name]
-                                                    ),
-                                                    categorie='observation',
-                                                    modifie_par=request.user,
-                                                )
-                                    logger.info(
-                                        f"Observation sauvegardée: {form.cleaned_data.get('date_observation')}"
+                        if form.has_changed() and form.instance.pk:
+                            if fiche_id and form.instance.pk in observations_avant:
+                                # Observation existante modifiée
+                                ancienne_obs = observations_avant[form.instance.pk]
+                                champs_modifies = list(form.changed_data)
+
+                                enregistrer_modifications_historique(
+                                    fiche,
+                                    ancienne_obs,
+                                    form.instance,
+                                    'observation',
+                                    request.user,
+                                    champs_modifies
+                                )
+                        elif form.has_changed() and not form.instance.pk and form.cleaned_data.get('date_observation'):
+                            # Nouvelle observation
+                            for field_name in ['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations']:
+                                if field_name in form.cleaned_data and form.cleaned_data[field_name]:
+                                    HistoriqueModification.objects.create(
+                                        fiche=fiche,
+                                        champ_modifie=field_name,
+                                        ancienne_valeur="",
+                                        nouvelle_valeur=str(form.cleaned_data[field_name]),
+                                        categorie='observation',
+                                        modifie_par=request.user,
                                     )
-                                except Exception as e:
-                                    logger.error(f"Erreur sauvegarde observation: {e}")
-                            else:
-                                logger.warning("Formulaire d'observation modifié mais sans date.")
+
+                    # Traiter les suppressions d'observations
+                    for obs_a_supprimer in observations_a_supprimer:
+                        HistoriqueModification.objects.create(
+                            fiche=fiche,
+                            champ_modifie='observation_supprimee',
+                            ancienne_valeur=f"Date: {obs_a_supprimer.date_observation}, Œufs: {obs_a_supprimer.nombre_oeufs}, Poussins: {obs_a_supprimer.nombre_poussins}",
+                            nouvelle_valeur="",
+                            categorie='observation',
+                            modifie_par=request.user,
+                        )
+                        obs_a_supprimer.delete()
+
+                    # Sauvegarder le formset des remarques
+                    saved_remarques = remarque_formset.save(commit=False)
+                    for remarque in saved_remarques:
+                        remarque.fiche = fiche
+                        remarque.save()
+                    remarque_formset.save_m2m()
+
+                    # Traiter les suppressions et ajouts de remarques pour l'historique
+                    if fiche_id:
+                        # Récupérer les remarques avant et après
+                        remarques_avant_ids = {r.id for r in remarques}
+                        remarques_apres_ids = {r.id for r in saved_remarques if r.id}
+
+                        # Gestion des suppressions de remarques
+                        remarques_supprimees_ids = remarques_avant_ids - remarques_apres_ids
+                        for remarque in remarques:
+                            if remarque.id in remarques_supprimees_ids:
+                                HistoriqueModification.objects.create(
+                                    fiche=fiche,
+                                    champ_modifie='remarque_supprimee',
+                                    ancienne_valeur=remarque.remarque,
+                                    nouvelle_valeur="",
+                                    categorie='remarque',
+                                    modifie_par=request.user,
+                                )
+
+                    # Gestion de l'ajout de remarques nouvelles
+                    for remarque in saved_remarques:
+                        if not remarque.id or remarque.id not in {r.id for r in remarques}:
+                            HistoriqueModification.objects.create(
+                                fiche=fiche,
+                                champ_modifie='remarque_ajoutee',
+                                ancienne_valeur="",
+                                nouvelle_valeur=remarque.remarque,
+                                categorie='remarque',
+                                modifie_par=request.user,
+                            )
 
                     if not fiche_id:
                         remarque_initiale = post_data.get('remarque-initiale')
                         if remarque_initiale:
                             Remarque.objects.create(fiche=fiche, remarque=remarque_initiale)
+
+                    # Mettre à jour les années des observations APRÈS le traitement du formset
+                    if fiche_id and fiche_avant and 'annee' in fiche_form.changed_data and fiche_avant.annee != fiche.annee:
+                        mettre_a_jour_annee_observations(
+                            fiche, fiche_avant.annee, fiche.annee, request.user
+                        )
 
                     messages.success(request, "Fiche d'observation sauvegardée avec succès!")
                     return redirect('modifier_observation', fiche_id=fiche.pk)
@@ -312,7 +480,15 @@ def saisie_observation(request, fiche_id=None):
         resume_form = ResumeObservationForm(instance=resume_instance)
         nid_form = NidForm(instance=nid_instance)
         causes_echec_form = CausesEchecForm(instance=causes_echec_instance)
+        if fiche_instance:
+            # HACK: Remove unsaved observations that may be lingering in memory
+            if hasattr(fiche_instance, 'observations'):
+                unsaved_obs = [obs for obs in fiche_instance.observations.all() if obs.pk is None]
+                if unsaved_obs:
+                    fiche_instance.observations.remove(*unsaved_obs)
+
         observation_formset = observationformset(instance=fiche_instance)
+        remarque_formset = remarqueformset(instance=fiche_instance)
 
     context = {
         'fiche_form': fiche_form,
@@ -321,6 +497,7 @@ def saisie_observation(request, fiche_id=None):
         'nid_form': nid_form,
         'causes_echec_form': causes_echec_form,
         'observation_formset': observation_formset,
+        'remarque_formset': remarque_formset,
         'remarques': remarques,
     }
 
@@ -337,32 +514,20 @@ def ajouter_observation(request, fiche_id):
             observation.fiche = fiche
             observation.save()
 
-            # Enregistrer l'ajout dans l'historique des modifications
-            for field_name in [
-                'date_observation',
-                'nombre_oeufs',
-                'nombre_poussins',
-                'observations',
-            ]:
-                if field_name in form.cleaned_data and form.cleaned_data[field_name]:
-                    HistoriqueModification.objects.create(
-                        fiche=fiche,
-                        champ_modifie=field_name,
-                        ancienne_valeur="",
-                        nouvelle_valeur=str(form.cleaned_data[field_name]),
-                        categorie='observation',
-                        modifie_par=request.user,
-                    )
-                    logger.info(
-                        f"Ajout d'observation, champ '{field_name}', "
-                        f"nouvelle valeur: '{form.cleaned_data[field_name]}', "
-                        f"par {request.user.username}"
-                    )
+            # Enregistrer l'ajout dans l'historique des modifications (une seule ligne)
+            HistoriqueModification.objects.create(
+                fiche=fiche,
+                champ_modifie='observation_ajoutee',
+                ancienne_valeur="",
+                nouvelle_valeur=f"Date: {observation.date_observation}, Œufs: {observation.nombre_oeufs}, Poussins: {observation.nombre_poussins}",
+                categorie='observation',
+                modifie_par=request.user,
+            )
 
             return redirect('modifier_observation', fiche_id=fiche_id)
     else:
         form = ObservationForm()
-    return render(request, 'saisie/ajouter_observation.html', {'form': form, 'fiche': fiche})
+    return render(request, 'saisie/ajouter_observation.html', {'form': form, 'fiche': fiche, 'fiche_id': fiche_id})
 
 
 @login_required
@@ -397,24 +562,70 @@ def historique_modifications(request, fiche_id):
     )
 
 
+def mettre_a_jour_annee_observations(fiche, ancienne_annee, nouvelle_annee, modifie_par):
+    """
+    Met à jour l'année de toutes les observations d'une fiche lorsque l'année de la fiche change.
+    """
+    if ancienne_annee == nouvelle_annee:
+        return
+
+    for observation in fiche.observations.all():
+        if observation.date_observation and observation.date_observation.year == ancienne_annee:
+            nouvelle_date = observation.date_observation.replace(year=nouvelle_annee)
+
+            HistoriqueModification.objects.create(
+                fiche=fiche,
+                champ_modifie='date_observation',
+                ancienne_valeur=str(observation.date_observation),
+                nouvelle_valeur=str(nouvelle_date),
+                categorie='observation',
+                modifie_par=modifie_par,
+            )
+
+            observation.date_observation = nouvelle_date
+            observation.save()
+
+
 def enregistrer_modifications_historique(
-    fiche, ancienne_instance, nouvelle_instance, categorie, modifie_par
+    fiche, ancienne_instance, nouvelle_instance, categorie, modifie_par, champs_modifies=None
 ):
     if not ancienne_instance or not nouvelle_instance:
         return
 
-    ancien_dict = model_to_dict(ancienne_instance)
-    nouveau_dict = model_to_dict(nouvelle_instance)
-    champs_ignores = ['id', 'fiche']
+    champs_ignores = ['id', 'fiche', 'DELETE']
 
-    for champ, ancienne_valeur in ancien_dict.items():
+    # Si on a une liste de champs modifiés, ne traiter que ceux-ci
+    if champs_modifies:
+        champs_a_verifier = champs_modifies
+    else:
+        champs_a_verifier = [field.name for field in ancienne_instance._meta.fields]
+
+    for champ in champs_a_verifier:
         if champ in champs_ignores:
             continue
 
-        nouvelle_valeur = nouveau_dict.get(champ)
+        # Vérifier que l'attribut existe vraiment sur le modèle
+        if not hasattr(ancienne_instance, champ) or not hasattr(nouvelle_instance, champ):
+            continue
 
-        # Normalisation et comparaison
-        if str(ancienne_valeur) != str(nouvelle_valeur):
+        ancienne_valeur = getattr(ancienne_instance, champ)
+        nouvelle_valeur = getattr(nouvelle_instance, champ)
+
+        # Comparaison spéciale pour les DateTimeField avec fuseau horaire
+        if hasattr(ancienne_valeur, 'year') and hasattr(nouvelle_valeur, 'year'):
+            ancienne_dt = (ancienne_valeur.year, ancienne_valeur.month, ancienne_valeur.day,
+                          ancienne_valeur.hour, ancienne_valeur.minute, ancienne_valeur.second)
+            nouvelle_dt = (nouvelle_valeur.year, nouvelle_valeur.month, nouvelle_valeur.day,
+                          nouvelle_valeur.hour, nouvelle_valeur.minute, nouvelle_valeur.second)
+            valeurs_egales = ancienne_dt == nouvelle_dt
+        elif ancienne_valeur is None and nouvelle_valeur is None:
+            valeurs_egales = True
+        elif ancienne_valeur is None or nouvelle_valeur is None:
+            valeurs_egales = False
+        else:
+            valeurs_egales = str(ancienne_valeur) == str(nouvelle_valeur)
+
+        if not valeurs_egales:
             HistoriqueModification.objects.create(
                 fiche=fiche,
                 champ_modifie=champ,
@@ -423,10 +634,6 @@ def enregistrer_modifications_historique(
                 categorie=categorie,
                 modifie_par=modifie_par,
             )
-            logger.info(
-                f"Modification sur {categorie}, champ '{champ}', "
-                f"ancienne: '{ancienne_valeur}', nouvelle: '{nouvelle_valeur}', par {modifie_par.username}"
-            )
 
 
 @login_required
@@ -434,10 +641,8 @@ def supprimer_observation(request, observation_id):
     """Vue pour supprimer une observation spécifique"""
     observation = get_object_or_404(Observation, id=observation_id)
     fiche_id = observation.fiche.num_fiche
-
-    # utilisateur connecté garanti ? idéalement avec @login_required sur la vue
     user = cast(Utilisateur, request.user)
-    # Vérifier que l'utilisateur est autorisé (observateur, admin, etc.)
+
     if user != observation.fiche.observateur and user.role != "administrateur":
         messages.error(request, "Vous n'êtes pas autorisé à supprimer cette observation")
         return redirect("detail_observation", fiche_id=fiche_id)
