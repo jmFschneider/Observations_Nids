@@ -5,40 +5,203 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
 {% endblock %}
 
-<form method="post">
-    {% csrf_token %}
+<div class="container">
+    <h2>Ajouter une observation - Fiche {{ fiche_id }}</h2>
 
-        <!-- Résumé de l'observation en pleine largeur -->
-        <!-- Tableau des observations -->
-        <div class="observations">
-            <h3>Observations</h3>
-            <div class="observations-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Nombre d'œufs</th>
-                            <th>Nombre de poussins</th>
-                            <th>Observations</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for observation in observations %}
-                        <tr>
-                            <td>{{ observation.date_observation|date:"d/m/Y H:i" }}</td>
-                            <td>{{ observation.nombre_oeufs }}</td>
-                            <td>{{ observation.nombre_poussins }}</td>
-                            <td>{{ observation.observations }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5">Aucune observation enregistrée.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <!-- Affichage des observations existantes -->
+    {% if fiche.observations.all %}
+    <div class="observations-existantes">
+        <h3>Observations existantes</h3>
+        <div class="observations-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Nombre d'œufs</th>
+                        <th>Nombre de poussins</th>
+                        <th>Observations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for observation in fiche.observations.all %}
+                    <tr>
+                        <td>{{ observation.date_observation|date:"d/m/Y H:i" }}</td>
+                        <td>{{ observation.nombre_oeufs }}</td>
+                        <td>{{ observation.nombre_poussins }}</td>
+                        <td>{{ observation.observations }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    <button type="submit">Ajouter une observation</button>
-</form>
+    </div>
+    {% endif %}
+
+    <!-- Formulaire pour ajouter une nouvelle observation -->
+    <div class="nouvelle-observation">
+        <h3>Nouvelle observation</h3>
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.date_observation.id_for_label }}">{{ form.date_observation.label }}</label>
+                {{ form.date_observation }}
+                {% if form.date_observation.errors %}
+                    <div class="error">{{ form.date_observation.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.nombre_oeufs.id_for_label }}">{{ form.nombre_oeufs.label }}</label>
+                {{ form.nombre_oeufs }}
+                {% if form.nombre_oeufs.errors %}
+                    <div class="error">{{ form.nombre_oeufs.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.nombre_poussins.id_for_label }}">{{ form.nombre_poussins.label }}</label>
+                {{ form.nombre_poussins }}
+                {% if form.nombre_poussins.errors %}
+                    <div class="error">{{ form.nombre_poussins.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.observations.id_for_label }}">{{ form.observations.label }}</label>
+                {{ form.observations }}
+                {% if form.observations.errors %}
+                    <div class="error">{{ form.observations.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Ajouter l'observation</button>
+                <a href="{% url 'modifier_observation' fiche_id=fiche_id %}" class="btn btn-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.observations-existantes {
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.nouvelle-observation {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: white;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.form-actions {
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 3px;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.observations-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.observations-table th, .observations-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.observations-table th {
+    background-color: #f2f2f2;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sélectionner tous les champs avec la classe 'clear-on-focus'
+    const fields = document.querySelectorAll('.clear-on-focus, input[type="text"], input[type="number"], textarea');
+
+    fields.forEach(field => {
+        // Stocker la valeur par défaut
+        const defaultValue = field.value;
+
+        // Vérifier si c'est une valeur par défaut à effacer
+        const shouldClearOnFocus = (
+            defaultValue === 'Non spécifié' ||
+            defaultValue === 'Non spécifiée' ||
+            defaultValue === '0' ||
+            defaultValue === '0,0' ||
+            defaultValue === '00'
+        );
+
+        if (shouldClearOnFocus) {
+            // Au focus, effacer si c'est toujours la valeur par défaut
+            field.addEventListener('focus', function() {
+                if (this.value === defaultValue) {
+                    this.value = '';
+                }
+            });
+
+            // Au blur, remettre la valeur par défaut si le champ est vide
+            field.addEventListener('blur', function() {
+                if (this.value.trim() === '') {
+                    this.value = defaultValue;
+                }
+            });
+        }
+    });
+});
+</script>
+
 {% endblock %}

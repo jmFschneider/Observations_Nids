@@ -2,7 +2,39 @@
 
 {% block extra_css %}
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'Observations/css/styles.css' %}">
+<style>
+/* Styles pour les observations marquées pour suppression */
+.observation-row.marked-for-deletion {
+    background-color: #f8f9fa;
+    opacity: 0.6;
+    text-decoration: line-through;
+}
+
+.observation-row.marked-for-deletion input,
+.observation-row.marked-for-deletion textarea {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.delete-confirmation-banner {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 10px 0;
+    display: none;
+}
+
+.delete-confirmation-banner.show {
+    display: block;
+}
+
+.delete-confirmation-banner .alert-warning {
+    margin: 0;
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -54,39 +86,43 @@
     {% csrf_token %}
 
     <!-- Section d'informations générales -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Informations générales</h5>
-        </div>
+    <section class="card mb-4">
+        <header class="card-header bg-primary text-white">
+            <h2 class="mb-0 h5">Informations générales</h2>
+        </header>
         <div class="card-body">
-            <table class="fiche-table">
-                <tr>
-                    <th>N° Fiche</th>
-                    <th>Observateur</th>
-                    <th>Espèce</th>
-                    <th>Année</th>
-                </tr>
-                <tr>
-                    <td>
-                        {% if fiche_form.instance.pk %}
-                            {{ fiche_form.instance.pk }}
-                        {% else %}
-                            À définir
-                        {% endif %}
-                    </td>
-                    <td>{{ fiche_form.instance.observateur.first_name }} {{ fiche_form.instance.observateur.last_name }}</td>
-                    <td>{{ fiche_form.espece }}</td>
-                    <td>{{ fiche_form.annee }}</td>
-                </tr>
+            <table class="fiche-table table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">N° Fiche</th>
+                        <th scope="col">Observateur</th>
+                        <th scope="col">Espèce</th>
+                        <th scope="col">Année</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            {% if fiche_form.instance.pk %}
+                                {{ fiche_form.instance.pk }}
+                            {% else %}
+                                À définir
+                            {% endif %}
+                        </td>
+                        <td>{{ fiche_form.instance.observateur.first_name }} {{ fiche_form.instance.observateur.last_name }}</td>
+                        <td>{{ fiche_form.espece }}</td>
+                        <td>{{ fiche_form.annee }}</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
-    </div>
+    </section>
 
     <!-- Section de localisation -->
-    <div class="card mb-4">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Localisation</h5>
-        </div>
+    <section class="card mb-4">
+        <header class="card-header bg-success text-white">
+            <h2 class="mb-0 h5">Localisation</h2>
+        </header>
         <div class="card-body">
             <div class="lieu">
                 <table class="localisation-table">
@@ -123,13 +159,13 @@
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Section du nid -->
-    <div class="card mb-4">
-        <div class="card-header bg-info text-white">
-            <h5 class="mb-0">Description du Nid</h5>
-        </div>
+    <section class="card mb-4">
+        <header class="card-header bg-info text-white">
+            <h2 class="mb-0 h5">Description du Nid</h2>
+        </header>
         <div class="card-body">
             <table class="nid-table">
                 <tr>
@@ -159,15 +195,25 @@
                 {{ nid_form.details_nid }}
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Section des observations -->
-    <div class="card mb-4">
-        <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0">Observations</h5>
-        </div>
+    <section class="card mb-4">
+        <header class="card-header bg-warning text-dark">
+            <h2 class="mb-0 h5">Observations</h2>
+        </header>
         <div class="card-body">
             {{ observation_formset.management_form }}
+            <!-- Bannière de confirmation des suppressions -->
+            <div id="delete-confirmation-banner" class="delete-confirmation-banner">
+                <div class="alert alert-warning">
+                    <strong>Attention :</strong> <span id="delete-count">0</span> observation(s) seront supprimée(s) lors de la validation.
+                    <button type="button" class="btn btn-sm btn-outline-secondary ml-2" id="clear-all-deletions">
+                        Annuler toutes les suppressions
+                    </button>
+                </div>
+            </div>
+
             <div class="observations-table">
                 <table>
                     <thead>
@@ -176,40 +222,47 @@
                             <th>Nombre d'œufs</th>
                             <th>Nombre de poussins</th>
                             <th>Observations</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {# Afficher TOUTES les formes du formset dans l'ordre #}
                         {% for form in observation_formset %}
-                        <tr>
-                            <!-- Ajouter les champs cachés nécessaires pour le formset -->
-                            {% for hidden in form.hidden_fields %}
-                                {{ hidden }}
-                            {% endfor %}
-                            <td>
-                                {% if form.date_observation.errors %}
-                                <div class="error">{{ form.date_observation.errors }}</div>
-                                {% endif %}
-                                {{ form.date_observation }}
-                            </td>
-                            <td>
-                                {% if form.nombre_oeufs.errors %}
-                                <div class="error">{{ form.nombre_oeufs.errors }}</div>
-                                {% endif %}
-                                {{ form.nombre_oeufs }}
-                            </td>
-                            <td>
-                                {% if form.nombre_poussins.errors %}
-                                <div class="error">{{ form.nombre_poussins.errors }}</div>
-                                {% endif %}
-                                {{ form.nombre_poussins }}
-                            </td>
-                            <td>
-                                {% if form.observations.errors %}
-                                <div class="error">{{ form.observations.errors }}</div>
-                                {% endif %}
-                                {{ form.observations }}
-                            </td>
-                        </tr>
+                            <tr class="observation-row" data-form-prefix="{{ form.prefix }}">
+                        <!--         {% comment %}{{ form.id }}{% endcomment %}
+                                <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk|default:'' }}">
+                                -->
+                                {{ form.id }}
+                                <td>
+                                    {% if form.date_observation.errors %}<div class="error">{{ form.date_observation.errors }}</div>{% endif %}
+                                    {{ form.date_observation }}
+                                </td>
+                                <td>
+                                    {% if form.nombre_oeufs.errors %}<div class="error">{{ form.nombre_oeufs.errors }}</div>{% endif %}
+                                    {{ form.nombre_oeufs }}
+                                </td>
+                                <td>
+                                    {% if form.nombre_poussins.errors %}<div class="error">{{ form.nombre_poussins.errors }}</div>{% endif %}
+                                    {{ form.nombre_poussins }}
+                                </td>
+                                <td>
+                                    {% if form.observations.errors %}<div class="error">{{ form.observations.errors }}</div>{% endif %}
+                                    {{ form.observations }}
+                                </td>
+                                <td>
+                                    <div style="display: none;">{{ form.DELETE }}</div>
+                                    {% if form.instance.pk %}
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-observation-btn" title="Marquer pour suppression">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary restore-observation-btn" title="Annuler la suppression" style="display: none;">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    {% else %}
+                                        <small class="text-muted">Nouvelle ligne</small>
+                                    {% endif %}
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -223,13 +276,13 @@
             </div>
             {% endif %}
         </div>
-    </div>
+    </section>
 
     <!-- Section résumé de l'observation -->
-    <div class="card mb-4">
-        <div class="card-header bg-secondary text-white">
-            <h5 class="mb-0">Résumé de l'observation</h5>
-        </div>
+    <section class="card mb-4">
+        <header class="card-header bg-secondary text-white">
+            <h2 class="mb-0 h5">Résumé de l'observation</h2>
+        </header>
         <div class="card-body">
             <div class="resume-container">
                 <table>
@@ -287,6 +340,7 @@
                                     {{ resume_form.nombre_oeufs_pondus.errors }}
                                     <label for="{{ resume_form.nombre_oeufs_pondus.id_for_label }}"></label>
                                     {{ resume_form.nombre_oeufs_pondus }}
+                                    <small style="display: block; color: #6c757d; font-size: 0.8em;">Vide = non observé</small>
                                 </div>
                             </td>
                             <td>
@@ -294,6 +348,7 @@
                                     {{ resume_form.nombre_oeufs_eclos.errors }}
                                     <label for="{{ resume_form.nombre_oeufs_eclos.id_for_label }}"></label>
                                     {{ resume_form.nombre_oeufs_eclos }}
+                                    <small style="display: block; color: #6c757d; font-size: 0.8em;">Vide = non observé</small>
                                 </div>
                             </td>
                             <td>
@@ -301,12 +356,14 @@
                                     {{ resume_form.nombre_oeufs_non_eclos.errors }}
                                     <label for="{{ resume_form.nombre_oeufs_non_eclos.id_for_label }}"></label>
                                     {{ resume_form.nombre_oeufs_non_eclos }}
+                                    <small style="display: block; color: #6c757d; font-size: 0.8em;">Vide = non observé</small>
                                 </div>
                             </td>
                             <td>
                                 <div class="form-field">
                                     {{ resume_form.nombre_poussins.errors }}
                                     {{ resume_form.nombre_poussins }}
+                                    <small style="display: block; color: #6c757d; font-size: 0.8em;">Vide = non observé</small>
                                 </div>
                             </td>
                         </tr>
@@ -314,13 +371,13 @@
                 </table>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Section causes d'échec et remarques -->
-    <div class="card mb-4">
-        <div class="card-header bg-danger text-white">
-            <h5 class="mb-0">Causes d'échec et remarques</h5>
-        </div>
+    <section class="card mb-4">
+        <header class="card-header bg-danger text-white">
+            <h2 class="mb-0 h5">Causes d'échec et remarques</h2>
+        </header>
         <div class="card-body">
             <div class="causes-remarques-container">
                 <!-- Partie gauche : Causes de l'échec -->
@@ -333,7 +390,16 @@
 
                 <!-- Partie droite : Remarques -->
                 <div class="remarques-container">
-                    <table>
+                    <div class="remarques-header">
+                        <h6>Remarques
+                            {% if fiche_form.instance.pk %}
+                                <button type="button" class="btn btn-sm btn-primary" id="open-remarques-modal-btn" style="margin-left: 10px;">
+                                    <i class="fas fa-plus"></i> Ajouter/Modifier
+                                </button>
+                            {% endif %}
+                        </h6>
+                    </div>
+                    <table class="remarques-table" id="remarques-table">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -342,50 +408,554 @@
                         </thead>
                         <tbody>
                             {% for remarque in remarques %}
-                                <tr>
+                                <tr class="remarque-row-readonly" data-remarque-id="{{ remarque.id }}">
                                     <td>{{ remarque.date_remarque|date:"d/m/Y H:i" }}</td>
-                                    <td>{{ remarque.remarque }}</td>
+                                    <td class="remarque-content">{{ remarque.remarque }}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>
                                     <td colspan="2" id="aucune-remarque">Aucune remarque trouvée.</td>
                                 </tr>
                             {% endfor %}
+                            {% if not fiche_form.instance.pk %}
                             <tr id="ligne-remarque-initiale" style="display:none;">
                                 <td>À la création</td>
                                 <td>
                                     <textarea id="remarque-initiale" placeholder="Ajouter une remarque initiale"></textarea>
                                 </td>
                             </tr>
+                            {% endif %}
                         </tbody>
                     </table>
+                    {% if not fiche_form.instance.pk %}
                     <input type="hidden" name="remarque-initiale" id="remarque-initiale-field" value="">
+                    {% endif %}
                 </div>
             </div>
 
+            <!-- Modal pour édition des remarques -->
+            <div id="remarques-modal" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5>Édition des remarques</h5>
+                        <button type="button" class="modal-close" id="close-remarques-modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="remarques-form">
+                            <div id="remarques-formset-container">
+                                <!-- Les remarques seront chargées ici dynamiquement -->
+                            </div>
+                            <button type="button" class="btn btn-secondary" id="add-remarque-btn">
+                                + Ajouter une remarque
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancel-remarques-btn">
+                            Annuler
+                        </button>
+                        <button type="button" class="btn btn-primary" id="save-remarques-btn">
+                            Sauvegarder
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .modal-content {
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                width: 90%;
+                max-width: 800px;
+                max-height: 80vh;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .modal-header {
+                padding: 1rem;
+                border-bottom: 1px solid #dee2e6;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background-color: #f8f9fa;
+            }
+
+            .modal-header h5 {
+                margin: 0;
+                font-weight: bold;
+            }
+
+            .modal-close {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .modal-body {
+                padding: 1rem;
+                overflow-y: auto;
+                flex: 1;
+            }
+
+            .modal-footer {
+                padding: 1rem;
+                border-top: 1px solid #dee2e6;
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                background-color: #f8f9fa;
+            }
+
+            .remarque-form-item {
+                border: 1px solid #dee2e6;
+                border-radius: 5px;
+                padding: 15px;
+                margin-bottom: 15px;
+                background-color: #f8f9fa;
+            }
+
+            .remarque-form-item .form-group {
+                margin-bottom: 10px;
+            }
+
+            .remarque-form-item label {
+                font-weight: bold;
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .remarque-form-item textarea {
+                width: 100%;
+                min-height: 80px;
+                padding: 8px;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                resize: vertical;
+            }
+
+            .remarque-form-item .delete-btn {
+                background-color: #dc3545;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 0.875rem;
+            }
+
+            .remarque-form-item .delete-btn:hover {
+                background-color: #c82333;
+            }
+
+            .remarques-info {
+                font-size: 0.8em;
+                color: #6c757d;
+                font-style: italic;
+            }
+
+            .remarque-row-readonly:hover {
+                background-color: #f8f9fa;
+                cursor: pointer;
+            }
+            </style>
+
             <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Use a proper JavaScript comparison that handles None values
-                    {% if fiche_form.instance.pk %}
-                        // We have a pk, so we're editing an existing fiche
-                        console.log("Editing existing fiche: {{ fiche_form.instance.pk }}");
-                    {% else %}
-                        // No pk, we're creating a new fiche
-                        console.log("Creating new fiche");
-                        document.getElementById('aucune-remarque').style.display = 'none';
-                        document.getElementById('ligne-remarque-initiale').style.display = '';
+document.addEventListener('DOMContentLoaded', function() {
+    let deletionCount = 0;
 
-                        // Capture la saisie de la remarque initiale et met à jour le champ caché
-                        var remarqueTextarea = document.getElementById('remarque-initiale');
-                        var remarqueField = document.getElementById('remarque-initiale-field');
+    function updateDeleteBanner() {
+        const banner = document.getElementById('delete-confirmation-banner');
+        const countElement = document.getElementById('delete-count');
+        if (!banner || !countElement) return;
 
-                        remarqueTextarea.addEventListener('input', function() {
-                            remarqueField.value = this.value;
-                        });
-                    {% endif %}
-                });
-            </script>
+        deletionCount = document.querySelectorAll('.observation-row.marked-for-deletion').length;
+        countElement.textContent = deletionCount;
+
+        if (deletionCount > 0) {
+            banner.classList.add('show');
+        } else {
+            banner.classList.remove('show');
+        }
+    }
+
+    function setupRow(row) {
+        const deleteBtn = row.querySelector('.delete-observation-btn');
+        const restoreBtn = row.querySelector('.restore-observation-btn');
+        const deleteCheckbox = row.querySelector('input[type="checkbox"][name*="-DELETE"]');
+
+        if (!deleteBtn || !restoreBtn || !deleteCheckbox) return;
+
+        // Action for the delete button
+        deleteBtn.addEventListener('click', function() {
+            deleteCheckbox.checked = true;
+            row.classList.add('marked-for-deletion');
+            row.querySelectorAll('input, textarea').forEach(el => {
+                if (el !== deleteCheckbox) el.disabled = true;
+            });
+            deleteBtn.style.display = 'none';
+            restoreBtn.style.display = 'inline-block';
+            updateDeleteBanner();
+        });
+
+        // Action for the restore button
+        restoreBtn.addEventListener('click', function() {
+            deleteCheckbox.checked = false;
+            row.classList.remove('marked-for-deletion');
+            row.querySelectorAll('input, textarea').forEach(el => {
+                el.disabled = false;
+            });
+            deleteBtn.style.display = 'inline-block';
+            restoreBtn.style.display = 'none';
+            updateDeleteBanner();
+        });
+    }
+
+    // Setup all existing rows
+    document.querySelectorAll('.observation-row').forEach(setupRow);
+
+    // Setup the "Clear all deletions" button
+    const clearAllBtn = document.getElementById('clear-all-deletions');
+    if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.observation-row.marked-for-deletion .restore-observation-btn').forEach(btn => {
+                btn.click();
+            });
+        });
+    }
+
+    // Add confirmation before submitting the form
+    const mainForm = document.querySelector('form[method="post"]:not([action*="logout"])');
+    if (mainForm) {
+        mainForm.addEventListener('submit', function(e) {
+            // Re-enable all disabled fields right before submission so their values are sent
+            document.querySelectorAll('.observation-row.marked-for-deletion input, .observation-row.marked-for-deletion textarea').forEach(el => {
+                el.disabled = false;
+            });
+
+            if (deletionCount > 0) {
+                const message = `Voulez-vous vraiment supprimer ${deletionCount} observation${deletionCount > 1 ? 's' : ''} ?`;
+                if (!confirm(message)) {
+                    e.preventDefault();
+                    // If submission is cancelled, re-disable the fields
+                    document.querySelectorAll('.observation-row.marked-for-deletion input, .observation-row.marked-for-deletion textarea').forEach(el => {
+                        const deleteCheckbox = el.closest('.observation-row').querySelector('input[type="checkbox"][name*="-DELETE"]');
+                        if (el !== deleteCheckbox) {
+                            el.disabled = true;
+                        }
+                    });
+                    return false;
+                }
+            }
+        });
+    }
+
+    // Setup submit button
+    const enregistrerBtn = mainForm ? mainForm.querySelector('button[type="submit"]') : null;
+    if (!enregistrerBtn) {
+        console.error('Submit button not found in main form');
+    }
+
+    // Remarques modal management
+
+    let remarquesData = [];
+    let remarqueCounter = 0;
+
+    // Load remarques via AJAX
+
+    function loadRemarquesData() {
+        {% if fiche_form.instance.pk %}
+        // Pour une fiche existante, charger via AJAX
+        fetch(`{{ request.path }}?get_remarques=1`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            remarquesData = data.remarques || [];
+            if (remarquesData.length > 0) {
+                remarqueCounter = Math.max(...remarquesData.map(r => r.id)) + 1;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading remarques:', error);
+            remarquesData = [];
+        });
+        {% else %}
+        // New fiche - no remarques
+        remarquesData = [];
+        {% endif %}
+    }
+
+    // Charger les données au démarrage
+    loadRemarquesData();
+
+    // Ajouter event listener pour double-clic sur tableau remarques
+    const remarquesTable = document.getElementById('remarques-table');
+    if (remarquesTable) {
+        remarquesTable.addEventListener('dblclick', function(e) {
+            if (e.target.closest('.remarque-row-readonly')) {
+                openRemarquesModal();
+            }
+        });
+    }
+
+    // Event listener pour le bouton "Ajouter/Modifier"
+    document.getElementById('open-remarques-modal-btn')?.addEventListener('click', openRemarquesModal);
+
+    // Event listeners pour les boutons de la popup
+    document.getElementById('close-remarques-modal')?.addEventListener('click', closeRemarquesModal);
+    document.getElementById('cancel-remarques-btn')?.addEventListener('click', closeRemarquesModal);
+    document.getElementById('save-remarques-btn')?.addEventListener('click', saveRemarques);
+    document.getElementById('add-remarque-btn')?.addEventListener('click', addRemarqueForm);
+
+    function openRemarquesModal() {
+        populateRemarquesModal();
+        document.getElementById('remarques-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Empêcher le scroll de la page
+    }
+
+    function closeRemarquesModal() {
+        document.getElementById('remarques-modal').style.display = 'none';
+        document.body.style.overflow = 'auto'; // Réactiver le scroll
+    }
+
+    function populateRemarquesModal() {
+        const container = document.getElementById('remarques-formset-container');
+        container.innerHTML = '';
+
+        remarquesData.forEach((remarque, index) => {
+            if (!remarque.toDelete) {
+                const formItem = createRemarqueFormItem(remarque, index);
+                container.appendChild(formItem);
+            }
+        });
+    }
+
+    function createRemarqueFormItem(remarque, index) {
+        const div = document.createElement('div');
+        div.className = 'remarque-form-item';
+        div.dataset.remarqueId = remarque.id || 'new';
+
+        div.innerHTML = `
+            <div class="form-group">
+                <label>Date: ${remarque.date_remarque || 'Nouvelle remarque'}</label>
+            </div>
+            <div class="form-group">
+                <label for="remarque-${index}">Remarque:</label>
+                <textarea id="remarque-${index}" name="remarque-${index}" placeholder="Saisissez votre remarque...">${remarque.remarque || ''}</textarea>
+            </div>
+            ${remarque.id ? `<button type="button" class="delete-btn" data-remarque-id="${remarque.id}">Supprimer</button>` : ''}
+        `;
+
+        // Ajouter event listener pour le bouton supprimer
+        if (remarque.id) {
+            const deleteBtn = div.querySelector('.delete-btn');
+            deleteBtn?.addEventListener('click', function() {
+                deleteRemarque(remarque.id);
+            });
+        }
+
+        return div;
+    }
+
+    function addRemarqueForm() {
+        const newRemarque = {
+            id: null,
+            remarque: '',
+            date_remarque: null,
+            toDelete: false
+        };
+        remarquesData.push(newRemarque);
+        populateRemarquesModal();
+    }
+
+    function deleteRemarque(remarqueId) {
+        const remarque = remarquesData.find(r => r.id === remarqueId);
+        if (remarque && confirm('Êtes-vous sûr de vouloir supprimer cette remarque ?')) {
+            remarque.toDelete = true;
+            populateRemarquesModal();
+        }
+    }
+
+    function saveRemarques() {
+        // Récupérer les données du formulaire
+        const formItems = document.querySelectorAll('.remarque-form-item');
+
+        formItems.forEach((item, index) => {
+            const textarea = item.querySelector('textarea');
+            const remarqueId = item.dataset.remarqueId;
+
+            if (remarqueId === 'new') {
+                // Nouvelle remarque
+                if (textarea.value.trim()) {
+                    // Ajouter aux données pour soumission
+                    const newData = {
+                        id: null,
+                        remarque: textarea.value.trim(),
+                        isNew: true
+                    };
+                    // Mettre à jour dans remarquesData
+                    const newRemarqueIndex = remarquesData.findIndex(r => !r.id && !r.toDelete);
+                    if (newRemarqueIndex >= 0) {
+                        remarquesData[newRemarqueIndex] = newData;
+                    }
+                }
+            } else {
+                // Remarque existante
+                const remarque = remarquesData.find(r => r.id == remarqueId);
+                if (remarque) {
+                    remarque.remarque = textarea.value.trim();
+                }
+            }
+        });
+
+        // Envoyer les données au serveur
+        submitRemarquesChanges();
+    }
+
+    function submitRemarquesChanges() {
+        // Créer les données pour l'envoi AJAX
+        const formData = new FormData();
+
+        // Ajouter le token CSRF
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        formData.append('csrfmiddlewaretoken', csrfToken);
+
+        // Ajouter un indicateur que c'est une mise à jour des remarques uniquement
+        formData.append('action', 'update_remarques');
+
+        // Préparer toutes les remarques (y compris celles à supprimer)
+        const toutesRemarques = remarquesData.filter(r => r.id || (!r.id && r.remarque && r.remarque.trim()));
+        const initialRemarques = remarquesData.filter(r => r.id);
+
+        // Ajouter les champs du formset
+        formData.append('remarques-TOTAL_FORMS', toutesRemarques.length.toString());
+        formData.append('remarques-INITIAL_FORMS', initialRemarques.length.toString());
+        formData.append('remarques-MIN_NUM_FORMS', '0');
+        formData.append('remarques-MAX_NUM_FORMS', '1000');
+
+        toutesRemarques.forEach((remarque, index) => {
+            if (remarque.id) {
+                formData.append(`remarques-${index}-id`, remarque.id.toString());
+            }
+            formData.append(`remarques-${index}-remarque`, remarque.remarque || '');
+
+            if (remarque.toDelete) {
+                formData.append(`remarques-${index}-DELETE`, 'on');
+            }
+        });
+
+        // Envoyer via AJAX
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // Succès - recharger la page pour voir les changements
+                window.location.reload();
+            } else {
+                throw new Error('Erreur lors de la sauvegarde');
+            }
+        })
+        .catch(error => {
+            console.error('Error saving remarques:', error);
+            alert('Erreur lors de la sauvegarde des remarques. Veuillez réessayer.');
+        })
+        .finally(() => {
+            closeRemarquesModal();
+        });
+    }
+
+
+    // Handle new fiche logic
+    {% if not fiche_form.instance.pk %}
+        const aucuneRemarque = document.getElementById('aucune-remarque');
+        const ligneRemarqueInitiale = document.getElementById('ligne-remarque-initiale');
+        if (aucuneRemarque) aucuneRemarque.style.display = 'none';
+        if (ligneRemarqueInitiale) ligneRemarqueInitiale.style.display = '';
+
+        const remarqueTextarea = document.getElementById('remarque-initiale');
+        const remarqueField = document.getElementById('remarque-initiale-field');
+        if (remarqueTextarea && remarqueField) {
+            remarqueTextarea.addEventListener('input', function() {
+                remarqueField.value = this.value;
+            });
+        }
+    {% endif %}
+
+    // Auto-clear default values on focus
+    const allFields = document.querySelectorAll('input[type="text"], input[type="number"], textarea');
+
+    allFields.forEach(field => {
+        const defaultValue = field.value;
+
+        // Vérifier si c'est une valeur par défaut à effacer
+        const shouldClearOnFocus = (
+            defaultValue === 'Non spécifié' ||
+            defaultValue === 'Non spécifiée' ||
+            defaultValue === '0' ||
+            defaultValue === '0,0' ||
+            defaultValue === '00'
+        );
+
+        if (shouldClearOnFocus) {
+            // Au focus, effacer si c'est toujours la valeur par défaut
+            field.addEventListener('focus', function() {
+                if (this.value === defaultValue) {
+                    this.value = '';
+                }
+            });
+
+            // Au blur, remettre la valeur par défaut si le champ est vide
+            field.addEventListener('blur', function() {
+                if (this.value.trim() === '') {
+                    this.value = defaultValue;
+                }
+            });
+        }
+    });
+});
+</script>
         </div>
+    </section>
+
+    <!-- Formset caché pour les remarques (pour soumission normale du formulaire) -->
+    <div style="display: none;">
+        {{ remarque_formset.management_form }}
+        {% for form in remarque_formset %}
+            {{ form.id }}
+            {{ form.remarque }}
+            {{ form.DELETE }}
+        {% endfor %}
     </div>
 
     <!-- Boutons de formulaire -->
@@ -400,5 +970,17 @@
         {% endif %}
     </div>
 </form>
-{% endblock %}
 
+<!-- Formulaire de soumission pour correction (en dehors du formulaire principal) -->
+{% if fiche_form.instance.pk %}
+    {% if fiche_form.instance.etat_correction.statut == 'nouveau' or fiche_form.instance.etat_correction.statut == 'en_edition' %}
+    <form method="post" action="{% url 'soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" style="margin-top: 10px;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success" onclick="return confirm('Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.');">
+            Soumettre pour correction
+        </button>
+    </form>
+    {% endif %}
+{% endif %}
+
+{% endblock %}

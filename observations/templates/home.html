@@ -17,10 +17,50 @@
     <div class="card-body">
         <ul>
             <li><a href="{% url 'observations_list' %}">Nouvelle observation</a></li>
-            <li><a href="{% url 'observations_list' %}">Nouvelle observation V2</a></li>
+            <li><a href="{% url 'liste_fiches_observations' %}">Liste des fiches d'observation</a></li>
         </ul>
     </div>
 </div>
+
+{% if fiches_en_edition %}
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h3>Mes fiches en cours d'édition</h3>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>N° Fiche</th>
+                    <th>Espèce</th>
+                    <th>Année</th>
+                    <th>Statut</th>
+                    <th>Dernière modification</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fiche in fiches_en_edition %}
+                <tr>
+                    <td>{{ fiche.num_fiche }}</td>
+                    <td>{{ fiche.espece.nom }}</td>
+                    <td>{{ fiche.annee }}</td>
+                    <td>
+                        <span class="badge {% if fiche.etat_correction.statut == 'nouveau' %}bg-secondary{% elif fiche.etat_correction.statut == 'en_edition' %}bg-warning{% endif %}">
+                            {{ fiche.etat_correction.get_statut_display }}
+                        </span>
+                    </td>
+                    <td>{{ fiche.etat_correction.date_derniere_modification|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <a href="{% url 'modifier_observation' fiche_id=fiche.num_fiche %}" class="btn btn-sm btn-primary">Continuer</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
 
 <div class="card mb-4">
     <div class="card-header bg-success text-white">
@@ -34,7 +74,7 @@
     </div>
 </div>
 
-{% if user.role == 'administrateur' %}
+{% if user.is_authenticated and user.role == 'administrateur' %}
 <div class="card mb-4">
     <div class="card-header bg-warning text-white">
         <h3>Administration</h3>
@@ -42,17 +82,17 @@
     <div class="card-body">
         <ul>
             <!-- Remplacer user_list par liste_utilisateurs -->
-            <li><a href="{% url 'administration:liste_utilisateurs' %}">Liste des observateurs</a></li>
+            <li><a href="{% url 'accounts:liste_utilisateurs' %}">Liste des observateurs</a></li>
             <!-- Remplacer user_create par creer_utilisateur -->
-            <li><a href="{% url 'administration:creer_utilisateur' %}">Ajouter un observateur</a></li>
-            <li><a href="{% url 'administration:liste_utilisateurs' %}">Gestion des utilisateurs</a></li>
-            <li><a href="{% url 'administration:creer_utilisateur' %}">Créer un nouvel utilisateur</a></li>
+            <li><a href="{% url 'accounts:creer_utilisateur' %}">Ajouter un observateur</a></li>
+            <li><a href="{% url 'accounts:liste_utilisateurs' %}">Gestion des utilisateurs</a></li>
+            <li><a href="{% url 'accounts:creer_utilisateur' %}">Créer un nouvel utilisateur</a></li>
         </ul>
     </div>
 </div>
 {% endif %}
 
-{% if user.is_superuser and user.role != 'administrateur' %}
+{% if user.is_authenticated and user.is_superuser and user.role != 'administrateur' %}
 <div class="card">
     <div class="card-header bg-danger text-white">
         <h3>Accès d'urgence</h3>
@@ -60,7 +100,7 @@
     <div class="card-body">
         <p><strong>Vous êtes un superutilisateur mais pas un administrateur dans le système de rôles.</strong></p>
         <p>Pour accéder aux fonctionnalités d'administration, vous devez d'abord vous promouvoir :</p>
-        <a href="{% url 'administration:promouvoir_administrateur' %}" class="btn btn-danger">Promouvoir en administrateur</a>
+        <a href="{% url 'accounts:promouvoir_administrateur' %}" class="btn btn-danger">Promouvoir en administrateur</a>
     </div>
 </div>
 {% endif %}

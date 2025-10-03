@@ -6,14 +6,14 @@
     <p><strong>Rôle:</strong> {{ user.get_role_display }}</p>
     <p><strong>Email:</strong> {{ user.email }}</p>
     <div class="actions">
-      <a href="{% url 'administration:modifier_utilisateur' user.id %}" class="btn btn-sm btn-primary">Modifier</a>
+      <a href="{% url 'accounts:modifier_utilisateur' user.id %}" class="btn btn-sm btn-primary">Modifier</a>
       {% if user.is_active %}
-        <form method="post" action="{% url 'administration:desactiver_utilisateur' user.id %}" class="d-inline">
+        <form method="post" action="{% url 'accounts:desactiver_utilisateur' user.id %}" class="d-inline">
           {% csrf_token %}
           <button type="submit" class="btn btn-sm btn-warning">Désactiver</button>
         </form>
       {% else %}
-        <form method="post" action="{% url 'administration:activer_utilisateur' user.id %}" class="d-inline">
+        <form method="post" action="{% url 'accounts:activer_utilisateur' user.id %}" class="d-inline">
           {% csrf_token %}
           <button type="submit" class="btn btn-sm btn-success">Activer</button>
         </form>

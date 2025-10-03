@@ -7,6 +7,7 @@ from .views.saisie_observation_view import (
     fiche_observation_view,
     historique_modifications,
     saisie_observation,
+    soumettre_pour_correction,
 )
 from .views.view_transcription import (
     check_progress,
@@ -19,6 +20,9 @@ from .views.views_home import (
     default_view,
     home,
 )
+from .views.views_observation import (
+    liste_fiches_observations,
+)
 
 urlpatterns = [
     # Routes principales
@@ -28,7 +32,9 @@ urlpatterns = [
     path('auth/logout/', LogoutView.as_view(next_page='home'), name='logout'),
     path('auth/login/', LoginView.as_view(template_name='login.html'), name='login'),
     # Routes d'observations
-    path('observations/', saisie_observation, name='observations_list'),
+    path('observations/', saisie_observation, name=
+    'observations_list'),
+    path('observations/liste/', liste_fiches_observations, name='liste_fiches_observations'),
     path('observations/<int:fiche_id>/', fiche_observation_view, name='fiche_observation'),
     #    path('observations/nouvelle/', saisie_observation, name='saisie_observation'),
     #    path('observations/sauvegarde/', traiter_saisie_observation, name='traiter_saisie_observation'),
@@ -45,6 +51,12 @@ urlpatterns = [
         'observations/historique/<int:fiche_id>/',
         historique_modifications,
         name='historique_modifications',
+    ),
+    # Route pour soumettre une fiche pour correction
+    path(
+        'observations/soumettre/<int:fiche_id>/',
+        soumettre_pour_correction,
+        name='soumettre_pour_correction',
     ),
 ]
 '''

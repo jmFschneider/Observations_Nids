@@ -53,7 +53,7 @@ if _local is not None:
     ALLOWED_HOSTS = getattr(_local, "ALLOWED_HOSTS", ALLOWED_HOSTS)
 
 
-AUTH_USER_MODEL = 'administration.Utilisateur'
+AUTH_USER_MODEL = 'accounts.Utilisateur'
 LOGIN_REDIRECT_URL = '/'
 
 # DurÃ©e de session : 3600 secondes (1 heure)
@@ -82,9 +82,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'administration.apps.AdministrationConfig',
+    'accounts.apps.AccountsConfig',
+    'core.apps.CoreConfig',
+    'taxonomy.apps.TaxonomyConfig',
+    'geo.apps.GeoConfig',
     'observations.apps.ObservationsConfig',
-    'importation.apps.ImportationConfig',
+    'review.apps.ReviewConfig',
+    'ingest.apps.IngestConfig',
+    'audit.apps.AuditConfig',
 ]
 
 MIDDLEWARE = [
@@ -137,6 +142,10 @@ WSGI_APPLICATION = 'observations_nids.wsgi.application'
 
 DATABASES = settings.get_database_config()
 
+# Surcharge depuis settings_local.py si présent
+if _local is not None and hasattr(_local, 'DATABASES'):
+    DATABASES = _local.DATABASES
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -178,7 +187,7 @@ STATIC_URL = '/static/'
 # Dossier oÃ¹ Django trouvera les fichiers statiques de l'application
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "observations", "static"),
-    os.path.join(BASE_DIR, "importation", "static"),
+    os.path.join(BASE_DIR, "ingest", "static"),
 ]
 
 # Dossier oÃ¹ Django collectera tous les fichiers statiques pour la mise en production
@@ -248,7 +257,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        'importation': {
+        'ingest': {
             'handlers': ['file', 'console'],
             'level': 'INFO',
             'propagate': False,

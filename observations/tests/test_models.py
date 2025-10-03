@@ -1,6 +1,8 @@
 """Tests des modèles du module observations."""
 import pytest
 from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
+from django.utils import timezone
 
 from observations.models import (
     FicheObservation,
@@ -50,7 +52,6 @@ class TestObservation:
 
     def test_creation_observation(self, fiche_observation):
         """Test de création d'une observation."""
-        from django.utils import timezone
 
         date_obs = timezone.now()
         observation = Observation.objects.create(
@@ -67,7 +68,6 @@ class TestObservation:
 
     def test_validation_nombres_negatifs(self, fiche_observation):
         """Test que les nombres négatifs sont rejetés."""
-        from django.utils import timezone
 
         with pytest.raises(ValidationError):
             obs = Observation(
@@ -90,7 +90,6 @@ class TestResumeObservation:
         resume.save()  # Devrait passer
 
         # Test violation de contrainte
-        from django.db.utils import IntegrityError
 
         with pytest.raises(IntegrityError):
             resume.nombre_oeufs_eclos = 10
@@ -98,7 +97,6 @@ class TestResumeObservation:
 
     def test_contrainte_jour_mois_together(self, fiche_observation):
         """Test que jour et mois sont renseignés ensemble ou pas du tout."""
-        from django.db.utils import IntegrityError
 
         resume = fiche_observation.resume
 

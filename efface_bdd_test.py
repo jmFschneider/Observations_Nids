@@ -6,6 +6,7 @@ import django
 
 # Imports des modèles
 from importation.models import EspeceCandidate, ImportationEnCours, TranscriptionBrute
+
 from observations.models import (
     CausesEchec,
     FicheObservation,

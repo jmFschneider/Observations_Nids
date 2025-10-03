@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Liste des fiches d'observation{% endblock %}
+
+{% block content %}
+<style>
+.etat-correction-cell {
+    transition: background-color 0.3s ease;
+    border-radius: 6px;
+    padding: 8px !important;
+}
+</style>
+
+<script>
+function getColorForPercentage(percentage) {
+    // Couleur rouge pour 0-49%, dégradé rouge-vert pour 50-100%
+    if (percentage < 50) {
+        // Rouge avec différentes intensités selon le pourcentage
+        const intensity = Math.max(0.3, percentage / 50); // Min 30% d'opacité
+        return `rgba(220, 53, 69, ${intensity * 0.3})`; // Bootstrap danger color avec transparence
+    } else {
+        // Dégradé du rouge (50%) au vert (100%)
+        const normalizedPercentage = (percentage - 50) / 50; // 0 à 1
+
+        // Interpolation linéaire entre rouge et vert
+        const red = Math.round(220 * (1 - normalizedPercentage) + 40 * normalizedPercentage);   // 220 -> 40
+        const green = Math.round(53 * (1 - normalizedPercentage) + 167 * normalizedPercentage); // 53 -> 167
+        const blue = Math.round(69 * (1 - normalizedPercentage) + 69 * normalizedPercentage);   // 69 -> 69
+
+        const opacity = 0.15 + (normalizedPercentage * 0.2); // Opacité de 15% à 35%
+        return `rgba(${red}, ${green}, ${blue}, ${opacity})`;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Appliquer la colorisation à toutes les cellules d'état de correction
+    const cellsEtatCorrection = document.querySelectorAll('.etat-correction-cell');
+
+    cellsEtatCorrection.forEach(function(cell) {
+        const percentage = parseInt(cell.dataset.percentage);
+        if (!isNaN(percentage)) {
+            cell.style.backgroundColor = getColorForPercentage(percentage);
+        }
+    });
+});
+</script>
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Liste des fiches d'observation</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">Liste des fiches d'observation</h1>
+
+    <div class="alert alert-info">
+        <p>Cette page affiche toutes les fiches d'observation enregistrées dans le système.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Fiches d'observation ({{ fiches.paginator.count }})</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Date de création</th>
+                        <th>Observateur</th>
+                        <th>Espèce</th>
+                        <th>Commune</th>
+                        <th>État de correction</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fiche in fiches %}
+                    <tr>
+                        <td>{{ fiche.num_fiche }}</td>
+                        <td>{{ fiche.date_creation|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if fiche.observateur %}
+                                {{ fiche.observateur.first_name }} {{ fiche.observateur.last_name }}
+                            {% else %}
+                                <span class="text-muted">Non renseigné</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if fiche.espece %}
+                                {{ fiche.espece.nom }}
+                            {% else %}
+                                <span class="text-muted">Non renseignée</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if fiche.localisation %}
+                                {{ fiche.localisation.commune }}
+                            {% else %}
+                                <span class="text-muted">Non renseignée</span>
+                            {% endif %}
+                        </td>
+                        <td class="etat-correction-cell"
+                            data-percentage="{% if fiche.etat_correction %}{{ fiche.etat_correction.pourcentage_completion }}{% else %}0{% endif %}">
+                            {% if fiche.etat_correction %}
+                                <div class="d-flex align-items-center">
+                                    <span class="badge
+                                        {% if fiche.etat_correction.statut == 'nouveau' %}badge-secondary
+                                        {% elif fiche.etat_correction.statut == 'en_cours' %}badge-warning
+                                        {% else %}badge-success{% endif %}">
+                                        {{ fiche.etat_correction.get_statut_display }}
+                                    </span>
+                                    {% if fiche.etat_correction.statut == 'en_cours' %}
+                                        <div class="progress ml-2" style="width: 60px; height: 20px;">
+                                            <div class="progress-bar" style="width: {{ fiche.etat_correction.pourcentage_completion }}%">
+                                                <small>{{ fiche.etat_correction.pourcentage_completion }}%</small>
+                                            </div>
+                                        </div>
+                                    {% elif fiche.etat_correction.statut == 'valide' %}
+                                        <small class="text-success ml-2">
+                                            <i class="fas fa-check-circle"></i>
+                                            {% if fiche.etat_correction.validee_par %}
+                                                par {{ fiche.etat_correction.validee_par.first_name }} {{ fiche.etat_correction.validee_par.last_name }}
+                                            {% endif %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <span class="badge badge-secondary">Nouveau</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Visualiser</a>
+                                <a href="{% url 'modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-warning">Corriger</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-3">Aucune fiche d'observation trouvée.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if fiches.paginator.num_pages > 1 %}
+        <div class="card-footer">
+            <nav aria-label="Pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if fiches.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">
+                                &laquo; Première
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ fiches.previous_page_number }}">
+                                Précédente
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&laquo; Première</span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">Précédente</span>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Page {{ fiches.number }} sur {{ fiches.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if fiches.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ fiches.next_page_number }}">
+                                Suivante
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ fiches.paginator.num_pages }}">
+                                Dernière &raquo;
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Suivante</span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">Dernière &raquo;</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'home' %}" class="btn btn-secondary">Retour à l'accueil</a>
+        <a href="{% url 'observations_list' %}" class="btn btn-primary">Nouvelle observation</a>
+    </div>
+</div>
+{% endblock %}

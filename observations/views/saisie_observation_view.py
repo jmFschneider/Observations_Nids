@@ -193,11 +193,9 @@ def saisie_observation(request, fiche_id=None):
         min_num=0,
     )
 
-    if request.method == "POST":
-
+    if request.method == "POST" and request.POST.get('action') == 'update_remarques':
         # Traitement spécial pour la mise à jour des remarques uniquement (via AJAX)
-        if request.POST.get('action') == 'update_remarques':
-            return handle_remarques_update(request, fiche_instance, remarqueformset)
+        return handle_remarques_update(request, fiche_instance, remarqueformset)
 
     # Traitement spécial pour récupérer les remarques via AJAX (GET)
     if request.GET.get('get_remarques') == '1' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -325,37 +323,64 @@ def saisie_observation(request, fiche_id=None):
                         )
 
                     # Sauvegarder les objets liés
-                    localisation = localisation_form.save(commit=False)
-                    localisation.fiche = fiche
-                    localisation.save()
-                    if fiche_id and localisation_avant:
-                        enregistrer_modifications_historique(
-                            fiche, localisation_avant, localisation, 'localisation', request.user, localisation_form.changed_data
-                        )
+                    # Pour une nouvelle fiche, ils ont déjà été créés par FicheObservation.save()
+                    # On les récupère et on les met à jour
+                    if fiche_id:
+                        # Modification : on met à jour les objets existants
+                        localisation = localisation_form.save(commit=False)
+                        localisation.fiche = fiche
+                        localisation.save()
+                        if localisation_avant:
+                            enregistrer_modifications_historique(
+                                fiche, localisation_avant, localisation, 'localisation', request.user, localisation_form.changed_data
+                            )
 
-                    resume = resume_form.save(commit=False)
-                    resume.fiche = fiche
-                    resume.save()
-                    if fiche_id and resume_avant:
-                        enregistrer_modifications_historique(
-                            fiche, resume_avant, resume, 'resume_observation', request.user, resume_form.changed_data
-                        )
+                        resume = resume_form.save(commit=False)
+                        resume.fiche = fiche
+                        resume.save()
+                        if resume_avant:
+                            enregistrer_modifications_historique(
+                                fiche, resume_avant, resume, 'resume_observation', request.user, resume_form.changed_data
+                            )
 
-                    nid = nid_form.save(commit=False)
-                    nid.fiche = fiche
-                    nid.save()
-                    if fiche_id and nid_avant:
-                        enregistrer_modifications_historique(
-                            fiche, nid_avant, nid, 'nid', request.user, nid_form.changed_data
-                        )
+                        nid = nid_form.save(commit=False)
+                        nid.fiche = fiche
+                        nid.save()
+                        if nid_avant:
+                            enregistrer_modifications_historique(
+                                fiche, nid_avant, nid, 'nid', request.user, nid_form.changed_data
+                            )
 
-                    causes_echec = causes_echec_form.save(commit=False)
-                    causes_echec.fiche = fiche
-                    causes_echec.save()
-                    if fiche_id and causes_echec_avant:
-                        enregistrer_modifications_historique(
-                            fiche, causes_echec_avant, causes_echec, 'causes_echec', request.user, causes_echec_form.changed_data
-                        )
+                        causes_echec = causes_echec_form.save(commit=False)
+                        causes_echec.fiche = fiche
+                        causes_echec.save()
+                        if causes_echec_avant:
+                            enregistrer_modifications_historique(
+                                fiche, causes_echec_avant, causes_echec, 'causes_echec', request.user, causes_echec_form.changed_data
+                            )
+                    else:
+                        # Nouvelle fiche : les objets ont été créés automatiquement
+                        # On les récupère et on les met à jour avec les données du formulaire
+
+                        localisation = fiche.localisation
+                        for field in localisation_form.cleaned_data:
+                            setattr(localisation, field, localisation_form.cleaned_data[field])
+                        localisation.save()
+
+                        resume = fiche.resume
+                        for field in resume_form.cleaned_data:
+                            setattr(resume, field, resume_form.cleaned_data[field])
+                        resume.save()
+
+                        nid = fiche.nid
+                        for field in nid_form.cleaned_data:
+                            setattr(nid, field, nid_form.cleaned_data[field])
+                        nid.save()
+
+                        causes_echec = fiche.causes_echec
+                        for field in causes_echec_form.cleaned_data:
+                            setattr(causes_echec, field, causes_echec_form.cleaned_data[field])
+                        causes_echec.save()
 
                     # Gérer les observations
                     if fiche_id:
@@ -480,12 +505,11 @@ def saisie_observation(request, fiche_id=None):
         resume_form = ResumeObservationForm(instance=resume_instance)
         nid_form = NidForm(instance=nid_instance)
         causes_echec_form = CausesEchecForm(instance=causes_echec_instance)
-        if fiche_instance:
+        if fiche_instance and hasattr(fiche_instance, 'observations'):
             # HACK: Remove unsaved observations that may be lingering in memory
-            if hasattr(fiche_instance, 'observations'):
-                unsaved_obs = [obs for obs in fiche_instance.observations.all() if obs.pk is None]
-                if unsaved_obs:
-                    fiche_instance.observations.remove(*unsaved_obs)
+            unsaved_obs = [obs for obs in fiche_instance.observations.all() if obs.pk is None]
+            if unsaved_obs:
+                fiche_instance.observations.remove(*unsaved_obs)
 
         observation_formset = observationformset(instance=fiche_instance)
         remarque_formset = remarqueformset(instance=fiche_instance)
@@ -595,10 +619,7 @@ def enregistrer_modifications_historique(
     champs_ignores = ['id', 'fiche', 'DELETE']
 
     # Si on a une liste de champs modifiés, ne traiter que ceux-ci
-    if champs_modifies:
-        champs_a_verifier = champs_modifies
-    else:
-        champs_a_verifier = [field.name for field in ancienne_instance._meta.fields]
+    champs_a_verifier = champs_modifies or [field.name for field in ancienne_instance._meta.fields]
 
     for champ in champs_a_verifier:
         if champ in champs_ignores:
@@ -651,4 +672,54 @@ def supprimer_observation(request, observation_id):
         observation.delete()
         messages.success(request, "Observation supprimée avec succès")
 
+    return redirect('modifier_observation', fiche_id=fiche_id)
+
+
+@login_required
+def soumettre_pour_correction(request, fiche_id):
+    """Soumettre une fiche pour correction (passage du statut en_edition à en_cours)"""
+    fiche = get_object_or_404(FicheObservation, pk=fiche_id)
+    user = cast(Utilisateur, request.user)
+
+    logger.info(f"soumettre_pour_correction appelé pour fiche {fiche_id}, méthode: {request.method}")
+
+    # Vérifier que c'est bien l'observateur de la fiche
+    if user != fiche.observateur and user.role != "administrateur":
+        messages.error(request, "Vous n'êtes pas autorisé à soumettre cette fiche")
+        return redirect('modifier_observation', fiche_id=fiche_id)
+
+    if request.method == 'POST':
+        # Récupérer l'état de correction
+        etat_correction = fiche.etat_correction
+        logger.info(f"Statut actuel de la fiche {fiche_id}: {etat_correction.statut}")
+
+        # Passer en mode correction (révision) seulement si en édition
+        if etat_correction.statut in ['nouveau', 'en_edition']:
+            # Calculer le pourcentage de complétion
+            pourcentage = etat_correction.calculer_pourcentage_completion()
+
+            # Forcer le statut à "en_cours" et sauvegarder sans recalcul automatique
+            etat_correction.statut = 'en_cours'
+            etat_correction.pourcentage_completion = pourcentage
+            etat_correction.save(skip_auto_calculation=True)
+
+            logger.info(f"Fiche {fiche_id} passée en statut 'en_cours', pourcentage: {pourcentage}%")
+
+            messages.success(
+                request,
+                f"Fiche #{fiche_id} soumise pour correction. "
+                f"Complétion : {pourcentage}%"
+            )
+        else:
+            logger.warning(f"Fiche {fiche_id} déjà en statut: {etat_correction.statut}")
+            messages.warning(
+                request,
+                f"La fiche est déjà en statut '{etat_correction.get_statut_display()}'"
+            )
+
+        # Rediriger vers la vue de détail (lecture seule)
+        logger.info(f"Redirection vers fiche_observation pour fiche {fiche_id}")
+        return redirect('fiche_observation', fiche_id=fiche_id)
+
+    logger.info(f"Méthode GET, redirection vers modifier_observation pour fiche {fiche_id}")
     return redirect('modifier_observation', fiche_id=fiche_id)

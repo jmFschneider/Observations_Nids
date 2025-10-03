@@ -23,13 +23,9 @@ from observations_nids import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('gestion/', include('administration.urls')),  # URLs pour l'application administration
-    path(
-        '', include('observations.urls')
-    ),  # URLs pour l'application observations (routes principales)
-    path(
-        'importation/', include('importation.urls')
-    ),  # URLs pour l'application importation avec préfixe
+    path('accounts/', include('accounts.urls')),
+    path('', include('observations.urls')),
+    path('ingest/', include('ingest.urls')),
 ]
 
 if settings.DEBUG:

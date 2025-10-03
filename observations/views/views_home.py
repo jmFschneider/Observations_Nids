@@ -3,8 +3,8 @@ import logging
 
 from django.shortcuts import render
 
-from administration.models import Utilisateur  # importation mise à jour
-from observations.models import Observation
+from accounts.models import Utilisateur
+from observations.models import FicheObservation, Observation
 
 logger = logging.getLogger('observations')
 
@@ -23,6 +23,12 @@ def home(request):
     users_count = Utilisateur.objects.count()
     observations_count = Observation.objects.count()
 
+    # Récupérer les fiches en cours d'édition de l'observateur connecté
+    fiches_en_edition = FicheObservation.objects.filter(
+        observateur=user,
+        etat_correction__statut__in=['nouveau', 'en_edition']
+    ).select_related('espece', 'etat_correction').order_by('-date_creation')[:5]
+
     return render(
         request,
         'home.html',
@@ -30,6 +36,7 @@ def home(request):
             'user': user,  # Renommé pour éviter la confusion avec le modèle
             'users_count': users_count,
             'observations_count': observations_count,
+            'fiches_en_edition': fiches_en_edition,
         },
     )
 

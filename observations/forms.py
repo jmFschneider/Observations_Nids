@@ -1,10 +1,9 @@
-# observations/forms.py
 from django import forms
 
+from geo.models import Localisation
 from observations.models import (
     CausesEchec,
     FicheObservation,
-    Localisation,
     Nid,
     Observation,
     Remarque,
@@ -79,11 +78,17 @@ class ObservationForm(forms.ModelForm):
         fields = ['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations']
         widgets = {
             'date_observation': forms.DateTimeInput(
-                attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'
+                attrs={'type': 'datetime-local', 'class': 'clear-on-focus'}, format='%Y-%m-%dT%H:%M'
+            ),
+            'nombre_oeufs': forms.NumberInput(
+                attrs={'class': 'clear-on-focus', 'placeholder': 'Nombre d\'œufs'}
+            ),
+            'nombre_poussins': forms.NumberInput(
+                attrs={'class': 'clear-on-focus', 'placeholder': 'Nombre de poussins'}
             ),
             'observations': forms.Textarea(
                 attrs={
-                    'class': 'section-content',
+                    'class': 'section-content clear-on-focus',
                     'rows': 1,
                     'placeholder': 'Observation',
                     'style': 'min-height: 30px; width: 250px; max-width: 100%; resize: vertical;',
@@ -145,11 +150,27 @@ class ResumeObservationForm(forms.ModelForm):
             'premier_poussin_volant_mois': forms.NumberInput(
                 attrs={'placeholder': 'Mois', 'min': 1, 'max': 12}
             ),
-            'nombre_oeufs_pondus': forms.NumberInput(attrs={'min': 0}),
-            'nombre_oeufs_eclos': forms.NumberInput(attrs={'min': 0}),
-            'nombre_oeufs_non_eclos': forms.NumberInput(attrs={'min': 0}),
-            'nombre_poussins': forms.NumberInput(attrs={'min': 0}),
+            'nombre_oeufs_pondus': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Non observé'}),
+            'nombre_oeufs_eclos': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Non observé'}),
+            'nombre_oeufs_non_eclos': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Non observé'}),
+            'nombre_poussins': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Non observé'}),
         }
+
+    def clean_nombre_oeufs_pondus(self):
+        value = self.cleaned_data.get('nombre_oeufs_pondus')
+        return None if value == '' or value is None else value
+
+    def clean_nombre_oeufs_eclos(self):
+        value = self.cleaned_data.get('nombre_oeufs_eclos')
+        return None if value == '' or value is None else value
+
+    def clean_nombre_oeufs_non_eclos(self):
+        value = self.cleaned_data.get('nombre_oeufs_non_eclos')
+        return None if value == '' or value is None else value
+
+    def clean_nombre_poussins(self):
+        value = self.cleaned_data.get('nombre_poussins')
+        return None if value == '' or value is None else value
 
 
 # utilisation de la form Django personnalisé avec mon css
@@ -190,10 +211,25 @@ class CausesEchecForm(forms.ModelForm):
 class RemarqueForm(forms.ModelForm):
     class Meta:
         model = Remarque
-        fields = ['fiche', 'remarque']  # date_remarque est exclu
+        fields = ['remarque']  # fiche sera assignée automatiquement, date_remarque est exclu
         widgets = {
-            'remarque': forms.TextInput(attrs={'placeholder': 'Entrez une remarque'}),
+            'remarque': forms.Textarea(attrs={
+                'placeholder': 'Entrez une remarque',
+                'rows': 2,
+                'style': 'width: 100%; resize: vertical;'
+            }),
         }
+
+# Formset pour gérer plusieurs remarques
+RemarqueFormSet = forms.inlineformset_factory(
+    FicheObservation,
+    Remarque,
+    form=RemarqueForm,
+    extra=1,  # Une ligne vide pour ajouter une nouvelle remarque
+    can_delete=True,  # Permet de supprimer des remarques
+    min_num=0,  # Aucune remarque minimum requise
+    validate_min=True
+)
 
 
 #

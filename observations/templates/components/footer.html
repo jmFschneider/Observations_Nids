@@ -9,7 +9,7 @@
             <ul class="list-unstyled">
                 <li><a href="{% url 'home' %}">Accueil</a></li>
                 {% if user.is_authenticated %}
-                <li><a href="{% url 'administration:mon_profil' %}">Mon profil</a></li>
+                <li><a href="{% url 'accounts:mon_profil' %}">Mon profil</a></li>
                 {% else %}
                 <li><a href="{% url 'login' %}">Connexion</a></li>
                 {% endif %}
