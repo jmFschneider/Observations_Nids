@@ -12,6 +12,7 @@ from django.utils.crypto import get_random_string
 
 from accounts.models import Utilisateur
 from geo.models import Localisation
+from geo.utils.geocoding import get_geocodeur
 from observations.models import (
     CausesEchec,
     FicheObservation,
@@ -34,6 +35,7 @@ class ImportationService:
         self.seuil_similarite = (
             0.8  # Seuil à partir duquel on considère une correspondance probable
         )
+        self.geocodeur = get_geocodeur()  # Réutiliser l'instance singleton
 
     def importer_fichiers_json(self, repertoire):
         """Importe tous les fichiers JSON d'un répertoire vers la table TranscriptionBrute"""
@@ -89,6 +91,7 @@ class ImportationService:
         transcriptions = TranscriptionBrute.objects.filter(traite=False)
         especes_ajoutees = 0
         utilisateurs_crees = 0
+        communes_geocodees = 0
 
         for transcription in transcriptions:
             try:
@@ -123,13 +126,39 @@ class ImportationService:
                         if utilisateur and getattr(utilisateur, '_created', False):
                             utilisateurs_crees += 1
 
+                # Extraire et géocoder la commune
+                if 'localisation' in donnees:
+                    loc = donnees['localisation']
+                    nom_commune = loc.get('commune') or loc.get('IGN_50000')
+                    departement = loc.get('dep_t')
+
+                    if nom_commune and isinstance(nom_commune, str) and nom_commune != 'Non spécifiée':
+                        try:
+                            # Rechercher la commune via le géocodeur
+                            resultat = self.geocodeur.geocoder_commune(nom_commune, departement)
+
+                            if resultat:
+                                logger.info(
+                                    f"Commune trouvée pour '{nom_commune}': {resultat['adresse_complete']} "
+                                    f"(source: {resultat['source']}, coordonnées: {resultat['coordonnees_gps']})"
+                                )
+                                communes_geocodees += 1
+                            else:
+                                logger.warning(f"Aucune commune trouvée pour '{nom_commune}'")
+                        except Exception as e:
+                            logger.error(f"Erreur lors du géocodage de '{nom_commune}': {str(e)}")
+
             except Exception as e:
                 logger.error(
                     f"Erreur lors de l'extraction des candidats depuis {transcription.fichier_source}: {str(e)}"
                 )
                 continue
 
-        return {'especes_ajoutees': especes_ajoutees, 'utilisateurs_crees': utilisateurs_crees}
+        return {
+            'especes_ajoutees': especes_ajoutees,
+            'utilisateurs_crees': utilisateurs_crees,
+            'communes_geocodees': communes_geocodees
+        }
 
     def _trouver_correspondance_espece(self, espece_candidate):
         """Tente de trouver une correspondance pour une espèce candidate"""
@@ -333,10 +362,58 @@ class ImportationService:
             if 'localisation' in donnees:
                 loc = donnees['localisation']
                 localisation = Localisation.objects.get(fiche=fiche)
-                localisation.commune = loc.get('commune') or loc.get('IGN_50000') or 'Non spécifiée'
+
+                # Récupérer les données brutes
+                nom_commune = loc.get('commune') or loc.get('IGN_50000') or 'Non spécifiée'
+                departement = loc.get('dep_t') or '00'
+
+                # Géocoder la commune pour obtenir les coordonnées
+                altitude_depuis_geo = None
+                if nom_commune != 'Non spécifiée':
+                    try:
+                        resultat_geo = self.geocodeur.geocoder_commune(nom_commune, departement)
+                        if resultat_geo:
+                            # Utiliser le nom officiel et les coordonnées trouvées
+                            localisation.commune = resultat_geo.get('adresse_complete', nom_commune).split(',')[0]
+                            localisation.latitude = str(resultat_geo['lat'])
+                            localisation.longitude = str(resultat_geo['lon'])
+                            localisation.coordonnees = resultat_geo['coordonnees_gps']
+                            localisation.source_coordonnees = resultat_geo['source']
+                            localisation.precision_gps = resultat_geo.get('precision_metres', 5000)
+                            if 'code_insee' in resultat_geo:
+                                localisation.code_insee = resultat_geo['code_insee']
+                            # Récupérer l'altitude si disponible
+                            if 'altitude' in resultat_geo and resultat_geo['altitude'] is not None:
+                                altitude_depuis_geo = resultat_geo['altitude']
+                            logger.info(
+                                f"Fiche {fiche.num_fiche}: Commune géocodée '{nom_commune}' -> "
+                                f"{localisation.commune} (source: {resultat_geo['source']})"
+                            )
+                        else:
+                            # Pas trouvé, garder le nom brut
+                            localisation.commune = nom_commune
+                            logger.warning(f"Fiche {fiche.num_fiche}: Commune '{nom_commune}' non trouvée, coordonnées non mises à jour")
+                    except Exception as e:
+                        # En cas d'erreur, garder le nom brut
+                        localisation.commune = nom_commune
+                        logger.error(f"Fiche {fiche.num_fiche}: Erreur géocodage '{nom_commune}': {str(e)}")
+                else:
+                    localisation.commune = nom_commune
+
                 localisation.lieu_dit = loc.get('coordonnees_et_ou_lieu_dit') or 'Non spécifiée'
-                localisation.departement = loc.get('dep_t') or '00'
-                localisation.altitude = loc.get('altitude') or '0'
+                localisation.departement = departement
+                # Utiliser l'altitude du géocodage si disponible, sinon celle du JSON, sinon 0
+                if altitude_depuis_geo is not None:
+                    localisation.altitude = altitude_depuis_geo
+                else:
+                    altitude_json = loc.get('altitude')
+                    if altitude_json:
+                        try:
+                            localisation.altitude = int(altitude_json)
+                        except (ValueError, TypeError):
+                            localisation.altitude = 0
+                    else:
+                        localisation.altitude = 0
                 localisation.paysage = loc.get('paysage') or 'Non spécifié'
                 localisation.alentours = loc.get('alentours') or 'Non spécifié'
                 localisation.save()
@@ -466,6 +543,11 @@ class ImportationService:
             if "remarque" in donnees and donnees["remarque"]:
                 Remarque.objects.create(fiche=fiche, remarque=donnees["remarque"])
 
+            # Mettre l'état de correction à "En cours de correction"
+            etat_correction = fiche.etat_correction
+            etat_correction.statut = 'en_cours'
+            etat_correction.save()
+
             importation.statut = 'complete'
             importation.transcription.traite = True
             importation.save()
@@ -505,24 +587,28 @@ class ImportationService:
                     "message": "Aucun identifiant fourni pour la réinitialisation",
                 }
 
+            # Sauvegarder le nom du fichier pour le message
+            fichier_nom = transcription.fichier_source
+
             # Suppression de la fiche d'observation si elle existe
             if importation and importation.fiche_observation:
                 fiche_id = importation.fiche_observation.num_fiche
                 importation.fiche_observation.delete()
                 logger.info(f"Fiche d'observation #{fiche_id} supprimée")
 
-            # Marquer la transcription comme non traitée
-            transcription.traite = False
-            transcription.save()
-
             # Supprimer l'importation en cours
             if importation:
                 importation.delete()
-                logger.info(f"importation pour {transcription.fichier_source} réinitialisée")
+                logger.info(f"ImportationEnCours pour {fichier_nom} supprimée")
+
+            # Marquer la transcription comme non traitée pour permettre la re-préparation
+            transcription.traite = False
+            transcription.save()
+            logger.info(f"TranscriptionBrute pour {fichier_nom} marquée comme non traitée")
 
             return {
                 "success": True,
-                "message": f"L'importation de {transcription.fichier_source} a été réinitialisée avec succès",
+                "message": f"L'importation de {fichier_nom} a été réinitialisée avec succès.",
             }
 
         except (ImportationEnCours.DoesNotExist, TranscriptionBrute.DoesNotExist) as e:

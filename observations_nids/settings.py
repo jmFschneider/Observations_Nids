@@ -186,12 +186,13 @@ LOGIN_URL = 'login'
 STATIC_URL = '/static/'
 # Dossier oÃ¹ Django trouvera les fichiers statiques de l'application
 STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),  # Dossier static à la racine
     os.path.join(BASE_DIR, "observations", "static"),
     os.path.join(BASE_DIR, "ingest", "static"),
 ]
 
 # Dossier oÃ¹ Django collectera tous les fichiers statiques pour la mise en production
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Dossier oÃ¹ seront stockÃ© les fichiers jpg
 MEDIA_URL = '/media/'
