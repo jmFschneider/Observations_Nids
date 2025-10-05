@@ -26,7 +26,7 @@
         </a>
     </div>
     <div class="row mb-4">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Transcriptions</h5>
@@ -52,34 +52,67 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-6">
+    <div class="row mb-4">
+        <div class="col-12">
             <div class="card">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">Réconciliation</h5>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Espèces candidates:</span>
-                        <strong>{{ especes_candidates }}</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Espèces validées:</span>
-                        <strong>{{ especes_validees }}</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>Espèces en attente:</span>
-                        <strong>{{ especes_candidates|add:"-"|add:especes_validees }}</strong>
-                    </div>
-
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Observateurs créés depuis transcription:</span>
-                        <strong>{{ observateurs_transcription }}</strong>
-                    </div>
-
-                    <div class="mt-3">
-                        <a href="{% url 'liste_especes_candidates' %}" class="btn btn-success">Gérer les espèces</a>
-                    </div>
+                    <table class="table table-borderless mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 33.33%;"><i class="fas fa-dove"></i> Espèces</th>
+                                <th class="text-center" style="width: 33.33%;"><i class="fas fa-users"></i> Observateurs</th>
+                                <th class="text-center" style="width: 33.33%;"><i class="fas fa-map-marker-alt"></i> Communes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Candidates:</span>
+                                        <strong>{{ especes_candidates }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Validées:</span>
+                                        <strong>{{ especes_validees }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <span>En attente:</span>
+                                        <strong>{{ especes_candidates|add:"-"|add:especes_validees }}</strong>
+                                    </div>
+                                    <div class="text-center">
+                                        <a href="{% url 'liste_especes_candidates' %}" class="btn btn-info">
+                                            <i class="fas fa-cog"></i> Gérer les espèces
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Créés lors de cette transcription:</span>
+                                        <strong>{{ observateurs_transcription }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Nombre total d'observateurs:</span>
+                                        <strong>{{ total_observateurs }}</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Trouvées lors de cette transcription:</span>
+                                        <strong>{{ communes_transcription|default:"0" }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Dans l'ensemble des fiches:</span>
+                                        <strong>{{ communes_fiches|default:"0" }}</strong>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

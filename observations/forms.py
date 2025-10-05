@@ -51,10 +51,10 @@ class LocalisationForm(forms.ModelForm):
             'alentours',
         ]
         widgets = {
-            'commune': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Commune'}),
+            'commune': forms.TextInput(attrs={'class': 'form-field', 'id': 'id_commune', 'placeholder': 'Commune', 'autocomplete': 'off'}),
             'lieu_dit': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Lieu-dit'}),
             'departement': forms.TextInput(
-                attrs={'class': 'form-field', 'placeholder': 'Département'}
+                attrs={'class': 'form-field', 'id': 'id_departement', 'placeholder': 'Département', 'readonly': 'readonly'}
             ),
             'coordonnees': forms.TextInput(
                 attrs={'class': 'form-field', 'placeholder': 'Coordonnées'}

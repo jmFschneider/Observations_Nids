@@ -68,7 +68,8 @@ def extraire_candidats(request):
         messages.success(
             request,
             f"Extraction terminée: {resultats['especes_ajoutees']} nouvelles espèces, "
-            f"{resultats['utilisateurs_crees']} nouveaux utilisateurs créés",
+            f"{resultats['utilisateurs_crees']} nouveaux utilisateurs créés, "
+            f"{resultats['communes_geocodees']} communes géocodées",
         )
 
         return redirect('accueil_importation')

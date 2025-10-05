@@ -26,6 +26,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('', include('observations.urls')),
     path('ingest/', include('ingest.urls')),
+    path('geo/', include('geo.urls')),
 ]
 
 if settings.DEBUG:
