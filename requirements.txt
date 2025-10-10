@@ -9,7 +9,7 @@
 # -----------------------------------------------------------------------------
 # Framework Django
 # -----------------------------------------------------------------------------
-Django==5.1.6
+Django==5.2.7
 asgiref==3.8.1
 sqlparse==0.5.3
 tzdata==2025.2
@@ -22,14 +22,14 @@ mysqlclient==2.2.7
 # -----------------------------------------------------------------------------
 # Celery et tâches asynchrones
 # -----------------------------------------------------------------------------
-celery==5.5.2
-django-celery-results==2.5.1
+celery==5.5.3
+django-celery-results==2.6.0
 redis==5.2.1
 amqp==5.3.1
 billiard==4.2.1
 kombu==5.5.3
 vine==5.1.0
-eventlet==0.39.1
+eventlet==0.40.3
 
 # -----------------------------------------------------------------------------
 # Monitoring Celery
@@ -42,22 +42,22 @@ humanize==4.12.2
 # -----------------------------------------------------------------------------
 # Google Cloud APIs (Vision API pour OCR / Gemini pour IA)
 # -----------------------------------------------------------------------------
-google-generativeai==0.8.4
+google-generativeai==0.8.5
 google-ai-generativelanguage==0.6.15
-google-api-core==2.24.2
-google-api-python-client==2.165.0
-google-auth==2.38.0
+google-api-core==2.26.0
+google-api-python-client==2.184.0
+google-auth==2.41.1
 google-auth-httplib2==0.2.0
-googleapis-common-protos==1.69.2
+googleapis-common-protos==1.70.0
 proto-plus==1.26.1
-protobuf==5.29.4
-grpcio==1.71.0
-grpcio-status==1.71.0
+protobuf==5.29.5
+grpcio==1.75.1
+grpcio-status==1.71.2
 
 # -----------------------------------------------------------------------------
 # Traitement d'images
 # -----------------------------------------------------------------------------
-pillow==11.1.0
+pillow==11.3.0
 
 # -----------------------------------------------------------------------------
 # Configuration et validation
@@ -70,10 +70,10 @@ pydantic_core==2.27.2
 # -----------------------------------------------------------------------------
 # HTTP et Web
 # -----------------------------------------------------------------------------
-requests==2.32.3
-certifi==2025.1.31
+requests==2.32.5
+certifi==2025.10.5
 charset-normalizer==3.4.1
-urllib3==2.3.0
+urllib3==2.5.0
 httplib2==0.22.0
 idna==3.10
 

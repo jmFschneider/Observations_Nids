@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(.venvScriptspip install beautifulsoup4 requests)"
+      "Bash(.venvScriptspip install beautifulsoup4 requests)",
+      "Bash(git checkout:*)",
+      "Bash(source:*)",
+      "Bash(ruff:*)",
+      "Bash(mypy:*)",
+      "Bash(pip show:*)",
+      "Bash(pip install:*)",
+      "Bash(python manage.py check:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
