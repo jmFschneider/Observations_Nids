@@ -1,11 +1,22 @@
 # 📘 Documentation – Index
 
-Bienvenue dans la documentation. Utilisez les liens ci-dessous pour accéder rapidement aux guides et à leurs sections.
+Bienvenue dans la documentation du projet **Observations Nids**.
+
+Utilisez les liens ci-dessous pour accéder rapidement aux guides et à leurs sections.
+
+- **Total de mots** : ≈ 11,357
+- **Taille totale** : 175.3 KB
+
+## 📊 Statistiques
+
+- **Nombre de documents** : 10
 
 ---
 
-### [0 _ README.md](0%20_%20README.md)
+### 📘 [0 _ README.md](0%20_%20README.md)
 **Documentation Projet Observations Nids - Guide Claude**
+  
+*≈ 272 mots • 2.4 KB*
 
 - [📚 Table des matières](0%20_%20README.md#table-des-matieres)
   - [🚀 Quick Start - Démarrage rapide](0%20_%20README.md#quick-start-demarrage-rapide)
@@ -21,8 +32,10 @@ Bienvenue dans la documentation. Utilisez les liens ci-dessous pour accéder rap
 
 ---
 
-### [1 _ quick_start_doc.md](1%20_%20quick_start_doc.md)
+### 🚀 [1 _ quick_start_doc.md](1%20_%20quick_start_doc.md)
 **Réinitialiser la BDD (DANGER)**
+  
+*≈ 766 mots • 10.1 KB*
 
 - [Prérequis](1%20_%20quick_start_doc.md#prerequis)
 - [Installation en 5 minutes](1%20_%20quick_start_doc.md#installation-en-5-minutes)
@@ -64,8 +77,10 @@ Bienvenue dans la documentation. Utilisez les liens ci-dessous pour accéder rap
 
 ---
 
-### [2 _ architecture_doc.md](2%20_%20architecture_doc.md)
+### 🏗️ [2 _ architecture_doc.md](2%20_%20architecture_doc.md)
 **observations/tests/test_models.py**
+  
+*≈ 2113 mots • 42.7 KB*
 
 - [Vue d'ensemble](2%20_%20architecture_doc.md#vue-densemble)
   - [Objectifs architecturaux](2%20_%20architecture_doc.md#objectifs-architecturaux)
@@ -139,8 +154,10 @@ Bienvenue dans la documentation. Utilisez les liens ci-dessous pour accéder rap
 
 ---
 
-### [3 _ workflows_doc.md](3%20_%20workflows_doc.md)
+### 🔄 [3 _ workflows_doc.md](3%20_%20workflows_doc.md)
 **Workflows de l'Application**
+  
+*≈ 2279 mots • 23.2 KB*
 
 - [Vue d'ensemble](3%20_%20workflows_doc.md#vue-densemble)
   - [Principe général](3%20_%20workflows_doc.md#principe-general)
@@ -218,8 +235,10 @@ Bienvenue dans la documentation. Utilisez les liens ci-dessous pour accéder rap
 
 ---
 
-### [7 _ geocoding_doc.md](7%20_%20geocoding_doc.md)
+### 🌍 [7 _ geocoding_doc.md](7%20_%20geocoding_doc.md)
 **Instance globale réutilisable**
+  
+*≈ 460 mots • 28.6 KB*
 
 - [Contexte et besoin](7%20_%20geocoding_doc.md#contexte-et-besoin)
   - [Problématique](7%20_%20geocoding_doc.md#problematique)
@@ -238,8 +257,10 @@ Bienvenue dans la documentation. Utilisez les liens ci-dessous pour accéder rap
 
 ---
 
-### [8_charger_communes_doc.md](8_charger_communes_doc.md)
+### 🏘️ [8_charger_communes_doc.md](8_charger_communes_doc.md)
 **Population moyenne**
+  
+*≈ 671 mots • 8.4 KB*
 
 - [Vue d'ensemble](8_charger_communes_doc.md#vue-densemble)
 - [Pourquoi charger cette base ?](8_charger_communes_doc.md#pourquoi-charger-cette-base)
@@ -286,8 +307,10 @@ Bienvenue dans la documentation. Utilisez les liens ci-dessous pour accéder rap
 
 ---
 
-### [9_guide_saisie_observations.md](9_guide_saisie_observations.md)
+### 📖 [9_guide_saisie_observations.md](9_guide_saisie_observations.md)
 **Guide d'utilisation - Saisie d'observations**
+  
+*≈ 1663 mots • 13.2 KB*
 
 - [Vue d'ensemble](9_guide_saisie_observations.md#vue-densemble)
 - [Accès au formulaire](9_guide_saisie_observations.md#acces-au-formulaire)
@@ -338,8 +361,10 @@ Bienvenue dans la documentation. Utilisez les liens ci-dessous pour accéder rap
 
 ---
 
-### [10_reset_database_doc.md](10_reset_database_doc.md)
+### 🗄️ [10_reset_database_doc.md](10_reset_database_doc.md)
 **geo/management/commands/reset_importations.py**
+  
+*≈ 843 mots • 16.7 KB*
 
 - [📋 Table des matières](10_reset_database_doc.md#table-des-matieres)
 - [Vue d'ensemble](10_reset_database_doc.md#vue-densemble)
@@ -394,3 +419,127 @@ Bienvenue dans la documentation. Utilisez les liens ci-dessous pour accéder rap
 - [Conclusion](10_reset_database_doc.md#conclusion)
 
 ---
+
+### ⚡ [11_optimisations_geocodage_altitude.md](11_optimisations_geocodage_altitude.md)
+**Supprimer aussi les fiches de transcription**
+  
+*≈ 1931 mots • 22.9 KB*
+
+- [📋 Table des matières](11_optimisations_geocodage_altitude.md#table-des-matieres)
+- [Vue d'ensemble](11_optimisations_geocodage_altitude.md#vue-densemble)
+  - [Contexte](11_optimisations_geocodage_altitude.md#contexte)
+  - [Objectifs](11_optimisations_geocodage_altitude.md#objectifs)
+- [Problèmes identifiés et résolus](11_optimisations_geocodage_altitude.md#problemes-identifies-et-resolus)
+  - [🐛 Problème 1 : Altitude non mise à jour en mode correction](11_optimisations_geocodage_altitude.md#probleme-1-altitude-non-mise-a-jour-en-mode-correction)
+    - [Symptômes](11_optimisations_geocodage_altitude.md#symptomes)
+    - [Cause racine](11_optimisations_geocodage_altitude.md#cause-racine)
+    - [Solution](11_optimisations_geocodage_altitude.md#solution)
+  - [🐛 Problème 2 : Valeur "0.0m" non détectée comme vide](11_optimisations_geocodage_altitude.md#probleme-2-valeur-00m-non-detectee-comme-vide)
+    - [Symptômes](11_optimisations_geocodage_altitude.md#symptomes-1)
+    - [Cause racine](11_optimisations_geocodage_altitude.md#cause-racine-1)
+    - [Solution](11_optimisations_geocodage_altitude.md#solution-1)
+  - [🐛 Problème 3 : Pas de contrôle sur l'écrasement de valeurs](11_optimisations_geocodage_altitude.md#probleme-3-pas-de-controle-sur-lecrasement-de-valeurs)
+    - [Symptômes](11_optimisations_geocodage_altitude.md#symptomes-2)
+    - [Solution](11_optimisations_geocodage_altitude.md#solution-2)
+- [Optimisations réalisées](11_optimisations_geocodage_altitude.md#optimisations-realisees)
+  - [1. Calcul de distance Haversine optimisé](11_optimisations_geocodage_altitude.md#1-calcul-de-distance-haversine-optimise)
+    - [Avant (version simplifiée et imprécise)](11_optimisations_geocodage_altitude.md#avant-version-simplifiee-et-imprecise)
+    - [Après (formule Haversine complète)](11_optimisations_geocodage_altitude.md#apres-formule-haversine-complete)
+  - [2. Requêtes de base de données optimisées](11_optimisations_geocodage_altitude.md#2-requetes-de-base-de-donnees-optimisees)
+    - [Avant (redondant)](11_optimisations_geocodage_altitude.md#avant-redondant)
+    - [Après (optimisé)](11_optimisations_geocodage_altitude.md#apres-optimise)
+  - [3. JavaScript externalisé](11_optimisations_geocodage_altitude.md#3-javascript-externalise)
+    - [Avant](11_optimisations_geocodage_altitude.md#avant)
+    - [Après](11_optimisations_geocodage_altitude.md#apres)
+  - [4. Instance géocodeur singleton](11_optimisations_geocodage_altitude.md#4-instance-geocodeur-singleton)
+    - [Avant](11_optimisations_geocodage_altitude.md#avant-1)
+    - [Après](11_optimisations_geocodage_altitude.md#apres-1)
+- [Configuration corrigée](11_optimisations_geocodage_altitude.md#configuration-corrigee)
+  - [Fichiers statiques Django](11_optimisations_geocodage_altitude.md#fichiers-statiques-django)
+    - [Configuration AVANT (incorrecte)](11_optimisations_geocodage_altitude.md#configuration-avant-incorrecte)
+    - [Configuration APRÈS (corrigée)](11_optimisations_geocodage_altitude.md#configuration-apres-corrigee)
+  - [Template avec cache busting](11_optimisations_geocodage_altitude.md#template-avec-cache-busting)
+- [Comportement final](11_optimisations_geocodage_altitude.md#comportement-final)
+  - [Gestion de l'altitude : Matrice de décision](11_optimisations_geocodage_altitude.md#gestion-de-laltitude-matrice-de-decision)
+  - [Message de confirmation](11_optimisations_geocodage_altitude.md#message-de-confirmation)
+- [Fichiers créés et modifiés](11_optimisations_geocodage_altitude.md#fichiers-crees-et-modifies)
+  - [Fichiers créés](11_optimisations_geocodage_altitude.md#fichiers-crees)
+  - [Fichiers modifiés](11_optimisations_geocodage_altitude.md#fichiers-modifies)
+- [Tests et validation](11_optimisations_geocodage_altitude.md#tests-et-validation)
+  - [Scénarios testés](11_optimisations_geocodage_altitude.md#scenarios-testes)
+    - [✅ Test 1 : Altitude vide → Commune avec altitude](11_optimisations_geocodage_altitude.md#test-1-altitude-vide-commune-avec-altitude)
+    - [✅ Test 2 : Altitude existante → Nouvelle commune](11_optimisations_geocodage_altitude.md#test-2-altitude-existante-nouvelle-commune)
+    - [✅ Test 3 : Confirmation acceptée](11_optimisations_geocodage_altitude.md#test-3-confirmation-acceptee)
+    - [✅ Test 4 : Confirmation refusée](11_optimisations_geocodage_altitude.md#test-4-confirmation-refusee)
+    - [✅ Test 5 : Autocomplétion fonctionnelle](11_optimisations_geocodage_altitude.md#test-5-autocompletion-fonctionnelle)
+    - [✅ Test 6 : Calcul de distance GPS](11_optimisations_geocodage_altitude.md#test-6-calcul-de-distance-gps)
+  - [Logs de débogage](11_optimisations_geocodage_altitude.md#logs-de-debogage)
+- [Problèmes rencontrés et solutions](11_optimisations_geocodage_altitude.md#problemes-rencontres-et-solutions)
+  - [Problème : Cache navigateur agressif](11_optimisations_geocodage_altitude.md#probleme-cache-navigateur-agressif)
+  - [Problème : Processus TIME_WAIT sur le port 8000](11_optimisations_geocodage_altitude.md#probleme-processus-timewait-sur-le-port-8000)
+  - [Problème : PyCharm et cache de templates](11_optimisations_geocodage_altitude.md#probleme-pycharm-et-cache-de-templates)
+- [Commandes utiles créées](11_optimisations_geocodage_altitude.md#commandes-utiles-creees)
+  - [reset_importations - Réinitialisation complète](11_optimisations_geocodage_altitude.md#resetimportations-reinitialisation-complete)
+  - [reset_transcriptions - Réinitialisation partielle](11_optimisations_geocodage_altitude.md#resettranscriptions-reinitialisation-partielle)
+- [Bonnes pratiques appliquées](11_optimisations_geocodage_altitude.md#bonnes-pratiques-appliquees)
+  - [1. Séparation des responsabilités](11_optimisations_geocodage_altitude.md#1-separation-des-responsabilites)
+  - [2. Pattern Singleton](11_optimisations_geocodage_altitude.md#2-pattern-singleton)
+  - [3. Configuration Django](11_optimisations_geocodage_altitude.md#3-configuration-django)
+  - [4. Gestion des fichiers statiques](11_optimisations_geocodage_altitude.md#4-gestion-des-fichiers-statiques)
+  - [5. Expérience utilisateur](11_optimisations_geocodage_altitude.md#5-experience-utilisateur)
+  - [6. Performance](11_optimisations_geocodage_altitude.md#6-performance)
+- [Métriques de performance](11_optimisations_geocodage_altitude.md#metriques-de-performance)
+  - [Avant optimisation](11_optimisations_geocodage_altitude.md#avant-optimisation)
+  - [Après optimisation](11_optimisations_geocodage_altitude.md#apres-optimisation)
+- [Prochaines améliorations possibles](11_optimisations_geocodage_altitude.md#prochaines-ameliorations-possibles)
+  - [Court terme](11_optimisations_geocodage_altitude.md#court-terme)
+  - [Moyen terme](11_optimisations_geocodage_altitude.md#moyen-terme)
+  - [Long terme](11_optimisations_geocodage_altitude.md#long-terme)
+- [Ressources et références](11_optimisations_geocodage_altitude.md#ressources-et-references)
+  - [Documentation officielle](11_optimisations_geocodage_altitude.md#documentation-officielle)
+  - [Outils utilisés](11_optimisations_geocodage_altitude.md#outils-utilises)
+  - [Fichiers de référence](11_optimisations_geocodage_altitude.md#fichiers-de-reference)
+- [Conclusion](11_optimisations_geocodage_altitude.md#conclusion)
+
+---
+
+### 🔄 [100_git_workflow_bonnes_pratiques.md](100_git_workflow_bonnes_pratiques.md)
+**4. Finaliser le merge**
+  
+*≈ 359 mots • 7.1 KB*
+
+- [Vue d'ensemble](100_git_workflow_bonnes_pratiques.md#vue-densemble)
+- [Structure des branches](100_git_workflow_bonnes_pratiques.md#structure-des-branches)
+  - [Branches principales](100_git_workflow_bonnes_pratiques.md#branches-principales)
+  - [Schéma du workflow](100_git_workflow_bonnes_pratiques.md#schema-du-workflow)
+- [Workflow quotidien](100_git_workflow_bonnes_pratiques.md#workflow-quotidien)
+  - [1. Configuration initiale (une seule fois)](100_git_workflow_bonnes_pratiques.md#1-configuration-initiale-une-seule-fois)
+  - [2. Développer une nouvelle fonctionnalité](100_git_workflow_bonnes_pratiques.md#2-developper-une-nouvelle-fonctionnalite)
+  - [3. Intégrer la fonctionnalité dans develop](100_git_workflow_bonnes_pratiques.md#3-integrer-la-fonctionnalite-dans-develop)
+  - [4. Tester sur develop](100_git_workflow_bonnes_pratiques.md#4-tester-sur-develop)
+  - [5. Mettre en production](100_git_workflow_bonnes_pratiques.md#5-mettre-en-production)
+- [Cas particuliers](100_git_workflow_bonnes_pratiques.md#cas-particuliers)
+  - [Correction urgente en production (hotfix)](100_git_workflow_bonnes_pratiques.md#correction-urgente-en-production-hotfix)
+  - [Travailler sur plusieurs fonctionnalités en parallèle](100_git_workflow_bonnes_pratiques.md#travailler-sur-plusieurs-fonctionnalites-en-parallele)
+  - [Annuler un merge non poussé](100_git_workflow_bonnes_pratiques.md#annuler-un-merge-non-pousse)
+- [Commandes utiles](100_git_workflow_bonnes_pratiques.md#commandes-utiles)
+  - [Voir l'état actuel](100_git_workflow_bonnes_pratiques.md#voir-letat-actuel)
+  - [Gérer les branches](100_git_workflow_bonnes_pratiques.md#gerer-les-branches)
+  - [Synchroniser avec le serveur](100_git_workflow_bonnes_pratiques.md#synchroniser-avec-le-serveur)
+- [Bonnes pratiques](100_git_workflow_bonnes_pratiques.md#bonnes-pratiques)
+  - [Messages de commit](100_git_workflow_bonnes_pratiques.md#messages-de-commit)
+  - [Commits fréquents](100_git_workflow_bonnes_pratiques.md#commits-frequents)
+  - [Ne jamais commiter](100_git_workflow_bonnes_pratiques.md#ne-jamais-commiter)
+  - [Tester avant de merger](100_git_workflow_bonnes_pratiques.md#tester-avant-de-merger)
+- [Résolution de conflits](100_git_workflow_bonnes_pratiques.md#resolution-de-conflits)
+- [Pour aller plus loin](100_git_workflow_bonnes_pratiques.md#pour-aller-plus-loin)
+  - [Alias Git utiles](100_git_workflow_bonnes_pratiques.md#alias-git-utiles)
+  - [Outils visuels](100_git_workflow_bonnes_pratiques.md#outils-visuels)
+- [Références](100_git_workflow_bonnes_pratiques.md#references)
+
+---
+
+
+---
+
+*Index généré automatiquement le 10/10/2025 à 10:35*

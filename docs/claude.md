@@ -69,8 +69,11 @@ observations_nids/
 - Suivi de la progression
 
 #### **taxonomy/** - Taxonomie
-- Modèle `Espece` : classification des espèces d'oiseaux
-- Nomenclature scientifique et vernaculaire
+- Modèles `Ordre`, `Famille`, `Espece` : classification taxonomique complète
+- Nomenclature scientifique et vernaculaire (français, anglais)
+- **Import TaxRef** : chargement automatique depuis le référentiel INPN/MNHN
+- Commande : `python manage.py charger_taxref`
+- Documentation complète : `taxonomy/README_TAXREF.md`
 
 ---
 
@@ -117,6 +120,61 @@ observations_nids/
 **ResumeObservation** : nombre d'œufs pondus/éclos, nombre de poussins
 **CausesEchec** : description textuelle des causes d'échec
 **EtatCorrection** : statut, pourcentage de complétion, dates de modification
+
+### Modèles taxonomiques (taxonomy/models.py)
+
+#### **Ordre**
+Classification taxonomique supérieure (ex: Passeriformes, Accipitriformes)
+- `nom` : CharField(max_length=100, unique=True)
+- `description` : TextField(blank=True)
+
+#### **Famille**
+Classification intermédiaire (ex: Turdidae, Accipitridae)
+- `nom` : CharField(max_length=100, unique=True)
+- `ordre` : ForeignKey vers Ordre
+- `description` : TextField(blank=True)
+
+#### **Espece**
+Espèce d'oiseau avec nomenclature complète
+- `nom` : CharField(max_length=100, unique=True) - Nom vernaculaire français
+- `nom_scientifique` : CharField - Nom latin (ex: "Turdus merula")
+- `nom_anglais` : CharField - Nom anglais
+- `famille` : ForeignKey vers Famille
+- `statut` : CharField - Statut de présence en France
+- `commentaire` : TextField - Informations complémentaires
+- `lien_oiseau_net` : URLField - Lien vers fiche Oiseaux.net
+- `valide_par_admin` : Boolean - Validation administrative
+
+**Chargement automatique (2 méthodes) :**
+
+```bash
+# MÉTHODE 1 (RECOMMANDÉE) : Import depuis la Liste des Oiseaux de France (LOF)
+python manage.py charger_lof
+# - Téléchargement automatique (64KB)
+# - Import rapide (10-30 secondes)
+# - ~577 espèces d'oiseaux de France
+# - Noms français + scientifiques
+# - Catégories de statut (A, B, C, D, E)
+
+# MÉTHODE 2 (ALTERNATIVE) : Import depuis TaxRef (INPN/MNHN)
+python manage.py charger_taxref --file /chemin/vers/TAXREFv17.txt
+# - Téléchargement manuel requis (150MB)
+# - Import plus long (1-3 minutes)
+# - ~574 espèces d'oiseaux de France
+# - Référentiel taxonomique national officiel
+```
+
+**Options LOF :**
+```bash
+python manage.py charger_lof                      # Import automatique (défaut: catégories A,AC)
+python manage.py charger_lof --categories A,AC,B,C  # Personnaliser les catégories
+python manage.py charger_lof --limit 50           # Mode test
+python manage.py charger_lof --file /chemin/vers/LOF2024.xlsx  # Depuis fichier local
+```
+
+**Sources des données :**
+- **LOF** : Commission de l'avifaune française (CAF) via Faune-France - [Documentation](taxonomy/README_LOF.md)
+- **TaxRef** : INPN/MNHN - Référentiel taxonomique national officiel - [Documentation](taxonomy/README_TAXREF.md)
 
 ---
 
@@ -311,6 +369,15 @@ redis-server
 
 # Créer un superutilisateur
 python manage.py createsuperuser
+
+# Charger les espèces d'oiseaux depuis LOF (recommandé)
+python manage.py charger_lof
+
+# Alternative : charger depuis TaxRef
+python manage.py charger_taxref --file /chemin/vers/TAXREFv17.txt
+
+# Charger les communes françaises
+python manage.py charger_communes_france
 
 # Collecter les fichiers statiques
 python manage.py collectstatic
@@ -536,6 +603,13 @@ Cela simplifie la logique métier et garantit l'intégrité des données.
 - [Pydantic Settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
 - [pytest-django](https://pytest-django.readthedocs.io/)
 
+### Données de référence
+- [Liste des Oiseaux de France (LOF)](https://www.faune-france.org/index.php?m_id=20061) - Commission de l'avifaune française (recommandé)
+- [Documentation import LOF](taxonomy/README_LOF.md) - Guide complet d'utilisation
+- [TaxRef - INPN](https://inpn.mnhn.fr/programme/referentiel-taxonomique-taxref) - Référentiel taxonomique national (alternative)
+- [API TaxRef](https://taxref.mnhn.fr/taxref-web/api/doc) - Documentation API
+- [Documentation import TaxRef](taxonomy/README_TAXREF.md) - Guide complet d'utilisation
+
 ---
 
 ## État actuel du projet et travaux en cours
@@ -554,6 +628,23 @@ Le projet a été récemment réorganisé pour séparer les responsabilités en 
 - Amélioration de la structure HTML (sémantique HTML5)
 - Optimisation de l'interface de saisie
 - Correction du bug de suppression d'observations
+
+### Système taxonomy (Octobre 2025)
+- ✅ **Création de la commande `charger_lof`** (RECOMMANDÉ)
+  - Import automatique depuis la Liste des Oiseaux de France (LOF)
+  - Téléchargement automatique (64KB)
+  - ~577 espèces d'oiseaux de France
+  - Import rapide (10-30 secondes)
+  - Catégories de statut (A, B, C, D, E)
+  - Documentation complète : `taxonomy/README_LOF.md`
+- ✅ **Création de la commande `charger_taxref`** (ALTERNATIVE)
+  - Import depuis TaxRef v17/v18 (INPN/MNHN)
+  - Téléchargement manuel requis (150MB)
+  - ~574 espèces d'oiseaux de France
+  - Référentiel taxonomique national officiel
+  - Documentation complète : `taxonomy/README_TAXREF.md`
+- ✅ Optimisé pour Raspberry Pi (traitement par lots, gestion mémoire)
+- 🎯 **Objectif :** Pré-remplir la base pour faciliter la saisie des observations
 
 ### Tests
 Structure de tests ajoutée avec pytest, mais couverture à améliorer.
@@ -615,5 +706,103 @@ Structure de tests ajoutée avec pytest, mais couverture à améliorer.
 
 ---
 
-*Documentation générée pour Claude Code - Version 1.0*
-*Dernière mise à jour : 2025-10-03*
+## Annexe : Commandes Django personnalisées
+
+### taxonomy/management/commands/
+
+#### `charger_lof.py` ⭐ RECOMMANDÉ
+Import automatique des espèces d'oiseaux depuis la Liste des Oiseaux de France (LOF)
+
+**Usage de base :**
+```bash
+python manage.py charger_lof  # Import automatique
+```
+
+**Options :**
+- `--categories A,AC` : Catégories à importer (défaut: A,AC = espèces sauvages)
+- `--file /chemin/vers/fichier.xlsx` : Import depuis fichier local
+- `--limit N` : Limite à N espèces (pour tests)
+- `--force` : Force le rechargement (⚠️ attention aux contraintes FK)
+
+**Avantages :**
+- ✅ Téléchargement automatique (64KB seulement)
+- ✅ Import rapide (10-30 secondes)
+- ✅ ~577 espèces d'oiseaux de France
+- ✅ Noms français + scientifiques
+- ✅ Catégories de statut (A, B, C, D, E)
+
+**Documentation complète :** `taxonomy/README_LOF.md`
+
+#### `charger_taxref.py` (ALTERNATIVE)
+Import automatique des espèces d'oiseaux depuis TaxRef (INPN/MNHN)
+
+**Usage de base :**
+```bash
+python manage.py charger_taxref --file /chemin/vers/TAXREFv17.txt
+```
+
+**Options :**
+- `--force` : Force le rechargement (supprime données existantes)
+- `--file /chemin/vers/fichier.txt` : Import depuis fichier local (requis)
+- `--taxref-version {17.0,18.0}` : Choix de la version TaxRef
+- `--limit N` : Limite à N espèces (pour tests)
+
+**Inconvénients :**
+- ⚠️ Téléchargement manuel requis (150MB)
+- ⚠️ Import plus long (1-3 minutes)
+- ⚠️ Fichier volumineux
+
+**Documentation complète :** `taxonomy/README_TAXREF.md`
+
+#### `recuperer_liens_oiseaux_net.py` 🔗 NOUVEAU
+Récupération automatique des liens vers les fiches oiseaux.net pour toutes les espèces
+
+**Usage de base :**
+```bash
+python manage.py recuperer_liens_oiseaux_net  # Mise à jour espèces sans lien
+```
+
+**Options :**
+- `--force` : Mettre à jour toutes les espèces (même celles avec lien existant)
+- `--limit N` : Mode test sur N espèces
+- `--dry-run` : Simuler sans modifier la base
+- `--delay N` : Délai entre requêtes en secondes (défaut: 1.0)
+
+**Stratégie de recherche (3 méthodes) :**
+1. **Construction depuis nom français** → `bernache.cravant.html` (taux ~95%)
+2. **Construction depuis nom scientifique** → `branta.bernicla.html` (fallback ~20%)
+3. **Recherche Google** → dernier recours (taux ~80%)
+
+**Performances :**
+- 577 espèces en ~10-20 minutes (selon délai)
+- Taux de réussite global : ~98%
+
+**Exemples :**
+```bash
+# Test sur 5 espèces
+python manage.py recuperer_liens_oiseaux_net --limit 5 --dry-run
+
+# Traitement complet recommandé
+python manage.py recuperer_liens_oiseaux_net --delay 1.5
+
+# Mise à jour forcée de toutes les espèces
+python manage.py recuperer_liens_oiseaux_net --force --delay 2
+```
+
+**Documentation complète :** `taxonomy/README_LIENS_OISEAUX_NET.md`
+
+### geo/management/commands/
+
+#### `charger_communes_france.py`
+Import des communes françaises depuis l'API Géoplateforme
+
+**Usage :**
+```bash
+python manage.py charger_communes_france
+python manage.py charger_communes_france --force
+```
+
+---
+
+*Documentation générée pour Claude Code - Version 1.1*
+*Dernière mise à jour : 2025-10-09*
