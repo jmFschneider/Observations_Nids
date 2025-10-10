@@ -205,6 +205,227 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ====================================
+    // Autocomplétion des communes
+    // ====================================
+
+    const communeInput = document.getElementById('id_commune');
+    if (communeInput) {
+        let communeTimeout;
+        let communeResultsDiv;
+        let selectedCommune = null;
+
+        // Créer la div pour les résultats
+        communeResultsDiv = document.createElement('div');
+        communeResultsDiv.className = 'commune-autocomplete-results';
+        communeResultsDiv.style.cssText = `
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ced4da;
+            border-top: none;
+            display: none;
+            z-index: 1050;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        `;
+
+        // Wrapper pour position relative
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'inline-block';
+        wrapper.style.width = '100%';
+        communeInput.parentNode.insertBefore(wrapper, communeInput);
+        wrapper.appendChild(communeInput);
+        wrapper.appendChild(communeResultsDiv);
+
+        // Fonction pour rechercher les communes
+        function rechercherCommunes(query) {
+            if (query.length < 2) {
+                communeResultsDiv.style.display = 'none';
+                return;
+            }
+
+            // Annuler la recherche précédente
+            clearTimeout(communeTimeout);
+
+            // Attendre 300ms après la dernière frappe
+            communeTimeout = setTimeout(function() {
+                // Récupérer coordonnées GPS si disponibles
+                const latInput = document.getElementById('id_latitude');
+                const lonInput = document.getElementById('id_longitude');
+                const lat = latInput ? latInput.value : '';
+                const lon = lonInput ? lonInput.value : '';
+
+                // Construire l'URL
+                let url = `/geo/rechercher-communes/?q=${encodeURIComponent(query)}`;
+                if (lat && lon) {
+                    url += `&lat=${lat}&lon=${lon}`;
+                }
+
+                // Appel AJAX
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        afficherResultatsCommunes(data.communes);
+                    })
+                    .catch(error => {
+                        console.error('Erreur recherche communes:', error);
+                        communeResultsDiv.innerHTML = '<div style="padding: 8px 12px; color: #dc3545;">Erreur lors de la recherche</div>';
+                        communeResultsDiv.style.display = 'block';
+                    });
+            }, 300);
+        }
+
+        // Fonction pour afficher les résultats
+        function afficherResultatsCommunes(communes) {
+            communeResultsDiv.innerHTML = '';
+
+            if (communes.length === 0) {
+                communeResultsDiv.innerHTML = '<div style="padding: 8px 12px; color: #6c757d;">Aucune commune trouvée</div>';
+                communeResultsDiv.style.display = 'block';
+                return;
+            }
+
+            communes.forEach(commune => {
+                const item = document.createElement('div');
+                item.className = 'commune-result-item';
+                item.style.cssText = `
+                    padding: 8px 12px;
+                    cursor: pointer;
+                    border-bottom: 1px solid #f0f0f0;
+                `;
+                item.textContent = commune.label;
+                item.dataset.commune = JSON.stringify(commune);
+
+                // Événements
+                item.addEventListener('click', function() {
+                    selectionnerCommune(commune);
+                });
+
+                item.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = '#e9ecef';
+                });
+
+                item.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = 'white';
+                });
+
+                communeResultsDiv.appendChild(item);
+            });
+
+            communeResultsDiv.style.display = 'block';
+        }
+
+        // Fonction pour sélectionner une commune
+        function selectionnerCommune(commune) {
+            selectedCommune = commune;
+
+            // Remplir le champ commune
+            communeInput.value = commune.nom;
+
+            // Remplir automatiquement le département
+            const departementInput = document.getElementById('id_departement');
+            if (departementInput && !departementInput.value) {
+                departementInput.value = commune.departement;
+            }
+
+            // Remplir les coordonnées GPS si vides
+            const latInput = document.getElementById('id_latitude');
+            const lonInput = document.getElementById('id_longitude');
+            if (latInput && lonInput) {
+                if (!latInput.value && commune.latitude) {
+                    latInput.value = commune.latitude;
+                }
+                if (!lonInput.value && commune.longitude) {
+                    lonInput.value = commune.longitude;
+                }
+            }
+
+            // Remplir l'altitude si vide et disponible
+            const altitudeInput = document.getElementById('id_altitude');
+            if (altitudeInput && !altitudeInput.value && commune.altitude) {
+                // Demander confirmation avant de remplir l'altitude
+                const currentAltitude = altitudeInput.value;
+                if (!currentAltitude || currentAltitude === '0' || currentAltitude === '0.0') {
+                    if (confirm(`Utiliser l'altitude de la commune ${commune.nom} : ${commune.altitude}m ?`)) {
+                        altitudeInput.value = commune.altitude;
+                    }
+                }
+            }
+
+            // Masquer les résultats
+            communeResultsDiv.style.display = 'none';
+        }
+
+        // Événement de saisie
+        communeInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            rechercherCommunes(query);
+        });
+
+        // Focus : ne rien faire (pas comme pour les espèces)
+        communeInput.addEventListener('focus', function() {
+            // Ne rien afficher au focus, seulement à la saisie
+        });
+
+        // Clic en dehors : masquer les résultats
+        document.addEventListener('click', function(e) {
+            if (!wrapper.contains(e.target)) {
+                communeResultsDiv.style.display = 'none';
+            }
+        });
+
+        // Navigation au clavier
+        communeInput.addEventListener('keydown', function(e) {
+            const items = communeResultsDiv.querySelectorAll('.commune-result-item');
+            const currentFocus = communeResultsDiv.querySelector('.commune-result-item.focused');
+            let currentIndex = -1;
+
+            if (currentFocus) {
+                currentIndex = Array.from(items).indexOf(currentFocus);
+            }
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (currentIndex < items.length - 1) {
+                    if (currentFocus) {
+                        currentFocus.classList.remove('focused');
+                        currentFocus.style.backgroundColor = 'white';
+                    }
+                    items[currentIndex + 1].classList.add('focused');
+                    items[currentIndex + 1].style.backgroundColor = '#007bff';
+                    items[currentIndex + 1].style.color = 'white';
+                    items[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (currentIndex > 0) {
+                    if (currentFocus) {
+                        currentFocus.classList.remove('focused');
+                        currentFocus.style.backgroundColor = 'white';
+                        currentFocus.style.color = 'black';
+                    }
+                    items[currentIndex - 1].classList.add('focused');
+                    items[currentIndex - 1].style.backgroundColor = '#007bff';
+                    items[currentIndex - 1].style.color = 'white';
+                    items[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (currentFocus) {
+                    const communeData = JSON.parse(currentFocus.dataset.commune);
+                    selectionnerCommune(communeData);
+                }
+            } else if (e.key === 'Escape') {
+                communeResultsDiv.style.display = 'none';
+            }
+        });
+    }
+
+    // ====================================
     // Gestion des observations (suppression, etc.)
     // ====================================
 
