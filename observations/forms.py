@@ -17,6 +17,11 @@ class FicheObservationForm(forms.ModelForm):
         fields = ["observateur", "espece", "annee", "chemin_image"]
         widgets = {
             "observateur": forms.HiddenInput(),  # Changer pour HiddenInput
+            "espece": forms.Select(attrs={
+                'class': 'form-control espece-select',
+                'data-live-search': 'true',
+                'data-search-delay': '800',  # Délai de 800ms entre les frappes
+            }),
         }
 
     def __init__(self, *args, **kwargs):

@@ -11,6 +11,9 @@
 <nav class="navbar">
     <a href="{% url 'home' %}">Accueil</a>
     <a href="{% url 'admin:index' %}">Admin</a>
+    {% if user.is_staff %}
+        <a href="{% url 'taxonomy:liste_especes' %}">Gestion des Espèces</a>
+    {% endif %}
 
     {% if user.is_authenticated %}
         <div class="navbar-right">

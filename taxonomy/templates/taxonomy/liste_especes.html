@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestion des Espèces{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-dove"></i> Gestion des Espèces</h1>
+                <div>
+                    <a href="{% url 'taxonomy:importer_especes' %}" class="btn btn-info">
+                        <i class="fas fa-file-import"></i> Importer des espèces
+                    </a>
+                    <a href="{% url 'taxonomy:creer_espece' %}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Créer une espèce
+                    </a>
+                </div>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tr>
+                            <td class="text-center" style="width: 33.33%;">
+                                <i class="fas fa-list fa-2x text-primary"></i>
+                                <div class="mt-2">
+                                    <h6 class="mb-0 text-muted">Espèces totales</h6>
+                                    <h3 class="mb-0 text-primary">{{ stats.total }}</h3>
+                                </div>
+                            </td>
+                            <td class="text-center" style="width: 33.33%;">
+                                <i class="fas fa-sitemap fa-2x text-info"></i>
+                                <div class="mt-2">
+                                    <h6 class="mb-0 text-muted">Familles</h6>
+                                    <h3 class="mb-0 text-info">{{ stats.familles }}</h3>
+                                </div>
+                            </td>
+                            <td class="text-center" style="width: 33.33%;">
+                                <i class="fas fa-layer-group fa-2x text-success"></i>
+                                <div class="mt-2">
+                                    <h6 class="mb-0 text-muted">Ordres</h6>
+                                    <h3 class="mb-0 text-success">{{ stats.ordres }}</h3>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recherche et filtres -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get">
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                            <tr>
+                                <td style="width: 25%; padding-right: 10px; border: none; vertical-align: top;">
+                                    <label for="search" class="form-label small">Rechercher</label>
+                                    <input type="text" class="form-control form-control-sm" id="search" name="q"
+                                           value="{{ search_query }}" placeholder="Nom français, scientifique...">
+                                </td>
+                                <td style="width: 15%; padding-right: 10px; border: none; vertical-align: top;">
+                                    <label for="ordre" class="form-label small">Ordre</label>
+                                    <select class="form-select form-select-sm" id="ordre" name="ordre">
+                                        <option value="">Tous</option>
+                                        {% for ordre in ordres %}
+                                        <option value="{{ ordre.id }}" {% if ordre_filter == ordre.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ ordre.nom }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td style="width: 28%; padding-right: 10px; border: none; vertical-align: top;">
+                                    <label for="famille" class="form-label small">Famille</label>
+                                    <select class="form-select form-select-sm" id="famille" name="famille">
+                                        <option value="">Toutes</option>
+                                        {% for famille in familles %}
+                                        <option value="{{ famille.id }}" {% if famille_filter == famille.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ famille.nom }} ({{ famille.ordre.nom }})
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td style="width: 15%; padding-right: 10px; border: none; vertical-align: top;">
+                                    <label for="statut" class="form-label small">Statut</label>
+                                    <select class="form-select form-select-sm" id="statut" name="statut">
+                                        <option value="">Tous</option>
+                                        {% for statut in statuts %}
+                                            {% if statut %}
+                                            <option value="{{ statut }}" {% if statut_filter == statut %}selected{% endif %}>
+                                                {{ statut }}
+                                            </option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td style="width: 80px; border: none; vertical-align: bottom; text-align: center; height: 55px;">
+                                    <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tableau des espèces -->
+            <div class="card">
+                <div class="card-body">
+                    {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nom français</th>
+                                    <th>Nom scientifique</th>
+                                    <th>Famille</th>
+                                    <th>Ordre</th>
+                                    <th>Statut</th>
+                                    <th class="text-center" style="width: 50px;"><i class="fas fa-dove"></i></th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for espece in page_obj %}
+                                <tr>
+                                    <td><strong>{{ espece.nom }}</strong></td>
+                                    <td><em>{{ espece.nom_scientifique }}</em></td>
+                                    <td>{{ espece.famille.nom|default:"-" }}</td>
+                                    <td>{{ espece.famille.ordre.nom|default:"-" }}</td>
+                                    <td>
+                                        {% if espece.statut %}
+                                        <span class="badge bg-info">{{ espece.statut }}</span>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if espece.lien_oiseau_net %}
+                                        <a href="{{ espece.lien_oiseau_net }}" target="_blank"
+                                           class="text-primary" title="Voir sur oiseaux.net">
+                                            <i class="fas fa-dove fa-lg"></i>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'taxonomy:detail_espece' espece.id %}"
+                                           class="btn btn-sm btn-info" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'taxonomy:modifier_espece' espece.id %}"
+                                           class="btn btn-sm btn-warning" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'taxonomy:supprimer_espece' espece.id %}"
+                                           class="btn btn-sm btn-danger" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <nav aria-label="Navigation des pages">
+                        <ul class="pagination justify-content-center mt-4">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if famille_filter %}&famille={{ famille_filter }}{% endif %}{% if ordre_filter %}&ordre={{ ordre_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if famille_filter %}&famille={{ famille_filter }}{% endif %}{% if ordre_filter %}&ordre={{ ordre_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if famille_filter %}&famille={{ famille_filter }}{% endif %}{% if ordre_filter %}&ordre={{ ordre_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if famille_filter %}&famille={{ famille_filter }}{% endif %}{% if ordre_filter %}&ordre={{ ordre_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Aucune espèce trouvée.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

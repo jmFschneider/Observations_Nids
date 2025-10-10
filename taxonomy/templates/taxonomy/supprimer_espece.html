@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer {{ espece.nom }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Confirmation de suppression</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Êtes-vous sûr de vouloir supprimer l'espèce suivante ?</p>
+
+                    <div class="alert alert-warning">
+                        <strong>{{ espece.nom }}</strong><br>
+                        <em>{{ espece.nom_scientifique }}</em>
+                    </div>
+
+                    {% if nombre_fiches > 0 %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Attention !</strong> Cette espèce est utilisée dans <strong>{{ nombre_fiches }}</strong> fiche(s) d'observation.
+                        <br>Vous ne pouvez pas la supprimer.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Cette espèce n'est utilisée dans aucune fiche d'observation. Vous pouvez la supprimer en toute sécurité.
+                    </div>
+                    {% endif %}
+
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'taxonomy:detail_espece' espece.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Annuler
+                            </a>
+                            {% if nombre_fiches == 0 %}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Confirmer la suppression
+                            </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

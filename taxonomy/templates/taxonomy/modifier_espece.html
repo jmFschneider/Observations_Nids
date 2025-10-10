@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier {{ espece.nom }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-edit"></i> Modifier {{ espece.nom }}</h1>
+                <a href="{% url 'taxonomy:detail_espece' espece.id %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Annuler
+                </a>
+            </div>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nom" class="form-label">Nom français *</label>
+                                <input type="text" class="form-control" id="nom" name="nom" value="{{ espece.nom }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="nom_scientifique" class="form-label">Nom scientifique *</label>
+                                <input type="text" class="form-control" id="nom_scientifique" name="nom_scientifique" value="{{ espece.nom_scientifique }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nom_anglais" class="form-label">Nom anglais</label>
+                                <input type="text" class="form-control" id="nom_anglais" name="nom_anglais" value="{{ espece.nom_anglais }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="statut" class="form-label">Statut</label>
+                                <input type="text" class="form-control" id="statut" name="statut" value="{{ espece.statut }}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="famille" class="form-label">Famille</label>
+                                <select class="form-select" id="famille" name="famille">
+                                    <option value="">-- Sélectionner une famille --</option>
+                                    {% for famille in familles %}
+                                    <option value="{{ famille.id }}" {% if espece.famille and famille.id == espece.famille.id %}selected{% endif %}>
+                                        {{ famille.nom }} ({{ famille.ordre.nom }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lien_oiseau_net" class="form-label">Lien Oiseaux.net</label>
+                                <input type="url" class="form-control" id="lien_oiseau_net" name="lien_oiseau_net" value="{{ espece.lien_oiseau_net }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="commentaire" class="form-label">Commentaire</label>
+                            <textarea class="form-control" id="commentaire" name="commentaire" rows="3">{{ espece.commentaire }}</textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'taxonomy:detail_espece' espece.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Enregistrer les modifications
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
