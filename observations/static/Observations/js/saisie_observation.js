@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 fetch(url)
                     .then(response => response.json())
                     .then(data => {
-                        afficherResultatsCommunes(data.communes);
+                        afficherResultatsCommunes(data.communes || []);
                     })
                     .catch(error => {
                         console.error('Erreur recherche communes:', error);
@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function afficherResultatsCommunes(communes) {
             communeResultsDiv.innerHTML = '';
 
-            if (communes.length === 0) {
+            if (!communes || communes.length === 0) {
                 communeResultsDiv.innerHTML = '<div style="padding: 8px 12px; color: #6c757d;">Aucune commune trouvée</div>';
                 communeResultsDiv.style.display = 'block';
                 return;
@@ -301,7 +301,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 item.dataset.commune = JSON.stringify(commune);
 
                 // Événements
-                item.addEventListener('click', function() {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     selectionnerCommune(commune);
                 });
 
@@ -326,30 +328,38 @@ document.addEventListener('DOMContentLoaded', function() {
             // Remplir le champ commune
             communeInput.value = commune.nom;
 
-            // Remplir automatiquement le département
+            // Remplir automatiquement le département (si vide ou valeur par défaut "00")
             const departementInput = document.getElementById('id_departement');
-            if (departementInput && !departementInput.value) {
+            if (departementInput && (!departementInput.value || departementInput.value === '' || departementInput.value === '00')) {
                 departementInput.value = commune.departement;
             }
 
-            // Remplir les coordonnées GPS si vides
+            // Remplir les coordonnées GPS si vides ou valeurs par défaut (0, 0.0)
             const latInput = document.getElementById('id_latitude');
             const lonInput = document.getElementById('id_longitude');
             if (latInput && lonInput) {
-                if (!latInput.value && commune.latitude) {
+                const latValue = latInput.value;
+                const lonValue = lonInput.value;
+                // Considérer comme vide si: vide, "0", "0.0", "0.00", etc.
+                const isLatEmpty = !latValue || latValue === '' || parseFloat(latValue) === 0;
+                const isLonEmpty = !lonValue || lonValue === '' || parseFloat(lonValue) === 0;
+
+                if (isLatEmpty && commune.latitude) {
                     latInput.value = commune.latitude;
                 }
-                if (!lonInput.value && commune.longitude) {
+                if (isLonEmpty && commune.longitude) {
                     lonInput.value = commune.longitude;
                 }
             }
 
-            // Remplir l'altitude si vide et disponible
+            // Remplir l'altitude si vide ou valeur par défaut (0)
             const altitudeInput = document.getElementById('id_altitude');
-            if (altitudeInput && !altitudeInput.value && commune.altitude) {
-                // Demander confirmation avant de remplir l'altitude
+            if (altitudeInput && commune.altitude) {
                 const currentAltitude = altitudeInput.value;
-                if (!currentAltitude || currentAltitude === '0' || currentAltitude === '0.0') {
+                // Considérer comme vide si: vide, "0", "0.0", "0.00", etc.
+                const isAltEmpty = !currentAltitude || currentAltitude === '' || parseFloat(currentAltitude) === 0;
+
+                if (isAltEmpty) {
                     if (confirm(`Utiliser l'altitude de la commune ${commune.nom} : ${commune.altitude}m ?`)) {
                         altitudeInput.value = commune.altitude;
                     }

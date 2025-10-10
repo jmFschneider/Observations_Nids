@@ -106,31 +106,8 @@ def rechercher_communes(request):
     lon = request.GET.get('lon', '').strip()
     limit = int(request.GET.get('limit', 10))
 
-    # Recherche par coordonnées GPS (bounding box)
-    if lat and lon:
-        try:
-            lat_float = float(lat)
-            lon_float = float(lon)
-
-            # Rayon approximatif : 0.1° ≈ 11 km
-            # Pour un rayon de ~10km autour de la position
-            delta = 0.1
-
-            communes = CommuneFrance.objects.filter(
-                latitude__gte=lat_float - delta,
-                latitude__lte=lat_float + delta,
-                longitude__gte=lon_float - delta,
-                longitude__lte=lon_float + delta,
-            ).values(
-                'nom', 'departement', 'code_departement', 'code_postal',
-                'code_insee', 'latitude', 'longitude', 'altitude'
-            )[:limit]
-
-        except ValueError:
-            return JsonResponse({'communes': [], 'error': 'Coordonnées GPS invalides'})
-
-    # Recherche par nom de commune
-    elif query and len(query) >= 2:
+    # Recherche par nom de commune (prioritaire)
+    if query and len(query) >= 2:
         communes = CommuneFrance.objects.filter(
             nom__icontains=query
         ).values(
