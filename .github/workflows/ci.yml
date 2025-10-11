@@ -2,12 +2,12 @@
 
 name: CI Django - Tests & Qualité
 
-# Déclenche le workflow sur les push et pull requests vers la branche main
+# Déclenche le workflow sur les push et pull requests vers les branches principales
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "develop", "feature/*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
 
 jobs:
   build-and-test:
@@ -58,7 +58,7 @@ jobs:
       - name: Analyse de types avec MyPy
         run: mypy .
 
-      # Étape 6: Lancer les tests unitaires avec Pytest
+      # Étape 6: Lancer les tests unitaires avec Pytest (avec couverture)
       - name: Exécution des tests avec Pytest
         # Les variables d'environnement sont utilisées par Django (config.py)
         # pour se connecter à la base de données du service
@@ -69,4 +69,14 @@ jobs:
           DB_PASSWORD: "testpassword"
           DB_HOST: "127.0.0.1" # L'hôte du service est mappé sur localhost
           DB_PORT: ${{ job.services.mariadb.ports[3306] }} # Port dynamique du service
-        run: pytest
+        run: pytest --cov --cov-report=xml --cov-report=term-missing
+
+      # Étape 7: Uploader le rapport de couverture
+      - name: Upload coverage reports to Codecov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
