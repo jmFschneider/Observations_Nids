@@ -25,7 +25,8 @@
       "Bash(del C:Projetsobservations_nidstest_permissions.py)",
       "Bash(git push:*)",
       "Bash(git stash:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(git branch:*)"
     ],
     "deny": [],
     "ask": []
