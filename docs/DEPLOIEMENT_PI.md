@@ -42,20 +42,20 @@ Depuis votre PC :
 ```bash
 # Option A : Via Git (si le Pi a accès au dépôt)
 ssh pi@adresse_ip
-cd /var/www/observations_nids
+cd /var/www/html/Observations_Nids
 git fetch origin
 git checkout production
 git pull origin production
 
 # Option B : Via SCP
-scp deploy_pi.sh pi@adresse_ip:/var/www/observations_nids/
+scp deploy_pi.sh pi@adresse_ip:/var/www/html/Observations_Nids/
 ```
 
 ### Étape 2 : Rendre le script exécutable
 
 ```bash
 ssh pi@adresse_ip
-cd /var/www/observations_nids
+cd /var/www/html/Observations_Nids
 chmod +x deploy_pi.sh
 ```
 
@@ -79,8 +79,8 @@ Le script effectuera automatiquement :
 ### Étape 4 : Créer le superutilisateur
 
 ```bash
-cd /var/www/observations_nids
-source venv/bin/activate
+cd /var/www/html/Observations_Nids
+source .venv/bin/activate
 python manage.py createsuperuser
 ```
 
@@ -96,7 +96,7 @@ Si vous préférez contrôler chaque étape :
 
 ```bash
 ssh pi@adresse_ip
-cd /var/www/observations_nids
+cd /var/www/html/Observations_Nids
 
 # Créer un dossier de sauvegarde
 mkdir -p backups/$(date +%Y%m%d_%H%M%S)
@@ -120,7 +120,7 @@ sudo systemctl stop apache2
 ### 3. Mettre à jour le code
 
 ```bash
-cd /var/www/observations_nids
+cd /var/www/html/Observations_Nids
 
 # Sauvegarder les changements locaux si nécessaire
 git stash
@@ -142,7 +142,7 @@ cp $BACKUP_DIR/.env .
 ### 5. Mettre à jour l'environnement Python
 
 ```bash
-source venv/bin/activate
+source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements-prod.txt
 ```
@@ -200,10 +200,10 @@ sudo tail -f /var/log/apache2/access.log
 
 ```bash
 # Le serveur web doit pouvoir écrire dans la base de données
-sudo chown www-data:www-data /var/www/observations_nids/db.sqlite3
+sudo chown www-data:www-data /var/www/html/Observations_Nids/db.sqlite3
 
 # Et dans le dossier media si nécessaire
-sudo chown -R www-data:www-data /var/www/observations_nids/media/
+sudo chown -R www-data:www-data /var/www/html/Observations_Nids/media/
 ```
 
 ### 4. Tester le site
@@ -232,11 +232,11 @@ sudo journalctl -xeu apache2.service
 sudo tail -f /var/log/apache2/error.log
 
 # Vérifier les permissions
-ls -la /var/www/observations_nids/db.sqlite3
+ls -la /var/www/html/Observations_Nids/db.sqlite3
 
 # Tester Django directement
-cd /var/www/observations_nids
-source venv/bin/activate
+cd /var/www/html/Observations_Nids
+source .venv/bin/activate
 python manage.py runserver 0.0.0.0:8001
 ```
 
@@ -244,19 +244,19 @@ python manage.py runserver 0.0.0.0:8001
 
 ```bash
 # Recollect les fichiers statiques
-cd /var/www/observations_nids
-source venv/bin/activate
+cd /var/www/html/Observations_Nids
+source .venv/bin/activate
 python manage.py collectstatic --clear --noinput
 
 # Vérifier les permissions
-sudo chown -R www-data:www-data /var/www/observations_nids/static/
+sudo chown -R www-data:www-data /var/www/html/Observations_Nids/static/
 ```
 
 ### Base de données corrompue
 
 ```bash
 # Restaurer depuis une sauvegarde
-cd /var/www/observations_nids
+cd /var/www/html/Observations_Nids
 cp backups/YYYYMMDD_HHMMSS/db.sqlite3 .
 sudo chown www-data:www-data db.sqlite3
 sudo systemctl restart apache2
@@ -267,7 +267,7 @@ sudo systemctl restart apache2
 Si le déploiement échoue :
 
 ```bash
-cd /var/www/observations_nids
+cd /var/www/html/Observations_Nids
 
 # Retourner à la version précédente
 git checkout Mise-en-place-des-forms-Django
@@ -277,7 +277,7 @@ cp backups/YYYYMMDD_HHMMSS/db.sqlite3 .
 sudo chown www-data:www-data db.sqlite3
 
 # Installer les anciennes dépendances
-source venv/bin/activate
+source .venv/bin/activate
 pip install -r requirements.txt
 
 # Redémarrer Apache
@@ -289,9 +289,9 @@ sudo systemctl restart apache2
 Pour les prochaines mises à jour (une fois la production stabilisée) :
 
 ```bash
-cd /var/www/observations_nids
+cd /var/www/html/Observations_Nids
 git pull origin production
-source venv/bin/activate
+source .venv/bin/activate
 pip install -r requirements-prod.txt
 python manage.py migrate
 python manage.py collectstatic --noinput
@@ -309,7 +309,7 @@ sudo systemctl restart apache2
 
 3. **Downtime** : Le site sera indisponible pendant environ 2-5 minutes durant la mise à jour.
 
-4. **Environnement virtuel** : Le script suppose que l'environnement virtuel est dans `/var/www/observations_nids/venv/`
+4. **Environnement virtuel** : Le script suppose que l'environnement virtuel est dans `/var/www/html/Observations_Nids/venv/`
 
 5. **Permissions** : Vérifiez que l'utilisateur `www-data` (Apache) a les bonnes permissions sur les fichiers.
 

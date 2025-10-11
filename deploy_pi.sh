@@ -18,8 +18,8 @@ echo -e "${GREEN}Déploiement Observations Nids${NC}"
 echo -e "${GREEN}================================${NC}\n"
 
 # Variables de configuration
-PROJECT_DIR="/var/www/observations_nids"
-VENV_DIR="$PROJECT_DIR/venv"
+PROJECT_DIR="/var/www/html/Observations_Nids"
+VENV_DIR="$PROJECT_DIR/.venv"
 BACKUP_DIR="$PROJECT_DIR/backups"
 APACHE_BACKUP="$BACKUP_DIR/apache_config_$(date +%Y%m%d_%H%M%S)"
 
