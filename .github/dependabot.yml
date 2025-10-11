@@ -1,0 +1,43 @@
+# Configuration Dependabot pour le projet Observations Nids
+# Documentation: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Surveillance des dépendances Python de développement
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    # Fichier à analyser pour les dépendances de développement
+    # Ce fichier inclut requirements-base.txt qui contient toutes les dépendances communes
+    versioning-strategy: increase
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+      - "security"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    # Grouper les mises à jour mineures et patches ensemble
+    groups:
+      django-ecosystem:
+        patterns:
+          - "django*"
+          - "celery*"
+        update-types:
+          - "minor"
+          - "patch"
+      google-apis:
+        patterns:
+          - "google-*"
+        update-types:
+          - "minor"
+          - "patch"
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
