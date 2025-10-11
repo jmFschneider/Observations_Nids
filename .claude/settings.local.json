@@ -25,7 +25,12 @@
       "Bash(del C:Projetsobservations_nidstest_permissions.py)",
       "Bash(git push:*)",
       "Bash(git stash:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "WebSearch",
+      "Bash(gh api:*)",
+      "Bash(git log:*)",
+      "Bash(pytest:*)",
+      "Bash(git merge:*)"
     ],
     "deny": [],
     "ask": []
