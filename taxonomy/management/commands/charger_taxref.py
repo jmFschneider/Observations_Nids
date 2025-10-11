@@ -221,7 +221,7 @@ class Command(BaseCommand):
         familles_cache: dict[str, Famille] = {}
 
         # Traitement par lots (optimisation mémoire)
-        BATCH_SIZE = 500
+        batch_size = 500
         especes_batch = []
 
         try:
@@ -295,7 +295,7 @@ class Command(BaseCommand):
                         especes_batch.append(espece)
 
                         # Insertion par lots
-                        if len(especes_batch) >= BATCH_SIZE:
+                        if len(especes_batch) >= batch_size:
                             self._insert_batch(especes_batch, stats)
                             especes_batch = []
 

@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from types import ModuleType
+from typing import Any
 
 from dotenv import load_dotenv
 
@@ -202,7 +203,6 @@ if _local is not None:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # --- Logging configuration (centralized, uses DJANGO_LOG_DIR env var in prod) ---
-from pathlib import Path as _Path
 
 DEFAULT_LOG_DIR = os.path.join(BASE_DIR, 'observations', 'logs')
 LOG_DIR = os.environ.get("DJANGO_LOG_DIR", DEFAULT_LOG_DIR)
@@ -214,11 +214,11 @@ if _local is not None:
 # Création du dossier logs s'il n'existe pas (seulement si dans BASE_DIR)
 try:
     if str(LOG_DIR).startswith(str(BASE_DIR)):
-        _Path(LOG_DIR).mkdir(parents=True, exist_ok=True)
+        Path(LOG_DIR).mkdir(parents=True, exist_ok=True)
 except Exception:
     pass
 
-LOGGING = {
+LOGGING: dict[str, Any] = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {

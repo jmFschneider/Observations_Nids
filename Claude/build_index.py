@@ -126,10 +126,7 @@ def parse_headings(md_path: Path, max_depth: int) -> tuple[str, list[tuple[int, 
 
 def format_file_size(size_or_path) -> str:
     """Retourne la taille du fichier de manière lisible."""
-    if isinstance(size_or_path, Path):
-        size = size_or_path.stat().st_size
-    else:
-        size = size_or_path
+    size = size_or_path.stat().st_size if isinstance(size_or_path, Path) else size_or_path
 
     if size < 1024:
         return f"{size} B"
@@ -141,26 +138,21 @@ def format_file_size(size_or_path) -> str:
 def get_file_emoji(filename: str) -> str:
     """Retourne un emoji approprié selon le type de fichier."""
     filename_lower = filename.lower()
-    if filename_lower.startswith('0') or 'readme' in filename_lower:
-        return '📘'
-    elif 'quick' in filename_lower or 'start' in filename_lower:
-        return '🚀'
-    elif 'architecture' in filename_lower:
-        return '🏗️'
-    elif 'workflow' in filename_lower or 'git' in filename_lower:
-        return '🔄'
-    elif 'guide' in filename_lower:
-        return '📖'
-    elif 'optimisation' in filename_lower or 'performance' in filename_lower:
-        return '⚡'
-    elif 'reset' in filename_lower or 'database' in filename_lower:
-        return '🗄️'
-    elif 'geocod' in filename_lower or 'altitude' in filename_lower:
-        return '🌍'
-    elif 'commune' in filename_lower:
-        return '🏘️'
-    else:
-        return '📄'
+    emoji_map = {
+        '📘': ['0', 'readme'],
+        '🚀': ['quick', 'start'],
+        '🏗️': ['architecture'],
+        '🔄': ['workflow', 'git'],
+        '📖': ['guide'],
+        '⚡': ['optimisation', 'performance'],
+        '🗄️': ['reset', 'database'],
+        '🌍': ['geocod', 'altitude'],
+        '🏘️': ['commune'],
+    }
+    for emoji, keywords in emoji_map.items():
+        if any(keyword in filename_lower for keyword in keywords):
+            return emoji
+    return '📄'
 
 def build_index(root: Path, out_file: Path, max_depth: int, excludes: list[str], show_stats: bool = True) -> str:
     """Génère l'index avec statistiques optionnelles."""
@@ -209,7 +201,7 @@ def build_index(root: Path, out_file: Path, max_depth: int, excludes: list[str],
         if sections:
             lines.append("")
             # Indentation cohérente selon le niveau
-            base_level = min(l for (l, _, _) in sections) if sections else 2
+            base_level = min(level for (level, _, _) in sections) if sections else 2
             for level, text, slug in sections:
                 indent = "  " * (level - base_level)
                 lines.append(f"{indent}- [{text}]({rel_url}#{slug})")
@@ -239,7 +231,6 @@ def safe_print(text: str):
         print(text)
     except UnicodeEncodeError:
         # Fallback : enlever les emojis pour Windows
-        import re
         text_no_emoji = re.sub(r'[^\x00-\x7F]+', '', text)
         print(text_no_emoji)
 

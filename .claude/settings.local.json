@@ -9,7 +9,20 @@
       "Bash(pip show:*)",
       "Bash(pip install:*)",
       "Bash(python manage.py check:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(curl -s \"http://127.0.0.1:8000/geo/rechercher-communes/?q=sai\")",
+      "Read(//c/**)",
+      "Bash(python manage.py shell:*)",
+      "Bash(python manage.py collectstatic:*)",
+      "Bash(del C:Projetsobservations_nidstest_api_communes.html)",
+      "Bash(curl -s \"http://127.0.0.1:8000/observations/modifier/18/\")",
+      "Bash(python test_remarques_ajax.py)",
+      "Bash(del C:Projetsobservations_nidstest_remarques_ajax.py)",
+      "Bash(curl -s \"http://127.0.0.1:8000/observations/liste/\")",
+      "Bash(curl:*)",
+      "Bash(python test_permissions.py:*)",
+      "Bash(del C:Projetsobservations_nidstest_permissions.py)"
     ],
     "deny": [],
     "ask": []

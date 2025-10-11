@@ -14,7 +14,6 @@ from pydantic_settings import BaseSettings
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Dans config.py, modifiez la classe DatabaseSettings et la fonction get_settings
 class DatabaseSettings(BaseModel):
     """Database configuration settings."""
 
@@ -36,22 +35,19 @@ class CelerySettings(BaseSettings):
     task_track_started: bool = True
     task_time_limit: int = 30 * 60  # 30 minutes
     worker_hijack_root_logger: bool = False
-    # Configuration spÃ©cifique Ã  Windows pour Celery
+    # Configuration spécifique à Windows pour Celery
     if os.name == 'nt':
         CELERY_WORKER_CONCURRENCY: int = 1
         CELERY_WORKER_POOL: str = 'solo'
 
     class Config:
-        env_prefix = "CELERY_"  # Chercher les variables prÃ©fixÃ©es par CELERY_
-        extra = "ignore"  # Ignore extra fields not defined in the model
+        env_prefix = "CELERY_"
+        extra = "ignore"
 
 
 class Settings(BaseSettings):
     """
     Project settings loaded from environment variables.
-
-    This class uses Pydantic to validate settings and provide default values.
-    Environment variables are loaded using python-dotenv.
     """
 
     # Core Django settings
@@ -60,11 +56,7 @@ class Settings(BaseSettings):
     ALLOWED_HOSTS: list[str] = Field(default_factory=lambda: ["localhost", "127.0.0.1"])
 
     gemini_api_key: str | None = None
-
-    # Celery settings (nouveau)
     celery: CelerySettings = Field(default_factory=CelerySettings)
-
-    # Database settings
     DATABASE: DatabaseSettings
 
     # Custom settings
@@ -94,11 +86,10 @@ class Settings(BaseSettings):
 
     class Config:
         """Pydantic config for environment variables."""
-
         env_file = ".env"
         env_file_encoding = "utf-8"
         env_nested_delimiter = "__"
-        extra = "ignore"  # Ignore extra fields not defined in the model
+        extra = "ignore"
 
     @validator("ALLOWED_HOSTS", pre=True)
     def validate_allowed_hosts(cls, v):  # noqa: N805
@@ -115,9 +106,8 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     """
     Get settings from environment variables.
-
-    This function creates a Settings instance with values from environment variables.
-    For database settings, it uses the DB_* environment variables.
+    Pydantic automatically reads from the .env file and environment.
+    We only need to manually construct nested models if they don't use prefixes.
     """
     database_settings = DatabaseSettings(
         name=os.environ.get("DB_NAME", "NidsObservation"),
@@ -127,26 +117,9 @@ def get_settings() -> Settings:
         port=os.environ.get("DB_PORT", "3306"),
     )
 
-    celery_settings = CelerySettings()
-    #     broker_url=os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0"),
-    #     result_backend=os.environ.get("CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/0"),
-    #     # Les autres paramÃ¨tres ont des valeurs par dÃ©faut dans la classe
-    # )
-
-    # Get ALLOWED_HOSTS from environment and process it directly
-    allowed_hosts = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1")
-
+    # Pydantic will load all other settings (SECRET_KEY, DEBUG, ALLOWED_HOSTS, etc.)
+    # automatically. The @validator for ALLOWED_HOSTS will correctly process the string.
     return Settings(
         DATABASE=database_settings,
-        SECRET_KEY=os.environ.get(
-            "SECRET_KEY", "django-insecure-^tzqm_vr2-7f#2p10rehlk4pr9!z8z^!3atbbwq@2!%h_$n2f0"
-        ),
-        DEBUG=os.environ.get("DEBUG", "False").lower() in ("true", "1", "t"),
-        USE_DEBUG_TOOLBAR=os.environ.get("USE_DEBUG_TOOLBAR", "False").lower()
-        in ("true", "1", "t"),
-        gemini_api_key=os.environ.get("GEMINI_API_KEY", None),
-        # Explicitly set ALLOWED_HOSTS to avoid JSON parsing issues
-        ALLOWED_HOSTS=allowed_hosts,
-        # Ajouter les paramÃ¨tres Celery
-        celery=celery_settings,
+        celery=CelerySettings()  # type: ignore[call-arg]
     )

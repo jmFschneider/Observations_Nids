@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 
 from accounts.models import Utilisateur
-from geo.models import CommuneFrance
+from geo.models import CommuneFrance, Localisation
 from ingest.models import EspeceCandidate, ImportationEnCours, TranscriptionBrute
 from observations.models import FicheObservation
 
@@ -28,7 +28,6 @@ def accueil_importation(request):
     # Statistiques communes
     communes_en_base = CommuneFrance.objects.count()
     # Communes trouvées lors de cette transcription (fiches issues de transcription avec code INSEE)
-    from geo.models import Localisation
     communes_transcription = Localisation.objects.filter(
         fiche__transcription=True,
         code_insee__isnull=False

@@ -1,8 +1,16 @@
 # =============================================================================
 # REQUIREMENTS DE DÉVELOPPEMENT - Observations Nids
 # =============================================================================
-# Installation : pip install -r requirements.txt -r requirements-dev.txt
+# Ce fichier étend la base avec les outils nécessaires pour le développement,
+# les tests, le linting et l'analyse de code.
+#
+# Installation : pip install -r requirements-dev.txt
 # =============================================================================
+
+# -----------------------------------------------------------------------------
+# Dépendances de base
+# -----------------------------------------------------------------------------
+-r requirements-base.txt
 
 # -----------------------------------------------------------------------------
 # Outils de formatage et linting

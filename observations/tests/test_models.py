@@ -37,12 +37,12 @@ class TestFicheObservation:
         # Vérifier les valeurs par défaut
         assert fiche_observation.localisation.commune == 'Non spécifiée'
         assert fiche_observation.nid.hauteur_nid == 0
-        assert fiche_observation.resume.nombre_oeufs_pondus == 0
+        assert fiche_observation.resume.nombre_oeufs_pondus is None
         assert fiche_observation.causes_echec.description == 'Aucune cause identifiée'
 
     def test_str_representation(self, fiche_observation):
         """Test de la représentation string."""
-        expected = f"Fiche #{fiche_observation.num_fiche}"
+        expected = f"Fiche {fiche_observation.num_fiche} - {fiche_observation.annee} ({fiche_observation.espece.nom})"
         assert str(fiche_observation) == expected
 
 

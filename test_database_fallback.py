@@ -20,7 +20,7 @@ sys.path.insert(0, str(BASE_DIR))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
 django.setup()
 
-from django.conf import settings
+from django.conf import settings  # noqa: E402
 
 
 def test_database_config():

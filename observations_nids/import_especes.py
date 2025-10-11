@@ -11,7 +11,7 @@ from collections import defaultdict
 import django
 
 # Importer les modèles après avoir configuré Django
-from observations.models import Espece, Famille, Ordre
+from taxonomy.models import Espece, Famille, Ordre
 
 # Configurer l'environnement Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')

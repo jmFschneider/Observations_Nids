@@ -4,22 +4,21 @@ import sys
 
 import django
 
-# Imports des modèles
-from importation.models import EspeceCandidate, ImportationEnCours, TranscriptionBrute
+from accounts.models import Utilisateur
+from audit.models import HistoriqueModification
 
+# Imports des modèles
+from ingest.models import EspeceCandidate, ImportationEnCours, TranscriptionBrute
 from observations.models import (
     CausesEchec,
     FicheObservation,
-    HistoriqueModification,
-    HistoriqueValidation,
     Localisation,
     Nid,
     Observation,
     Remarque,
     ResumeObservation,
-    Utilisateur,
-    Validation,
 )
+from review.models import HistoriqueValidation, Validation
 
 # Initialisation de l'environnement Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')

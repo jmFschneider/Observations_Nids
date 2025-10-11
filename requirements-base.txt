@@ -1,9 +1,9 @@
 # =============================================================================
-# REQUIREMENTS PRINCIPAUX - Observations Nids
+# REQUIREMENTS DE BASE - Observations Nids
 # =============================================================================
-# Ce fichier contient toutes les dépendances pour le développement local
-# Pour la production : pip install -r requirements-prod.txt
-# Pour le développement : pip install -r requirements.txt -r requirements-dev.txt
+# Ce fichier contient les dépendances communes à tous les environnements (dev, prod).
+# Il est utilisé par requirements-dev.txt et requirements-prod.txt.
+# NE PAS INSTALLER DIRECTEMENT.
 # =============================================================================
 
 # -----------------------------------------------------------------------------

@@ -125,9 +125,8 @@ class Command(BaseCommand):
 
                 # Décompresser (le fichier est gzippé)
                 self.stdout.write("Décompression du fichier...")
-                with gzip.open(lof_file, 'rb') as f_in:
-                    with open(lof_file_decompressed, 'wb') as f_out:
-                        shutil.copyfileobj(f_in, f_out)
+                with gzip.open(lof_file, 'rb') as f_in, open(lof_file_decompressed, 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
 
                 self.stdout.write(self.style.SUCCESS("[OK] Décompression terminée"))
 
@@ -201,7 +200,10 @@ class Command(BaseCommand):
             for row in ws.iter_rows(min_row=2, values_only=True):
                 stats['total_lines'] += 1
 
-                col1, categorie, nom_sci, nom_fr = row
+                # S'assurer que les valeurs sont des chaînes de caractères
+                col1, categorie, nom_sci, nom_fr = (
+                    str(cell) if cell is not None else '' for cell in row[:4]
+                )
 
                 if not nom_sci:
                     continue

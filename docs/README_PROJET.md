@@ -184,6 +184,28 @@ L'application utilise intensivement les **Django Inline Formsets** pour gérer l
 - **Authentification requise** : Toutes les vues nécessitent une authentification
 - **Permissions** : Contrôle d'accès basé sur les rôles
 
+## Gestion des Dépendances Python
+
+La gestion des dépendances Python a été restructurée pour plus de clarté et de maintenabilité. Elle s'articule autour de trois fichiers principaux dans le répertoire racine :
+
+-   `requirements-base.txt` : Contient la liste de toutes les dépendances de base requises pour faire fonctionner l'application. Les versions des paquets y sont définies et servent de source unique de vérité.
+-   `requirements-dev.txt` : Dédié à l'environnement de développement. Il inclut la base et y ajoute les outils nécessaires pour les tests, le linting et le débogage (ex: `pytest`, `ruff`, `django-debug-toolbar`).
+-   `requirements-prod.txt` : Dédié à l'environnement de production. Il inclut la base et y ajoute les paquets spécifiques à la production (ex: `gunicorn`).
+
+### Commandes d'installation
+
+**Pour un environnement de développement complet :**
+```bash
+pip install -r requirements-dev.txt
+```
+
+**Pour un environnement de production :**
+```bash
+pip install -r requirements-prod.txt
+```
+
+Cette organisation assure que les environnements de développement et de production partagent exactement les mêmes versions des paquets de base, évitant ainsi les problèmes de type "ça marche sur ma machine".
+
 ## Déploiement et maintenance
 
 ### Environnements

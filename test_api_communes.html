@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Communes</title>
+</head>
+<body>
+    <h1>Test API Communes</h1>
+    <input type="text" id="test_commune" placeholder="Tapez un nom de commune">
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('test_commune').addEventListener('input', function() {
+            const query = this.value;
+            if (query.length < 2) return;
+
+            const url = `/geo/rechercher-communes/?q=${encodeURIComponent(query)}`;
+            console.log('Fetching:', url);
+
+            fetch(url)
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Data received:', data);
+                    document.getElementById('results').innerHTML = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('results').innerHTML = 'Erreur: ' + error;
+                });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+# Fichier de workflow pour l'Intégration Continue (CI) avec GitHub Actions
+
+name: CI Django - Tests & Qualité
+
+# Déclenche le workflow sur les push et pull requests vers la branche main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    # Services : conteneurs additionnels pour le job (ex: base de données)
+    services:
+      # Label du conteneur de base de données
+      mariadb:
+        image: mariadb:10.5
+        # Variables d'environnement pour initialiser la DB
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: testpassword
+        # Options pour le healthcheck, pour s'assurer que la DB est prête
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -prootpassword"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      # Étape 1: Récupérer le code du dépôt
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      # Étape 2: Mettre en place l'environnement Python
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Étape 3: Installer les dépendances du projet
+      - name: Installation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      # Étape 4: Lancer les analyseurs de code statique (Linting & Formatting)
+      - name: Analyse de code avec Ruff
+        run: |
+          ruff check .
+          ruff format --check .
+
+      # Étape 5: Lancer l'analyse de types avec MyPy
+      - name: Analyse de types avec MyPy
+        run: mypy .
+
+      # Étape 6: Lancer les tests unitaires avec Pytest
+      - name: Exécution des tests avec Pytest
+        # Les variables d'environnement sont utilisées par Django (config.py)
+        # pour se connecter à la base de données du service
+        env:
+          SECRET_KEY: "dummy-secret-key-for-ci"
+          DB_NAME: "test_db"
+          DB_USER: "test_user"
+          DB_PASSWORD: "testpassword"
+          DB_HOST: "127.0.0.1" # L'hôte du service est mappé sur localhost
+          DB_PORT: ${{ job.services.mariadb.ports[3306] }} # Port dynamique du service
+        run: pytest

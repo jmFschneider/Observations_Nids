@@ -161,10 +161,7 @@ class GeocodeurCommunes:
         """Géocode via Nominatim (fallback)"""
         try:
             # Construire la requête
-            if departement:
-                query = f"{commune}, {departement}, France"
-            else:
-                query = f"{commune}, France"
+            query = f"{commune}, {departement}, France" if departement else f"{commune}, France"
 
             # Limiter aux résultats de type ville/village
             location = self.geolocator.geocode(query, country_codes='fr', exactly_one=True)

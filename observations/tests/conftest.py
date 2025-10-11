@@ -1,13 +1,20 @@
 """Fixtures spécifiques au module observations."""
 import pytest
 
-from observations.models import Espece, Famille, FicheObservation
+from observations.models import FicheObservation
+from taxonomy.models import Espece, Famille, Ordre
 
 
 @pytest.fixture
-def famille():
+def ordre():
+    """Ordre d'oiseaux de test."""
+    return Ordre.objects.create(nom='Accipitriformes')
+
+
+@pytest.fixture
+def famille(ordre):
     """Famille d'oiseaux de test."""
-    return Famille.objects.create(nom='Accipitridae')
+    return Famille.objects.create(nom='Accipitridae', ordre=ordre)
 
 
 @pytest.fixture

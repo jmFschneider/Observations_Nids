@@ -53,6 +53,7 @@ Usage:
 
 import re
 import time
+import unicodedata
 from urllib.parse import quote_plus
 
 import requests
@@ -236,7 +237,6 @@ class Command(BaseCommand):
         nom_clean = nom_francais.strip().lower()
 
         # Normaliser les caractères accentués
-        import unicodedata
         nom_clean = unicodedata.normalize('NFD', nom_clean)
         nom_clean = ''.join(c for c in nom_clean if unicodedata.category(c) != 'Mn')
 

@@ -22,11 +22,11 @@ class UtilisateurAdmin(UserAdmin):
 
     fieldsets = UserAdmin.fieldsets + (
         ('Informations supplémentaires', {'fields': ('role', 'est_valide', 'est_transcription')}),
-    )
+    )  # type: ignore
 
     add_fieldsets = UserAdmin.add_fieldsets + (
         ('Informations supplémentaires', {'fields': ('role', 'est_valide', 'est_transcription')}),
-    )
+    )  # type: ignore
 
 
 admin.site.register(Utilisateur, UtilisateurAdmin)

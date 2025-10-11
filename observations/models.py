@@ -297,6 +297,12 @@ class EtatCorrection(models.Model):
     def __str__(self):
         return f"État correction Fiche {self.fiche.num_fiche} - {self.get_statut_display()}"
 
+    def save(self, *args, **kwargs):
+        # Calculer automatiquement le pourcentage avant la sauvegarde
+        if not kwargs.pop('skip_auto_calculation', False):
+            self.calculer_pourcentage_completion()
+        super().save(*args, **kwargs)
+
     def calculer_pourcentage_completion(self):
         """Calcule automatiquement le pourcentage de completion basé sur les données de la fiche"""
         score = 0
@@ -353,12 +359,6 @@ class EtatCorrection(models.Model):
 
         self.pourcentage_completion = pourcentage
         return pourcentage
-
-    def save(self, *args, **kwargs):
-        # Calculer automatiquement le pourcentage avant la sauvegarde
-        if not kwargs.pop('skip_auto_calculation', False):
-            self.calculer_pourcentage_completion()
-        super().save(*args, **kwargs)
 
     def valider(self, utilisateur):
         """Marque la fiche comme validée par un utilisateur"""

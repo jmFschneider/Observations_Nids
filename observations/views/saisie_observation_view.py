@@ -158,6 +158,22 @@ def saisie_observation(request, fiche_id=None):
     if fiche_id:
         try:
             fiche_instance = FicheObservation.objects.get(pk=fiche_id)
+            user = cast(Utilisateur, request.user)
+
+            # Vérifier les permissions pour les fiches en cours de saisie
+            if hasattr(fiche_instance, 'etat_correction'):
+                etat = fiche_instance.etat_correction
+                # Si la fiche est en cours de saisie (nouveau ou en_edition),
+                # seul l'auteur ou un administrateur peut l'éditer
+                if (etat.statut in ['nouveau', 'en_edition']
+                        and user != fiche_instance.observateur and user.role != "administrateur"):
+                    messages.error(
+                        request,
+                        f"Vous n'êtes pas autorisé à modifier cette fiche. "
+                        f"Seul l'auteur ({fiche_instance.observateur.username}) peut continuer la saisie."
+                    )
+                    return redirect('fiche_observation', fiche_id=fiche_id)
+
             localisation_instance = fiche_instance.localisation
             nid_instance = fiche_instance.nid
             resume_instance = fiche_instance.resume
@@ -319,7 +335,7 @@ def saisie_observation(request, fiche_id=None):
 
                     if fiche_id and fiche_avant:
                         enregistrer_modifications_historique(
-                            fiche, fiche_avant, fiche, 'fiche', request.user, fiche_form.changed_data
+                            fiche, (fiche_avant, fiche), 'fiche', request.user, fiche_form.changed_data
                         )
 
                     # Sauvegarder les objets liés
@@ -332,7 +348,7 @@ def saisie_observation(request, fiche_id=None):
                         localisation.save()
                         if localisation_avant:
                             enregistrer_modifications_historique(
-                                fiche, localisation_avant, localisation, 'localisation', request.user, localisation_form.changed_data
+                                fiche, (localisation_avant, localisation), 'localisation', request.user, localisation_form.changed_data
                             )
 
                         resume = resume_form.save(commit=False)
@@ -340,7 +356,7 @@ def saisie_observation(request, fiche_id=None):
                         resume.save()
                         if resume_avant:
                             enregistrer_modifications_historique(
-                                fiche, resume_avant, resume, 'resume_observation', request.user, resume_form.changed_data
+                                fiche, (resume_avant, resume), 'resume_observation', request.user, resume_form.changed_data
                             )
 
                         nid = nid_form.save(commit=False)
@@ -348,7 +364,7 @@ def saisie_observation(request, fiche_id=None):
                         nid.save()
                         if nid_avant:
                             enregistrer_modifications_historique(
-                                fiche, nid_avant, nid, 'nid', request.user, nid_form.changed_data
+                                fiche, (nid_avant, nid), 'nid', request.user, nid_form.changed_data
                             )
 
                         causes_echec = causes_echec_form.save(commit=False)
@@ -356,7 +372,7 @@ def saisie_observation(request, fiche_id=None):
                         causes_echec.save()
                         if causes_echec_avant:
                             enregistrer_modifications_historique(
-                                fiche, causes_echec_avant, causes_echec, 'causes_echec', request.user, causes_echec_form.changed_data
+                                fiche, (causes_echec_avant, causes_echec), 'causes_echec', request.user, causes_echec_form.changed_data
                             )
                     else:
                         # Nouvelle fiche : les objets ont été créés automatiquement
@@ -409,8 +425,7 @@ def saisie_observation(request, fiche_id=None):
 
                                 enregistrer_modifications_historique(
                                     fiche,
-                                    ancienne_obs,
-                                    form.instance,
+                                    (ancienne_obs, form.instance),
                                     'observation',
                                     request.user,
                                     champs_modifies
@@ -611,8 +626,9 @@ def mettre_a_jour_annee_observations(fiche, ancienne_annee, nouvelle_annee, modi
 
 
 def enregistrer_modifications_historique(
-    fiche, ancienne_instance, nouvelle_instance, categorie, modifie_par, champs_modifies=None
+    fiche, instances, categorie, modifie_par, champs_modifies=None
 ):
+    ancienne_instance, nouvelle_instance = instances
     if not ancienne_instance or not nouvelle_instance:
         return
 

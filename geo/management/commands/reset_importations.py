@@ -7,6 +7,9 @@ Usage:
     python manage.py reset_importations --confirm  # Sans confirmation interactive
 """
 
+
+import contextlib
+
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
 
@@ -217,12 +220,10 @@ class Command(BaseCommand):
                 ]
 
                 for table in tables:
-                    try:
+                    with contextlib.suppress(Exception):
                         cursor.execute(
                             f"DELETE FROM sqlite_sequence WHERE name='{table}'"
                         )
-                    except Exception:
-                        pass  # La table peut ne pas exister dans sqlite_sequence
 
                 self.stdout.write('  ✓ Séquences SQLite réinitialisées')
 
@@ -244,10 +245,8 @@ class Command(BaseCommand):
                 ]
 
                 for sequence in sequences:
-                    try:
+                    with contextlib.suppress(Exception):
                         cursor.execute(f"ALTER SEQUENCE {sequence} RESTART WITH 1")
-                    except Exception:
-                        pass  # La séquence peut ne pas exister
 
                 self.stdout.write('  ✓ Séquences PostgreSQL réinitialisées')
 

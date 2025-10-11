@@ -38,9 +38,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const cellsEtatCorrection = document.querySelectorAll('.etat-correction-cell');
 
     cellsEtatCorrection.forEach(function(cell) {
-        const percentage = parseInt(cell.dataset.percentage);
-        if (!isNaN(percentage)) {
-            cell.style.backgroundColor = getColorForPercentage(percentage);
+        // Vérifier si c'est une fiche "En cours de saisie" (statut en_edition ou nouveau)
+        const badgeElement = cell.querySelector('.badge-info');
+        if (badgeElement) {
+            // Couleur bleu clair pour les fiches en cours de saisie
+            cell.style.backgroundColor = 'rgba(23, 162, 184, 0.15)'; // Bootstrap info color avec transparence
+        } else {
+            // Utiliser la colorisation basée sur le pourcentage pour les autres statuts
+            const percentage = parseInt(cell.dataset.percentage);
+            if (!isNaN(percentage)) {
+                cell.style.backgroundColor = getColorForPercentage(percentage);
+            }
         }
     });
 });
@@ -107,10 +115,15 @@ document.addEventListener('DOMContentLoaded', function() {
                             {% if fiche.etat_correction %}
                                 <div class="d-flex align-items-center">
                                     <span class="badge
-                                        {% if fiche.etat_correction.statut == 'nouveau' %}badge-secondary
+                                        {% if fiche.etat_correction.statut == 'nouveau' %}badge-info
+                                        {% elif fiche.etat_correction.statut == 'en_edition' %}badge-info
                                         {% elif fiche.etat_correction.statut == 'en_cours' %}badge-warning
                                         {% else %}badge-success{% endif %}">
-                                        {{ fiche.etat_correction.get_statut_display }}
+                                        {% if fiche.etat_correction.statut == 'en_edition' %}
+                                            En cours de saisie
+                                        {% else %}
+                                            {{ fiche.etat_correction.get_statut_display }}
+                                        {% endif %}
                                     </span>
                                     {% if fiche.etat_correction.statut == 'en_cours' %}
                                         <div class="progress ml-2" style="width: 60px; height: 20px;">
@@ -134,7 +147,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td>
                             <div class="d-flex gap-1">
                                 <a href="{% url 'fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Visualiser</a>
-                                <a href="{% url 'modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-warning">Corriger</a>
+                                {% if fiche.etat_correction.statut == 'en_edition' or fiche.etat_correction.statut == 'nouveau' %}
+                                    {% if user == fiche.observateur or user.role == 'administrateur' %}
+                                        <a href="{% url 'modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-primary">Continuer</a>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-secondary" disabled title="Seul l'auteur peut continuer la saisie">Continuer</button>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{% url 'modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-warning">Corriger</a>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>
