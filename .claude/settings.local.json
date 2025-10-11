@@ -22,7 +22,10 @@
       "Bash(curl -s \"http://127.0.0.1:8000/observations/liste/\")",
       "Bash(curl:*)",
       "Bash(python test_permissions.py:*)",
-      "Bash(del C:Projetsobservations_nidstest_permissions.py)"
+      "Bash(del C:Projetsobservations_nidstest_permissions.py)",
+      "Bash(git push:*)",
+      "Bash(git stash:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []
