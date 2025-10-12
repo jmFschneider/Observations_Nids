@@ -26,6 +26,7 @@
       "Bash(git push:*)",
       "Bash(git stash:*)",
       "Bash(git fetch:*)",
+      "Bash(git branch:*)",
       "WebSearch",
       "Bash(gh api:*)",
       "Bash(git log:*)",
