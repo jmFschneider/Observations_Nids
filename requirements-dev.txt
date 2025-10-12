@@ -15,8 +15,7 @@
 # -----------------------------------------------------------------------------
 # Outils de formatage et linting
 # -----------------------------------------------------------------------------
-black==25.9.0
-ruff==0.14.0
+ruff==0.12.12  # Remplace black (fait linting + formatting)
 
 # -----------------------------------------------------------------------------
 # Analyse de types
@@ -45,8 +44,8 @@ pytest-cov==6.0.0
 # -----------------------------------------------------------------------------
 # Analyse de code et graphiques de dépendances
 # -----------------------------------------------------------------------------
-pyan3==1.2.0
-pygraphviz==1.14
+# pyan3==1.2.0  # Non utilisé - décommenté si besoin d'analyse de dépendances
+# pygraphviz==1.14  # Non utilisé - décommenté si besoin de graphes
 
 # -----------------------------------------------------------------------------
 # Gestion des dépendances
@@ -56,9 +55,9 @@ pip-tools==7.5.1
 # -----------------------------------------------------------------------------
 # Analyse de données (pour analyse de logs ou datasets)
 # -----------------------------------------------------------------------------
-pandas==2.3.3
-pandas-stubs==2.3.2.250827
-numpy==2.3.3
+# pandas==2.3.2  # Non utilisé - décommenter si besoin d'analyse de données
+# pandas-stubs==2.3.2.250827
+# numpy==2.3.3  # Non utilisé - décommenter si besoin de calculs scientifiques
 
 # -----------------------------------------------------------------------------
 # Build tools

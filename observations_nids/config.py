@@ -109,6 +109,11 @@ def get_settings() -> Settings:
     Pydantic automatically reads from the .env file and environment.
     We only need to manually construct nested models if they don't use prefixes.
     """
+    from dotenv import load_dotenv
+
+    # Charger explicitement les variables d'environnement depuis .env
+    load_dotenv(BASE_DIR / ".env")
+
     database_settings = DatabaseSettings(
         name=os.environ.get("DB_NAME", "NidsObservation"),
         user=os.environ.get("DB_USER", "jms"),
@@ -118,7 +123,7 @@ def get_settings() -> Settings:
     )
 
     # Pydantic will load all other settings (SECRET_KEY, DEBUG, ALLOWED_HOSTS, etc.)
-    # automatically. The @validator for ALLOWED_HOSTS will correctly process the string.
+    # automatically from environment variables. The @validator for ALLOWED_HOSTS will correctly process the string.
     return Settings(
         DATABASE=database_settings,
         celery=CelerySettings()  # type: ignore[call-arg]
