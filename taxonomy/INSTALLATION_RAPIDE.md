@@ -1,5 +1,11 @@
 # Installation rapide - Import TaxRef
 
+**Remarque : je n'ai pas réussi à me connecter correctement sur le site. J'ai abandonné cette solution au profit de oiseaux.net**
+
+[TOC]
+
+
+
 ## Guide rapide pour démarrer
 
 **⚠️ Important :** Le téléchargement automatique n'est pas disponible. Vous devez d'abord télécharger TaxRef manuellement.
