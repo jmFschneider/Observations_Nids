@@ -33,7 +33,7 @@ typing-inspection==0.4.2
 # Outils de débogage Django
 # -----------------------------------------------------------------------------
 django-debug-toolbar==5.1.0
-django-extensions==3.2.3
+django-extensions==4.1
 
 # -----------------------------------------------------------------------------
 # Tests
