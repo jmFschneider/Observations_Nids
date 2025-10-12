@@ -43,7 +43,7 @@ humanize==4.12.2
 # Google Cloud APIs (Vision API pour OCR / Gemini pour IA)
 # -----------------------------------------------------------------------------
 google-generativeai==0.8.5
-google-ai-generativelanguage==0.6.15
+google-ai-generativelanguage==0.7.0
 google-api-core==2.26.0
 google-api-python-client==2.184.0
 google-auth==2.41.1
