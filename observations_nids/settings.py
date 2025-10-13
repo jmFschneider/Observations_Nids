@@ -275,6 +275,32 @@ try:
 except FileNotFoundError:
     VERSION = "0.0.0"  # Valeur par défaut en cas d'erreur
 
+# --- Email Configuration ---
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend'
+)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get(
+    'DEFAULT_FROM_EMAIL', 'noreply@observations-nids.fr'
+)
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', '')
+
+# Surcharge depuis settings_local.py si présent
+if _local is not None:
+    EMAIL_BACKEND = getattr(_local, 'EMAIL_BACKEND', EMAIL_BACKEND)
+    EMAIL_HOST = getattr(_local, 'EMAIL_HOST', EMAIL_HOST)
+    EMAIL_PORT = getattr(_local, 'EMAIL_PORT', EMAIL_PORT)
+    EMAIL_USE_TLS = getattr(_local, 'EMAIL_USE_TLS', EMAIL_USE_TLS)
+    EMAIL_HOST_USER = getattr(_local, 'EMAIL_HOST_USER', EMAIL_HOST_USER)
+    EMAIL_HOST_PASSWORD = getattr(_local, 'EMAIL_HOST_PASSWORD', EMAIL_HOST_PASSWORD)
+    DEFAULT_FROM_EMAIL = getattr(_local, 'DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
+    ADMIN_EMAIL = getattr(_local, 'ADMIN_EMAIL', ADMIN_EMAIL)
+# --- End Email Configuration ---
+
 # Active Debug Toolbar uniquement si défini dans settings_local ou .env
 try:
     from .settings_local import USE_DEBUG_TOOLBAR

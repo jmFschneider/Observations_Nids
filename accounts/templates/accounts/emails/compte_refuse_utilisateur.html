@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votre demande de compte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border: 1px solid #dee2e6;
+        }
+        .alert-box {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .reason-box {
+            background-color: white;
+            padding: 15px;
+            border-left: 4px solid #dc3545;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Votre demande de compte</h1>
+    </div>
+
+    <div class="content">
+        <p>Bonjour {{ utilisateur.first_name }},</p>
+
+        <div class="alert-box">
+            <p>Nous vous informons que votre demande de compte sur <strong>Observations Nids</strong>
+            n'a pas pu être approuvée pour le moment.</p>
+        </div>
+
+        {% if raison %}
+        <div class="reason-box">
+            <p><strong>Raison :</strong></p>
+            <p>{{ raison }}</p>
+        </div>
+        {% endif %}
+
+        <p>Si vous pensez qu'il s'agit d'une erreur ou si vous souhaitez plus d'informations,
+        n'hésitez pas à nous contacter.</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="http://{{ site_url }}/accounts/inscription-publique/" class="button">
+                Faire une nouvelle demande
+            </a>
+        </div>
+
+        <p style="font-size: 14px; color: #6c757d; margin-top: 30px;">
+            Merci de votre compréhension.
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>Cet email a été envoyé automatiquement par Observations Nids.</p>
+        <p>Merci de ne pas répondre à cet email.</p>
+    </div>
+</body>
+</html>

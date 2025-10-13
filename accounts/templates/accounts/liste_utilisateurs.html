@@ -3,7 +3,14 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Gestion des utilisateurs</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gestion des utilisateurs</h1>
+        {% if demandes_en_attente > 0 %}
+        <span class="badge badge-warning badge-pill" style="font-size: 1.2rem; padding: 10px 15px;">
+            <i class="fas fa-clock"></i> {{ demandes_en_attente }} demande(s) en attente
+        </span>
+        {% endif %}
+    </div>
 
     <div class="row mb-4">
         <div class="col-md-6">
@@ -41,18 +48,38 @@
                     <th>Prénom</th>
                     <th>Email</th>
                     <th>Rôle</th>
+                    <th>Validation</th>
                     <th>Statut</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for utilisateur in utilisateurs %}
-                <tr id="user-row-{{ utilisateur.id }}" onclick="loadUserDetail({{ utilisateur.id }})" style="cursor: pointer;">
-                    <td>{{ utilisateur.username }}</td>
+                <tr id="user-row-{{ utilisateur.id }}" onclick="loadUserDetail({{ utilisateur.id }})"
+                    style="cursor: pointer; {% if not utilisateur.est_valide %}background-color: #fff3cd;{% endif %}">
+                    <td>
+                        {{ utilisateur.username }}
+                        {% if not utilisateur.est_valide %}
+                        <span class="badge badge-warning ml-2">
+                            <i class="fas fa-exclamation-triangle"></i> Nouveau
+                        </span>
+                        {% endif %}
+                    </td>
                     <td>{{ utilisateur.last_name }}</td>
                     <td>{{ utilisateur.first_name }}</td>
                     <td>{{ utilisateur.email }}</td>
                     <td>{{ utilisateur.get_role_display }}</td>
+                    <td>
+                        {% if utilisateur.est_valide %}
+                            <span class="badge badge-success">
+                                <i class="fas fa-check"></i> Validé
+                            </span>
+                        {% else %}
+                            <span class="badge badge-warning">
+                                <i class="fas fa-clock"></i> En attente
+                            </span>
+                        {% endif %}
+                    </td>
                     <td>
                         {% if utilisateur.is_active %}
                             <span class="badge badge-success">Actif</span>
@@ -60,8 +87,17 @@
                             <span class="badge badge-danger">Inactif</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td onclick="event.stopPropagation();">
                         <div class="btn-group" role="group">
+                            {% if not utilisateur.est_valide %}
+                                <form method="post" action="{% url 'accounts:valider_utilisateur' utilisateur.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Valider le compte de {{ utilisateur.username }} ?');">
+                                        <i class="fas fa-check-circle"></i> Valider
+                                    </button>
+                                </form>
+                            {% endif %}
+
                             <a href="{% url 'accounts:modifier_utilisateur' utilisateur.id %}" class="btn btn-sm btn-info">
                                 <i class="fas fa-edit"></i> Modifier
                             </a>
@@ -86,14 +122,8 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="text-center">Aucun utilisateur trouvé</td>
+                    <td colspan="8" class="text-center">Aucun utilisateur trouvé</td>
                 </tr>
-                    {% if not utilisateur.est_valide %}
-                        <form method="post" action="{% url 'accounts:valider_utilisateur' utilisateur.id %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-success">Valider</button>
-                        </form>
-                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>

@@ -8,7 +8,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import ListView
 
 from accounts.forms import UtilisateurChangeForm, UtilisateurCreationForm
-from accounts.models import Utilisateur
+from accounts.models import Notification, Utilisateur
+from accounts.utils.email_service import EmailService
 from observations.models import FicheObservation
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         queryset = super().get_queryset()
         recherche = self.request.GET.get('recherche', '')
         role = self.request.GET.get('role', 'tous')
+        valide = self.request.GET.get('valide', 'tous')
 
         if recherche:
             queryset = queryset.filter(
@@ -49,13 +51,20 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         if role != 'tous':
             queryset = queryset.filter(role=role)
 
-        return queryset.order_by('username')
+        if valide == 'oui':
+            queryset = queryset.filter(est_valide=True)
+        elif valide == 'non':
+            queryset = queryset.filter(est_valide=False)
+
+        return queryset.order_by('-date_joined')  # Les plus récents en premier
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['recherche'] = self.request.GET.get('recherche', '')
         context['role'] = self.request.GET.get('role', 'tous')
         context['valide'] = self.request.GET.get('valide', 'tous')
+        # Ajouter le nombre de demandes en attente
+        context['demandes_en_attente'] = Utilisateur.objects.filter(est_valide=False).count()
         return context
 
 
@@ -173,10 +182,26 @@ def inscription_publique(request):
             utilisateur = form.save(commit=False)
             utilisateur.est_valide = False  # Nécessite approbation par un admin
             utilisateur.role = 'observateur'  # Rôle par défaut
+            utilisateur.is_active = False  # Compte inactif jusqu'à validation
             utilisateur.save()
             logger.info(
                 f"Nouvelle demande d'inscription reçue : {utilisateur.username} ({utilisateur.email})"
             )
+
+            # Créer des notifications pour tous les administrateurs
+            administrateurs = Utilisateur.objects.filter(role='administrateur', is_active=True)
+            for admin in administrateurs:
+                Notification.objects.create(
+                    destinataire=admin,
+                    type_notification='demande_compte',
+                    titre=f"Nouvelle demande de compte : {utilisateur.username}",
+                    message=f"{utilisateur.first_name} {utilisateur.last_name} ({utilisateur.email}) a demandé un compte.",
+                    lien=f"/accounts/utilisateurs/{utilisateur.id}/detail/",
+                    utilisateur_concerne=utilisateur,
+                )
+
+            # Envoyer un email à l'administrateur principal
+            EmailService.envoyer_email_nouvelle_demande_compte(utilisateur)
 
             messages.success(
                 request,
@@ -215,6 +240,30 @@ def promouvoir_administrateur(request):
 def valider_utilisateur(request, user_id):
     utilisateur = get_object_or_404(Utilisateur, id=user_id)
     utilisateur.est_valide = True
+    utilisateur.is_active = True  # Activer le compte
     utilisateur.save()
-    messages.success(request, f"L'utilisateur {utilisateur.username} a été validé.")
+
+    # Créer une notification pour l'utilisateur
+    Notification.objects.create(
+        destinataire=utilisateur,
+        type_notification='compte_valide',
+        titre="Votre compte a été validé",
+        message="Votre demande de compte a été approuvée. Vous pouvez maintenant vous connecter.",
+        lien="/login/",
+    )
+
+    # Envoyer un email à l'utilisateur
+    EmailService.envoyer_email_compte_valide(utilisateur)
+
+    # Marquer les notifications des admins comme lues
+    Notification.objects.filter(
+        type_notification='demande_compte', utilisateur_concerne=utilisateur, est_lue=False
+    ).update(est_lue=True)
+
+    messages.success(
+        request,
+        f"L'utilisateur {utilisateur.username} a été validé et notifié par email.",
+    )
+    logger.info(f"Compte validé pour {utilisateur.username} par {request.user.username}")
+
     return redirect('accounts:liste_utilisateurs')

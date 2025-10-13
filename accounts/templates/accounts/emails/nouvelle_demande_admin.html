@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle demande de compte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border: 1px solid #dee2e6;
+        }
+        .user-info {
+            background-color: white;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            margin: 20px 0;
+        }
+        .user-info p {
+            margin: 8px 0;
+        }
+        .user-info strong {
+            color: #495057;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #218838;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .alert {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Nouvelle demande de compte</h1>
+    </div>
+
+    <div class="content">
+        <p>Bonjour,</p>
+
+        <p>Une nouvelle demande de compte a été enregistrée sur <strong>Observations Nids</strong>.</p>
+
+        <div class="user-info">
+            <h3>Informations de l'utilisateur :</h3>
+            <p><strong>Nom d'utilisateur :</strong> {{ utilisateur.username }}</p>
+            <p><strong>Prénom :</strong> {{ utilisateur.first_name }}</p>
+            <p><strong>Nom :</strong> {{ utilisateur.last_name }}</p>
+            <p><strong>Email :</strong> {{ utilisateur.email }}</p>
+            <p><strong>Date de la demande :</strong> {{ utilisateur.date_joined|date:"d/m/Y à H:i" }}</p>
+        </div>
+
+        <div class="alert">
+            Cette demande nécessite votre approbation avant que l'utilisateur puisse se connecter.
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="http://{{ site_url }}/accounts/utilisateurs/" class="button">
+                Gérer les utilisateurs
+            </a>
+        </div>
+
+        <p style="font-size: 14px; color: #6c757d;">
+            Pour valider ou refuser cette demande, connectez-vous à l'interface d'administration
+            et accédez à la liste des utilisateurs.
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>Cet email a été envoyé automatiquement par Observations Nids.</p>
+        <p>Merci de ne pas répondre à cet email.</p>
+    </div>
+</body>
+</html>
