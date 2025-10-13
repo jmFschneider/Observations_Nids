@@ -123,15 +123,25 @@ class Command(BaseCommand):
 
                 self.stdout.write(self.style.SUCCESS("[OK] Téléchargement terminé"))
 
-                # Décompresser (le fichier est gzippé)
-                self.stdout.write("Décompression du fichier...")
-                with gzip.open(lof_file, 'rb') as f_in, open(lof_file_decompressed, 'wb') as f_out:
-                    shutil.copyfileobj(f_in, f_out)
+                # Vérifier si le fichier est compressé ou déjà un Excel
+                with open(lof_file, 'rb') as f:
+                    magic = f.read(2)
 
-                self.stdout.write(self.style.SUCCESS("[OK] Décompression terminée"))
-
-                # Nettoyer le fichier compressé
-                lof_file.unlink()
+                # PK = ZIP/XLSX, 1f8b = GZIP
+                if magic == b'PK':
+                    # Déjà un fichier Excel, pas de décompression nécessaire
+                    self.stdout.write("Fichier Excel détecté (non compressé)")
+                    shutil.move(str(lof_file), str(lof_file_decompressed))
+                elif magic == b'\x1f\x8b':
+                    # Fichier gzippé, décompresser
+                    self.stdout.write("Décompression du fichier...")
+                    with gzip.open(lof_file, 'rb') as f_in, open(lof_file_decompressed, 'wb') as f_out:
+                        shutil.copyfileobj(f_in, f_out)
+                    self.stdout.write(self.style.SUCCESS("[OK] Décompression terminée"))
+                    lof_file.unlink()
+                else:
+                    self.stdout.write(self.style.ERROR(f"Format de fichier non reconnu: {magic}"))
+                    return None
 
             except requests.RequestException as e:
                 self.stdout.write(self.style.ERROR(f'Erreur lors du téléchargement: {e}'))
