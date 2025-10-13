@@ -130,4 +130,4 @@ dnspython==2.7.0
 greenlet==3.2.1
 packaging==25.0
 uritemplate==4.1.1
-wcwidth==0.2.13
+wcwidth==0.2.14
