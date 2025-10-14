@@ -24,7 +24,7 @@ mysqlclient==2.2.7
 # -----------------------------------------------------------------------------
 celery==5.5.3
 django-celery-results==2.6.0
-redis==5.2.1
+redis==6.4.0
 amqp==5.3.1
 billiard==4.2.1
 kombu==5.5.3
@@ -34,25 +34,25 @@ eventlet==0.40.3
 # -----------------------------------------------------------------------------
 # Monitoring Celery
 # -----------------------------------------------------------------------------
-flower==2.0.0
-prometheus_client==0.21.1
-tornado==6.5
+flower==2.0.1
+prometheus_client==0.23.1
+tornado==6.5.2
 humanize==4.12.2
 
 # -----------------------------------------------------------------------------
 # Google Cloud APIs (Vision API pour OCR / Gemini pour IA)
 # -----------------------------------------------------------------------------
 google-generativeai==0.8.5
-google-ai-generativelanguage==0.6.15
+google-ai-generativelanguage==0.7.0
 google-api-core==2.26.0
 google-api-python-client==2.184.0
 google-auth==2.41.1
 google-auth-httplib2==0.2.0
 googleapis-common-protos==1.70.0
 proto-plus==1.26.1
-protobuf==5.29.5
+protobuf==6.32.1
 grpcio==1.75.1
-grpcio-status==1.71.2
+grpcio-status==1.75.1
 
 # -----------------------------------------------------------------------------
 # Traitement d'images
@@ -63,7 +63,7 @@ pillow==11.3.0
 # Configuration et validation
 # -----------------------------------------------------------------------------
 python-dotenv==1.1.0
-pydantic==2.10.6
+pydantic==2.12.0
 pydantic-settings==2.2.1
 pydantic_core==2.27.2
 
@@ -86,14 +86,14 @@ geopy==2.4.1
 # Parsing et scraping
 # -----------------------------------------------------------------------------
 beautifulsoup4==4.13.3
-soupsieve==2.6
+soupsieve==2.8
 
 # -----------------------------------------------------------------------------
 # Utilitaires CLI
 # -----------------------------------------------------------------------------
-click==8.1.8
+click==8.3.0
 click-didyoumean==0.3.1
-click-plugins==1.1.1
+click-plugins==1.1.1.2
 click-repl==0.3.0
 colorama==0.4.6
 prompt_toolkit==3.0.51
@@ -105,15 +105,15 @@ tqdm==4.67.1
 python-dateutil==2.9.0.post0
 pytz==2025.2
 six==1.17.0
-typing_extensions==4.12.2
+typing_extensions==4.15.0
 annotated-types==0.7.0
 
 # -----------------------------------------------------------------------------
 # Cryptographie et authentification
 # -----------------------------------------------------------------------------
 pyasn1==0.6.1
-pyasn1_modules==0.4.1
-rsa==4.9
+pyasn1_modules==0.4.2
+rsa==4.9.1
 cachetools==5.5.2
 
 # -----------------------------------------------------------------------------
@@ -128,6 +128,6 @@ pyparsing==3.2.3
 # -----------------------------------------------------------------------------
 dnspython==2.7.0
 greenlet==3.2.1
-packaging==24.2
+packaging==25.0
 uritemplate==4.1.1
-wcwidth==0.2.13
+wcwidth==0.2.14
