@@ -17,9 +17,11 @@ sys.path.insert(0, str(BASE_DIR))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
 django.setup()
 
+import pytest
 from observations.models import FicheObservation  # noqa: E402
 
 
+@pytest.mark.django_db
 def test_popup_remarques():
     """Test la fonctionnalité popup des remarques."""
 

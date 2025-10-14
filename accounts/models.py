@@ -48,7 +48,6 @@ class Notification(models.Model):
     lien = models.CharField(
         max_length=255,
         blank=True,
-        null=True,
         verbose_name="Lien",
         help_text="URL relative vers la ressource concernée",
     )
@@ -68,6 +67,15 @@ class Notification(models.Model):
         verbose_name="Utilisateur concerné",
     )
 
+    class Meta:
+        verbose_name = "Notification"
+        verbose_name_plural = "Notifications"
+        ordering = ['-date_creation']
+        indexes = [
+            models.Index(fields=['destinataire', 'est_lue']),
+            models.Index(fields=['type_notification']),
+        ]
+
     def __str__(self):
         return f"{self.get_type_notification_display()} - {self.titre} ({self.destinataire.username})"
 
@@ -77,12 +85,3 @@ class Notification(models.Model):
             self.est_lue = True
             self.date_lecture = timezone.now()
             self.save()
-
-    class Meta:
-        verbose_name = "Notification"
-        verbose_name_plural = "Notifications"
-        ordering = ['-date_creation']
-        indexes = [
-            models.Index(fields=['destinataire', 'est_lue']),
-            models.Index(fields=['type_notification']),
-        ]

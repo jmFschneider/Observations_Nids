@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic import BaseModel, Field, validator
 from pydantic_settings import BaseSettings
 
@@ -109,7 +110,6 @@ def get_settings() -> Settings:
     Pydantic automatically reads from the .env file and environment.
     We only need to manually construct nested models if they don't use prefixes.
     """
-    from dotenv import load_dotenv
 
     # Charger explicitement les variables d'environnement depuis .env
     load_dotenv(BASE_DIR / ".env")

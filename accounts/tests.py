@@ -1,14 +1,16 @@
 """
 Tests pour l'application accounts
 """
-import pytest
-from django.test import TestCase, Client
-from django.urls import reverse
-from django.core import mail
-from django.utils import timezone
-from unittest.mock import patch, MagicMock
+import time
+from unittest.mock import patch
 
-from accounts.models import Utilisateur, Notification
+import pytest
+from django.core import mail
+from django.test import Client, TestCase
+from django.urls import reverse
+from django.utils import timezone
+
+from accounts.models import Notification, Utilisateur
 from accounts.utils.email_service import EmailService
 
 
@@ -85,10 +87,7 @@ class TestNotificationModel(TestCase):
 
     def test_notification_ordering(self):
         """Test de l'ordre des notifications (plus récentes en premier)"""
-        # Import nécessaire pour gérer les timestamps
-        import time
-
-        notif1 = Notification.objects.create(
+        _ = Notification.objects.create(
             destinataire=self.admin,
             titre='Notification 1',
             message='Message 1'
@@ -97,7 +96,7 @@ class TestNotificationModel(TestCase):
         # Attendre un peu pour s'assurer que les timestamps sont différents
         time.sleep(0.01)
 
-        notif2 = Notification.objects.create(
+        _ = Notification.objects.create(
             destinataire=self.admin,
             titre='Notification 2',
             message='Message 2'
@@ -313,7 +312,7 @@ class TestValiderUtilisateurView(TestCase):
     def test_valider_utilisateur_requires_admin(self):
         """Test que seuls les admins peuvent valider"""
         # Créer un observateur normal
-        observateur = Utilisateur.objects.create_user(
+        _ = Utilisateur.objects.create_user(
             username='observateur',
             email='obs@test.com',
             password='testpass123',

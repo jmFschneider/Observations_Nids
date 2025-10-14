@@ -6,14 +6,15 @@ Ces tests vérifient les fonctionnalités critiques qui ont causé une régressi
 - Auto-remplissage des coordonnées GPS et altitude après sélection
 """
 
+from decimal import Decimal
+
 import pytest
 from django.urls import reverse
-from decimal import Decimal
 
 from accounts.models import Utilisateur
 from geo.models import CommuneFrance
 from observations.models import FicheObservation
-from taxonomy.models import Ordre, Famille, Espece
+from taxonomy.models import Espece, Famille, Ordre
 
 
 @pytest.fixture
@@ -224,7 +225,7 @@ class TestAutoRemplissageGeo:
             # Vérifier les types
             assert isinstance(commune['latitude'], str)
             assert isinstance(commune['longitude'], str)
-            assert isinstance(commune['altitude'], (int, type(None)))
+            assert isinstance(commune['altitude'], int | None)
 
     def test_coordonnees_valides(self, client, utilisateur, communes_test):
         """Test que les coordonnées GPS sont dans des plages valides"""

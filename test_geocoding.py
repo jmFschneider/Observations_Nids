@@ -7,10 +7,18 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
 django.setup()
 
+import pytest
+
 from geo.utils.geocoding import get_geocodeur  # noqa: E402
 
 
+
+
+
+@pytest.mark.django_db
+
 def test_geocoding():
+
     geocodeur = get_geocodeur()
 
     print("=== Test du système de géocodage ===\n")

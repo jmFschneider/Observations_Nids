@@ -140,7 +140,7 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.SUCCESS("[OK] Décompression terminée"))
                     lof_file.unlink()
                 else:
-                    self.stdout.write(self.style.ERROR(f"Format de fichier non reconnu: {magic}"))
+                    self.stdout.write(self.style.ERROR(f"Format de fichier non reconnu: {magic!r}"))
                     return None
 
             except requests.RequestException as e:
@@ -151,7 +151,25 @@ class Command(BaseCommand):
                 return None
 
         else:
-            self.stdout.write(f"Utilisation du fichier existant: {lof_file_decompressed}")
+            # Vérifier que le fichier en cache est valide
+            try:
+                with open(lof_file_decompressed, 'rb') as f:
+                    magic = f.read(2)
+                    if magic != b'PK':
+                        # Fichier corrompu, le supprimer et re-télécharger
+                        self.stdout.write(
+                            self.style.WARNING(
+                                "Fichier en cache corrompu, re-téléchargement..."
+                            )
+                        )
+                        lof_file_decompressed.unlink()
+                        return self._download_lof()  # Récursion pour re-télécharger
+
+                self.stdout.write(f"Utilisation du fichier existant: {lof_file_decompressed}")
+            except Exception:
+                # Si erreur de lecture, supprimer et re-télécharger
+                lof_file_decompressed.unlink(missing_ok=True)
+                return self._download_lof()
 
         return lof_file_decompressed
 
