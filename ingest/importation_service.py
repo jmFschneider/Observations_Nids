@@ -132,7 +132,11 @@ class ImportationService:
                     nom_commune = loc.get('commune') or loc.get('IGN_50000')
                     departement = loc.get('dep_t')
 
-                    if nom_commune and isinstance(nom_commune, str) and nom_commune != 'Non spécifiée':
+                    if (
+                        nom_commune
+                        and isinstance(nom_commune, str)
+                        and nom_commune != 'Non spécifiée'
+                    ):
                         try:
                             # Rechercher la commune via le géocodeur
                             resultat = self.geocodeur.geocoder_commune(nom_commune, departement)
@@ -157,7 +161,7 @@ class ImportationService:
         return {
             'especes_ajoutees': especes_ajoutees,
             'utilisateurs_crees': utilisateurs_crees,
-            'communes_geocodees': communes_geocodees
+            'communes_geocodees': communes_geocodees,
         }
 
     def _trouver_correspondance_espece(self, espece_candidate):
@@ -333,7 +337,9 @@ class ImportationService:
             base_dir = os.path.join(settings.MEDIA_ROOT, 'transcription_results')
             for subdir in os.listdir(base_dir):
                 subdir_path = os.path.join(base_dir, subdir)
-                if os.path.isdir(subdir_path) and os.path.exists(os.path.join(subdir_path, nom_fichier_json)):
+                if os.path.isdir(subdir_path) and os.path.exists(
+                    os.path.join(subdir_path, nom_fichier_json)
+                ):
                     repertoire_source = subdir
                     break
 
@@ -374,7 +380,9 @@ class ImportationService:
                         resultat_geo = self.geocodeur.geocoder_commune(nom_commune, departement)
                         if resultat_geo:
                             # Utiliser le nom officiel et les coordonnées trouvées
-                            localisation.commune = resultat_geo.get('adresse_complete', nom_commune).split(',')[0]
+                            localisation.commune = resultat_geo.get(
+                                'adresse_complete', nom_commune
+                            ).split(',')[0]
                             localisation.latitude = str(resultat_geo['lat'])
                             localisation.longitude = str(resultat_geo['lon'])
                             localisation.coordonnees = resultat_geo['coordonnees_gps']
@@ -392,11 +400,15 @@ class ImportationService:
                         else:
                             # Pas trouvé, garder le nom brut
                             localisation.commune = nom_commune
-                            logger.warning(f"Fiche {fiche.num_fiche}: Commune '{nom_commune}' non trouvée, coordonnées non mises à jour")
+                            logger.warning(
+                                f"Fiche {fiche.num_fiche}: Commune '{nom_commune}' non trouvée, coordonnées non mises à jour"
+                            )
                     except Exception as e:
                         # En cas d'erreur, garder le nom brut
                         localisation.commune = nom_commune
-                        logger.error(f"Fiche {fiche.num_fiche}: Erreur géocodage '{nom_commune}': {str(e)}")
+                        logger.error(
+                            f"Fiche {fiche.num_fiche}: Erreur géocodage '{nom_commune}': {str(e)}"
+                        )
                 else:
                     localisation.commune = nom_commune
 

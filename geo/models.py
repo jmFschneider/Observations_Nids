@@ -1,4 +1,3 @@
-
 from django.db import models
 
 
@@ -7,6 +6,7 @@ class CommuneFrance(models.Model):
     Cache des communes françaises pour géocodage rapide
     Source : API Géoplateforme (data.gouv.fr)
     """
+
     # Identification
     nom = models.CharField(max_length=200, db_index=True)
     code_insee = models.CharField(max_length=5, unique=True, help_text="Code INSEE de la commune")
@@ -67,7 +67,7 @@ class Localisation(models.Model):
     # Nouveaux champs pour le géocodage
     precision_gps = models.IntegerField(
         default=5000,
-        help_text="Précision estimée en mètres (ex: 10m pour GPS terrain, 5000m pour commune)"
+        help_text="Précision estimée en mètres (ex: 10m pour GPS terrain, 5000m pour commune)",
     )
     source_coordonnees = models.CharField(
         max_length=50,
@@ -79,13 +79,9 @@ class Localisation(models.Model):
             ('base_locale', 'Base locale des communes'),
             ('nominatim', 'Nominatim (OSM)'),
         ],
-        default='geocodage_auto'
+        default='geocodage_auto',
     )
-    code_insee = models.CharField(
-        max_length=5,
-        blank=True,
-        help_text="Code INSEE de la commune"
-    )
+    code_insee = models.CharField(max_length=5, blank=True, help_text="Code INSEE de la commune")
 
     def __str__(self):
         return f"Localisation {self.commune} ({self.departement})"

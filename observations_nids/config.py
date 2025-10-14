@@ -87,6 +87,7 @@ class Settings(BaseSettings):
 
     class Config:
         """Pydantic config for environment variables."""
+
         env_file = ".env"
         env_file_encoding = "utf-8"
         env_nested_delimiter = "__"
@@ -126,5 +127,5 @@ def get_settings() -> Settings:
     # automatically from environment variables. The @validator for ALLOWED_HOSTS will correctly process the string.
     return Settings(
         DATABASE=database_settings,
-        celery=CelerySettings()  # type: ignore[call-arg]
+        celery=CelerySettings(),  # type: ignore[call-arg]
     )

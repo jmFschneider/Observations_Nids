@@ -104,6 +104,6 @@ class Command(BaseCommand):
         depts = CommuneFrance.objects.values('departement').distinct().count()
         self.stdout.write(
             self.style.SUCCESS(
-                f"\nBase de données:\n" f"   - {total} communes\n" f"   - {depts} départements"
+                f"\nBase de données:\n   - {total} communes\n   - {depts} départements"
             )
         )

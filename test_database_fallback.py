@@ -57,5 +57,6 @@ def test_database_config():
     print("dans settings_local.py ou définissez DJANGO_DB=sqlite")
     print("=" * 60)
 
+
 if __name__ == "__main__":
     test_database_config()

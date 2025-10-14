@@ -1,6 +1,7 @@
 """
 Tests pour l'application accounts
 """
+
 import time
 from unittest.mock import patch
 
@@ -27,7 +28,7 @@ class TestNotificationModel(TestCase):
             password='testpass123',
             role='administrateur',
             est_valide=True,
-            is_active=True
+            is_active=True,
         )
 
         # Créer un utilisateur en attente
@@ -37,7 +38,7 @@ class TestNotificationModel(TestCase):
             password='testpass123',
             role='observateur',
             est_valide=False,
-            is_active=False
+            is_active=False,
         )
 
     def test_notification_creation(self):
@@ -47,7 +48,7 @@ class TestNotificationModel(TestCase):
             type_notification='demande_compte',
             titre='Test notification',
             message='Message de test',
-            utilisateur_concerne=self.user_pending
+            utilisateur_concerne=self.user_pending,
         )
 
         self.assertEqual(notification.destinataire, self.admin)
@@ -61,7 +62,7 @@ class TestNotificationModel(TestCase):
             destinataire=self.admin,
             type_notification='demande_compte',
             titre='Test notification',
-            message='Message de test'
+            message='Message de test',
         )
 
         # Marquer comme lue
@@ -79,7 +80,7 @@ class TestNotificationModel(TestCase):
             destinataire=self.admin,
             type_notification='demande_compte',
             titre='Test notification',
-            message='Message de test'
+            message='Message de test',
         )
 
         expected = f"Demande de compte - Test notification ({self.admin.username})"
@@ -88,18 +89,14 @@ class TestNotificationModel(TestCase):
     def test_notification_ordering(self):
         """Test de l'ordre des notifications (plus récentes en premier)"""
         _ = Notification.objects.create(
-            destinataire=self.admin,
-            titre='Notification 1',
-            message='Message 1'
+            destinataire=self.admin, titre='Notification 1', message='Message 1'
         )
 
         # Attendre un peu pour s'assurer que les timestamps sont différents
         time.sleep(0.01)
 
         _ = Notification.objects.create(
-            destinataire=self.admin,
-            titre='Notification 2',
-            message='Message 2'
+            destinataire=self.admin, titre='Notification 2', message='Message 2'
         )
 
         notifications = Notification.objects.all()
@@ -121,7 +118,7 @@ class TestEmailService(TestCase):
             first_name='Test',
             last_name='User',
             role='observateur',
-            est_valide=False
+            est_valide=False,
         )
 
     def test_envoyer_email_nouvelle_demande_compte(self):
@@ -219,7 +216,7 @@ class TestInscriptionPubliqueView(TestCase):
             password='testpass123',
             role='administrateur',
             est_valide=True,
-            is_active=True
+            is_active=True,
         )
 
         admin2 = Utilisateur.objects.create_user(
@@ -228,7 +225,7 @@ class TestInscriptionPubliqueView(TestCase):
             password='testpass123',
             role='administrateur',
             est_valide=True,
-            is_active=True
+            is_active=True,
         )
 
         data = {
@@ -287,7 +284,7 @@ class TestValiderUtilisateurView(TestCase):
             password='testpass123',
             role='administrateur',
             est_valide=True,
-            is_active=True
+            is_active=True,
         )
 
         # Créer un utilisateur en attente
@@ -297,7 +294,7 @@ class TestValiderUtilisateurView(TestCase):
             password='testpass123',
             role='observateur',
             est_valide=False,
-            is_active=False
+            is_active=False,
         )
 
         # Créer une notification pour cet utilisateur
@@ -306,7 +303,7 @@ class TestValiderUtilisateurView(TestCase):
             type_notification='demande_compte',
             titre=f'Nouvelle demande : {self.user_pending.username}',
             message='Demande de compte',
-            utilisateur_concerne=self.user_pending
+            utilisateur_concerne=self.user_pending,
         )
 
     def test_valider_utilisateur_requires_admin(self):
@@ -318,7 +315,7 @@ class TestValiderUtilisateurView(TestCase):
             password='testpass123',
             role='observateur',
             est_valide=True,
-            is_active=True
+            is_active=True,
         )
 
         self.client.login(username='observateur', password='testpass123')
@@ -367,7 +364,7 @@ class TestHomePageNotifications(TestCase):
             password='testpass123',
             role='administrateur',
             est_valide=True,
-            is_active=True
+            is_active=True,
         )
 
         # Créer un observateur
@@ -377,7 +374,7 @@ class TestHomePageNotifications(TestCase):
             password='testpass123',
             role='observateur',
             est_valide=True,
-            is_active=True
+            is_active=True,
         )
 
     def test_home_page_shows_notification_banner_for_admin(self):
@@ -389,7 +386,7 @@ class TestHomePageNotifications(TestCase):
                 email=f'pending{i}@test.com',
                 password='testpass123',
                 est_valide=False,
-                is_active=False
+                is_active=False,
             )
 
         self.client.login(username='admin', password='testpass123')
@@ -410,7 +407,7 @@ class TestHomePageNotifications(TestCase):
                 email=f'pending{i}@test.com',
                 password='testpass123',
                 est_valide=False,
-                is_active=False
+                is_active=False,
             )
 
         self.client.login(username='observateur', password='testpass123')
@@ -436,7 +433,7 @@ class TestHomePageNotifications(TestCase):
                 email=f'pending{i}@test.com',
                 password='testpass123',
                 est_valide=False,
-                is_active=False
+                is_active=False,
             )
 
         self.client.login(username='admin', password='testpass123')
@@ -460,7 +457,7 @@ class TestListeUtilisateursView(TestCase):
             password='testpass123',
             role='administrateur',
             est_valide=True,
-            is_active=True
+            is_active=True,
         )
 
         # Créer des utilisateurs validés
@@ -470,7 +467,7 @@ class TestListeUtilisateursView(TestCase):
                 email=f'validated{i}@test.com',
                 password='testpass123',
                 est_valide=True,
-                is_active=True
+                is_active=True,
             )
 
         # Créer des utilisateurs en attente
@@ -480,7 +477,7 @@ class TestListeUtilisateursView(TestCase):
                 email=f'pending{i}@test.com',
                 password='testpass123',
                 est_valide=False,
-                is_active=False
+                is_active=False,
             )
 
     def test_liste_utilisateurs_filter_pending(self):

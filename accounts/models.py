@@ -1,4 +1,3 @@
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
@@ -7,7 +6,6 @@ from core.constants import ROLE_CHOICES
 
 
 class Utilisateur(AbstractUser):
-
     role = models.CharField(max_length=15, choices=ROLE_CHOICES, default='observateur')
     est_valide = models.BooleanField(default=False)
     est_transcription = models.BooleanField(default=False)
@@ -53,9 +51,7 @@ class Notification(models.Model):
     )
     est_lue = models.BooleanField(default=False, verbose_name="Lue")
     date_creation = models.DateTimeField(default=timezone.now, verbose_name="Date de création")
-    date_lecture = models.DateTimeField(
-        blank=True, null=True, verbose_name="Date de lecture"
-    )
+    date_lecture = models.DateTimeField(blank=True, null=True, verbose_name="Date de lecture")
 
     # Référence optionnelle vers l'utilisateur concerné par la notification
     utilisateur_concerne = models.ForeignKey(
@@ -77,7 +73,9 @@ class Notification(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.get_type_notification_display()} - {self.titre} ({self.destinataire.username})"
+        return (
+            f"{self.get_type_notification_display()} - {self.titre} ({self.destinataire.username})"
+        )
 
     def marquer_comme_lue(self):
         """Marque la notification comme lue"""

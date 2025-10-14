@@ -62,7 +62,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Point d'entrée principal de la commande."""
-        self.stdout.write(self.style.MIGRATE_HEADING('\n=== Chargement TaxRef - Oiseaux de France ===\n'))
+        self.stdout.write(
+            self.style.MIGRATE_HEADING('\n=== Chargement TaxRef - Oiseaux de France ===\n')
+        )
 
         # Vérifier si déjà chargé depuis TaxRef
         especes_taxref = Espece.objects.filter(valide_par_admin=True).count()
@@ -367,9 +369,7 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Ordres: {total_ordres}\n"
-                f"Familles: {total_familles}\n"
-                f"Espèces: {total_especes}\n"
+                f"Ordres: {total_ordres}\nFamilles: {total_familles}\nEspèces: {total_especes}\n"
             )
         )
 

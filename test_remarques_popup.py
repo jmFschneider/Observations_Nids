@@ -42,7 +42,9 @@ def test_popup_remarques():
 
         for remarque in remarques:
             try:
-                print(f"  - {remarque.date_remarque.strftime('%d/%m/%Y %H:%M')}: [Remarque ID {remarque.pk}]")
+                print(
+                    f"  - {remarque.date_remarque.strftime('%d/%m/%Y %H:%M')}: [Remarque ID {remarque.pk}]"
+                )
             except Exception:
                 print(f"  - [Erreur affichage remarque ID {remarque.pk}]")
 
@@ -55,6 +57,7 @@ def test_popup_remarques():
         print("Créez d'abord une fiche avec des remarques pour tester")
 
     print("=" * 60)
+
 
 if __name__ == "__main__":
     test_popup_remarques()

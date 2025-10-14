@@ -17,11 +17,13 @@ class FicheObservationForm(forms.ModelForm):
         fields = ["observateur", "espece", "annee", "chemin_image"]
         widgets = {
             "observateur": forms.HiddenInput(),  # Changer pour HiddenInput
-            "espece": forms.Select(attrs={
-                'class': 'form-control espece-select',
-                'data-live-search': 'true',
-                'data-search-delay': '800',  # Délai de 800ms entre les frappes
-            }),
+            "espece": forms.Select(
+                attrs={
+                    'class': 'form-control espece-select',
+                    'data-live-search': 'true',
+                    'data-search-delay': '800',  # Délai de 800ms entre les frappes
+                }
+            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -56,10 +58,22 @@ class LocalisationForm(forms.ModelForm):
             'alentours',
         ]
         widgets = {
-            'commune': forms.TextInput(attrs={'class': 'form-field', 'id': 'id_commune', 'placeholder': 'Commune', 'autocomplete': 'off'}),
+            'commune': forms.TextInput(
+                attrs={
+                    'class': 'form-field',
+                    'id': 'id_commune',
+                    'placeholder': 'Commune',
+                    'autocomplete': 'off',
+                }
+            ),
             'lieu_dit': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Lieu-dit'}),
             'departement': forms.TextInput(
-                attrs={'class': 'form-field', 'id': 'id_departement', 'placeholder': 'Département', 'readonly': 'readonly'}
+                attrs={
+                    'class': 'form-field',
+                    'id': 'id_departement',
+                    'placeholder': 'Département',
+                    'readonly': 'readonly',
+                }
             ),
             'coordonnees': forms.TextInput(
                 attrs={'class': 'form-field', 'placeholder': 'Coordonnées'}
@@ -155,9 +169,13 @@ class ResumeObservationForm(forms.ModelForm):
             'premier_poussin_volant_mois': forms.NumberInput(
                 attrs={'placeholder': 'Mois', 'min': 1, 'max': 12}
             ),
-            'nombre_oeufs_pondus': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Non observé'}),
+            'nombre_oeufs_pondus': forms.NumberInput(
+                attrs={'min': 0, 'placeholder': 'Non observé'}
+            ),
             'nombre_oeufs_eclos': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Non observé'}),
-            'nombre_oeufs_non_eclos': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Non observé'}),
+            'nombre_oeufs_non_eclos': forms.NumberInput(
+                attrs={'min': 0, 'placeholder': 'Non observé'}
+            ),
             'nombre_poussins': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Non observé'}),
         }
 
@@ -218,12 +236,15 @@ class RemarqueForm(forms.ModelForm):
         model = Remarque
         fields = ['remarque']  # fiche sera assignée automatiquement, date_remarque est exclu
         widgets = {
-            'remarque': forms.Textarea(attrs={
-                'placeholder': 'Entrez une remarque',
-                'rows': 2,
-                'style': 'width: 100%; resize: vertical;'
-            }),
+            'remarque': forms.Textarea(
+                attrs={
+                    'placeholder': 'Entrez une remarque',
+                    'rows': 2,
+                    'style': 'width: 100%; resize: vertical;',
+                }
+            ),
         }
+
 
 # Formset pour gérer plusieurs remarques
 RemarqueFormSet = forms.inlineformset_factory(
@@ -233,7 +254,7 @@ RemarqueFormSet = forms.inlineformset_factory(
     extra=1,  # Une ligne vide pour ajouter une nouvelle remarque
     can_delete=True,  # Permet de supprimer des remarques
     min_num=0,  # Aucune remarque minimum requise
-    validate_min=True
+    validate_min=True,
 )
 
 

@@ -7,7 +7,6 @@ Usage:
     python manage.py reset_importations --confirm  # Sans confirmation interactive
 """
 
-
 import contextlib
 
 from django.core.management.base import BaseCommand
@@ -66,11 +65,7 @@ class Command(BaseCommand):
         if not keep_users:
             self.stdout.write('  • Utilisateurs créés par transcription')
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                '\n✅ Les données suivantes seront PRÉSERVÉES :\n'
-            )
-        )
+        self.stdout.write(self.style.SUCCESS('\n✅ Les données suivantes seront PRÉSERVÉES :\n'))
         self.stdout.write('  • geo_commune_france (toutes les communes)')
         self.stdout.write('  • taxonomy_espece (catalogue des espèces)')
 
@@ -161,9 +156,7 @@ class Command(BaseCommand):
                 self.reset_sequences()
 
                 self.stdout.write(
-                    self.style.SUCCESS(
-                        '\n✅ Réinitialisation terminée avec succès !\n'
-                    )
+                    self.style.SUCCESS('\n✅ Réinitialisation terminée avec succès !\n')
                 )
 
                 # Afficher le résumé
@@ -190,9 +183,7 @@ class Command(BaseCommand):
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(
-                    f'\n❌ Erreur lors de la réinitialisation : {str(e)}'
-                )
+                self.style.ERROR(f'\n❌ Erreur lors de la réinitialisation : {str(e)}')
             )
             raise
 
@@ -221,9 +212,7 @@ class Command(BaseCommand):
 
                 for table in tables:
                     with contextlib.suppress(Exception):
-                        cursor.execute(
-                            f"DELETE FROM sqlite_sequence WHERE name='{table}'"
-                        )
+                        cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{table}'")
 
                 self.stdout.write('  ✓ Séquences SQLite réinitialisées')
 

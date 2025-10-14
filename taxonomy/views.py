@@ -114,9 +114,7 @@ def creer_espece(request):
 
         # Validation
         if not nom or not nom_scientifique:
-            messages.error(
-                request, "Le nom français et le nom scientifique sont obligatoires."
-            )
+            messages.error(request, "Le nom français et le nom scientifique sont obligatoires.")
         else:
             try:
                 # Vérifier si l'espèce existe déjà
@@ -140,9 +138,7 @@ def creer_espece(request):
                         lien_oiseau_net=lien_oiseau_net,
                         valide_par_admin=True,
                     )
-                    messages.success(
-                        request, f"L'espèce '{espece.nom}' a été créée avec succès."
-                    )
+                    messages.success(request, f"L'espèce '{espece.nom}' a été créée avec succès.")
                     return redirect('taxonomy:detail_espece', espece_id=espece.id)
 
             except Exception as e:
@@ -178,9 +174,7 @@ def modifier_espece(request, espece_id):
 
         # Validation
         if not nom or not nom_scientifique:
-            messages.error(
-                request, "Le nom français et le nom scientifique sont obligatoires."
-            )
+            messages.error(request, "Le nom français et le nom scientifique sont obligatoires.")
         else:
             try:
                 # Vérifier les doublons (sauf l'espèce actuelle)
@@ -200,9 +194,7 @@ def modifier_espece(request, espece_id):
                     espece.nom = nom
                     espece.nom_scientifique = nom_scientifique
                     espece.nom_anglais = nom_anglais
-                    espece.famille = (
-                        Famille.objects.get(pk=famille_id) if famille_id else None
-                    )
+                    espece.famille = Famille.objects.get(pk=famille_id) if famille_id else None
                     espece.statut = statut
                     espece.commentaire = commentaire
                     espece.lien_oiseau_net = lien_oiseau_net
@@ -276,20 +268,15 @@ def importer_especes(request):
         'total_especes': Espece.objects.count(),
         'total_familles': Famille.objects.count(),
         'total_ordres': Ordre.objects.count(),
-        'especes_lof': Espece.objects.filter(
-            commentaire__icontains='Import LOF'
-        ).count(),
-        'especes_taxref': Espece.objects.filter(
-            commentaire__icontains='Import TaxRef'
-        ).count(),
+        'especes_lof': Espece.objects.filter(commentaire__icontains='Import LOF').count(),
+        'especes_taxref': Espece.objects.filter(commentaire__icontains='Import TaxRef').count(),
         'especes_manuelles': Espece.objects.filter(valide_par_admin=False).count(),
     }
 
     # Dernières espèces importées
-    dernieres_especes = (
-        Espece.objects.select_related('famille', 'famille__ordre')
-        .order_by('-id')[:10]
-    )
+    dernieres_especes = Espece.objects.select_related('famille', 'famille__ordre').order_by('-id')[
+        :10
+    ]
 
     context = {
         'stats': stats,

@@ -25,7 +25,7 @@ def utilisateur(db):
         email='test@example.com',
         password='testpass123',
         first_name='Test',
-        last_name='User'
+        last_name='User',
     )
 
 
@@ -41,7 +41,7 @@ def communes_test(db):
             'code_insee': '93066',
             'latitude': Decimal('48.936'),
             'longitude': Decimal('2.354'),
-            'altitude': 33
+            'altitude': 33,
         },
         {
             'nom': 'Saint-Denis-en-Val',
@@ -51,7 +51,7 @@ def communes_test(db):
             'code_insee': '45272',
             'latitude': Decimal('47.876'),
             'longitude': Decimal('1.962'),
-            'altitude': 105
+            'altitude': 105,
         },
         {
             'nom': 'Saint-Ouen',
@@ -61,7 +61,7 @@ def communes_test(db):
             'code_insee': '93070',
             'latitude': Decimal('48.912'),
             'longitude': Decimal('2.334'),
-            'altitude': 39
+            'altitude': 39,
         },
     ]
 
@@ -80,17 +80,11 @@ def fiche_test(db, utilisateur):
     ordre = Ordre.objects.create(nom='Passeriformes')
     famille = Famille.objects.create(nom='Turdidae', ordre=ordre)
     espece = Espece.objects.create(
-        nom='Merle noir',
-        nom_scientifique='Turdus merula',
-        famille=famille
+        nom='Merle noir', nom_scientifique='Turdus merula', famille=famille
     )
 
     # Créer la fiche
-    fiche = FicheObservation.objects.create(
-        observateur=utilisateur,
-        espece=espece,
-        annee=2025
-    )
+    fiche = FicheObservation.objects.create(observateur=utilisateur, espece=espece, annee=2025)
 
     return fiche
 
@@ -164,11 +158,14 @@ class TestRechercherCommunes:
 
         url = reverse('geo:rechercher_communes')
         # Recherche depuis un point proche de Saint-Denis (93)
-        response = client.get(url, {
-            'q': 'saint',
-            'lat': '48.936',  # Coordonnées de Saint-Denis
-            'lon': '2.354'
-        })
+        response = client.get(
+            url,
+            {
+                'q': 'saint',
+                'lat': '48.936',  # Coordonnées de Saint-Denis
+                'lon': '2.354',
+            },
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -254,11 +251,14 @@ class TestGeocodageManuel:
         client.force_login(utilisateur)
 
         url = reverse('geo:geocoder_commune')
-        response = client.post(url, {
-            'fiche_id': fiche_test.pk,
-            'commune': 'Saint-Denis',
-            'departement': 'Seine-Saint-Denis'
-        })
+        response = client.post(
+            url,
+            {
+                'fiche_id': fiche_test.pk,
+                'commune': 'Saint-Denis',
+                'departement': 'Seine-Saint-Denis',
+            },
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -280,10 +280,7 @@ class TestGeocodageManuel:
         client.force_login(utilisateur)
 
         url = reverse('geo:geocoder_commune')
-        response = client.post(url, {
-            'fiche_id': fiche_test.pk,
-            'commune': ''
-        })
+        response = client.post(url, {'fiche_id': fiche_test.pk, 'commune': ''})
 
         assert response.status_code == 400
         data = response.json()
@@ -295,10 +292,7 @@ class TestGeocodageManuel:
         client.force_login(utilisateur)
 
         url = reverse('geo:geocoder_commune')
-        response = client.post(url, {
-            'fiche_id': 99999,
-            'commune': 'Saint-Denis'
-        })
+        response = client.post(url, {'fiche_id': 99999, 'commune': 'Saint-Denis'})
 
         assert response.status_code == 404
         data = response.json()

@@ -24,10 +24,13 @@ def home(request):
     observations_count = Observation.objects.count()
 
     # Récupérer les fiches en cours d'édition de l'observateur connecté
-    fiches_en_edition = FicheObservation.objects.filter(
-        observateur=user,
-        etat_correction__statut__in=['nouveau', 'en_edition']
-    ).select_related('espece', 'etat_correction').order_by('-date_creation')[:5]
+    fiches_en_edition = (
+        FicheObservation.objects.filter(
+            observateur=user, etat_correction__statut__in=['nouveau', 'en_edition']
+        )
+        .select_related('espece', 'etat_correction')
+        .order_by('-date_creation')[:5]
+    )
 
     # Compter les demandes de compte en attente (pour les administrateurs)
     demandes_en_attente = 0

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Script de test du système de géocodage"""
+
 import os
 
 import django
@@ -13,9 +14,7 @@ from geo.utils.geocoding import get_geocodeur  # noqa: E402
 
 
 @pytest.mark.django_db
-
 def test_geocoding():
-
     geocodeur = get_geocodeur()
 
     print("=== Test du système de géocodage ===\n")
@@ -78,6 +77,7 @@ def test_geocoding():
         print("  Note: Plusieurs communes avec ce nom - necessite departement")
 
     print("\n=== Tests terminés ===")
+
 
 if __name__ == '__main__':
     test_geocoding()

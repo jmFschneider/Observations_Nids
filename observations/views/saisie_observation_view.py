@@ -59,7 +59,10 @@ def handle_remarques_update(request, fiche_instance, remarqueformset):
                                 )
                         elif remarque_id and not is_deleted:
                             # Remarque modifiée
-                            if remarque_id.id in remarques_avant and remarques_avant[remarque_id.id].remarque != remarque_text:
+                            if (
+                                remarque_id.id in remarques_avant
+                                and remarques_avant[remarque_id.id].remarque != remarque_text
+                            ):
                                 HistoriqueModification.objects.create(
                                     fiche=fiche_instance,
                                     champ_modifie='remarque_modifiee',
@@ -85,7 +88,9 @@ def handle_remarques_update(request, fiche_instance, remarqueformset):
                 return JsonResponse({'status': 'success'})
             else:
                 logger.error(f"Erreurs dans le formset de remarques: {remarque_formset.errors}")
-                return JsonResponse({'status': 'error', 'errors': remarque_formset.errors}, status=400)
+                return JsonResponse(
+                    {'status': 'error', 'errors': remarque_formset.errors}, status=400
+                )
 
     except Exception as e:
         logger.error(f"Erreur lors de la mise à jour des remarques: {str(e)}")
@@ -100,12 +105,14 @@ def handle_get_remarques(request, fiche_instance):
         if fiche_instance:
             remarques = []
             for remarque in fiche_instance.remarques.all():
-                remarques.append({
-                    'id': remarque.id,
-                    'remarque': remarque.remarque,
-                    'date_remarque': remarque.date_remarque.strftime('%d/%m/%Y %H:%M'),
-                    'toDelete': False
-                })
+                remarques.append(
+                    {
+                        'id': remarque.id,
+                        'remarque': remarque.remarque,
+                        'date_remarque': remarque.date_remarque.strftime('%d/%m/%Y %H:%M'),
+                        'toDelete': False,
+                    }
+                )
             return JsonResponse({'remarques': remarques})
         else:
             return JsonResponse({'remarques': []})
@@ -165,12 +172,15 @@ def saisie_observation(request, fiche_id=None):
                 etat = fiche_instance.etat_correction
                 # Si la fiche est en cours de saisie (nouveau ou en_edition),
                 # seul l'auteur ou un administrateur peut l'éditer
-                if (etat.statut in ['nouveau', 'en_edition']
-                        and user != fiche_instance.observateur and user.role != "administrateur"):
+                if (
+                    etat.statut in ['nouveau', 'en_edition']
+                    and user != fiche_instance.observateur
+                    and user.role != "administrateur"
+                ):
                     messages.error(
                         request,
                         f"Vous n'êtes pas autorisé à modifier cette fiche. "
-                        f"Seul l'auteur ({fiche_instance.observateur.username}) peut continuer la saisie."
+                        f"Seul l'auteur ({fiche_instance.observateur.username}) peut continuer la saisie.",
                     )
                     return redirect('fiche_observation', fiche_id=fiche_id)
 
@@ -214,7 +224,10 @@ def saisie_observation(request, fiche_id=None):
         return handle_remarques_update(request, fiche_instance, remarqueformset)
 
     # Traitement spécial pour récupérer les remarques via AJAX (GET)
-    if request.GET.get('get_remarques') == '1' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    if (
+        request.GET.get('get_remarques') == '1'
+        and request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    ):
         return handle_get_remarques(request, fiche_instance)
 
     if request.method == "POST":
@@ -303,7 +316,6 @@ def saisie_observation(request, fiche_id=None):
         if forms_valid:
             try:
                 with transaction.atomic():
-
                     # Récupérer les anciennes instances pour l'historique
                     if fiche_id:
                         fiche_avant = FicheObservation.objects.select_related().get(pk=fiche_id)
@@ -335,7 +347,11 @@ def saisie_observation(request, fiche_id=None):
 
                     if fiche_id and fiche_avant:
                         enregistrer_modifications_historique(
-                            fiche, (fiche_avant, fiche), 'fiche', request.user, fiche_form.changed_data
+                            fiche,
+                            (fiche_avant, fiche),
+                            'fiche',
+                            request.user,
+                            fiche_form.changed_data,
                         )
 
                     # Sauvegarder les objets liés
@@ -348,7 +364,11 @@ def saisie_observation(request, fiche_id=None):
                         localisation.save()
                         if localisation_avant:
                             enregistrer_modifications_historique(
-                                fiche, (localisation_avant, localisation), 'localisation', request.user, localisation_form.changed_data
+                                fiche,
+                                (localisation_avant, localisation),
+                                'localisation',
+                                request.user,
+                                localisation_form.changed_data,
                             )
 
                         resume = resume_form.save(commit=False)
@@ -356,7 +376,11 @@ def saisie_observation(request, fiche_id=None):
                         resume.save()
                         if resume_avant:
                             enregistrer_modifications_historique(
-                                fiche, (resume_avant, resume), 'resume_observation', request.user, resume_form.changed_data
+                                fiche,
+                                (resume_avant, resume),
+                                'resume_observation',
+                                request.user,
+                                resume_form.changed_data,
                             )
 
                         nid = nid_form.save(commit=False)
@@ -372,7 +396,11 @@ def saisie_observation(request, fiche_id=None):
                         causes_echec.save()
                         if causes_echec_avant:
                             enregistrer_modifications_historique(
-                                fiche, (causes_echec_avant, causes_echec), 'causes_echec', request.user, causes_echec_form.changed_data
+                                fiche,
+                                (causes_echec_avant, causes_echec),
+                                'causes_echec',
+                                request.user,
+                                causes_echec_form.changed_data,
                             )
                     else:
                         # Nouvelle fiche : les objets ont été créés automatiquement
@@ -428,12 +456,24 @@ def saisie_observation(request, fiche_id=None):
                                     (ancienne_obs, form.instance),
                                     'observation',
                                     request.user,
-                                    champs_modifies
+                                    champs_modifies,
                                 )
-                        elif form.has_changed() and not form.instance.pk and form.cleaned_data.get('date_observation'):
+                        elif (
+                            form.has_changed()
+                            and not form.instance.pk
+                            and form.cleaned_data.get('date_observation')
+                        ):
                             # Nouvelle observation
-                            for field_name in ['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations']:
-                                if field_name in form.cleaned_data and form.cleaned_data[field_name]:
+                            for field_name in [
+                                'date_observation',
+                                'nombre_oeufs',
+                                'nombre_poussins',
+                                'observations',
+                            ]:
+                                if (
+                                    field_name in form.cleaned_data
+                                    and form.cleaned_data[field_name]
+                                ):
                                     HistoriqueModification.objects.create(
                                         fiche=fiche,
                                         champ_modifie=field_name,
@@ -499,7 +539,12 @@ def saisie_observation(request, fiche_id=None):
                             Remarque.objects.create(fiche=fiche, remarque=remarque_initiale)
 
                     # Mettre à jour les années des observations APRÈS le traitement du formset
-                    if fiche_id and fiche_avant and 'annee' in fiche_form.changed_data and fiche_avant.annee != fiche.annee:
+                    if (
+                        fiche_id
+                        and fiche_avant
+                        and 'annee' in fiche_form.changed_data
+                        and fiche_avant.annee != fiche.annee
+                    ):
                         mettre_a_jour_annee_observations(
                             fiche, fiche_avant.annee, fiche.annee, request.user
                         )
@@ -566,7 +611,11 @@ def ajouter_observation(request, fiche_id):
             return redirect('modifier_observation', fiche_id=fiche_id)
     else:
         form = ObservationForm()
-    return render(request, 'saisie/ajouter_observation.html', {'form': form, 'fiche': fiche, 'fiche_id': fiche_id})
+    return render(
+        request,
+        'saisie/ajouter_observation.html',
+        {'form': form, 'fiche': fiche, 'fiche_id': fiche_id},
+    )
 
 
 @login_required
@@ -650,10 +699,22 @@ def enregistrer_modifications_historique(
 
         # Comparaison spéciale pour les DateTimeField avec fuseau horaire
         if hasattr(ancienne_valeur, 'year') and hasattr(nouvelle_valeur, 'year'):
-            ancienne_dt = (ancienne_valeur.year, ancienne_valeur.month, ancienne_valeur.day,
-                          ancienne_valeur.hour, ancienne_valeur.minute, ancienne_valeur.second)
-            nouvelle_dt = (nouvelle_valeur.year, nouvelle_valeur.month, nouvelle_valeur.day,
-                          nouvelle_valeur.hour, nouvelle_valeur.minute, nouvelle_valeur.second)
+            ancienne_dt = (
+                ancienne_valeur.year,
+                ancienne_valeur.month,
+                ancienne_valeur.day,
+                ancienne_valeur.hour,
+                ancienne_valeur.minute,
+                ancienne_valeur.second,
+            )
+            nouvelle_dt = (
+                nouvelle_valeur.year,
+                nouvelle_valeur.month,
+                nouvelle_valeur.day,
+                nouvelle_valeur.hour,
+                nouvelle_valeur.minute,
+                nouvelle_valeur.second,
+            )
             valeurs_egales = ancienne_dt == nouvelle_dt
         elif ancienne_valeur is None and nouvelle_valeur is None:
             valeurs_egales = True
@@ -697,7 +758,9 @@ def soumettre_pour_correction(request, fiche_id):
     fiche = get_object_or_404(FicheObservation, pk=fiche_id)
     user = cast(Utilisateur, request.user)
 
-    logger.info(f"soumettre_pour_correction appelé pour fiche {fiche_id}, méthode: {request.method}")
+    logger.info(
+        f"soumettre_pour_correction appelé pour fiche {fiche_id}, méthode: {request.method}"
+    )
 
     # Vérifier que c'est bien l'observateur de la fiche
     if user != fiche.observateur and user.role != "administrateur":
@@ -719,18 +782,17 @@ def soumettre_pour_correction(request, fiche_id):
             etat_correction.pourcentage_completion = pourcentage
             etat_correction.save(skip_auto_calculation=True)
 
-            logger.info(f"Fiche {fiche_id} passée en statut 'en_cours', pourcentage: {pourcentage}%")
+            logger.info(
+                f"Fiche {fiche_id} passée en statut 'en_cours', pourcentage: {pourcentage}%"
+            )
 
             messages.success(
-                request,
-                f"Fiche #{fiche_id} soumise pour correction. "
-                f"Complétion : {pourcentage}%"
+                request, f"Fiche #{fiche_id} soumise pour correction. Complétion : {pourcentage}%"
             )
         else:
             logger.warning(f"Fiche {fiche_id} déjà en statut: {etat_correction.statut}")
             messages.warning(
-                request,
-                f"La fiche est déjà en statut '{etat_correction.get_statut_display()}'"
+                request, f"La fiche est déjà en statut '{etat_correction.get_statut_display()}'"
             )
 
         # Rediriger vers la vue de détail (lecture seule)

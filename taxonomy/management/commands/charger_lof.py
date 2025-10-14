@@ -66,8 +66,7 @@ class Command(BaseCommand):
         if especes_count > 100 and not options['force']:
             self.stdout.write(
                 self.style.WARNING(
-                    f'{especes_count} espèces déjà en base. '
-                    'Utilisez --force pour recharger.'
+                    f'{especes_count} espèces déjà en base. Utilisez --force pour recharger.'
                 )
             )
             return
@@ -135,7 +134,10 @@ class Command(BaseCommand):
                 elif magic == b'\x1f\x8b':
                     # Fichier gzippé, décompresser
                     self.stdout.write("Décompression du fichier...")
-                    with gzip.open(lof_file, 'rb') as f_in, open(lof_file_decompressed, 'wb') as f_out:
+                    with (
+                        gzip.open(lof_file, 'rb') as f_in,
+                        open(lof_file_decompressed, 'wb') as f_out,
+                    ):
                         shutil.copyfileobj(f_in, f_out)
                     self.stdout.write(self.style.SUCCESS("[OK] Décompression terminée"))
                     lof_file.unlink()
@@ -158,9 +160,7 @@ class Command(BaseCommand):
                     if magic != b'PK':
                         # Fichier corrompu, le supprimer et re-télécharger
                         self.stdout.write(
-                            self.style.WARNING(
-                                "Fichier en cache corrompu, re-téléchargement..."
-                            )
+                            self.style.WARNING("Fichier en cache corrompu, re-téléchargement...")
                         )
                         lof_file_decompressed.unlink()
                         return self._download_lof()  # Récursion pour re-télécharger
@@ -362,9 +362,7 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Ordres: {total_ordres}\n"
-                f"Familles: {total_familles}\n"
-                f"Espèces: {total_especes}\n"
+                f"Ordres: {total_ordres}\nFamilles: {total_familles}\nEspèces: {total_especes}\n"
             )
         )
 
@@ -373,9 +371,7 @@ class Command(BaseCommand):
         exemples = Espece.objects.select_related('famille', 'famille__ordre')[:5]
         for esp in exemples:
             famille_info = f" ({esp.famille.nom})" if esp.famille else ""
-            ordre_info = (
-                f" - {esp.famille.ordre.nom}" if esp.famille and esp.famille.ordre else ""
-            )
+            ordre_info = f" - {esp.famille.ordre.nom}" if esp.famille and esp.famille.ordre else ""
             self.stdout.write(f"  - {esp.nom}{famille_info}{ordre_info}")
             self.stdout.write(f"    {esp.nom_scientifique}")
 

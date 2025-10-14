@@ -4,6 +4,7 @@ Centralise la logique d'envoi d'emails avec templates HTML et texte.
 """
 
 import logging
+
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -40,9 +41,7 @@ class EmailService:
             }
 
             # Rendu des templates HTML et texte
-            html_content = render_to_string(
-                'accounts/emails/nouvelle_demande_admin.html', contexte
-            )
+            html_content = render_to_string('accounts/emails/nouvelle_demande_admin.html', contexte)
             text_content = strip_tags(html_content)
 
             # Création et envoi de l'email

@@ -1,4 +1,3 @@
-
 from django.db import models
 
 from accounts.models import Utilisateur
@@ -7,7 +6,6 @@ from taxonomy.models import Espece
 
 
 class TranscriptionBrute(models.Model):
-
     fichier_source = models.CharField(max_length=255, unique=True)
     json_brut = models.JSONField()
     date_importation = models.DateTimeField(auto_now_add=True)
@@ -18,7 +16,6 @@ class TranscriptionBrute(models.Model):
 
 
 class EspeceCandidate(models.Model):
-
     nom_transcrit = models.CharField(max_length=100, unique=True)
     espece_validee = models.ForeignKey(Espece, on_delete=models.SET_NULL, null=True, blank=True)
     validation_manuelle = models.BooleanField(default=False)
@@ -31,7 +28,6 @@ class EspeceCandidate(models.Model):
 
 
 class ImportationEnCours(models.Model):
-
     transcription = models.OneToOneField(TranscriptionBrute, on_delete=models.CASCADE)
     fiche_observation = models.OneToOneField(
         'observations.FicheObservation', on_delete=models.SET_NULL, null=True, blank=True
