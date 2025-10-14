@@ -56,6 +56,13 @@ jobs:
 
       # Étape 5: Lancer l'analyse de types avec MyPy
       - name: Analyse de types avec MyPy
+        env:
+          SECRET_KEY: "dummy-secret-key-for-mypy"
+          DB_NAME: "test_db"
+          DB_USER: "test_user"
+          DB_PASSWORD: "testpassword"
+          DB_HOST: "127.0.0.1"
+          DB_PORT: "3306"
         run: mypy .
 
       # Étape 6: Lancer les tests unitaires avec Pytest (avec couverture)
