@@ -35,7 +35,7 @@ eventlet==0.40.3
 # Monitoring Celery
 # -----------------------------------------------------------------------------
 flower==2.0.1
-prometheus_client==0.21.1
+prometheus_client==0.23.1
 tornado==6.5.2
 humanize==4.12.2
 
