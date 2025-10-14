@@ -24,6 +24,9 @@ jobs:
           MYSQL_DATABASE: test_db
           MYSQL_USER: test_user
           MYSQL_PASSWORD: testpassword
+        # Publier le port 3306
+        ports:
+          - 3306:3306
         # Options pour le healthcheck, pour s'assurer que la DB est prête
         options: >-
           --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -prootpassword"
@@ -74,8 +77,8 @@ jobs:
           DB_NAME: "test_db"
           DB_USER: "test_user"
           DB_PASSWORD: "testpassword"
-          DB_HOST: "127.0.0.1" # L'hôte du service est mappé sur localhost
-          DB_PORT: ${{ job.services.mariadb.ports[3306] }} # Port dynamique du service
+          DB_HOST: "127.0.0.1"
+          DB_PORT: "3306"
         run: pytest --cov --cov-report=xml --cov-report=term-missing
 
       # Étape 7: Uploader le rapport de couverture
