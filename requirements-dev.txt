@@ -66,5 +66,5 @@ build==1.2.2.post1
 pyproject_hooks==1.2.0
 platformdirs==4.4.0
 pathspec==0.12.1
-setuptools==76.0.0
+setuptools==78.1.1
 wheel==0.45.1
