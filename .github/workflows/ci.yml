@@ -51,6 +51,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
+      # Étape 3.5: Donner les permissions à test_user pour créer des bases de données de test
+      - name: Configuration des permissions MariaDB pour les tests
+        run: |
+          mysql -h 127.0.0.1 -u root -prootpassword -e "GRANT ALL PRIVILEGES ON *.* TO 'test_user'@'%' WITH GRANT OPTION;"
+          mysql -h 127.0.0.1 -u root -prootpassword -e "FLUSH PRIVILEGES;"
+
       # Étape 4: Lancer les analyseurs de code statique (Linting & Formatting)
       - name: Analyse de code avec Ruff
         run: |
