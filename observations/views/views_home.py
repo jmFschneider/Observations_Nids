@@ -29,6 +29,11 @@ def home(request):
         etat_correction__statut__in=['nouveau', 'en_edition']
     ).select_related('espece', 'etat_correction').order_by('-date_creation')[:5]
 
+    # Compter les demandes de compte en attente (pour les administrateurs)
+    demandes_en_attente = 0
+    if user.role == 'administrateur':
+        demandes_en_attente = Utilisateur.objects.filter(est_valide=False).count()
+
     return render(
         request,
         'home.html',
@@ -37,6 +42,7 @@ def home(request):
             'users_count': users_count,
             'observations_count': observations_count,
             'fiches_en_edition': fiches_en_edition,
+            'demandes_en_attente': demandes_en_attente,
         },
     )
 

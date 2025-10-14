@@ -6,6 +6,16 @@
 {% endblock %}
 
 {% block content %}
+{% if user.role == 'administrateur' and demandes_en_attente > 0 %}
+<div class="alert alert-warning fade show" role="alert" id="alertDemandes" style="background-color: #fff3cd; border-color: #ffc107; color: #856404; position: relative; padding-right: 40px;">
+    <strong><i class="fas fa-exclamation-triangle"></i> {{ demandes_en_attente }} demande(s) de compte en attente !</strong>
+    <a href="{% url 'accounts:liste_utilisateurs' %}?valide=non" class="alert-link" style="color: #533f03; text-decoration: underline;">Voir les demandes</a>
+    <button type="button" aria-label="Close" onclick="document.getElementById('alertDemandes').style.display='none';" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #8B0000; opacity: 1; font-weight: bold; font-size: 24px; cursor: pointer; padding: 0; line-height: 1;">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endif %}
+
 <h1>Bienvenue sur le suivi des observations</h1>
 <p>Nombre total d'observateurs : {{ users_count }}</p>
 <p>Nombre total d'observations : {{ observations_count }}</p>
@@ -81,10 +91,6 @@
     </div>
     <div class="card-body">
         <ul>
-            <!-- Remplacer user_list par liste_utilisateurs -->
-            <li><a href="{% url 'accounts:liste_utilisateurs' %}">Liste des observateurs</a></li>
-            <!-- Remplacer user_create par creer_utilisateur -->
-            <li><a href="{% url 'accounts:creer_utilisateur' %}">Ajouter un observateur</a></li>
             <li><a href="{% url 'accounts:liste_utilisateurs' %}">Gestion des utilisateurs</a></li>
             <li><a href="{% url 'accounts:creer_utilisateur' %}">Créer un nouvel utilisateur</a></li>
         </ul>
