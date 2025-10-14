@@ -7,12 +7,9 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
 django.setup()
 
-import pytest
+import pytest  # noqa: E402
 
 from geo.utils.geocoding import get_geocodeur  # noqa: E402
-
-
-
 
 
 @pytest.mark.django_db

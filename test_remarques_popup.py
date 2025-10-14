@@ -17,7 +17,8 @@ sys.path.insert(0, str(BASE_DIR))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
 django.setup()
 
-import pytest
+import pytest  # noqa: E402
+
 from observations.models import FicheObservation  # noqa: E402
 
 
