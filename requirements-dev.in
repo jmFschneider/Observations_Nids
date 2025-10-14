@@ -18,5 +18,5 @@ build
 pyproject_hooks
 platformdirs
 pathspec
-setuptools
+setuptools>=78.1.1
 wheel
