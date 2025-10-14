@@ -32,8 +32,7 @@ urlpatterns = [
     path('auth/logout/', LogoutView.as_view(next_page='home'), name='logout'),
     path('auth/login/', LoginView.as_view(template_name='login.html'), name='login'),
     # Routes d'observations
-    path('observations/', saisie_observation, name=
-    'observations_list'),
+    path('observations/', saisie_observation, name='observations_list'),
     path('observations/liste/', liste_fiches_observations, name='liste_fiches_observations'),
     path('observations/<int:fiche_id>/', fiche_observation_view, name='fiche_observation'),
     #    path('observations/nouvelle/', saisie_observation, name='saisie_observation'),

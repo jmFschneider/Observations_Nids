@@ -1,4 +1,5 @@
 """Fixtures spécifiques au module observations."""
+
 import pytest
 
 from observations.models import FicheObservation

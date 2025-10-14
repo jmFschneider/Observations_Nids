@@ -1,0 +1,22 @@
+# requirements-dev.in
+-r requirements-base.in
+
+ruff
+mypy
+django-stubs
+django-stubs-ext
+types-pytz
+types-PyYAML
+typing-inspection
+django-debug-toolbar
+django-extensions
+pytest
+pytest-django
+pytest-cov
+pip-tools
+build
+pyproject_hooks
+platformdirs
+pathspec
+setuptools>=78.1.1
+wheel

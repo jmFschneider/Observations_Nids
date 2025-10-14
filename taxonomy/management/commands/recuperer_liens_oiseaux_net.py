@@ -7,9 +7,9 @@ Usage:
     python manage.py recuperer_liens_oiseaux_net --limit 10  # Tester sur 10 espèces
     python manage.py recuperer_liens_oiseaux_net --dry-run  # Simuler sans modifier la base
     python manage.py recuperer_liens_oiseaux_net --delay 1.5
-    
-    
-    
+
+
+
 [ECHECS] Especes non trouvees:
 ============================================================
   - Oie de taïga (Anser fabalis)
@@ -96,18 +96,22 @@ class Command(BaseCommand):
         delay = options['delay']
 
         # Filtrer les espèces (toujours exclure celles sans nom scientifique)
-        especes_base = Espece.objects.exclude(nom_scientifique='').exclude(nom_scientifique__isnull=True)
+        especes_base = Espece.objects.exclude(nom_scientifique='').exclude(
+            nom_scientifique__isnull=True
+        )
 
         if force:
             especes = especes_base
-            self.stdout.write(self.style.WARNING(
-                "[Mode FORCE] Mise a jour de toutes les especes, meme celles avec lien existant"
-            ))
+            self.stdout.write(
+                self.style.WARNING(
+                    "[Mode FORCE] Mise a jour de toutes les especes, meme celles avec lien existant"
+                )
+            )
         else:
-            especes = especes_base.filter(lien_oiseau_net__isnull=True) | especes_base.filter(lien_oiseau_net='')
-            self.stdout.write(self.style.SUCCESS(
-                "Mise a jour uniquement des especes sans lien"
-            ))
+            especes = especes_base.filter(lien_oiseau_net__isnull=True) | especes_base.filter(
+                lien_oiseau_net=''
+            )
+            self.stdout.write(self.style.SUCCESS("Mise a jour uniquement des especes sans lien"))
 
         if limit:
             especes = especes[:limit]
@@ -116,9 +120,11 @@ class Command(BaseCommand):
         total = especes.count()
 
         if total == 0:
-            self.stdout.write(self.style.SUCCESS(
-                "\nAucune espèce à traiter. Toutes les espèces ont déjà un lien !"
-            ))
+            self.stdout.write(
+                self.style.SUCCESS(
+                    "\nAucune espèce à traiter. Toutes les espèces ont déjà un lien !"
+                )
+            )
             return
 
         if dry_run:
@@ -177,7 +183,9 @@ class Command(BaseCommand):
                     url_google = self.chercher_via_google(espece.nom_scientifique, espece.nom)
 
                     if url_google:
-                        self.stdout.write(self.style.SUCCESS(f"  [OK] Trouve via Google: {url_google}"))
+                        self.stdout.write(
+                            self.style.SUCCESS(f"  [OK] Trouve via Google: {url_google}")
+                        )
                         if not dry_run:
                             espece.lien_oiseau_net = url_google
                             espece.save()
@@ -192,9 +200,9 @@ class Command(BaseCommand):
                 time.sleep(delay)
 
         # Résumé final
-        self.stdout.write("\n" + "="*60)
+        self.stdout.write("\n" + "=" * 60)
         self.stdout.write(self.style.SUCCESS("\n[RESUME]"))
-        self.stdout.write("="*60)
+        self.stdout.write("=" * 60)
         self.stdout.write(f"Total traite      : {total}")
         self.stdout.write(self.style.SUCCESS(f"[OK] Succes direct   : {stats['success_direct']}"))
         self.stdout.write(self.style.SUCCESS(f"[OK] Succes Google   : {stats['success_google']}"))
@@ -207,23 +215,23 @@ class Command(BaseCommand):
             self.stdout.write(f"\nTaux de réussite : {taux_reussite:.1f}%")
 
         if failed_species:
-            self.stdout.write("\n" + "="*60)
+            self.stdout.write("\n" + "=" * 60)
             self.stdout.write(self.style.ERROR("\n[ECHECS] Especes non trouvees:"))
-            self.stdout.write("="*60)
+            self.stdout.write("=" * 60)
             for species in failed_species:
                 self.stdout.write(f"  - {species}")
             self.stdout.write("\n[CONSEIL] Verifiez manuellement ces especes sur oiseaux.net")
 
         if dry_run:
-            self.stdout.write("\n" + "="*60)
-            self.stdout.write(self.style.WARNING(
-                "Mode DRY-RUN : Aucune modification n'a été enregistrée"
-            ))
-            self.stdout.write(self.style.WARNING(
-                "Relancez sans --dry-run pour appliquer les modifications"
-            ))
+            self.stdout.write("\n" + "=" * 60)
+            self.stdout.write(
+                self.style.WARNING("Mode DRY-RUN : Aucune modification n'a été enregistrée")
+            )
+            self.stdout.write(
+                self.style.WARNING("Relancez sans --dry-run pour appliquer les modifications")
+            )
 
-        self.stdout.write("\n" + "="*60)
+        self.stdout.write("\n" + "=" * 60)
         self.stdout.write(self.style.SUCCESS("\n[OK] Traitement termine !\n"))
 
     def construire_url_depuis_nom_francais(self, nom_francais):
@@ -275,9 +283,7 @@ class Command(BaseCommand):
         Vérifie qu'une URL existe et retourne un contenu valide.
         """
         try:
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
             response = requests.head(url, headers=headers, timeout=10, allow_redirects=True)
 
             # Accepter 200 (OK) et 301/302 (redirections)
@@ -294,9 +300,7 @@ class Command(BaseCommand):
             query = f"{nom_scientifique} {nom_francais} site:oiseaux.net"
             url_google = f"https://www.google.com/search?q={quote_plus(query)}"
 
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
 
             response = requests.get(url_google, headers=headers, timeout=10)
             response.raise_for_status()

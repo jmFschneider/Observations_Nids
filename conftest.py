@@ -1,4 +1,5 @@
 """Configuration globale pour pytest."""
+
 import pytest
 from django.contrib.auth import get_user_model
 

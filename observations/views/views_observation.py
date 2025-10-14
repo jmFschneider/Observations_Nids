@@ -37,9 +37,13 @@ def fiche_observation_view(request, fiche_id):
 
 @login_required
 def liste_fiches_observations(request):
-    fiches = FicheObservation.objects.select_related(
-        'observateur', 'espece', 'localisation', 'etat_correction'
-    ).all().order_by('-date_creation')
+    fiches = (
+        FicheObservation.objects.select_related(
+            'observateur', 'espece', 'localisation', 'etat_correction'
+        )
+        .all()
+        .order_by('-date_creation')
+    )
 
     paginator = Paginator(fiches, 10)
     page = request.GET.get('page', 1)

@@ -34,11 +34,7 @@ class Command(BaseCommand):
         delete_fiches = options.get('delete_fiches', False)
 
         # Afficher un avertissement
-        self.stdout.write(
-            self.style.WARNING(
-                '\n⚠️  Cette opération va supprimer :\n'
-            )
-        )
+        self.stdout.write(self.style.WARNING('\n⚠️  Cette opération va supprimer :\n'))
         self.stdout.write('  • Importations en cours')
         self.stdout.write('  • Transcriptions brutes')
         self.stdout.write('  • Espèces candidates')
@@ -48,9 +44,7 @@ class Command(BaseCommand):
             self.stdout.write(f'  • {fiches_transcription_count} fiches créées par transcription')
         else:
             self.stdout.write(
-                self.style.SUCCESS(
-                    '  ✅ Les fiches créées par transcription seront PRÉSERVÉES'
-                )
+                self.style.SUCCESS('  ✅ Les fiches créées par transcription seront PRÉSERVÉES')
             )
 
         # Demander confirmation
@@ -94,9 +88,7 @@ class Command(BaseCommand):
                 self.stdout.write('  ✓ Espèces candidates supprimées')
 
                 self.stdout.write(
-                    self.style.SUCCESS(
-                        '\n✅ Réinitialisation des transcriptions terminée !\n'
-                    )
+                    self.style.SUCCESS('\n✅ Réinitialisation des transcriptions terminée !\n')
                 )
 
                 self.stdout.write(self.style.SUCCESS('📋 Actions effectuées :'))
@@ -115,8 +107,6 @@ class Command(BaseCommand):
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(
-                    f'\n❌ Erreur lors de la réinitialisation : {str(e)}'
-                )
+                self.style.ERROR(f'\n❌ Erreur lors de la réinitialisation : {str(e)}')
             )
             raise

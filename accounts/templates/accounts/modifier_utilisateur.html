@@ -10,6 +10,29 @@
                     <h4 class="mb-0">Modifier l'utilisateur {{ utilisateur.username }}</h4>
                 </div>
                 <div class="card-body">
+                    <style>
+                        .form-table {
+                            display: table;
+                            width: 100%;
+                        }
+                        .form-row-table {
+                            display: table-row;
+                        }
+                        .form-label-cell {
+                            display: table-cell;
+                            padding-right: 15px;
+                            padding-bottom: 15px;
+                            white-space: nowrap;
+                            vertical-align: top;
+                            padding-top: 8px;
+                        }
+                        .form-input-cell {
+                            display: table-cell;
+                            width: 100%;
+                            padding-bottom: 15px;
+                        }
+                    </style>
+
                     <form method="post">
                         {% csrf_token %}
 
@@ -21,100 +44,155 @@
                         </div>
                         {% endif %}
 
-                        <div class="form-group row">
-                            <label for="{{ form.username.id_for_label }}" class="col-sm-3 col-form-label">Nom d'utilisateur</label>
-                            <div class="col-sm-9">
-                                {{ form.username }}
-                                {% if form.username.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.username.errors }}
+                        <div class="form-table">
+                            <!-- Nom d'utilisateur -->
+                            <div class="form-row-table">
+                                <div class="form-label-cell">
+                                    <label for="{{ form.username.id_for_label }}"><strong>Nom d'utilisateur :</strong></label>
                                 </div>
-                                {% endif %}
-                                <small class="form-text text-muted">Obligatoire. 150 caractères maximum.</small>
+                                <div class="form-input-cell">
+                                    <input type="text"
+                                           name="{{ form.username.name }}"
+                                           id="{{ form.username.id_for_label }}"
+                                           class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                                           value="{{ form.username.value|default:'' }}"
+                                           required
+                                           maxlength="150">
+                                    {% if form.username.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.username.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Obligatoire. 150 caractères maximum.</small>
+                                </div>
+                            </div>
+
+                            <!-- Prénom -->
+                            <div class="form-row-table">
+                                <div class="form-label-cell">
+                                    <label for="{{ form.first_name.id_for_label }}"><strong>Prénom :</strong></label>
+                                </div>
+                                <div class="form-input-cell">
+                                    <input type="text"
+                                           name="{{ form.first_name.name }}"
+                                           id="{{ form.first_name.id_for_label }}"
+                                           class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                                           value="{{ form.first_name.value|default:'' }}"
+                                           maxlength="150">
+                                    {% if form.first_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.first_name.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Nom -->
+                            <div class="form-row-table">
+                                <div class="form-label-cell">
+                                    <label for="{{ form.last_name.id_for_label }}"><strong>Nom :</strong></label>
+                                </div>
+                                <div class="form-input-cell">
+                                    <input type="text"
+                                           name="{{ form.last_name.name }}"
+                                           id="{{ form.last_name.id_for_label }}"
+                                           class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                                           value="{{ form.last_name.value|default:'' }}"
+                                           maxlength="150">
+                                    {% if form.last_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.last_name.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="form-row-table">
+                                <div class="form-label-cell">
+                                    <label for="{{ form.email.id_for_label }}"><strong>Email :</strong></label>
+                                </div>
+                                <div class="form-input-cell">
+                                    <input type="email"
+                                           name="{{ form.email.name }}"
+                                           id="{{ form.email.id_for_label }}"
+                                           class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                           value="{{ form.email.value|default:'' }}">
+                                    {% if form.email.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Rôle -->
+                            <div class="form-row-table">
+                                <div class="form-label-cell">
+                                    <label for="{{ form.role.id_for_label }}"><strong>Rôle :</strong></label>
+                                </div>
+                                <div class="form-input-cell">
+                                    <select name="{{ form.role.name }}"
+                                            id="{{ form.role.id_for_label }}"
+                                            class="form-control {% if form.role.errors %}is-invalid{% endif %}">
+                                        {% for value, label in form.role.field.choices %}
+                                        <option value="{{ value }}" {% if form.role.value == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if form.role.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.role.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Validation -->
+                            <div class="form-row-table">
+                                <div class="form-label-cell">
+                                    <strong>Validation :</strong>
+                                </div>
+                                <div class="form-input-cell">
+                                    <div class="form-check">
+                                        <input type="checkbox"
+                                               name="{{ form.est_valide.name }}"
+                                               id="{{ form.est_valide.id_for_label }}"
+                                               class="form-check-input"
+                                               {% if form.est_valide.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="{{ form.est_valide.id_for_label }}">
+                                            Utilisateur validé
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Statut -->
+                            <div class="form-row-table">
+                                <div class="form-label-cell">
+                                    <strong>Statut :</strong>
+                                </div>
+                                <div class="form-input-cell">
+                                    <div class="form-check">
+                                        <input type="checkbox"
+                                               name="{{ form.is_active.name }}"
+                                               id="{{ form.is_active.id_for_label }}"
+                                               class="form-check-input"
+                                               {% if form.is_active.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                            Utilisateur actif
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group row">
-                            <label for="{{ form.first_name.id_for_label }}" class="col-sm-3 col-form-label">Prénom</label>
-                            <div class="col-sm-9">
-                                {{ form.first_name }}
-                                {% if form.first_name.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.first_name.errors }}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="{{ form.last_name.id_for_label }}" class="col-sm-3 col-form-label">Nom</label>
-                            <div class="col-sm-9">
-                                {{ form.last_name }}
-                                {% if form.last_name.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.last_name.errors }}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="{{ form.email.id_for_label }}" class="col-sm-3 col-form-label">Email</label>
-                            <div class="col-sm-9">
-                                {{ form.email }}
-                                {% if form.email.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.email.errors }}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="{{ form.role.id_for_label }}" class="col-sm-3 col-form-label">Rôle</label>
-                            <div class="col-sm-9">
-                                {{ form.role }}
-                                {% if form.role.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.role.errors }}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-3">Validation</div>
-                            <div class="col-sm-9">
-                                <div class="form-check">
-                                    {{ form.est_valide }}
-                                    <label class="form-check-label" for="{{ form.est_valide.id_for_label }}">
-                                        Utilisateur validé
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-3">Statut</div>
-                            <div class="col-sm-9">
-                                <div class="form-check">
-                                    {{ form.is_active }}
-                                    <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
-                                        Utilisateur actif
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-9 offset-sm-3">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Enregistrer les modifications
-                                </button>
-                                <a href="{% url 'accounts:liste_utilisateurs' %}" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Annuler
-                                </a>
-                            </div>
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Enregistrer les modifications
+                            </button>
+                            <a href="{% url 'accounts:liste_utilisateurs' %}" class="btn btn-secondary ml-2">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
                         </div>
                     </form>
                 </div>

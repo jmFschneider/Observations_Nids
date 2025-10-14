@@ -86,7 +86,7 @@ class FicheObservation(models.Model):
                 defaults={
                     'statut': 'nouveau',
                     'pourcentage_completion': 0,
-                }
+                },
             )
 
             logger.info(f"Fiche d'observation #{self.num_fiche} créée avec tous les objets liés")
@@ -98,7 +98,7 @@ class FicheObservation(models.Model):
             defaults={
                 'statut': 'nouveau',
                 'pourcentage_completion': 0,
-            }
+            },
         )
         etat_correction.calculer_pourcentage_completion()
         etat_correction.save(skip_auto_calculation=False)
@@ -270,19 +270,16 @@ class EtatCorrection(models.Model):
         ('valide', 'Validée'),
     ]
 
-    fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="etat_correction")
+    fiche = models.OneToOneField(
+        FicheObservation, on_delete=models.CASCADE, related_name="etat_correction"
+    )
     statut = models.CharField(max_length=20, choices=STATUTS_CHOICES, default='nouveau')
     pourcentage_completion = models.IntegerField(
-        default=0,
-        validators=[MinValueValidator(0), MaxValueValidator(100)]
+        default=0, validators=[MinValueValidator(0), MaxValueValidator(100)]
     )
     date_derniere_modification = models.DateTimeField(auto_now=True)
     validee_par = models.ForeignKey(
-        Utilisateur,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="validations"
+        Utilisateur, on_delete=models.SET_NULL, null=True, blank=True, related_name="validations"
     )
     date_validation = models.DateTimeField(null=True, blank=True)
 
@@ -319,8 +316,12 @@ class EtatCorrection(models.Model):
         # Critère 3: Localisation complète (1 point)
         if hasattr(self.fiche, 'localisation'):
             loc = self.fiche.localisation
-            if (loc.commune and loc.commune != 'Non spécifiée' and
-                loc.departement and loc.departement != '00'):
+            if (
+                loc.commune
+                and loc.commune != 'Non spécifiée'
+                and loc.departement
+                and loc.departement != '00'
+            ):
                 score += 1
 
         # Critère 4: Au moins une observation avec date (1 point)
@@ -366,5 +367,3 @@ class EtatCorrection(models.Model):
         self.validee_par = utilisateur
         self.date_validation = timezone.now()
         self.save()
-
-

@@ -28,14 +28,21 @@ def accueil_importation(request):
     # Statistiques communes
     communes_en_base = CommuneFrance.objects.count()
     # Communes trouvées lors de cette transcription (fiches issues de transcription avec code INSEE)
-    communes_transcription = Localisation.objects.filter(
-        fiche__transcription=True,
-        code_insee__isnull=False
-    ).exclude(code_insee='').values('code_insee').distinct().count()
+    communes_transcription = (
+        Localisation.objects.filter(fiche__transcription=True, code_insee__isnull=False)
+        .exclude(code_insee='')
+        .values('code_insee')
+        .distinct()
+        .count()
+    )
     # Communes dans l'ensemble des fiches (toutes fiches avec code INSEE)
-    communes_fiches = Localisation.objects.filter(
-        code_insee__isnull=False
-    ).exclude(code_insee='').values('code_insee').distinct().count()
+    communes_fiches = (
+        Localisation.objects.filter(code_insee__isnull=False)
+        .exclude(code_insee='')
+        .values('code_insee')
+        .distinct()
+        .count()
+    )
 
     importations_en_attente = ImportationEnCours.objects.filter(statut='en_attente').count()
     importations_erreur = ImportationEnCours.objects.filter(statut='erreur').count()

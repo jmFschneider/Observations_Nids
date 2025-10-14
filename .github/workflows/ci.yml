@@ -24,6 +24,9 @@ jobs:
           MYSQL_DATABASE: test_db
           MYSQL_USER: test_user
           MYSQL_PASSWORD: testpassword
+        # Publier le port 3306
+        ports:
+          - 3306:3306
         # Options pour le healthcheck, pour s'assurer que la DB est prête
         options: >-
           --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -prootpassword"
@@ -48,6 +51,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
+      # Étape 3.5: Donner les permissions à test_user pour créer des bases de données de test
+      - name: Configuration des permissions MariaDB pour les tests
+        run: |
+          mysql -h 127.0.0.1 -u root -prootpassword -e "GRANT ALL PRIVILEGES ON *.* TO 'test_user'@'%' WITH GRANT OPTION;"
+          mysql -h 127.0.0.1 -u root -prootpassword -e "FLUSH PRIVILEGES;"
+
       # Étape 4: Lancer les analyseurs de code statique (Linting & Formatting)
       - name: Analyse de code avec Ruff
         run: |
@@ -56,9 +65,27 @@ jobs:
 
       # Étape 5: Lancer l'analyse de types avec MyPy
       - name: Analyse de types avec MyPy
+        env:
+          SECRET_KEY: "dummy-secret-key-for-mypy"
+          DB_NAME: "test_db"
+          DB_USER: "test_user"
+          DB_PASSWORD: "testpassword"
+          DB_HOST: "127.0.0.1"
+          DB_PORT: "3306"
         run: mypy .
 
-      # Étape 6: Lancer les tests unitaires avec Pytest (avec couverture)
+      # Étape 6: Exécuter les migrations Django
+      - name: Migrations Django
+        env:
+          SECRET_KEY: "dummy-secret-key-for-ci"
+          DB_NAME: "test_db"
+          DB_USER: "test_user"
+          DB_PASSWORD: "testpassword"
+          DB_HOST: "127.0.0.1"
+          DB_PORT: "3306"
+        run: python manage.py migrate --noinput
+
+      # Étape 7: Lancer les tests unitaires avec Pytest (avec couverture)
       - name: Exécution des tests avec Pytest
         # Les variables d'environnement sont utilisées par Django (config.py)
         # pour se connecter à la base de données du service
@@ -67,11 +94,11 @@ jobs:
           DB_NAME: "test_db"
           DB_USER: "test_user"
           DB_PASSWORD: "testpassword"
-          DB_HOST: "127.0.0.1" # L'hôte du service est mappé sur localhost
-          DB_PORT: ${{ job.services.mariadb.ports[3306] }} # Port dynamique du service
+          DB_HOST: "127.0.0.1"
+          DB_PORT: "3306"
         run: pytest --cov --cov-report=xml --cov-report=term-missing
 
-      # Étape 7: Uploader le rapport de couverture
+      # Étape 8: Uploader le rapport de couverture
       - name: Upload coverage reports to Codecov
         if: always()
         uses: codecov/codecov-action@v4

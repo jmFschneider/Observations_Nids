@@ -99,9 +99,7 @@ class GeocodeurCommunes:
             else:
                 dept_filter['departement__icontains'] = departement
 
-            result = CommuneFrance.objects.filter(
-                nom__iexact=commune_clean, **dept_filter
-            ).first()
+            result = CommuneFrance.objects.filter(nom__iexact=commune_clean, **dept_filter).first()
 
             if result:
                 return self._format_resultat_local(result)
@@ -155,9 +153,7 @@ class GeocodeurCommunes:
             'altitude': commune.altitude,
         }
 
-    def _geocoder_nominatim(
-        self, commune: str, departement: str | None = None
-    ) -> dict | None:
+    def _geocoder_nominatim(self, commune: str, departement: str | None = None) -> dict | None:
         """Géocode via Nominatim (fallback)"""
         try:
             # Construire la requête
@@ -247,19 +243,23 @@ class GeocodeurCommunes:
             result = self.geocoder_commune(commune, departement)
 
             if result:
-                results.append({
-                    'commune': commune,
-                    'departement': departement,
-                    'resultat': result,
-                    'success': True,
-                })
+                results.append(
+                    {
+                        'commune': commune,
+                        'departement': departement,
+                        'resultat': result,
+                        'success': True,
+                    }
+                )
             else:
-                results.append({
-                    'commune': commune,
-                    'departement': departement,
-                    'resultat': None,
-                    'success': False,
-                })
+                results.append(
+                    {
+                        'commune': commune,
+                        'departement': departement,
+                        'resultat': None,
+                        'success': False,
+                    }
+                )
 
             # Respect du rate limit Nominatim (1 req/sec)
             if result and result.get('source') == 'nominatim':
@@ -271,6 +271,7 @@ class GeocodeurCommunes:
 # Instance globale réutilisable
 class _GeocodeurSingleton:
     """Singleton pour l'instance du géocodeur"""
+
     _instance: GeocodeurCommunes | None = None
 
     @classmethod

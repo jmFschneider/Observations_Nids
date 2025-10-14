@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic import BaseModel, Field, validator
 from pydantic_settings import BaseSettings
 
@@ -86,6 +87,7 @@ class Settings(BaseSettings):
 
     class Config:
         """Pydantic config for environment variables."""
+
         env_file = ".env"
         env_file_encoding = "utf-8"
         env_nested_delimiter = "__"
@@ -109,7 +111,6 @@ def get_settings() -> Settings:
     Pydantic automatically reads from the .env file and environment.
     We only need to manually construct nested models if they don't use prefixes.
     """
-    from dotenv import load_dotenv
 
     # Charger explicitement les variables d'environnement depuis .env
     load_dotenv(BASE_DIR / ".env")
@@ -126,5 +127,5 @@ def get_settings() -> Settings:
     # automatically from environment variables. The @validator for ALLOWED_HOSTS will correctly process the string.
     return Settings(
         DATABASE=database_settings,
-        celery=CelerySettings()  # type: ignore[call-arg]
+        celery=CelerySettings(),  # type: ignore[call-arg]
     )

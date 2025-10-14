@@ -31,75 +31,171 @@
                         </div>
                         {% endif %}
 
-                        <!-- Nom d'utilisateur -->
-                        <div class="form-group">
-                            <label for="{{ form.username.id_for_label }}">Nom d'utilisateur</label>
-                            {{ form.username }}
-                            {% if form.username.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.username.errors }}
-                            </div>
-                            {% endif %}
-                        </div>
+                        <style>
+                            .form-table {
+                                display: table;
+                                width: 100%;
+                            }
+                            .form-row {
+                                display: table-row;
+                            }
+                            .form-label-cell {
+                                display: table-cell;
+                                padding-right: 15px;
+                                padding-bottom: 15px;
+                                white-space: nowrap;
+                                vertical-align: top;
+                                padding-top: 8px;
+                            }
+                            .form-input-cell {
+                                display: table-cell;
+                                width: 100%;
+                                padding-bottom: 15px;
+                            }
+                        </style>
 
-                        <!-- Email -->
-                        <div class="form-group">
-                            <label for="{{ form.email.id_for_label }}">Email</label>
-                            {{ form.email }}
-                            {% if form.email.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.email.errors }}
+                        <div class="form-table">
+                            <!-- Nom d'utilisateur -->
+                            <div class="form-row">
+                                <div class="form-label-cell">
+                                    <label for="{{ form.username.id_for_label }}"><strong>Nom d'utilisateur :</strong></label>
+                                </div>
+                                <div class="form-input-cell">
+                                    <input type="text"
+                                           name="{{ form.username.name }}"
+                                           id="{{ form.username.id_for_label }}"
+                                           class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                                           value="{{ form.username.value|default:'' }}"
+                                           required
+                                           maxlength="150">
+                                    {% if form.username.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.username.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Obligatoire. 150 caractères maximum. Lettres, chiffres et @/./+/-/_ uniquement.
+                                    </small>
+                                </div>
                             </div>
-                            {% endif %}
-                        </div>
 
-                        <!-- Prénom -->
-                        <div class="form-group">
-                            <label for="{{ form.first_name.id_for_label }}">Prénom</label>
-                            {{ form.first_name }}
-                            {% if form.first_name.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.first_name.errors }}
+                            <!-- Email -->
+                            <div class="form-row">
+                                <div class="form-label-cell">
+                                    <label for="{{ form.email.id_for_label }}"><strong>Email :</strong></label>
+                                </div>
+                                <div class="form-input-cell">
+                                    <input type="email"
+                                           name="{{ form.email.name }}"
+                                           id="{{ form.email.id_for_label }}"
+                                           class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                           value="{{ form.email.value|default:'' }}"
+                                           required>
+                                    {% if form.email.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Adresse email valide pour recevoir les notifications.
+                                    </small>
+                                </div>
                             </div>
-                            {% endif %}
-                        </div>
 
-                        <!-- Nom -->
-                        <div class="form-group">
-                            <label for="{{ form.last_name.id_for_label }}">Nom</label>
-                            {{ form.last_name }}
-                            {% if form.last_name.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.last_name.errors }}
+                            <!-- Prénom -->
+                            <div class="form-row">
+                                <div class="form-label-cell">
+                                    <label for="{{ form.first_name.id_for_label }}"><strong>Prénom :</strong></label>
+                                </div>
+                                <div class="form-input-cell">
+                                    <input type="text"
+                                           name="{{ form.first_name.name }}"
+                                           id="{{ form.first_name.id_for_label }}"
+                                           class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                                           value="{{ form.first_name.value|default:'' }}"
+                                           maxlength="150">
+                                    {% if form.first_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.first_name.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
                             </div>
-                            {% endif %}
-                        </div>
 
-                        <!-- Mot de passe -->
-                        <div class="form-group">
-                            <label for="{{ form.password1.id_for_label }}">Mot de passe</label>
-                            {{ form.password1 }}
-                            {% if form.password1.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.password1.errors }}
+                            <!-- Nom -->
+                            <div class="form-row">
+                                <div class="form-label-cell">
+                                    <label for="{{ form.last_name.id_for_label }}"><strong>Nom :</strong></label>
+                                </div>
+                                <div class="form-input-cell">
+                                    <input type="text"
+                                           name="{{ form.last_name.name }}"
+                                           id="{{ form.last_name.id_for_label }}"
+                                           class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                                           value="{{ form.last_name.value|default:'' }}"
+                                           maxlength="150">
+                                    {% if form.last_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.last_name.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
                             </div>
-                            {% endif %}
-                        </div>
 
-                        <!-- Confirmation de mot de passe -->
-                        <div class="form-group">
-                            <label for="{{ form.password2.id_for_label }}">Confirmer le mot de passe</label>
-                            {{ form.password2 }}
-                            {% if form.password2.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.password2.errors }}
+                            <!-- Mot de passe -->
+                            <div class="form-row">
+                                <div class="form-label-cell">
+                                    <label for="{{ form.password1.id_for_label }}"><strong>Mot de passe :</strong></label>
+                                </div>
+                                <div class="form-input-cell">
+                                    <input type="password"
+                                           name="{{ form.password1.name }}"
+                                           id="{{ form.password1.id_for_label }}"
+                                           class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                                           required
+                                           autocomplete="new-password">
+                                    {% if form.password1.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.password1.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Minimum 8 caractères. Ne doit pas être entièrement numérique.
+                                    </small>
+                                </div>
                             </div>
-                            {% endif %}
+
+                            <!-- Confirmation de mot de passe -->
+                            <div class="form-row">
+                                <div class="form-label-cell">
+                                    <label for="{{ form.password2.id_for_label }}"><strong>Confirmer le mot de passe :</strong></label>
+                                </div>
+                                <div class="form-input-cell">
+                                    <input type="password"
+                                           name="{{ form.password2.name }}"
+                                           id="{{ form.password2.id_for_label }}"
+                                           class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                                           required
+                                           autocomplete="new-password">
+                                    {% if form.password2.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.password2.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Saisissez le même mot de passe pour vérification.
+                                    </small>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group mt-4">
-                            <button type="submit" class="btn btn-primary">Demander un compte</button>
-                            <a href="{% url 'login' %}" class="btn btn-secondary ml-2">Déjà inscrit? Se connecter</a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> Demander un compte
+                            </button>
+                            <a href="{% url 'login' %}" class="btn btn-secondary ml-2">
+                                <i class="fas fa-sign-in-alt"></i> Déjà inscrit? Se connecter
+                            </a>
                         </div>
                     </form>
                 </div>

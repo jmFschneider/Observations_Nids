@@ -4,7 +4,6 @@ from .models import Utilisateur
 
 
 class UtilisateurCreationForm(UserCreationForm):
-
     class Meta:
         model = Utilisateur
         fields = ('username', 'email', 'first_name', 'last_name', 'est_valide')
@@ -20,7 +19,6 @@ class UtilisateurCreationForm(UserCreationForm):
 
 
 class UtilisateurChangeForm(UserChangeForm):
-
     class Meta:
         model = Utilisateur
         fields = ('username', 'email', 'first_name', 'last_name', 'role', 'est_valide', 'is_active')

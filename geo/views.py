@@ -65,14 +65,16 @@ def geocoder_commune_manuelle(request):
 
             logger.info(f"Géocodage manuel réussi: {commune} -> {coords['coordonnees_gps']}")
 
-            return JsonResponse({
-                'success': True,
-                'coords': coords,
-                'message': "Commune géocodée avec succès",
-                'adresse': coords.get('adresse_complete', ''),
-                'source': coords.get('source', ''),
-                'precision': coords.get('precision', ''),
-            })
+            return JsonResponse(
+                {
+                    'success': True,
+                    'coords': coords,
+                    'message': "Commune géocodée avec succès",
+                    'adresse': coords.get('adresse_complete', ''),
+                    'source': coords.get('source', ''),
+                    'precision': coords.get('precision', ''),
+                }
+            )
         else:
             return JsonResponse(
                 {'success': False, 'message': f"Impossible de trouver la commune '{commune}'"}
@@ -108,11 +110,15 @@ def rechercher_communes(request):
 
     # Recherche par nom de commune (prioritaire)
     if query and len(query) >= 2:
-        communes = CommuneFrance.objects.filter(
-            nom__icontains=query
-        ).values(
-            'nom', 'departement', 'code_departement', 'code_postal',
-            'code_insee', 'latitude', 'longitude', 'altitude'
+        communes = CommuneFrance.objects.filter(nom__icontains=query).values(
+            'nom',
+            'departement',
+            'code_departement',
+            'code_postal',
+            'code_insee',
+            'latitude',
+            'longitude',
+            'altitude',
         )[:limit]
 
     else:
@@ -139,8 +145,8 @@ def rechercher_communes(request):
                 dlon = lon2_rad - lon_rad
 
                 # Haversine
-                a = sin(dlat/2)**2 + cos(lat_rad) * cos(lat2_rad) * sin(dlon/2)**2
-                c = 2 * atan2(sqrt(a), sqrt(1-a))
+                a = sin(dlat / 2) ** 2 + cos(lat_rad) * cos(lat2_rad) * sin(dlon / 2) ** 2
+                c = 2 * atan2(sqrt(a), sqrt(1 - a))
                 distance_km = 6371 * c  # Rayon de la Terre en km
 
                 if distance_km < 1:
@@ -150,16 +156,18 @@ def rechercher_communes(request):
             except Exception as e:
                 logger.debug(f"Erreur calcul distance: {e}")
 
-        results.append({
-            'nom': commune['nom'],
-            'departement': commune['departement'],
-            'code_departement': commune['code_departement'],
-            'code_postal': commune['code_postal'],
-            'code_insee': commune['code_insee'],
-            'label': f"{commune['nom']} ({commune['code_departement']}) - {commune['departement']}{distance_info}",
-            'latitude': str(commune['latitude']),
-            'longitude': str(commune['longitude']),
-            'altitude': commune['altitude'] if commune.get('altitude') is not None else None,
-        })
+        results.append(
+            {
+                'nom': commune['nom'],
+                'departement': commune['departement'],
+                'code_departement': commune['code_departement'],
+                'code_postal': commune['code_postal'],
+                'code_insee': commune['code_insee'],
+                'label': f"{commune['nom']} ({commune['code_departement']}) - {commune['departement']}{distance_info}",
+                'latitude': str(commune['latitude']),
+                'longitude': str(commune['longitude']),
+                'altitude': commune['altitude'] if commune.get('altitude') is not None else None,
+            }
+        )
 
     return JsonResponse({'communes': results})
