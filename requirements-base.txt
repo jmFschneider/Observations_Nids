@@ -59,10 +59,7 @@ click-repl==0.3.0
     #   -r requirements-base.in
     #   celery
 colorama==0.4.6
-    # via
-    #   -r requirements-base.in
-    #   click
-    #   tqdm
+    # via -r requirements-base.in
 django==5.2.7
     # via
     #   -r requirements-base.in
@@ -136,7 +133,7 @@ humanize==4.12.2
     # via
     #   -r requirements-base.in
     #   flower
-idna==3.10
+idna==3.11
     # via
     #   -r requirements-base.in
     #   requests
@@ -255,7 +252,6 @@ typing-extensions==4.12.2
 tzdata==2025.2
     # via
     #   -r requirements-base.in
-    #   django
     #   kombu
 uritemplate==4.1.1
     # via
