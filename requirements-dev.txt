@@ -224,12 +224,12 @@ pyasn1-modules==0.4.1
     # via
     #   -r requirements-base.in
     #   google-auth
-pydantic==2.10.6
+pydantic==2.12.2
     # via
     #   -r requirements-base.in
     #   google-generativeai
     #   pydantic-settings
-pydantic-core==2.27.2
+pydantic-core==2.41.4
     # via
     #   -r requirements-base.in
     #   pydantic
@@ -306,7 +306,7 @@ types-pyyaml==6.0.12.20241230
     # via
     #   -r requirements-dev.in
     #   django-stubs
-typing-extensions==4.12.2
+typing-extensions==4.15.0
     # via
     #   -r requirements-base.in
     #   beautifulsoup4
@@ -319,7 +319,9 @@ typing-extensions==4.12.2
     #   pydantic-core
     #   typing-inspection
 typing-inspection==0.4.2
-    # via -r requirements-dev.in
+    # via
+    #   -r requirements-dev.in
+    #   pydantic
 tzdata==2025.2
     # via
     #   -r requirements-base.in
