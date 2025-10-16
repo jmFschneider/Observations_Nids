@@ -154,7 +154,7 @@ humanize==4.12.2
     # via
     #   -r requirements-base.in
     #   flower
-idna==3.10
+idna==3.11
     # via
     #   -r requirements-base.in
     #   requests
