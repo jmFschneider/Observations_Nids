@@ -79,7 +79,7 @@ django-celery-results==2.6.0
     # via -r requirements-base.in
 django-debug-toolbar==5.1.0
     # via -r requirements-dev.in
-django-extensions==3.2.3
+django-extensions==4.1
     # via -r requirements-dev.in
 django-stubs==5.2.7
     # via -r requirements-dev.in
