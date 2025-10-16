@@ -149,7 +149,7 @@ markupsafe==3.0.2
     #   jinja2
 mysqlclient==2.2.7
     # via -r requirements-base.in
-packaging==24.2
+packaging==25.0
     # via -r requirements-base.in
 pillow==11.3.0
     # via -r requirements-base.in
