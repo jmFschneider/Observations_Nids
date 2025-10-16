@@ -39,7 +39,7 @@ certifi==2025.10.5
     # via
     #   -r requirements-base.in
     #   requests
-charset-normalizer==3.4.1
+charset-normalizer==3.4.4
     # via
     #   -r requirements-base.in
     #   requests
