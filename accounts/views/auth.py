@@ -1,5 +1,4 @@
 import logging
-from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -8,7 +7,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.generic import ListView
@@ -136,12 +134,14 @@ def desactiver_utilisateur(request, user_id):
         utilisateur = get_object_or_404(Utilisateur, id=user_id)
         utilisateur.is_active = False
         utilisateur.save()
-        logger.info(f"Utilisateur {utilisateur.username} supprimé (soft delete) par {request.user.username}")
+        logger.info(
+            f"Utilisateur {utilisateur.username} supprimé (soft delete) par {request.user.username}"
+        )
         messages.success(
             request,
             f"L'utilisateur {utilisateur.username} a été supprimé. "
             f"Il ne peut plus se connecter mais ses données sont conservées. "
-            f"Vous pouvez le réactiver à tout moment."
+            f"Vous pouvez le réactiver à tout moment.",
         )
 
     return redirect('accounts:liste_utilisateurs')
@@ -159,7 +159,7 @@ def activer_utilisateur(request, user_id):
         messages.success(
             request,
             f"L'utilisateur {utilisateur.username} a été réactivé. "
-            f"Il peut à nouveau se connecter à l'application."
+            f"Il peut à nouveau se connecter à l'application.",
         )
 
     return redirect('accounts:liste_utilisateurs')
@@ -321,7 +321,9 @@ def mot_de_passe_oublie(request):
                     # Envoyer l'email avec le lien de réinitialisation
                     EmailService.envoyer_email_reinitialisation_mdp(utilisateur, uid, token)
 
-                logger.info(f"Email de réinitialisation envoyé à {email} ({utilisateurs.count()} compte(s))")
+                logger.info(
+                    f"Email de réinitialisation envoyé à {email} ({utilisateurs.count()} compte(s))"
+                )
             else:
                 # Ne pas révéler si l'email existe ou non (sécurité)
                 logger.warning(f"Tentative de réinitialisation pour email inexistant : {email}")
@@ -374,7 +376,7 @@ def reinitialiser_mot_de_passe(request, uidb64, token):
             {'form': form, 'validlink': True},
         )
     else:
-        logger.warning(f"Tentative de réinitialisation avec lien invalide ou expiré")
+        logger.warning("Tentative de réinitialisation avec lien invalide ou expiré")
         return render(
             request,
             'accounts/reinitialiser_mot_de_passe.html',

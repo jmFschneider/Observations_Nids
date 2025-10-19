@@ -189,7 +189,9 @@ class EmailService:
             site_url = settings.ALLOWED_HOSTS[0] if settings.ALLOWED_HOSTS else 'localhost'
             # Ajouter http:// ou https:// selon la configuration
             protocole = 'https' if not settings.DEBUG else 'http'
-            reset_url = f"{protocole}://{site_url}/accounts/reinitialiser-mot-de-passe/{uid}/{token}/"
+            reset_url = (
+                f"{protocole}://{site_url}/accounts/reinitialiser-mot-de-passe/{uid}/{token}/"
+            )
 
             # Contexte pour le template
             contexte = {

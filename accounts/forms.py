@@ -32,7 +32,11 @@ class MotDePasseOublieForm(forms.Form):
         label="Adresse email",
         max_length=254,
         widget=forms.EmailInput(
-            attrs={'class': 'form-control', 'placeholder': 'votre.email@exemple.com', 'autofocus': True}
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'votre.email@exemple.com',
+                'autofocus': True,
+            }
         ),
     )
 
