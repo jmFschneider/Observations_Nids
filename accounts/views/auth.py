@@ -289,31 +289,31 @@ def mot_de_passe_oublie(request):
         form = MotDePasseOublieForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            try:
-                utilisateur = Utilisateur.objects.get(email=email, is_active=True)
 
-                # Générer le token et l'UID
-                token = default_token_generator.make_token(utilisateur)
-                uid = urlsafe_base64_encode(force_bytes(utilisateur.pk))
+            # Récupérer tous les utilisateurs actifs avec cet email
+            utilisateurs = Utilisateur.objects.filter(email=email, is_active=True)
 
-                # Envoyer l'email avec le lien de réinitialisation
-                EmailService.envoyer_email_reinitialisation_mdp(utilisateur, uid, token)
+            if utilisateurs.exists():
+                # Envoyer un email à chaque utilisateur trouvé
+                for utilisateur in utilisateurs:
+                    # Générer le token et l'UID
+                    token = default_token_generator.make_token(utilisateur)
+                    uid = urlsafe_base64_encode(force_bytes(utilisateur.pk))
 
-                logger.info(f"Email de réinitialisation envoyé à {email}")
-                messages.success(
-                    request,
-                    "Un email contenant les instructions de réinitialisation a été envoyé à votre adresse.",
-                )
-                return redirect('login')
+                    # Envoyer l'email avec le lien de réinitialisation
+                    EmailService.envoyer_email_reinitialisation_mdp(utilisateur, uid, token)
 
-            except Utilisateur.DoesNotExist:
+                logger.info(f"Email de réinitialisation envoyé à {email} ({utilisateurs.count()} compte(s))")
+            else:
                 # Ne pas révéler si l'email existe ou non (sécurité)
                 logger.warning(f"Tentative de réinitialisation pour email inexistant : {email}")
-                messages.success(
-                    request,
-                    "Un email contenant les instructions de réinitialisation a été envoyé à votre adresse.",
-                )
-                return redirect('login')
+
+            # Message identique que l'email existe ou non (sécurité)
+            messages.success(
+                request,
+                "Un email contenant les instructions de réinitialisation a été envoyé à votre adresse.",
+            )
+            return redirect('login')
     else:
         form = MotDePasseOublieForm()
 
