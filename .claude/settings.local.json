@@ -12,7 +12,9 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(ruff check:*)",
-      "Bash(ruff format:*)"
+      "Bash(ruff format:*)",
+      "Bash(pytest:*)",
+      "Bash(mypy:*)"
     ],
     "deny": [],
     "ask": []
