@@ -50,6 +50,7 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         recherche = self.request.GET.get('recherche', '')
         role = self.request.GET.get('role', 'tous')
         valide = self.request.GET.get('valide', 'tous')
+        actif = self.request.GET.get('actif', 'tous')
 
         if recherche:
             queryset = queryset.filter(
@@ -67,6 +68,11 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         elif valide == 'non':
             queryset = queryset.filter(est_valide=False)
 
+        if actif == 'oui':
+            queryset = queryset.filter(is_active=True)
+        elif actif == 'non':
+            queryset = queryset.filter(is_active=False)
+
         return queryset.order_by('-date_joined')  # Les plus récents en premier
 
     def get_context_data(self, **kwargs):
@@ -74,6 +80,7 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context['recherche'] = self.request.GET.get('recherche', '')
         context['role'] = self.request.GET.get('role', 'tous')
         context['valide'] = self.request.GET.get('valide', 'tous')
+        context['actif'] = self.request.GET.get('actif', 'tous')
         # Ajouter le nombre de demandes en attente
         context['demandes_en_attente'] = Utilisateur.objects.filter(est_valide=False).count()
         return context
@@ -124,12 +131,18 @@ def modifier_utilisateur(request, user_id):
 @login_required
 @user_passes_test(est_admin)
 def desactiver_utilisateur(request, user_id):
-    """Vue pour désactiver un utilisateur"""
+    """Vue pour désactiver un utilisateur (soft delete)"""
     if request.method == 'POST':
         utilisateur = get_object_or_404(Utilisateur, id=user_id)
         utilisateur.is_active = False
         utilisateur.save()
-        messages.success(request, f"L'utilisateur {utilisateur.username} a été désactivé")
+        logger.info(f"Utilisateur {utilisateur.username} supprimé (soft delete) par {request.user.username}")
+        messages.success(
+            request,
+            f"L'utilisateur {utilisateur.username} a été supprimé. "
+            f"Il ne peut plus se connecter mais ses données sont conservées. "
+            f"Vous pouvez le réactiver à tout moment."
+        )
 
     return redirect('accounts:liste_utilisateurs')
 
@@ -137,12 +150,17 @@ def desactiver_utilisateur(request, user_id):
 @login_required
 @user_passes_test(est_admin)
 def activer_utilisateur(request, user_id):
-    """Vue pour activer un utilisateur"""
+    """Vue pour réactiver un utilisateur précédemment désactivé"""
     if request.method == 'POST':
         utilisateur = get_object_or_404(Utilisateur, id=user_id)
         utilisateur.is_active = True
         utilisateur.save()
-        messages.success(request, f"L'utilisateur {utilisateur.username} a été activé")
+        logger.info(f"Utilisateur {utilisateur.username} réactivé par {request.user.username}")
+        messages.success(
+            request,
+            f"L'utilisateur {utilisateur.username} a été réactivé. "
+            f"Il peut à nouveau se connecter à l'application."
+        )
 
     return redirect('accounts:liste_utilisateurs')
 
