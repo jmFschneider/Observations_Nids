@@ -1,13 +1,24 @@
 import logging
+from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.generic import ListView
 
-from accounts.forms import UtilisateurChangeForm, UtilisateurCreationForm
+from accounts.forms import (
+    MotDePasseOublieForm,
+    NouveauMotDePasseForm,
+    UtilisateurChangeForm,
+    UtilisateurCreationForm,
+)
 from accounts.models import Notification, Utilisateur
 from accounts.utils.email_service import EmailService
 from observations.models import FicheObservation
@@ -267,3 +278,87 @@ def valider_utilisateur(request, user_id):
     logger.info(f"Compte validé pour {utilisateur.username} par {request.user.username}")
 
     return redirect('accounts:liste_utilisateurs')
+
+
+def mot_de_passe_oublie(request):
+    """
+    Vue pour demander une réinitialisation de mot de passe.
+    L'utilisateur saisit son email et reçoit un lien de réinitialisation.
+    """
+    if request.method == 'POST':
+        form = MotDePasseOublieForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                utilisateur = Utilisateur.objects.get(email=email, is_active=True)
+
+                # Générer le token et l'UID
+                token = default_token_generator.make_token(utilisateur)
+                uid = urlsafe_base64_encode(force_bytes(utilisateur.pk))
+
+                # Envoyer l'email avec le lien de réinitialisation
+                EmailService.envoyer_email_reinitialisation_mdp(utilisateur, uid, token)
+
+                logger.info(f"Email de réinitialisation envoyé à {email}")
+                messages.success(
+                    request,
+                    "Un email contenant les instructions de réinitialisation a été envoyé à votre adresse.",
+                )
+                return redirect('login')
+
+            except Utilisateur.DoesNotExist:
+                # Ne pas révéler si l'email existe ou non (sécurité)
+                logger.warning(f"Tentative de réinitialisation pour email inexistant : {email}")
+                messages.success(
+                    request,
+                    "Un email contenant les instructions de réinitialisation a été envoyé à votre adresse.",
+                )
+                return redirect('login')
+    else:
+        form = MotDePasseOublieForm()
+
+    return render(request, 'accounts/mot_de_passe_oublie.html', {'form': form})
+
+
+def reinitialiser_mot_de_passe(request, uidb64, token):
+    """
+    Vue pour réinitialiser le mot de passe avec un token valide.
+    L'utilisateur saisit son nouveau mot de passe.
+    """
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        utilisateur = Utilisateur.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, Utilisateur.DoesNotExist):
+        utilisateur = None
+
+    # Vérifier que l'utilisateur et le token sont valides
+    if utilisateur is not None and default_token_generator.check_token(utilisateur, token):
+        if request.method == 'POST':
+            form = NouveauMotDePasseForm(request.POST)
+            if form.is_valid():
+                # Enregistrer le nouveau mot de passe
+                nouveau_mdp = form.cleaned_data['password1']
+                utilisateur.password = make_password(nouveau_mdp)
+                utilisateur.save()
+
+                logger.info(f"Mot de passe réinitialisé pour {utilisateur.username}")
+                messages.success(
+                    request,
+                    "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
+                )
+                return redirect('login')
+        else:
+            form = NouveauMotDePasseForm()
+
+        return render(
+            request,
+            'accounts/reinitialiser_mot_de_passe.html',
+            {'form': form, 'validlink': True},
+        )
+    else:
+        logger.warning(f"Tentative de réinitialisation avec lien invalide ou expiré")
+        return render(
+            request,
+            'accounts/reinitialiser_mot_de_passe.html',
+            {'validlink': False},
+        )

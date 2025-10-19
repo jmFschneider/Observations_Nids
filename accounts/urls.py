@@ -35,4 +35,11 @@ urlpatterns = [
         auth.promouvoir_administrateur,
         name='promouvoir_administrateur',
     ),
+    # Réinitialisation de mot de passe
+    path('mot-de-passe-oublie/', auth.mot_de_passe_oublie, name='mot_de_passe_oublie'),
+    path(
+        'reinitialiser-mot-de-passe/<uidb64>/<token>/',
+        auth.reinitialiser_mot_de_passe,
+        name='reinitialiser_mot_de_passe',
+    ),
 ]
