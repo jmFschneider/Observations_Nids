@@ -51,3 +51,6 @@ htmlcov/
 # OS
 Thumbs.db
 .DS_Storetmp/
+
+# MkDocs
+site/
