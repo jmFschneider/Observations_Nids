@@ -129,7 +129,7 @@ httplib2==0.22.0
     #   -r requirements-base.in
     #   google-api-python-client
     #   google-auth-httplib2
-humanize==4.12.2
+humanize==4.14.0
     # via
     #   -r requirements-base.in
     #   flower
