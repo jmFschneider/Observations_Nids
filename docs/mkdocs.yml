@@ -15,8 +15,22 @@ nav:
       - 'Git Workflow': 'learning/git/README.md'
       - 'CI-CD': 'learning/ci-cd/README.md'
   - 'Documentation':
-    - 'Architecture Projet': 'project/architecture.md'
-    - 'Gestion Utilisateurs': 'account/GESTION_UTILISATEURS.md'
+    - 'Architecture':
+      - 'Vue d''ensemble': 'architecture/index.md'
+      - 'Domaines':
+        - 'Fiches d''observation': 'architecture/domaines/observations.md'
+        - 'Gestion utilisateurs': 'architecture/domaines/utilisateurs.md'
+        - 'Données de nidification': 'architecture/domaines/nidification.md'
+        - 'Localisation': 'architecture/domaines/localisation.md'
+        - 'Taxonomie': 'architecture/domaines/taxonomie.md'
+        - 'Workflow de correction': 'architecture/domaines/workflow-correction.md'
+        - 'Validation': 'architecture/domaines/validation.md'
+        - 'Audit & Traçabilité': 'architecture/domaines/audit.md'
+        - 'Import & Transcription': 'architecture/domaines/import-transcription.md'
+      - 'Diagrammes':
+        - 'ERD (Entité-Relation)': 'architecture/diagrammes/erd.md'
+    - 'Ancienne Architecture': 'project/architecture.md'
+    - 'Gestion Utilisateurs (Legacy)': 'account/GESTION_UTILISATEURS.md'
     - 'Stratégie de Tests': 'testing/STRATEGIE_TESTS.md'
     - 'API': 'api/API_DOCUMENTATION.md'
     - 'Configuration': 'configuration/configuration.md'

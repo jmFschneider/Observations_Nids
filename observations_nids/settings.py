@@ -115,6 +115,7 @@ INTERNAL_IPS = [
 # Configuration optionnelle
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda request: True,  # Affiche toujours la toolbar en développement
+    'RENDER_PANELS': True,  # Force le rendu synchrone des panneaux (fix pour v6.0.0)
 }
 
 TEMPLATES = [
