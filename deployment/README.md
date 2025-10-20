@@ -16,7 +16,7 @@ Ce dossier contient les fichiers nécessaires pour déployer les services Celery
 
 ### Documentation
 
-- **CELERY_DEPLOYMENT.md** : Guide complet de déploiement avec toutes les explications
+- **[CELERY_DEPLOYMENT.md](../docs/deployment/CELERY_DEPLOYMENT.md)** : Guide complet de déploiement avec toutes les explications
 
 ## Déploiement rapide
 
@@ -60,7 +60,7 @@ sudo systemctl status celery-worker celery-beat
 
 ## Documentation
 
-Consultez [CELERY_DEPLOYMENT.md](./CELERY_DEPLOYMENT.md) pour :
+Consultez [CELERY_DEPLOYMENT.md](../docs/deployment/CELERY_DEPLOYMENT.md) pour :
 - Explication détaillée des problèmes corrigés
 - Guide complet de déploiement
 - Commandes de gestion et debugging

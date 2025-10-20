@@ -1,0 +1,27 @@
+site_name: Observations Nids
+dev_addr: '127.0.0.1:8001'
+nav:
+  - 'Accueil': 'index.md'
+  - 'Changelog': 'CHANGELOG.md'
+  - 'Guides':
+    - 'Guides Utilisateur':
+      - 'Navigation Générale': 'aide_utilisateurs/01_navigation_generale.md'
+      - 'Saisie Observation': 'aide_utilisateurs/02_saisie_nouvelle_observation.md'
+      - 'Correction Transcription': 'aide_utilisateurs/03_correction_transcription.md'
+    - 'Guides Techniques':
+      - 'Installation (Développement)': 'installation/development.md'
+      - 'Installation (Production)': 'installation/production.md'
+      - 'Déploiement PI': 'deployment/DEPLOIEMENT_PI.md'
+      - 'Git Workflow': 'learning/git/README.md'
+      - 'CI-CD': 'learning/ci-cd/README.md'
+  - 'Documentation':
+    - 'Architecture Projet': 'project/architecture.md'
+    - 'Gestion Utilisateurs': 'account/GESTION_UTILISATEURS.md'
+    - 'Stratégie de Tests': 'testing/STRATEGIE_TESTS.md'
+    - 'API': 'api/API_DOCUMENTATION.md'
+    - 'Configuration': 'configuration/configuration.md'
+    - 'Base de données': 'database/reset_database.md'
+    - 'Suivi de projet':
+      - 'Améliorations': 'Possibilite_amelioration_documentation.md'
+      - 'Optimisations Futures': 'Todo/OPTIMISATIONS_FUTURES.md'
+      - 'Nettoyage': 'Todo/TODO_NETTOYAGE.md'

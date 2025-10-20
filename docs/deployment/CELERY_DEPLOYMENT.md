@@ -233,7 +233,7 @@ sudo systemctl enable redis-server
 - `deployment/celery-worker.service` : Service systemd pour le worker Celery
 - `deployment/celery-beat.service` : Service systemd pour le scheduler Celery
 - `deployment/setup_celery_permissions.sh` : Script de configuration des permissions
-- `deployment/CELERY_DEPLOYMENT.md` : Ce guide
+- `docs/deployment/CELERY_DEPLOYMENT.md` : Ce guide
 
 ## Support
 

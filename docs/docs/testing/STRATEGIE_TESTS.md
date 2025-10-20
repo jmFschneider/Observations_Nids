@@ -4,52 +4,44 @@
 
 ---
 
-## 1. État Actuel des Tests
+## 1. État Actuel des Tests (Mis à jour le 19/10/2025)
 
 ### 1.1 Vue d'Ensemble
 
 **Statistiques globales :**
-- **25 tests** actuellement dans le projet, tous passant ✅
-- **Couverture globale : 40%** (1059 lignes couvertes sur 2644)
-- **3 modules testés** : `geo`, `observations`, `accounts`
+- **66 tests** actuellement dans le projet, tous passant ✅
+- **Couverture globale : 41%**
+- **5 modules testés** : `geo`, `observations`, `accounts`, `core`, `audit`
 
 **Répartition des tests :**
 ```
-├── accounts/tests.py ..................... 20 tests
-│   ├── TestNotificationModel ............ 4 tests
-│   ├── TestEmailService ................. 4 tests
-│   ├── TestInscriptionPubliqueView ...... 4 tests
-│   ├── TestValiderUtilisateurView ....... 2 tests
-│   ├── TestHomePageNotifications ........ 4 tests
-│   └── TestListeUtilisateursView ........ 2 tests
-│
-├── observations/tests/test_models.py ..... 9 tests
-│   ├── TestFicheObservation ............. 3 tests
-│   ├── TestObservation .................. 2 tests
-│   ├── TestResumeObservation ............ 2 tests
-│   └── TestLocalisation ................. 2 tests
-│
-├── geo/tests/test_api_communes.py ........ 13 tests
-│   ├── TestRechercherCommunes ........... 7 tests
-│   ├── TestAutoRemplissageGeo ........... 2 tests
-│   ├── TestGeocodageManuel .............. 3 tests
-│   └── TestRegressionAutocompletion ..... 1 test
-│
-└── Tests racine .......................... 3 tests
-    ├── test_geocoding.py
-    ├── test_remarques_popup.py
-    └── test_database_fallback.py
+Total : 66 tests (100% passants)
+
+accounts/
+├── test_models.py ...................... 20 tests ✅
+└── test_password_reset.py .............. 21 tests ✅ (nouveau)
+
+observations/
+└── test_models.py ...................... 9 tests ✅
+
+geo/
+└── test_api_communes.py ................ 13 tests ✅
+
+Racine/
+├── test_geocoding.py ................... 1 test ✅
+├── test_remarques_popup.py ............. 1 test ✅
+└── test_database_fallback.py ........... 1 test ✅
 ```
 
 ### 1.2 Couverture par Module
 
-| Module | Couverture | Lignes couvertes / Total | État |
-|--------|-----------|--------------------------|------|
-| **geo** | **99%** | 169/171 | ✅ Excellent |
-| **accounts** | **9%** | 147/1580 | ⚠️ Critique |
-| **observations** | **28%** | 743/2644 | ⚠️ Insuffisant |
-| **audit** | **89%** | 16/18 | ✅ Bon |
-| **core** | **86%** | 18/21 | ✅ Bon |
+| Module | Couverture | État |
+|--------|-----------|------|
+| **geo** | **99%** | ✅ Excellent |
+| **accounts** | **~50%** | ⚠️ Insuffisant |
+| **observations** | **28%** | ⚠️ Insuffisant |
+| **audit** | **89%** | ✅ Bon |
+| **core** | **86%** | ✅ Bon |
 
 ---
 
@@ -358,47 +350,12 @@
 
 **Objectif : Couvrir 100% des fonctionnalités de sécurité**
 
-#### 4.1 Tests de Réinitialisation de Mot de Passe
+#### 4.1 Tests de Réinitialisation de Mot de Passe - ✅ TERMINÉ
 
-**Fichier : `accounts/tests/test_password_reset.py`** (nouveau)
+**Fichier : `accounts/tests/test_password_reset.py`**
+**Statut :** Implémenté (21 tests)
 
-```python
-class TestMotDePasseOublie:
-    """Tests pour la demande de réinitialisation"""
-
-    def test_email_existant_envoie_email()
-    def test_email_inexistant_message_generique()  # Sécurité : pas de révélation
-    def test_utilisateur_inactif_pas_email()
-    def test_utilisateurs_multiples_meme_email_tous_recevant()
-    def test_formulaire_email_invalide()
-    def test_redirection_apres_soumission()
-
-class TestReinitialiserMotDePasse:
-    """Tests pour la réinitialisation avec token"""
-
-    def test_token_valide_affiche_formulaire()
-    def test_token_invalide_affiche_erreur()
-    def test_token_expire_affiche_erreur()  # Simuler > 24h
-    def test_uid_invalide_affiche_erreur()
-    def test_utilisateur_inexistant_affiche_erreur()
-    def test_mot_de_passe_court_rejete()  # < 8 caractères
-    def test_mots_de_passe_differents_rejete()
-    def test_reset_reussi_sauvegarde_hash()
-    def test_reset_reussi_redirige_login()
-    def test_reset_reussi_logue_action()
-    def test_url_reset_protocole_correct()  # HTTP dev, HTTPS prod
-
-class TestEmailReinitialisation:
-    """Tests pour l'envoi d'email de reset"""
-
-    def test_email_contient_lien_correct()
-    def test_email_contient_uid_et_token()
-    def test_email_html_et_texte_brut()
-    def test_email_pas_envoye_si_utilisateur_sans_email()
-    def test_email_logue_envoi()
-```
-
-**Estimation : 17 tests, 4-6 heures**
+*Cette section a été entièrement testée dans le cadre de la feature `reinitialisation_mdp`.*
 
 #### 4.2 Tests de Soft Delete
 
