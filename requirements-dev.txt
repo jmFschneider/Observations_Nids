@@ -193,7 +193,7 @@ platformdirs==4.5.0
     # via -r requirements-dev.in
 pluggy==1.6.0
     # via pytest
-prometheus-client==0.21.1
+prometheus-client==0.23.1
     # via
     #   -r requirements-base.in
     #   flower
