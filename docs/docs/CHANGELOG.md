@@ -1,3 +1,76 @@
+# 20 Octobre 2025 - Restructuration de la Documentation
+
+## Documentation
+- **Intégration de MkDocs** : Mise en place de MkDocs pour générer une documentation professionnelle
+  - Configuration complète avec thème Material
+  - Structure hiérarchique de la documentation (architecture, fonctionnalités, installation, etc.)
+  - Nettoyage des doublons de documentation
+- **Restructuration architecture** : Réorganisation de la documentation avec structure par domaines
+  - Documentation utilisateur complète
+  - Documentation technique détaillée
+  - Guides d'installation développement et production
+
+## Maintenance des Dépendances
+- **Mise à jour automatique** : Merge de 10 pull requests Dependabot
+  - `django-debug-toolbar` : 5.1.0 → 6.0.0
+  - `humanize` : 4.12.2 → 4.14.0
+  - `rsa` : 4.9 → 4.9.1
+  - `redis` : 5.2.1 → 6.4.0
+  - `click-plugins` : 1.1.1 → 1.1.1.2
+  - `prometheus-client` : 0.21.1 → 0.23.1
+  - `google-api-python-client` et autres dépendances Google
+  - `asgiref` : 3.8.1 → 3.10.0
+  - Groupe `development-dependencies` avec 10 packages mis à jour
+
+---
+
+# 19 Octobre 2025 - Gestion des Utilisateurs et Réinitialisation de Mot de Passe
+
+## Fonctionnalités
+- **Réinitialisation de mot de passe** : Système complet de récupération de mot de passe
+  - Gestion des emails en double avec message d'erreur approprié
+  - Contrainte d'unicité sur le champ email dans la base de données
+  - 21 tests critiques pour valider le processus complet
+- **Amélioration de la suppression d'utilisateurs** : Interface améliorée avec soft delete
+  - Suppression logique (désactivation) plutôt que suppression physique
+  - Conservation de l'historique et des données d'audit
+
+## Documentation
+- **Documentation utilisateur complète** : Guide détaillé de la gestion des utilisateurs
+- **INDEX.md récapitulatif** : Document central récapitulant l'ensemble du projet et des tests
+
+## Qualité
+- **Tests** : 21 nouveaux tests pour la réinitialisation de mot de passe
+- **Linting** : Application des corrections Ruff (formatage + linting)
+
+---
+
+# 16-17 Octobre 2025 - Documentation et Configuration Déploiement
+
+## Documentation
+- **Documentation utilisateur** : Guide complet pour les utilisateurs finaux
+  - Guide de saisie des observations
+  - Gestion du compte utilisateur
+  - Utilisation des fonctionnalités avancées
+- **Configuration déploiement** : Documentation complète du déploiement
+  - Configuration Apache pour WSGI
+  - Scripts de maintenance (activation/désactivation)
+  - Guide de mise en production
+
+## Maintenance des Dépendances
+- **Mise à jour automatique** : Merge de plusieurs pull requests Dependabot
+  - `django-extensions` : 3.2.3 → 4.1
+  - `charset-normalizer` : 3.4.1 → 3.4.4
+  - `pydantic` : 2.10.6 → 2.12.2
+  - `packaging` : 24.2 → 25.0
+  - `idna` : 3.10 → 3.11
+  - `tornado` : 6.5 → 6.5.2
+  - `wcwidth` : 0.2.13 → 0.2.14
+  - `pyasn1-modules` : 0.4.1 → 0.4.2
+  - `types-pyyaml` mis à jour
+
+---
+
 # 14 Octobre 2025 - Amélioration de l'Interface Utilisateur et Notifications
 
 ## Interface Utilisateur
