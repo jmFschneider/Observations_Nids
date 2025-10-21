@@ -1,57 +1,71 @@
 # Contexte de Session - Projet Observations Nids
 
 ## Date de dernière mise à jour
-2025-10-20
+2025-10-21
 
 ## État actuel du projet
 
 ### Branche active
-- **Branche locale**: `feature/reinitialisation_mdp`
-- **Branche main**: Nécessite mise à jour
+- **Branche locale**: `main`
+- **Branche GitHub**: À jour avec `origin/main`
 
 ### Situation actuelle
-Des modifications urgentes ont été faites directement sur le serveur de production (Raspberry Pi) et doivent être intégrées avant de mettre à jour la branche main.
+Le projet est maintenant à jour avec la documentation complète. Les tâches de restructuration de la documentation avec MkDocs et la mise en place du README principal ont été complétées.
 
 ### Fichiers modifiés localement (non committés)
-- `.claude/settings.local.json` (modifié)
-- `deployment/CELERY_DEPLOYMENT.md` (supprimé)
-- `deployment/README.md` (modifié)
-- Documentation dans `docs/` (restructurée vers `docs/docs/` et `docs/deployment/`)
-- `local_changes_backup.patch` (contient les modifications du serveur prod)
+- `.claude/settings.local.json` (modifié - configuration locale Claude Code)
+- `.gitignore` (modifié - règles d'exclusion locales)
 
-### Fichiers non trackés
-- `check_duplicate_emails.py`
-- `coverage.xml`
-- `docs/deployment/` (nouvelle structure)
-- `docs/docs/` (nouvelle structure)
-- `docs/mkdocs.yml`
+### Fichiers récemment ajoutés et committés
+- `README.md` - README principal pour la page GitHub (76 lignes)
+- `docs/docs/CHANGELOG.md` - Mis à jour avec les modifications du 14-20 octobre
+- `maintenance.html` - Page de maintenance
+- `scripts/maintenance_on.sh` - Script d'activation du mode maintenance
+- `scripts/maintenance_off.sh` - Script de désactivation du mode maintenance
 
 ## Commits récents
-1. `f8e9311` - docs: Ajouter INDEX.md récapitulatif complet du projet et des tests
-2. `19073c3` - test: Ajouter 21 tests critiques pour la réinitialisation de mot de passe
-3. `b5c6cd8` - style: Appliquer les corrections Ruff (linting + formatage)
-4. `a55ef5f` - feat: Améliorer l'interface de suppression d'utilisateurs (soft delete)
+1. `5321a63` - feat: Ajouter scripts et page de maintenance
+2. `ae12401` - docs: Ajouter README.md principal et mettre à jour CHANGELOG.md
+3. `03b196c` - docs: Restructurer documentation architecture avec structure hiérarchique
+4. `c556568` - chore: Intégrer MkDocs dans le projet et nettoyer les doublons
+5. `2c0c946` - chore(deps-dev): bump django-debug-toolbar from 5.1.0 to 6.0.0
 
-## Actions en cours
+## Travaux récemment complétés
 
-### Étape 1: Récupération des modifications du serveur prod
-Les modifications du Raspberry Pi doivent être:
-1. Sauvegardées dans une nouvelle branche sur le serveur
-2. Poussées vers GitHub
-3. Récupérées et intégrées dans la branche feature locale
+### Documentation (14-21 octobre 2025)
+1. ✅ Intégration de MkDocs avec thème Material
+2. ✅ Restructuration complète de la documentation (architecture hiérarchique)
+3. ✅ Création du README.md principal pour GitHub
+4. ✅ Mise à jour du CHANGELOG.md avec les modifications récentes
+5. ✅ Ajout des scripts de maintenance
 
-### Prochaines étapes
-1. ✅ Créer document de contexte
-2. ⏳ Préparer les commandes pour le Raspberry Pi
-3. ⏳ Créer branche `prod/raspberry-pi-changes-YYYYMMDD` sur le serveur
-4. ⏳ Pousser vers GitHub
-5. ⏳ Récupérer et merger dans `feature/reinitialisation_mdp`
-6. ⏳ Mettre à jour la branche main
+### Fonctionnalités récentes (octobre 2025)
+1. ✅ Système de réinitialisation de mot de passe (21 tests)
+2. ✅ Amélioration de la gestion des utilisateurs (soft delete)
+3. ✅ Système de notifications pour demandes de compte
+4. ✅ Amélioration de l'interface utilisateur (alignement formulaires)
+
+### Maintenance des dépendances
+- ✅ 10+ packages mis à jour via Dependabot
+- ✅ Correction de vulnérabilités de sécurité
+- ✅ Migration vers versions récentes (Django 5.1+, Redis 6.4, etc.)
+
+## Prochaines étapes suggérées
+
+### Nettoyage de la documentation
+- ⏳ Nettoyer les multiples fichiers README dispersés dans le projet
+- ⏳ Consolider la documentation vers la structure MkDocs
+
+### Développement
+- ⏳ Continuer les tests et amélioration de la couverture
+- ⏳ Optimisations de performance si nécessaire
+- ⏳ Nouvelles fonctionnalités selon les besoins utilisateurs
 
 ## Notes importantes
-- Le serveur prod (Raspberry Pi) n'est pas accessible directement via Claude Code
-- Toutes les commandes pour le serveur doivent être fournies à l'utilisateur
-- Le fichier `local_changes_backup.patch` contient une modification mineure dans `observations_nids/config.py` (suppression d'un newline en fin de fichier)
+- Le projet utilise maintenant MkDocs pour la documentation (thème Material)
+- La documentation est structurée de manière hiérarchique dans `docs/docs/`
+- Les scripts de maintenance sont disponibles dans `scripts/`
+- Les fichiers de configuration locale Claude Code ne sont pas versionnés
 
 ## Commandes utiles pour reprise
 
