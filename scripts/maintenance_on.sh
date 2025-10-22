@@ -5,7 +5,7 @@
 set -e  # Arrêt en cas d'erreur
 
 # Configuration
-PROJECT_DIR="/var/www/observations_nids"
+PROJECT_DIR="/var/www/html/Observations_Nids"
 MAINTENANCE_FILE="$PROJECT_DIR/.maintenance"
 
 echo "================================================"
