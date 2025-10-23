@@ -125,7 +125,7 @@ Ce projet est un projet personnel à but non lucratif destiné à la gestion d'o
 
 ## Auteur
 
-Jean-Marc Schneider - [jmFschneider](https://github.com/jmFschneider)
+Jean-Marie Schneider - [jmFschneider](https://github.com/jmFschneider)
 
 ## Remerciements
 
