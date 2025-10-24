@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Script pour vérifier les emails en double dans la base de données"""
+
 import os  # noqa: I001
 import django  # noqa: I001
 
@@ -10,11 +11,7 @@ from django.db.models import Count  # noqa: E402, I001
 from accounts.models import Utilisateur  # noqa: E402, I001
 
 # Trouver les emails en double
-duplicates = (
-    Utilisateur.objects.values('email')
-    .annotate(count=Count('email'))
-    .filter(count__gt=1)
-)
+duplicates = Utilisateur.objects.values('email').annotate(count=Count('email')).filter(count__gt=1)
 
 if duplicates:
     print("ERREUR: Emails en double detectes:\n")
