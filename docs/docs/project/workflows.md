@@ -1,5 +1,14 @@
 # Workflows de l'Application
 
+> **Documentation détaillée des processus métier**
+> Ce document décrit les 5 workflows majeurs de l'application : transcription OCR, correction, validation, audit et consultation.
+
+**Navigation :**
+- **[← Retour à la page projet](./README.md)** : Vue d'ensemble du projet
+- **[Liste des fonctionnalités →](./FEATURES.md)** : Inventaire complet des fonctionnalités par module
+
+---
+
 ## Vue d'ensemble
 
 Le projet **Observations Nids** organise la numérisation et la validation des données ornithologiques selon un processus structuré en 5 étapes principales. Ce workflow garantit la qualité des données tout en optimisant l'efficacité du traitement.

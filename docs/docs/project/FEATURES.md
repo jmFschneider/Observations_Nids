@@ -1,11 +1,24 @@
 # Liste des Fonctionnalités - Observations Nids
 
-Ce document liste les fonctionnalités implémentées dans l'application, leur état et leurs dépendances.
+> **Inventaire complet des fonctionnalités**
+> Ce document liste les fonctionnalités implémentées dans l'application par module, leur état de développement et leurs dépendances.
 
-**Légende :**
-- ✅ **Stable :** Fonctionne correctement, testé.
-- 🚧 **En développement :** Fonctionnel mais peut évoluer.
-- ⚠️ **Attention :** Problèmes connus ou limitations.
+**Navigation :**
+- **[← Retour à la page projet](./README.md)** : Vue d'ensemble du projet
+- **[Workflows détaillés →](./workflows.md)** : Processus métier et utilisation des fonctionnalités
+
+---
+
+## Légende des statuts
+
+- ✅ **Stable :** Fonctionne correctement, testé et utilisé en production.
+- 🚧 **En développement :** Fonctionnel mais peut évoluer, non finalisé.
+- ⚠️ **Attention :** Problèmes connus ou limitations importantes.
+
+**Résumé global :**
+- ✅ Stable : **28 fonctionnalités**
+- 🚧 En développement : **2 fonctionnalités**
+- ⚠️ Attention : **0 fonctionnalité**
 
 ---
 
