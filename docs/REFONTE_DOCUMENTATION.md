@@ -534,26 +534,33 @@ docs/
 
 ---
 
-### Jour 2 - ___/___/2025
-**Temps passé** : ___ heures
-**Avancement** : ____%
+### Jour 2 - 24/10/2025 (en cours)
+**Temps passé** : 2 heures
+**Avancement** : 25%
+**Statut** : 🟡 EN COURS (Tâche 2.1/4 terminée)
 
 **Réalisé** :
--
--
--
+- ✅ Tâche 2.1 : Consolidation complète de la section Installation
+  - Fusion de 3 fichiers (`development.md` + `README.md` + `manual_steps.md`)
+  - Guide enrichi : 470 lignes (vs ~180 avant)
+  - Ajout sections : installation Redis, commandes utiles, dépannage exhaustif
+  - Table des matières détaillée, procédure de vérification
+- 📖 Lecture et préparation Tâche 2.2 (production.md + redis-celery-production.md)
 
 **Difficultés rencontrées** :
--
--
+- Fichiers volumineux à fusionner (nécessite bonne structuration)
+- Gestion de la limite de tokens (103K/200K utilisés)
 
 **Décisions prises** :
--
--
+- Structure consolidée avec 7 sections principales
+- Conservation des 3 fichiers sources (marqués obsolètes, suppression à venir)
+- Ajout d'une section "Prochaines étapes" avec liens vers autres docs
 
-**À faire demain** :
--
--
+**À faire lors de la prochaine session (Jour 2 suite)** :
+- Terminer Tâche 2.2 : Consolider production.md + redis-celery-production.md
+- Tâche 2.3 : Consolider taxonomie (4 fichiers → 1)
+- Tâche 2.4 : Consolider géolocalisation (3 fichiers → 1)
+- Créer dossier _archive_old/ et y déplacer fichiers obsolètes
 
 ---
 
