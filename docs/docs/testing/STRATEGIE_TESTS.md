@@ -4,9 +4,154 @@
 
 ---
 
-## 1. État Actuel des Tests (Mis à jour le 19/10/2025)
+## 📋 Table des matières
 
-### 1.1 Vue d'Ensemble
+1. [Guide de démarrage](#1-guide-de-démarrage)
+2. [État actuel des tests](#2-état-actuel-des-tests)
+3. [Analyse détaillée par module](#3-analyse-détaillée-par-module)
+4. [Zones critiques sans tests](#4-zones-critiques-sans-tests)
+5. [Plan de tests prioritaires](#5-plan-de-tests-prioritaires)
+6. [Résumé du plan](#6-résumé-du-plan)
+7. [Recommandations d'implémentation](#7-recommandations-dimplémentation)
+8. [Tests prioritaires pour feature actuelle](#8-tests-prioritaires-pour-feature-actuelle)
+9. [Outils et bonnes pratiques](#9-outils-et-bonnes-pratiques)
+10. [Métriques de suivi](#10-métriques-de-suivi)
+11. [Risques et mitigation](#11-risques-et-mitigation)
+12. [Conclusion et recommandations](#12-conclusion-et-recommandations)
+13. [Annexes](#13-annexes)
+
+---
+
+## 1. Guide de démarrage
+
+### 1.1 Vue d'ensemble
+
+Le projet utilise **Pytest** avec **pytest-django** comme framework de test. Cette combinaison permet d'écrire des tests clairs, concis et puissants.
+
+- **Qualité du code :** Les tests sont exécutés automatiquement par notre intégration continue (CI) à chaque modification du code
+- **Couverture de code :** La couverture des tests est mesurée avec **pytest-cov** pour identifier les parties du code qui ne sont pas testées
+
+### 1.2 Configuration
+
+La configuration principale de `pytest` se trouve dans le fichier `pytest.ini` à la racine du projet.
+
+**Points importants de `pytest.ini` :**
+- `DJANGO_SETTINGS_MODULE` est défini pour que `pytest` puisse charger l'environnement Django
+- La section `addopts` configure des options par défaut. Notamment, elle active automatiquement la **mesure de la couverture de code** (`--cov`) à chaque fois que vous lancez `pytest`
+
+`pytest` est configuré pour découvrir automatiquement tous les fichiers `test_*.py` ou `*_test.py` dans le projet, il n'est donc pas nécessaire de lister manuellement les répertoires de test.
+
+### 1.3 Lancer les Tests
+
+Assurez-vous d'avoir installé les dépendances de développement :
+```bash
+pip install -r requirements-dev.txt
+```
+
+#### Lancer tous les tests
+
+La commande est simple. À la racine du projet, lancez :
+```bash
+pytest
+```
+Cette commande va découvrir et lancer tous les tests, et affichera un résumé de la couverture de code directement dans le terminal.
+
+#### Lancer des tests spécifiques
+
+Vous pouvez cibler une application, un répertoire, un fichier ou même un test spécifique.
+
+```bash
+# Lancer tous les tests de l'application 'geo'
+pytest geo/
+
+# Lancer uniquement les tests d'un fichier spécifique
+pytest geo/tests/test_api_communes.py
+
+# Lancer un test spécifique par son nom
+pytest -k "test_regression_selection_commune"
+```
+
+#### Utiliser les Marqueurs
+
+Des marqueurs (`markers`) sont définis dans `pytest.ini` pour catégoriser les tests.
+
+```bash
+# Lancer uniquement les tests unitaires
+pytest -m unit
+
+# Lancer tous les tests sauf ceux marqués comme lents
+pytest -m "not slow"
+```
+
+### 1.4 Consulter le Rapport de Couverture
+
+Après avoir lancé les tests, vous pouvez générer un rapport HTML détaillé pour explorer visuellement les lignes de code qui sont couvertes par les tests.
+
+1. **Générez le rapport :**
+   ```bash
+   pytest --cov-report=html
+   ```
+
+2. **Ouvrez le rapport :**
+   Un répertoire `htmlcov/` a été créé. Ouvrez le fichier `index.html` dans votre navigateur.
+
+### 1.5 Écrire des Tests
+
+#### Structure des Fichiers
+
+Les tests pour une application doivent être placés dans le répertoire de cette application. Deux structures sont possibles :
+
+1. **Un seul fichier :** Pour un petit nombre de tests, vous pouvez les placer dans `VOTRE_APP/tests.py`
+2. **Un répertoire dédié (recommandé) :** Pour une meilleure organisation, créez un répertoire `VOTRE_APP/tests/` et placez-y vos fichiers de test, en les nommant `test_*.py` (ex: `test_models.py`, `test_views.py`)
+
+#### Utiliser les Fixtures
+
+Les fixtures sont des fonctions qui fournissent des données ou des objets de test réutilisables. Elles sont définies dans les fichiers `conftest.py`.
+
+**Fixtures principales disponibles :**
+
+- `user` : Un objet `Utilisateur` simple
+- `admin_user` : Un utilisateur avec les droits administrateur (`is_staff=True`)
+- `client` : Un client de test Django de base
+- `authenticated_client` : Un client de test déjà authentifié avec l'utilisateur `user`
+
+**Exemple d'utilisation d'une fixture dans un test :**
+
+```python
+# Dans un fichier de test, par exemple geo/tests/test_views.py
+
+import pytest
+from django.urls import reverse
+
+@pytest.mark.django_db
+def test_page_geocoder_requires_login(client):
+    """Vérifie que la page de géocodage redirige si l'utilisateur n'est pas connecté."""
+    url = reverse('geo:geocoder_commune')
+    response = client.post(url)
+    # On s'attend à une redirection vers la page de login
+    assert response.status_code == 302
+    assert '/auth/login/' in response.url
+
+@pytest.mark.django_db
+def test_page_geocoder_works_for_logged_in_user(authenticated_client):
+    """Vérifie que la page est accessible pour un utilisateur connecté."""
+    url = reverse('geo:geocoder_commune')
+    # On fait un POST avec des données invalides, mais on s'attend à un code 200 ou 400, pas 302
+    response = authenticated_client.post(url)
+    assert response.status_code != 302
+```
+
+N'oubliez pas d'ajouter le marqueur `@pytest.mark.django_db` à tous les tests qui interagissent avec la base de données.
+
+### 1.6 Exemple Complet
+
+Pour un exemple complet d'implémentation de tests, consultez **[Tests de Réinitialisation de Mot de Passe](TESTS_REINITIALISATION_MDP.md)** qui documente 21 tests couvrant la fonctionnalité de password reset avec tous les cas de sécurité.
+
+---
+
+## 2. État Actuel des Tests
+
+### 2.1 Vue d'Ensemble
 
 **Statistiques globales :**
 - **66 tests** actuellement dans le projet, tous passant ✅
@@ -33,7 +178,7 @@ Racine/
 └── test_database_fallback.py ........... 1 test ✅
 ```
 
-### 1.2 Couverture par Module
+### 2.2 Couverture par Module
 
 | Module | Couverture | État |
 |--------|-----------|------|
@@ -45,67 +190,52 @@ Racine/
 
 ---
 
-## 2. Analyse Détaillée par Module
+## 3. Analyse Détaillée par Module
 
-### 2.1 Module `accounts` - PRIORITÉ CRITIQUE ⚠️
+### 3.1 Module `accounts` - PRIORITÉ CRITIQUE ⚠️
 
-**Couverture actuelle : 9%**
+**Couverture actuelle : ~50%** (amélioré grâce aux tests password_reset)
+
+#### Zones TESTÉES :
+
+✅ **Tests existants (41 tests) couvrent :**
+- Modèle Notification (création, lecture, tri)
+- Service email de base (nouvelle demande, validation, refus)
+- Inscription publique (workflow complet)
+- Validation utilisateur par admin
+- **Réinitialisation de mot de passe** (21 tests) ✅ NOUVEAU
+  - Voir détails dans [TESTS_REINITIALISATION_MDP.md](TESTS_REINITIALISATION_MDP.md)
+
+**Couverture après tests password_reset :**
+- `accounts/forms.py` : 97% (était 0%)
+- `accounts/views/auth.py` : 70% (était 26%) - **+44%**
+- `accounts/utils/email_service.py` : 78% (était 18%) - **+60%**
 
 #### Zones NON testées (critiques pour la sécurité) :
 
-**A. Vues d'authentification (`accounts/views/auth.py` - 194 lignes, 0% couvert) :**
+**A. Gestion des utilisateurs (`accounts/views/auth.py`) :**
 
 ❌ **Fonctionnalités critiques sans tests :**
 
-1. **Réinitialisation de mot de passe** (nouvellement implémentée) :
-   - `mot_de_passe_oublie()` - lignes 301-340
-   - `reinitialiser_mot_de_passe()` - lignes 343-384
-   - **Risques** : Tokens invalides, emails multiples, failles de sécurité
-
-2. **Gestion des utilisateurs** :
+1. **Gestion des utilisateurs** :
    - `creer_utilisateur()` - lignes 89-102
    - `modifier_utilisateur()` - lignes 107-126
    - `desactiver_utilisateur()` (soft delete) - lignes 131-147
    - `activer_utilisateur()` - lignes 152-165
    - **Risques** : Permissions, intégrité des données
 
-3. **Détails et profils** :
+2. **Détails et profils** :
    - `detail_utilisateur()` - lignes 170-186
    - `mon_profil()` - lignes 190-202
    - **Risques** : Fuites d'informations, requêtes AJAX
 
-4. **Promotion administrateur** :
+3. **Promotion administrateur** :
    - `promouvoir_administrateur()` - lignes 246-264
    - **Risques** : Élévation de privilèges non autorisée
 
-**B. Service d'emails (`accounts/utils/email_service.py` - 82 lignes, 0% couvert) :**
-
-❌ **Méthode critique sans tests :**
-- `envoyer_email_reinitialisation_mdp()` - lignes 169-226
-- **Risques** : URLs incorrectes, protocole HTTP/HTTPS, tokens non transmis
-
-**C. Formulaires (`accounts/forms.py` - 35 lignes, 0% couvert) :**
-
-❌ **Validations non testées :**
-- `MotDePasseOublieForm` - validation d'email
-- `NouveauMotDePasseForm` - validation de mot de passe (8+ caractères, correspondance)
-- **Risques** : Mots de passe faibles acceptés, validations bypassées
-
-#### Zones TESTÉES (couverture partielle) :
-
-✅ **Tests existants (20 tests) couvrent :**
-- Modèle Notification (création, lecture, tri)
-- Service email de base (nouvelle demande, validation, refus)
-- Inscription publique (workflow complet)
-- Validation utilisateur par admin
-- Notifications page d'accueil
-- Liste utilisateurs (filtres basiques)
-
-**Couverture models : 84%** - Bon, quelques méthodes manquantes (lignes 86, 92-95)
-
 ---
 
-### 2.2 Module `observations` - PRIORITÉ ÉLEVÉE ⚠️
+### 3.2 Module `observations` - PRIORITÉ ÉLEVÉE ⚠️
 
 **Couverture actuelle : 28%**
 
@@ -155,7 +285,7 @@ Racine/
 
 ---
 
-### 2.3 Module `geo` - EXCELLENT ✅
+### 3.3 Module `geo` - EXCELLENT ✅
 
 **Couverture actuelle : 99%**
 
@@ -172,32 +302,34 @@ Racine/
 
 ---
 
-### 2.4 Modules `core` et `audit` - BON ✅
+### 3.4 Modules `core` et `audit` - BON ✅
 
 **core : 86%** - Bonne couverture, exceptions personnalisées non testées (14 lignes)
 **audit : 89%** - Bon, quelques méthodes du modèle AuditLog manquantes
 
 ---
 
-## 3. Zones Critiques Sans Tests
+## 4. Zones Critiques Sans Tests
 
-### 3.1 SÉCURITÉ (Priorité : CRITIQUE)
+### 4.1 SÉCURITÉ (Priorité : CRITIQUE)
 
 #### A. Authentification et Autorisations
 
-❌ **Tests manquants :**
+✅ **Tests EXISTANTS (21 tests - password reset) :**
 
-1. **Réinitialisation de mot de passe** (feature/reinitialisation_mdp) :
-   ```
-   - Test token expiré (> 24h)
-   - Test token invalide / manipulé
-   - Test utilisateur inexistant
-   - Test utilisateur désactivé
-   - Test emails multiples pour même adresse
-   - Test URL de reset correcte (HTTP vs HTTPS)
-   - Test validation mot de passe faible
-   - Test non-correspondance mots de passe
-   ```
+Voir détails complets dans [TESTS_REINITIALISATION_MDP.md](TESTS_REINITIALISATION_MDP.md)
+
+1. **Réinitialisation de mot de passe** ✅ TESTÉ :
+   - ✅ Test token expiré (> 24h)
+   - ✅ Test token invalide / manipulé
+   - ✅ Test utilisateur inexistant
+   - ✅ Test utilisateur désactivé
+   - ✅ Test emails multiples pour même adresse
+   - ✅ Test URL de reset correcte (HTTP vs HTTPS)
+   - ✅ Test validation mot de passe faible
+   - ✅ Test non-correspondance mots de passe
+
+❌ **Tests MANQUANTS :**
 
 2. **Contrôle d'accès** :
    ```
@@ -241,7 +373,7 @@ Racine/
 
 ---
 
-### 3.2 INTÉGRITÉ DES DONNÉES (Priorité : ÉLEVÉE)
+### 4.2 INTÉGRITÉ DES DONNÉES (Priorité : ÉLEVÉE)
 
 #### A. Workflow Observations
 
@@ -287,14 +419,18 @@ Racine/
 
 ---
 
-### 3.3 FONCTIONNALITÉS MÉTIER (Priorité : MOYENNE)
+### 4.3 FONCTIONNALITÉS MÉTIER (Priorité : MOYENNE)
 
 #### A. Emails
 
-❌ **Tests manquants :**
+✅ **Tests EXISTANTS (5 tests dans test_password_reset.py) :**
+- ✅ Test envoi email réinitialisation mdp
+- ✅ Test email avec utilisateur sans adresse email
+- ✅ Test email HTML et texte
+- ✅ Test protocole URL correct (HTTP dev, HTTPS prod)
+
+❌ **Tests MANQUANTS :**
 ```
-- Test envoi email réinitialisation mdp (nouveau)
-- Test email avec utilisateur sans adresse email
 - Test email en mode console vs SMTP
 - Test templates HTML rendus correctement
 - Test contexte email contient toutes les variables
@@ -330,7 +466,7 @@ Racine/
 
 ---
 
-### 3.4 UI/UX (Priorité : BASSE)
+### 4.4 UI/UX (Priorité : BASSE)
 
 ❌ **Tests manquants :**
 ```
@@ -344,20 +480,25 @@ Racine/
 
 ---
 
-## 4. Plan de Tests Prioritaires
+## 5. Plan de Tests Prioritaires
 
 ### Phase 1 : SÉCURITÉ CRITIQUE (Semaines 1-2)
 
 **Objectif : Couvrir 100% des fonctionnalités de sécurité**
 
-#### 4.1 Tests de Réinitialisation de Mot de Passe - ✅ TERMINÉ
+#### 5.1 Tests de Réinitialisation de Mot de Passe - ✅ TERMINÉ
 
 **Fichier : `accounts/tests/test_password_reset.py`**
-**Statut :** Implémenté (21 tests)
+**Statut :** ✅ Implémenté (21 tests)
 
-*Cette section a été entièrement testée dans le cadre de la feature `reinitialisation_mdp`.*
+*Voir documentation complète dans [TESTS_REINITIALISATION_MDP.md](TESTS_REINITIALISATION_MDP.md)*
 
-#### 4.2 Tests de Soft Delete
+**Couverture obtenue :**
+- `accounts/forms.py` : 97%
+- `accounts/views/auth.py` : 70%
+- `accounts/utils/email_service.py` : 78%
+
+#### 5.2 Tests de Soft Delete
 
 **Fichier : `accounts/tests/test_soft_delete.py`** (nouveau)
 
@@ -395,7 +536,7 @@ class TestUtilisateurDesactive:
 
 **Estimation : 18 tests, 4-5 heures**
 
-#### 4.3 Tests de Contrôle d'Accès
+#### 5.3 Tests de Contrôle d'Accès
 
 **Fichier : `accounts/tests/test_permissions.py`** (nouveau)
 
@@ -429,7 +570,7 @@ class TestPermissionsProfil:
 
 **Estimation : 15 tests, 3-4 heures**
 
-#### 4.4 Tests de Contrainte Email Unique
+#### 5.4 Tests de Contrainte Email Unique
 
 **Fichier : `accounts/tests/test_email_uniqueness.py`** (nouveau)
 
@@ -448,7 +589,7 @@ class TestEmailUnique:
 
 **Estimation : 7 tests, 2-3 heures**
 
-**TOTAL PHASE 1 : 57 tests, 13-18 heures**
+**TOTAL PHASE 1 : 61 tests (21 existants + 40 nouveaux), 9-12 heures**
 
 ---
 
@@ -456,7 +597,7 @@ class TestEmailUnique:
 
 **Objectif : Couvrir 80% des vues observations**
 
-#### 4.5 Tests de Workflow Observations
+#### 5.5 Tests de Workflow Observations
 
 **Fichier : `observations/tests/test_workflow_fiche.py`** (nouveau)
 
@@ -508,7 +649,7 @@ class TestSuppressionFiche:
 
 **Estimation : 25 tests, 8-10 heures**
 
-#### 4.6 Tests de Validation Données
+#### 5.6 Tests de Validation Données
 
 **Fichier : `observations/tests/test_validations.py`** (nouveau)
 
@@ -540,7 +681,7 @@ class TestValidationsRelations:
 
 **Estimation : 13 tests, 4-5 heures**
 
-#### 4.7 Tests de Transcription
+#### 5.7 Tests de Transcription
 
 **Fichier : `observations/tests/test_transcription.py`** (nouveau)
 
@@ -568,35 +709,7 @@ class TestWorkflowTranscription:
 
 **Objectif : Couvrir services et tâches asynchrones**
 
-#### 4.8 Tests de Service Email Complets
-
-**Fichier : `accounts/tests/test_email_service_extended.py`** (nouveau)
-
-```python
-class TestEmailServiceReinitialisation:
-    """Tests pour email réinitialisation (nouveau)"""
-
-    def test_envoyer_email_reinitialisation_mdp_succes()
-    def test_email_contient_uid_token()
-    def test_url_reset_https_production()
-    def test_url_reset_http_developpement()
-    def test_template_html_rendu()
-    def test_fallback_texte_brut()
-    def test_utilisateur_sans_email_retourne_false()
-    def test_exception_email_logue_erreur()
-
-class TestEmailServiceConfiguration:
-    """Tests pour la configuration email"""
-
-    def test_console_backend_developpement()
-    def test_smtp_backend_production()
-    def test_admin_email_manquant_logge_warning()
-    def test_from_email_correct()
-```
-
-**Estimation : 12 tests, 4-5 heures**
-
-#### 4.9 Tests de Recherche et Filtres
+#### 5.8 Tests de Recherche et Filtres
 
 **Fichier : `accounts/tests/test_recherche_filtres.py`** (nouveau)
 
@@ -631,7 +744,7 @@ class TestBadgeNotifications:
 
 **Estimation : 15 tests, 4-5 heures**
 
-#### 4.10 Tests des Tâches Celery
+#### 5.9 Tests des Tâches Celery
 
 **Fichier : `observations/tests/test_celery_tasks.py`** (nouveau)
 
@@ -648,7 +761,7 @@ class TestTasksImages:
 
 **Estimation : 5 tests, 3-4 heures**
 
-**TOTAL PHASE 3 : 32 tests, 11-14 heures**
+**TOTAL PHASE 3 : 20 tests, 7-9 heures**
 
 ---
 
@@ -656,7 +769,7 @@ class TestTasksImages:
 
 **Objectif : Atteindre 80%+ de couverture globale**
 
-#### 4.11 Tests des Vues Observations Complexes
+#### 5.10 Tests des Vues Observations Complexes
 
 **Fichier : `observations/tests/test_saisie_observation.py`** (nouveau)
 
@@ -687,7 +800,7 @@ class TestClonageFiche:
 
 **Estimation : 11 tests, 5-6 heures**
 
-#### 4.12 Tests de Non-Régression
+#### 5.11 Tests de Non-Régression
 
 **Fichier : `tests/test_regressions.py`** (nouveau)
 
@@ -706,35 +819,35 @@ class TestRegressions:
 
 ---
 
-## 5. Résumé du Plan
+## 6. Résumé du Plan
 
-### 5.1 Objectifs Chiffrés
+### 6.1 Objectifs Chiffrés
 
-| Phase | Domaine | Tests à ajouter | Heures estimées | Couverture cible |
-|-------|---------|-----------------|-----------------|------------------|
-| 1 | Sécurité | 57 tests | 13-18h | accounts: 50%+ |
-| 2 | Données | 46 tests | 15-19h | observations: 60%+ |
-| 3 | Métier | 32 tests | 11-14h | accounts: 70%+, observations: 70%+ |
-| 4 | Compléments | 14 tests | 6-8h | Global: 80%+ |
-| **TOTAL** | - | **149 tests** | **45-59h** | **80%+** |
+| Phase | Domaine | Tests existants | Tests à ajouter | Heures estimées | Couverture cible |
+|-------|---------|----------------|-----------------|-----------------|------------------|
+| 1 | Sécurité | 21 | 40 tests | 9-12h | accounts: 60%+ |
+| 2 | Données | 0 | 46 tests | 15-19h | observations: 60%+ |
+| 3 | Métier | 0 | 20 tests | 7-9h | accounts: 70%+, observations: 70%+ |
+| 4 | Compléments | 0 | 14 tests | 6-8h | Global: 80%+ |
+| **TOTAL** | - | **21** | **120 tests** | **37-48h** | **80%+** |
 
-**Tests actuels : 25**
-**Tests après plan : 174 tests**
+**Tests actuels : 66**
+**Tests après plan : 186 tests**
 
-### 5.2 Couverture Attendue Après Plan
+### 6.2 Couverture Attendue Après Plan
 
 | Module | Avant | Après | Amélioration |
 |--------|-------|-------|--------------|
-| accounts | 9% | 75%+ | +66% |
+| accounts | ~50% | 75%+ | +25% |
 | observations | 28% | 75%+ | +47% |
 | geo | 99% | 99% | - |
-| **GLOBAL** | **40%** | **80%+** | **+40%** |
+| **GLOBAL** | **41%** | **80%+** | **+39%** |
 
 ---
 
-## 6. Recommandations d'Implémentation
+## 7. Recommandations d'Implémentation
 
-### 6.1 Structure des Tests
+### 7.1 Structure des Tests
 
 **Organisation proposée :**
 
@@ -744,11 +857,10 @@ tests/
 │   ├── __init__.py
 │   ├── conftest.py                      # Fixtures communes accounts
 │   ├── test_models.py                   # Existant (Notification, Utilisateur)
-│   ├── test_password_reset.py           # PHASE 1 - Nouveau
+│   ├── test_password_reset.py           # ✅ Existant - PHASE 1
 │   ├── test_soft_delete.py              # PHASE 1 - Nouveau
 │   ├── test_permissions.py              # PHASE 1 - Nouveau
 │   ├── test_email_uniqueness.py         # PHASE 1 - Nouveau
-│   ├── test_email_service_extended.py   # PHASE 3 - Nouveau
 │   └── test_recherche_filtres.py        # PHASE 3 - Nouveau
 │
 ├── observations/
@@ -767,7 +879,7 @@ tests/
 └── test_regressions.py                  # PHASE 4 - Nouveau
 ```
 
-### 6.2 Fixtures Réutilisables
+### 7.2 Fixtures Réutilisables
 
 **Créer dans `conftest.py` (racine) :**
 
@@ -817,7 +929,7 @@ def fiche_complete(db, user_observateur, espece):
     return fiche
 ```
 
-### 6.3 Configuration de Coverage
+### 7.3 Configuration de Coverage
 
 **Mettre à jour `pytest.ini` :**
 
@@ -865,7 +977,7 @@ exclude_lines =
     @abstractmethod
 ```
 
-### 6.4 Intégration CI/CD
+### 7.4 Intégration CI/CD
 
 **Ajouter dans `.github/workflows/tests.yml` :**
 
@@ -902,43 +1014,26 @@ jobs:
 
 ---
 
-## 7. Tests Prioritaires pour Feature Actuelle
+## 8. Tests Prioritaires pour Feature Actuelle
 
-### 7.1 Tests à Ajouter IMMÉDIATEMENT (feature/reinitialisation_mdp)
+### 8.1 Tests Réinitialisation de Mot de Passe - ✅ TERMINÉ
 
-**Avant de merger la branche actuelle**, implémenter au minimum :
+**Fichier : `accounts/tests/test_password_reset.py`**
+**Statut :** ✅ Implémenté (21 tests)
 
-#### Tests Critiques (2-3 heures) :
+✅ **Résultats obtenus :**
+- 21 tests passent
+- Couverture `accounts/views/auth.py` : 70% (+44%)
+- Couverture `accounts/forms.py` : 97% (+97%)
+- Couverture `accounts/utils/email_service.py` : 78% (+60%)
 
-```python
-# accounts/tests/test_password_reset_minimal.py
-
-class TestMotDePasseOublieMinimal:
-    def test_email_existant_envoie_email()
-    def test_email_inexistant_pas_revelation()
-    def test_utilisateur_inactif_ignore()
-
-class TestReinitialiserMotDePasseMinimal:
-    def test_token_valide_permet_reset()
-    def test_token_invalide_refuse()
-    def test_mot_de_passe_court_refuse()
-    def test_mots_de_passe_differents_refuse()
-    def test_reset_reussi_hash_sauvegarde()
-
-class TestEmailReinitialisation:
-    def test_email_contient_lien_valide()
-    def test_utilisateur_sans_email_gere()
-```
-
-**Estimation : 11 tests essentiels, 2-3 heures**
-
-Ces tests garantissent que la fonctionnalité de réinitialisation de mot de passe est sécurisée avant le déploiement.
+Voir documentation complète dans **[TESTS_REINITIALISATION_MDP.md](TESTS_REINITIALISATION_MDP.md)**
 
 ---
 
-## 8. Outils et Bonnes Pratiques
+## 9. Outils et Bonnes Pratiques
 
-### 8.1 Outils de Test Recommandés
+### 9.1 Outils de Test Recommandés
 
 | Outil | Usage | Installé |
 |-------|-------|----------|
@@ -957,7 +1052,7 @@ pip install factory-boy faker freezegun responses
 pip freeze > requirements-dev.txt
 ```
 
-### 8.2 Bonnes Pratiques
+### 9.2 Bonnes Pratiques
 
 #### A. Nommage des Tests
 
@@ -1011,22 +1106,22 @@ def test_email_envoye(mock_send):
 
 ---
 
-## 9. Métriques de Suivi
+## 10. Métriques de Suivi
 
-### 9.1 Indicateurs Clés
+### 10.1 Indicateurs Clés
 
 | Métrique | Valeur Actuelle | Objectif | Critique |
 |----------|-----------------|----------|----------|
-| Couverture globale | 40% | 80%+ | ⚠️ |
-| Tests totaux | 25 | 174+ | ⚠️ |
-| Couverture accounts | 9% | 75%+ | 🔴 CRITIQUE |
-| Couverture observations | 28% | 75%+ | ⚠️ |
+| Couverture globale | 41% | 80%+ | ⚠️ |
+| Tests totaux | 66 | 186+ | ⚠️ |
+| Couverture accounts | ~50% | 75%+ | ⚠️ |
+| Couverture observations | 28% | 75%+ | 🔴 CRITIQUE |
 | Couverture geo | 99% | 99% | ✅ |
-| Tests sécurité | 10 | 67+ | 🔴 CRITIQUE |
-| Tests intégration | 5 | 50+ | ⚠️ |
+| Tests sécurité | 31 | 71+ | ⚠️ |
+| Tests intégration | 5 | 50+ | 🔴 CRITIQUE |
 | Temps exécution tests | ~45s | < 2min | ✅ |
 
-### 9.2 Tableau de Bord de Progression
+### 10.2 Tableau de Bord de Progression
 
 **À suivre après chaque phase :**
 
@@ -1058,25 +1153,25 @@ pytest --durations=10
 
 ---
 
-## 10. Risques et Mitigation
+## 11. Risques et Mitigation
 
-### 10.1 Risques Identifiés
+### 11.1 Risques Identifiés
 
 | Risque | Impact | Probabilité | Mitigation |
 |--------|--------|-------------|------------|
-| **Failles de sécurité non détectées** | 🔴 Critique | Élevée | Phase 1 prioritaire (57 tests sécurité) |
+| **Failles de sécurité non détectées** | 🔴 Critique | Moyenne | Phase 1 prioritaire (40 tests sécurité nouveaux) |
 | **Régression sur features existantes** | 🟠 Majeur | Moyenne | Tests de non-régression + CI/CD |
 | **Perte de données utilisateurs** | 🔴 Critique | Faible | Tests intégrité (Phase 2) |
-| **Emails non envoyés en production** | 🟠 Majeur | Moyenne | Tests service email + monitoring |
+| **Emails non envoyés en production** | 🟠 Majeur | Faible | Tests service email (✅ fait) |
 | **Permissions bypassées** | 🔴 Critique | Moyenne | Tests permissions exhaustifs |
 | **Temps d'exécution tests trop long** | 🟡 Mineur | Faible | Optimisation fixtures + DB transactionnelle |
 
-### 10.2 Plan de Mitigation
+### 11.2 Plan de Mitigation
 
 **Sécurité :**
-- ✅ Implémenter Phase 1 en priorité
+- ✅ Phase 1 tests password reset terminée (21 tests)
 - ✅ Revue de code systématique pour toute modification authentification
-- ✅ Tests de pénétration manuels après Phase 1
+- ⏳ Tests de pénétration manuels après Phase 1 complète
 
 **Performance :**
 - ✅ Utiliser `pytest-xdist` pour parallélisation si > 2 minutes
@@ -1090,48 +1185,46 @@ pytest --durations=10
 
 ---
 
-## 11. Conclusion et Recommandations
+## 12. Conclusion et Recommandations
 
-### 11.1 Constats Principaux
+### 12.1 Constats Principaux
 
 1. **✅ Points Forts :**
    - Module `geo` excellemment testé (99%)
    - Tests existants bien structurés et maintenables
    - Utilisation correcte de pytest-django
    - Fixtures de base déjà en place
+   - **Tests password reset implémentés** (21 tests) ✅
 
 2. **⚠️ Points d'Amélioration :**
-   - **Couverture critique insuffisante** sur `accounts` (9%) et `observations` (28%)
-   - **Aucun test sur fonctionnalités récemment ajoutées** (réinitialisation mdp, soft delete)
-   - **Risques de sécurité élevés** : permissions, authentification, validations
+   - **Couverture insuffisante** sur `observations` (28%)
+   - **Manque de tests sur fonctionnalités récentes** (soft delete, permissions)
+   - **Risques de sécurité** : permissions, authentification, validations
    - **Manque de tests d'intégration** pour workflows complets
 
-3. **🔴 Urgences :**
-   - **Tester la réinitialisation de mot de passe AVANT merge** (11 tests minimum)
-   - Tester le soft delete et les permissions admin (18 tests)
-   - Ajouter tests de contrainte email unique (7 tests)
+3. **🟡 Progrès Réalisés :**
+   - ✅ **21 tests password reset** ajoutés (+60% couverture email_service)
+   - ✅ Couverture `accounts` passée de 9% à ~50%
+   - ✅ Cas de sécurité critiques couverts (énumération, tokens, protocoles)
 
-### 11.2 Recommandations Immédiates
-
-**AVANT de merger `feature/reinitialisation_mdp` :**
-
-1. ✅ **Implémenter les 11 tests critiques de password reset** (2-3h)
-2. ✅ **Tester manuellement en production simulée** (SMTP réel, HTTPS)
-3. ✅ **Revue de code sécurité** par un pair
+### 12.2 Recommandations Immédiates
 
 **Cette semaine :**
 
-4. ✅ **Compléter Phase 1** (57 tests sécurité, 13-18h)
-5. ✅ **Configurer CI/CD** avec seuil 80% de couverture
-6. ✅ **Documenter procédure de tests** pour contributeurs
+1. ✅ **Compléter Phase 1** (40 tests sécurité restants, 9-12h)
+   - Tests soft delete (18 tests)
+   - Tests permissions (15 tests)
+   - Tests email unique (7 tests)
+2. ✅ **Configurer CI/CD** avec seuil 80% de couverture
+3. ✅ **Documenter procédure de tests** pour contributeurs
 
 **Ce mois :**
 
-7. ✅ **Implémenter Phases 2 et 3** (78 tests, 26-33h)
-8. ✅ **Former l'équipe** aux bonnes pratiques de tests
-9. ✅ **Atteindre 80% de couverture globale**
+4. ✅ **Implémenter Phases 2 et 3** (66 tests, 22-28h)
+5. ✅ **Former l'équipe** aux bonnes pratiques de tests
+6. ✅ **Atteindre 80% de couverture globale**
 
-### 11.3 Bénéfices Attendus
+### 12.3 Bénéfices Attendus
 
 Après implémentation complète du plan :
 
@@ -1141,14 +1234,14 @@ Après implémentation complète du plan :
 - **Documentation vivante** : Tests comme spécifications exécutables
 - **Qualité professionnelle** : 80%+ couverture = standard industriel
 
-**Investissement total : 45-59 heures**
+**Investissement total : 37-48 heures**
 **ROI : Économie de dizaines d'heures de debugging et correction de bugs en production**
 
 ---
 
-## 12. Annexes
+## 13. Annexes
 
-### 12.1 Commandes Utiles
+### 13.1 Commandes Utiles
 
 ```bash
 # Lancer tous les tests
@@ -1192,44 +1285,7 @@ pytest --cov=. --cov-report=xml
 pytest --cov=. --cov-fail-under=80
 ```
 
-### 12.2 Structure Complète du Projet de Tests
-
-```
-observations_nids/
-├── accounts/
-│   ├── tests/
-│   │   ├── __init__.py
-│   │   ├── conftest.py
-│   │   ├── test_models.py (✅ existant - 20 tests)
-│   │   ├── test_password_reset.py (❌ à créer - Phase 1)
-│   │   ├── test_soft_delete.py (❌ à créer - Phase 1)
-│   │   ├── test_permissions.py (❌ à créer - Phase 1)
-│   │   ├── test_email_uniqueness.py (❌ à créer - Phase 1)
-│   │   ├── test_email_service_extended.py (❌ à créer - Phase 3)
-│   │   └── test_recherche_filtres.py (❌ à créer - Phase 3)
-│   └── ...
-├── observations/
-│   ├── tests/
-│   │   ├── __init__.py
-│   │   ├── conftest.py
-│   │   ├── test_models.py (✅ existant - 9 tests)
-│   │   ├── test_workflow_fiche.py (❌ à créer - Phase 2)
-│   │   ├── test_validations.py (❌ à créer - Phase 2)
-│   │   ├── test_transcription.py (❌ à créer - Phase 2)
-│   │   ├── test_saisie_observation.py (❌ à créer - Phase 4)
-│   │   └── test_celery_tasks.py (❌ à créer - Phase 3)
-│   └── ...
-├── geo/
-│   └── tests/
-│       ├── __init__.py
-│       └── test_api_communes.py (✅ existant - 13 tests - 99% couverture)
-├── conftest.py (✅ existant - fixtures globales)
-├── pytest.ini (✅ existant - configuration)
-├── .coveragerc (❌ à créer - configuration couverture)
-└── test_regressions.py (❌ à créer - Phase 4)
-```
-
-### 12.3 Checklist de Merge de Branche
+### 13.2 Checklist de Merge de Branche
 
 **Avant de merger toute feature branch :**
 
@@ -1244,7 +1300,7 @@ observations_nids/
 - [ ] ✅ Tests manuels en environnement de staging
 - [ ] ✅ Revue de code par un pair (si disponible)
 
-### 12.4 Ressources
+### 13.3 Ressources
 
 **Documentation officielle :**
 - pytest : https://docs.pytest.org/
@@ -1256,9 +1312,12 @@ observations_nids/
 - AAA Pattern : http://wiki.c2.com/?ArrangeActAssert
 - Test Pyramid : https://martinfowler.com/articles/practical-test-pyramid.html
 
+**Documentation du projet :**
+- **[Tests de Réinitialisation de Mot de Passe](TESTS_REINITIALISATION_MDP.md)** - Exemple complet de 21 tests
+
 ---
 
 **Document généré le : 19 octobre 2025**
-**Version : 1.0**
+**Version : 2.0 (consolidé avec README.md)**
 **Auteur : Claude Code**
 **Statut : FINAL - Prêt pour implémentation**
