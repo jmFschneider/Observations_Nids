@@ -8,13 +8,27 @@ Le domaine utilisateur gère l'authentification, l'autorisation et les notificat
 
 ---
 
-## Modèle Utilisateur
+## Table des matières
 
-### Rôle métier
+1. [Modèles](#modèles)
+2. [Workflow d'inscription](#workflow-dinscription)
+3. [Gestion administrative](#gestion-administrative)
+4. [Réinitialisation de mot de passe](#réinitialisation-de-mot-de-passe)
+5. [Suppression d'utilisateurs (Soft Delete)](#suppression-dutilisateurs-soft-delete)
+6. [Sécurité](#sécurité)
+7. [Requêtes ORM courantes](#requêtes-orm-courantes)
+
+---
+
+## Modèles
+
+### Modèle Utilisateur
+
+#### Rôle métier
 
 Représente un utilisateur de l'application avec un système de rôles et de validation de compte par les administrateurs.
 
-### Héritage
+#### Héritage
 
 ```python
 class Utilisateur(AbstractUser):
@@ -25,7 +39,7 @@ class Utilisateur(AbstractUser):
     # - date_joined, last_login
 ```
 
-### Champs spécifiques
+#### Champs spécifiques
 
 | Champ | Type | Description | Défaut | Contraintes |
 |-------|------|-------------|--------|-------------|
@@ -34,7 +48,7 @@ class Utilisateur(AbstractUser):
 | `est_transcription` | BooleanField | Utilisateur dédié aux transcriptions OCR | False | Compte technique |
 | `email` | EmailField | Adresse email | - | **UNIQUE** et **OBLIGATOIRE** |
 
-### Système de rôles
+#### Système de rôles
 
 **Définition** : `core/constants.py::ROLE_CHOICES`
 
@@ -46,7 +60,7 @@ ROLE_CHOICES = [
 ]
 ```
 
-#### Permissions par rôle
+##### Permissions par rôle
 
 | Rôle | Permissions |
 |------|-------------|
@@ -54,9 +68,7 @@ ROLE_CHOICES = [
 | **Correcteur** | • Toutes permissions observateur<br>• Corriger toutes les fiches<br>• Accès outil de transcription |
 | **Administrateur** | • Toutes permissions<br>• Gérer les utilisateurs<br>• Valider les comptes<br>• Accès admin Django |
 
-**Voir** : [Documentation complète gestion utilisateurs](../../account/GESTION_UTILISATEURS.md)
-
-### Contrainte d'unicité email
+#### Contrainte d'unicité email
 
 ```python
 email = models.EmailField(
@@ -73,7 +85,7 @@ email = models.EmailField(
 - **Validation** : Niveau base de données + niveau formulaire
 - **Script de vérification** : `scripts/check_duplicate_emails.py`
 
-### Relations
+#### Relations
 
 | Collection | Description |
 |------------|-------------|
@@ -84,13 +96,13 @@ email = models.EmailField(
 
 ---
 
-## Modèle Notification
+### Modèle Notification
 
-### Rôle métier
+#### Rôle métier
 
 Système de notifications internes pour informer les utilisateurs d'événements importants (demandes de compte, validations, etc.).
 
-### Champs
+#### Champs
 
 | Champ | Type | Description | Index |
 |-------|------|-------------|-------|
@@ -104,7 +116,7 @@ Système de notifications internes pour informer les utilisateurs d'événements
 | `date_lecture` | DateTimeField | Date de lecture | NULL si non lue |
 | `utilisateur_concerne` | ForeignKey | Référence optionnelle utilisateur | → Utilisateur, Optionnel |
 
-### Types de notifications
+#### Types de notifications
 
 ```python
 TYPE_CHOICES = [
@@ -116,7 +128,7 @@ TYPE_CHOICES = [
 ]
 ```
 
-### Index composites
+#### Index composites
 
 ```python
 indexes = [
@@ -134,9 +146,9 @@ Notification.objects.filter(
 ).order_by('-date_creation')
 ```
 
-### Méthodes
+#### Méthodes
 
-#### `marquer_comme_lue()`
+##### `marquer_comme_lue()`
 
 ```python
 def marquer_comme_lue(self):
@@ -171,92 +183,501 @@ graph TD
 
 ### Étapes détaillées
 
-1. **Inscription publique**
-   - URL : `/accounts/inscription-publique/`
-   - Formulaire : `UtilisateurCreationForm`
-   - Champs : username, email, first_name, last_name, password
+#### 1. Inscription publique
 
-2. **Création du compte**
-   ```python
-   user = Utilisateur.objects.create(
-       username='...',
-       email='...',
-       first_name='...',
-       last_name='...',
-       role='observateur',
-       est_valide=False,  # ← Compte en attente
-       is_active=False,   # ← Ne peut pas se connecter
-   )
-   ```
+- URL : `/accounts/inscription-publique/`
+- Formulaire : `UtilisateurCreationForm`
+- Champs : username, email, first_name, last_name, password
 
-3. **Notifications automatiques**
-   ```python
-   # Notification à tous les admins
-   admins = Utilisateur.objects.filter(role='administrateur')
-   for admin in admins:
-       Notification.objects.create(
-           destinataire=admin,
-           type_notification='demande_compte',
-           titre='Nouvelle demande de compte',
-           message=f'{user.get_full_name()} demande un accès',
-           lien=f'/accounts/utilisateur/{user.id}/',
-           utilisateur_concerne=user
-       )
-   ```
+#### 2. Création du compte
 
-4. **Validation par admin**
-   - Admin consulte la liste des demandes
-   - URL : `/accounts/liste-utilisateurs/?valide=non`
-   - Actions possibles :
-     - **Valider** → `est_valide=True`, `is_active=True`
-     - **Refuser** → Suppression ou rejet
+```python
+user = Utilisateur.objects.create(
+    username='...',
+    email='...',
+    first_name='...',
+    last_name='...',
+    role='observateur',
+    est_valide=False,  # ← Compte en attente
+    is_active=False,   # ← Ne peut pas se connecter
+)
+```
 
-5. **Notification de validation**
-   ```python
-   Notification.objects.create(
-       destinataire=user,
-       type_notification='compte_valide',
-       titre='Votre compte a été validé',
-       message='Vous pouvez maintenant vous connecter.',
-       lien='/login/'
-   )
-   ```
+#### 3. Notifications automatiques
 
-**Voir** : [Workflow complet](../../account/GESTION_UTILISATEURS.md#workflow-dinscription)
+```python
+# Notification à tous les admins
+admins = Utilisateur.objects.filter(role='administrateur')
+for admin in admins:
+    Notification.objects.create(
+        destinataire=admin,
+        type_notification='demande_compte',
+        titre='Nouvelle demande de compte',
+        message=f'{user.get_full_name()} demande un accès',
+        lien=f'/accounts/utilisateur/{user.id}/',
+        utilisateur_concerne=user
+    )
+```
+
+#### 4. Validation par admin
+
+- Admin consulte la liste des demandes
+- URL : `/accounts/liste-utilisateurs/?valide=non`
+- Actions possibles :
+  - **Valider** → `est_valide=True`, `is_active=True`
+  - **Refuser** → Suppression ou rejet
+
+#### 5. Notification de validation
+
+```python
+Notification.objects.create(
+    destinataire=user,
+    type_notification='compte_valide',
+    titre='Votre compte a été validé',
+    message='Vous pouvez maintenant vous connecter.',
+    lien='/login/'
+)
+```
 
 ---
 
-## Soft delete (suppression)
+## Gestion administrative
 
-### Implémentation actuelle
+### Liste des utilisateurs
 
-Les utilisateurs peuvent être **désactivés** via `is_active=False` :
+**URL** : `/accounts/utilisateurs/`
+**Permission requise** : Administrateur
+
+#### Filtres disponibles
+
+1. **Recherche textuelle**
+   - Recherche dans : username, first_name, last_name, email
+   - Insensible à la casse
+
+2. **Filtre par rôle**
+   - Tous les rôles
+   - Observateurs
+   - Correcteurs
+   - Administrateurs
+
+3. **Filtre par validation**
+   - Tous
+   - Validés
+   - En attente (nouveaux comptes)
+
+4. **Filtre par statut**
+   - Tous les statuts
+   - Actifs uniquement
+   - Inactifs uniquement (utilisateurs supprimés)
+
+#### Affichage des utilisateurs
+
+**Colonnes affichées** :
+- Nom d'utilisateur (avec badge "Nouveau" si non validé)
+- Nom
+- Prénom
+- Email
+- Rôle
+- Validation (Validé / En attente)
+- Statut (Actif / Inactif)
+- Actions
+
+**Indicateurs visuels** :
+- 🟡 Fond jaune : Compte en attente de validation
+- 🔘 Grisé + barré : Compte inactif (supprimé)
+- Badge compteur : Nombre de demandes en attente
+
+#### Actions disponibles
+
+Pour chaque utilisateur :
+
+1. **Valider** (si non validé)
+   - Active le compte (is_active = True)
+   - Marque comme validé (est_valide = True)
+   - Envoie un email de confirmation à l'utilisateur
+   - Crée une notification pour l'utilisateur
+   - Marque les notifications admin comme lues
+
+2. **Modifier**
+   - Formulaire d'édition des informations
+   - Changement de rôle possible
+   - Modification email, nom, prénom
+
+3. **Supprimer** (si actif) - Soft Delete
+   - Désactive le compte (is_active = False)
+   - Conserve toutes les données
+   - Affichage en grisé dans la liste
+   - Action réversible
+   - Voir section [Suppression d'utilisateurs](#suppression-dutilisateurs-soft-delete)
+
+4. **Réactiver** (si inactif)
+   - Réactive le compte (is_active = True)
+   - L'utilisateur peut à nouveau se connecter
+   - Retour à l'affichage normal
+
+### Création manuelle d'utilisateurs
+
+**URL** : `/accounts/utilisateurs/creer/`
+**Permission requise** : Administrateur
+
+Les administrateurs peuvent créer directement des comptes validés :
+- Compte créé avec est_valide = True
+- Compte actif immédiatement (is_active = True)
+- Rôle choisi par l'administrateur
+
+### Modification d'utilisateurs
+
+**URL** : `/accounts/utilisateurs/<user_id>/modifier/`
+**Permission requise** : Administrateur
+
+**Champs modifiables** :
+- Nom d'utilisateur
+- Email
+- Prénom
+- Nom
+- Rôle
+- Statut de validation
+- Statut actif/inactif
+
+### Détails d'un utilisateur
+
+**URL** : `/accounts/utilisateurs/<user_id>/detail/`
+**Permission requise** : Administrateur
+
+**Informations affichées** :
+- Informations personnelles
+- Nombre d'observations créées
+- Liste des fiches d'observation
+- Historique des actions
+
+**Chargement AJAX** :
+- Les détails se chargent sans rechargement de page
+- Clic sur une ligne de la liste des utilisateurs
+
+---
+
+## Réinitialisation de mot de passe
+
+### Vue d'ensemble
+
+Cette fonctionnalité permet aux utilisateurs qui ont oublié leur mot de passe de le réinitialiser de manière sécurisée via email.
+
+### Workflow utilisateur
+
+```
+1. Page de login
+   └─> Clic sur "Mot de passe oublié ?"
+       └─> 2. Formulaire de demande de réinitialisation
+           ├─> Saisie de l'email
+           └─> Envoi du formulaire
+               └─> 3. Email de réinitialisation envoyé
+                   ├─> Lien avec token (valide 24h)
+                   └─> Clic sur le lien
+                       └─> 4. Formulaire nouveau mot de passe
+                           ├─> Saisie du nouveau mot de passe
+                           ├─> Confirmation du mot de passe
+                           └─> Enregistrement
+                               └─> 5. Redirection vers login
+```
+
+### Composants implémentés
+
+#### Formulaires (`accounts/forms.py`)
+
+**`MotDePasseOublieForm`**
+- **Champ** : `email` (EmailField)
+- **Validation** : Format email valide
+- **Usage** : Page de demande de réinitialisation
+
+**`NouveauMotDePasseForm`**
+- **Champs** :
+  - `password1` : Nouveau mot de passe
+  - `password2` : Confirmation du mot de passe
+- **Validations** :
+  - Minimum 8 caractères
+  - Les deux mots de passe doivent correspondre
+
+#### Vues (`accounts/views/auth.py`)
+
+**`mot_de_passe_oublie(request)`**
+- **URL** : `/accounts/mot-de-passe-oublie/`
+- **Méthode** : GET et POST
+- **Authentification** : Non requise
+- **Fonctionnement** :
+  1. Affiche le formulaire de saisie d'email
+  2. Vérifie si l'email existe dans la base de données
+  3. Génère un token sécurisé (Django `default_token_generator`)
+  4. Encode l'ID utilisateur (base64)
+  5. Envoie l'email avec le lien de réinitialisation
+  6. **Sécurité** : Message identique que l'email existe ou non (évite l'énumération d'emails)
+
+**`reinitialiser_mot_de_passe(request, uidb64, token)`**
+- **URL** : `/accounts/reinitialiser-mot-de-passe/<uidb64>/<token>/`
+- **Méthode** : GET et POST
+- **Authentification** : Non requise
+- **Fonctionnement** :
+  1. Décode l'UID et récupère l'utilisateur
+  2. Vérifie la validité du token
+  3. Si valide : affiche le formulaire de nouveau mot de passe
+  4. Enregistre le nouveau mot de passe avec hachage
+  5. Redirige vers la page de login
+
+#### Service Email (`accounts/utils/email_service.py`)
+
+**`EmailService.envoyer_email_reinitialisation_mdp(utilisateur, uid, token)`**
+- **Template** : `accounts/emails/reinitialisation_mot_de_passe.html`
+- **Sujet** : "[Observations Nids] Réinitialisation de votre mot de passe"
+- **Contenu** :
+  - Bouton avec lien de réinitialisation
+  - Lien copié/collable en fallback
+  - Avertissement de validité (24h)
+  - Instructions de sécurité
+- **Protocole** : HTTPS en production, HTTP en développement
+
+#### Templates
+
+**`accounts/templates/accounts/mot_de_passe_oublie.html`**
+- Formulaire de saisie d'email
+- Bouton d'envoi
+- Lien de retour vers la page de login
+
+**`accounts/templates/accounts/reinitialiser_mot_de_passe.html`**
+- Deux états :
+  - **Lien valide** : Formulaire de nouveau mot de passe
+  - **Lien invalide/expiré** : Message d'erreur avec option de redemander un lien
+
+**`accounts/templates/accounts/emails/reinitialisation_mot_de_passe.html`**
+- Email HTML responsive
+- Style inline pour compatibilité email
+- Bouton CTA principal
+- Lien de fallback
+- Section d'avertissements
+
+#### URLs (`accounts/urls.py`)
 
 ```python
-# accounts/views/auth.py
+# Demande de réinitialisation
+path('mot-de-passe-oublie/', auth.mot_de_passe_oublie, name='mot_de_passe_oublie')
+
+# Réinitialisation avec token
+path('reinitialiser-mot-de-passe/<uidb64>/<token>/',
+     auth.reinitialiser_mot_de_passe,
+     name='reinitialiser_mot_de_passe')
+```
+
+### Mesures de sécurité
+
+1. **Token sécurisé**
+   - Utilise `django.contrib.auth.tokens.default_token_generator`
+   - Token unique basé sur le timestamp et le hash du mot de passe
+   - Invalide automatiquement après changement de mot de passe
+
+2. **Durée de validité**
+   - Les tokens expirent après 24 heures
+   - Configurable via `PASSWORD_RESET_TIMEOUT` dans settings
+
+3. **Encodage sécurisé**
+   - UID utilisateur encodé en base64 URL-safe
+   - Empêche la manipulation directe des IDs
+
+4. **Protection contre l'énumération**
+   - Message identique que l'email existe ou non
+   - Logs séparés pour le monitoring (email inexistant)
+
+5. **Validation du mot de passe**
+   - Minimum 8 caractères
+   - Vérification de correspondance password1/password2
+   - Hachage Django (`make_password`)
+
+6. **Compte actif uniquement**
+   - La réinitialisation ne fonctionne que pour les comptes `is_active=True`
+
+### Configuration requise
+
+#### Variables d'environnement
+
+```bash
+# .env
+ADMIN_EMAIL=admin@example.com          # Pour notifications admin
+DEFAULT_FROM_EMAIL=noreply@example.com # Email expéditeur
+ALLOWED_HOSTS=["localhost", "example.com"]  # Pour construire les URLs
+```
+
+#### Configuration SMTP
+
+**En développement** (backend console) :
+```python
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+```
+
+**En production** (SMTP) :
+```python
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@example.com'
+EMAIL_HOST_PASSWORD = 'your-app-password'
+```
+
+### Monitoring et logs
+
+**Événements logués** :
+
+```python
+# Email de réinitialisation envoyé
+logger.info(f"Email de réinitialisation envoyé à {email}")
+
+# Tentative pour email inexistant
+logger.warning(f"Tentative de réinitialisation pour email inexistant : {email}")
+
+# Réinitialisation réussie
+logger.info(f"Mot de passe réinitialisé pour {utilisateur.username}")
+
+# Lien invalide ou expiré
+logger.warning(f"Tentative de réinitialisation avec lien invalide ou expiré")
+```
+
+---
+
+## Suppression d'utilisateurs (Soft Delete)
+
+### Concept
+
+**Soft Delete** = Suppression "douce" sans perte de données
+
+- L'utilisateur est **désactivé** (is_active = False)
+- Toutes ses données **restent dans le système**
+- Ses observations **restent accessibles**
+- Action **100% réversible**
+- Aucune suppression définitive depuis l'interface web
+
+### Interface utilisateur
+
+#### Bouton "Supprimer"
+
+**Apparence** :
+- Icône : `trash-alt` (poubelle)
+- Couleur : Rouge (`btn-danger`)
+- Visible uniquement pour les utilisateurs actifs
+
+**Message de confirmation** :
+```
+⚠️ ATTENTION
+
+Voulez-vous vraiment supprimer cet utilisateur ?
+
+L'utilisateur [username] ne pourra plus se connecter.
+Ses observations resteront dans le système.
+
+Cette action est réversible via le bouton 'Réactiver'.
+```
+
+#### Affichage des utilisateurs supprimés
+
+**Style CSS** :
+```css
+.user-inactive {
+    opacity: 0.5;                    /* Semi-transparent */
+    background-color: #f8f9fa;       /* Fond gris clair */
+}
+
+.user-inactive td {
+    color: #6c757d;                  /* Texte gris */
+    text-decoration: line-through;   /* Texte barré */
+}
+```
+
+**Comportement** :
+- Ligne complète en grisé
+- Texte barré
+- Badge "Inactif" en rouge
+- Survol possible (opacity: 0.7)
+- Boutons et badges restent visibles (opacity: 1)
+
+#### Bouton "Réactiver"
+
+**Apparence** :
+- Icône : `user-check`
+- Couleur : Vert (`btn-success`)
+- Visible uniquement pour les utilisateurs inactifs
+
+**Message de confirmation** :
+```
+Voulez-vous réactiver l'utilisateur [username] ?
+
+Il pourra à nouveau se connecter à l'application.
+```
+
+### Workflow technique
+
+**Suppression** :
+```python
+@login_required
+@user_passes_test(est_admin)
 def desactiver_utilisateur(request, user_id):
     utilisateur = get_object_or_404(Utilisateur, id=user_id)
     utilisateur.is_active = False
     utilisateur.save()
+
+    # Log de l'action
+    logger.info(f"Utilisateur {utilisateur.username} supprimé (soft delete) par {request.user.username}")
+
+    # Message de succès explicite
+    messages.success(request,
+        f"L'utilisateur {utilisateur.username} a été supprimé. "
+        f"Il ne peut plus se connecter mais ses données sont conservées. "
+        f"Vous pouvez le réactiver à tout moment."
+    )
 ```
+
+**Réactivation** :
+```python
+@login_required
+@user_passes_test(est_admin)
+def activer_utilisateur(request, user_id):
+    utilisateur = get_object_or_404(Utilisateur, id=user_id)
+    utilisateur.is_active = True
+    utilisateur.save()
+
+    # Log de l'action
+    logger.info(f"Utilisateur {utilisateur.username} réactivé par {request.user.username}")
+
+    messages.success(request,
+        f"L'utilisateur {utilisateur.username} a été réactivé. "
+        f"Il peut à nouveau se connecter à l'application."
+    )
+```
+
+### Impact sur les données
+
+**Ce qui est conservé** :
+- ✅ Informations utilisateur (username, email, nom, prénom)
+- ✅ Toutes les observations créées
+- ✅ Historique des modifications
+- ✅ Notifications
+- ✅ Relations ForeignKey
+
+**Ce qui est affecté** :
+- ❌ Connexion impossible (is_active = False)
+- ❌ Apparaît comme "Inactif" dans les listes
+- ℹ️ Les observations restent attribuées à cet utilisateur
+
+### Suppression définitive (admin Django)
+
+**Interface admin Django** : `/admin/accounts/utilisateur/`
+
+**Cas d'usage** :
+- Nettoyage de comptes de test
+- Suppression suite à demande RGPD
+- Cas exceptionnels uniquement
 
 **Conséquences** :
-- ✅ Utilisateur ne peut plus se connecter
-- ✅ Données (fiches, observations) conservées
-- ✅ Réversible (`activer_utilisateur()`)
+- ⚠️ Suppression définitive de toutes les données
+- ⚠️ CASCADE ou PROTECT selon les ForeignKey
+- ⚠️ Peut échouer si des données liées existent
 
-### Amélioration future
-
-Implémenter soft delete via `core.models.SoftDeleteModel` :
-
-```python
-class Utilisateur(AbstractUser, SoftDeleteModel):
-    # Hérite automatiquement de:
-    # - is_deleted (BooleanField)
-    # - deleted_at (DateTimeField)
-    # - soft_delete() méthode
-    pass
-```
+**Recommandation** : Utiliser uniquement en dernier recours. Préférer le soft delete.
 
 ---
 
@@ -301,49 +722,56 @@ RECOMMANDATION:
 2. Ajouter une contrainte unique sur le champ email
 ```
 
----
+### Authentification et autorisation
 
-## Réinitialisation de mot de passe
+**Décorateurs utilisés** :
+```python
+@login_required                    # Authentification requise
+@user_passes_test(est_admin)       # Administrateur requis
+@user_passes_test(est_superuser)   # Superuser requis (Django)
+```
 
-### Workflow
+**Mixins pour les vues class-based** :
+```python
+LoginRequiredMixin      # Authentification requise
+UserPassesTestMixin     # Test personnalisé (est_admin)
+```
 
-1. **Page "Mot de passe oublié"**
-   - URL : `/accounts/mot-de-passe-oublie/`
-   - Saisie de l'email
+### Protection contre les attaques
 
-2. **Génération du lien**
-   ```python
-   from django.contrib.auth.tokens import default_token_generator
-   from django.utils.http import urlsafe_base64_encode
-   from django.utils.encoding import force_bytes
+**1. Énumération d'utilisateurs**
+- Messages identiques que l'email existe ou non (réinitialisation mdp)
+- Pas de différenciation dans les erreurs de login
 
-   uid = urlsafe_base64_encode(force_bytes(user.pk))
-   token = default_token_generator.make_token(user)
+**2. CSRF (Cross-Site Request Forgery)**
+- Token CSRF sur tous les formulaires POST
+- Middleware CSRF actif
 
-   reset_url = f'/accounts/reinitialiser/{uid}/{token}/'
-   ```
+**3. XSS (Cross-Site Scripting)**
+- Templates Django avec échappement automatique
+- Validation des inputs utilisateur
 
-3. **Envoi de l'email**
-   - Template : `accounts/templates/accounts/emails/reinitialisation_mot_de_passe.html`
-   - Lien valide 24h
+**4. SQL Injection**
+- ORM Django (requêtes paramétrées)
+- Pas de requêtes SQL brutes
 
-4. **Réinitialisation**
-   - Utilisateur clique le lien
-   - Saisie du nouveau mot de passe
-   - Validation et redirection
+### Logs et traçabilité
 
-**Voir** : [Documentation réinitialisation](../../account/REINITIALISATION_MDP.md)
+**Actions loguées** :
+```python
+# Inscription
+logger.info(f"Nouvelle demande d'inscription reçue : {username} ({email})")
 
-### Tests associés
+# Validation
+logger.info(f"Compte validé pour {username} par {admin.username}")
 
-**Fichier** : `accounts/tests/test_password_reset.py`
+# Réinitialisation mdp
+logger.info(f"Email de réinitialisation envoyé à {email}")
 
-**21 tests critiques** :
-- ✅ Envoi email si compte existe
-- ✅ Pas de révélation si email inexistant
-- ✅ Token valide/invalide
-- ✅ Contrainte email unique
-- ✅ Gestion des utilisateurs inactifs
+# Suppression/Réactivation
+logger.info(f"Utilisateur {username} supprimé (soft delete) par {admin.username}")
+logger.info(f"Utilisateur {username} réactivé par {admin.username}")
+```
 
 ---
 
@@ -379,7 +807,7 @@ admins = Utilisateur.objects.filter(
 ### Statistiques par rôle
 
 ```python
-from django.db.models import Count
+from django.db.models import Count, Q
 
 stats = Utilisateur.objects.values('role').annotate(
     total=Count('id'),
@@ -413,11 +841,10 @@ Si un utilisateur est supprimé :
 
 ## Voir aussi
 
-- **[Gestion utilisateurs complète](../../account/GESTION_UTILISATEURS.md)** - Workflow détaillé, formulaires, vues
-- **[Réinitialisation mot de passe](../../account/REINITIALISATION_MDP.md)** - Documentation technique complète
-- **[Tests](../../testing/TESTS_REINITIALISATION_MDP.md)** - 21 tests de réinitialisation
 - **[Diagramme ERD](../diagrammes/erd.md)** - Relations avec autres modèles
+- **[Workflow de correction](workflow-correction.md)** - Interactions avec les utilisateurs
+- **[Configuration](../../configuration/configuration.md)** - Variables d'environnement
 
 ---
 
-*Dernière mise à jour : 2025-10-20*
+*Dernière mise à jour : 2025-10-24*
