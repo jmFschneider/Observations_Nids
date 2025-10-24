@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 """Script pour vérifier les emails en double dans la base de données"""
-import os
-import django
+import os  # noqa: I001
+import django  # noqa: I001
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
 django.setup()
 
-from django.db.models import Count
-from accounts.models import Utilisateur
+from django.db.models import Count  # noqa: E402, I001
+from accounts.models import Utilisateur  # noqa: E402, I001
 
 # Trouver les emails en double
 duplicates = (
