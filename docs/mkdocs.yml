@@ -1,10 +1,15 @@
-site_name: Observations Nids
+site_name: Observations Nids - Guide Utilisateur
+site_description: Guide utilisateur pour l'application Observations Nids
 dev_addr: '127.0.0.1:8001'
 
 # Thème avec support de recherche
 theme:
   name: material
   language: fr
+  palette:
+    - scheme: default
+      primary: green
+      accent: light-green
   features:
     - navigation.instant
     - navigation.tracking
@@ -17,12 +22,11 @@ theme:
     - search.share
     - content.code.copy
     - toc.follow
-    - toc.integrate
 
 extra_javascript:
   - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js
 
-# Plugins (la recherche est incluse par défaut)
+# Plugins
 plugins:
   - search:
       lang: fr
@@ -44,11 +48,12 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.details
 
+# Navigation Utilisateurs
 nav:
   - '🏠 Accueil': 'index.md'
   - '📋 Changelog': 'CHANGELOG.md'
 
-  - '🎯 Projet':
+  - '🎯 Le Projet':
     - 'Vue d''ensemble': 'project/README.md'
     - 'Fonctionnalités': 'project/FEATURES.md'
     - 'Workflows': 'project/workflows.md'
@@ -58,46 +63,12 @@ nav:
     - 'Saisir une Observation': 'aide_utilisateurs/02_saisie_nouvelle_observation.md'
     - 'Corriger des Fiches': 'aide_utilisateurs/03_correction_transcription.md'
 
-  - '🚀 Installation & Déploiement':
-    - 'Installation Développement': 'installation/development.md'
-    - 'Installation Production': 'installation/production.md'
-    - 'Déploiement Production': 'deployment/production.md'
-
-  - '🏗️ Architecture':
-    - 'Vue d''ensemble': 'architecture/index.md'
-    - 'Domaines':
-      - 'Fiches d''observation': 'architecture/domaines/observations.md'
-      - 'Gestion utilisateurs': 'architecture/domaines/utilisateurs.md'
-      - 'Données de nidification': 'architecture/domaines/nidification.md'
-      - 'Localisation': 'architecture/domaines/localisation.md'
-      - 'Taxonomie': 'architecture/domaines/taxonomie.md'
-      - 'Workflow de correction': 'architecture/domaines/workflow-correction.md'
-      - 'Validation': 'architecture/domaines/validation.md'
-      - 'Audit & Traçabilité': 'architecture/domaines/audit.md'
-      - 'Import & Transcription': 'architecture/domaines/import-transcription.md'
-    - 'Diagrammes':
-      - 'ERD (Entité-Relation)': 'architecture/diagrammes/erd.md'
-
-  - '🔧 Guides Fonctionnels':
-    - 'Taxonomie': 'guides/fonctionnalites/taxonomie.md'
+  - '🔧 Fonctionnalités':
+    - 'Gestion des Espèces': 'guides/fonctionnalites/taxonomie.md'
     - 'Géolocalisation': 'guides/fonctionnalites/geolocalisation.md'
 
-  - '🧪 Tests & Qualité':
-    - 'Stratégie de Tests': 'testing/STRATEGIE_TESTS.md'
-    - 'Exemple : Tests Reset MDP': 'testing/TESTS_REINITIALISATION_MDP.md'
+  - '🆘 Aide':
+    - 'Dépannage': 'learning/troubleshooting/README.md'
 
-  - '⚙️ Configuration & API':
-    - 'Configuration': 'configuration/configuration.md'
-    - 'API Documentation': 'api/API_DOCUMENTATION.md'
-    - 'Base de données': 'database/reset_database.md'
-
-  - '📚 Apprentissage':
-    - 'Git Workflow': 'learning/git/README.md'
-    - 'CI-CD': 'learning/ci-cd/README.md'
-    - 'Troubleshooting': 'learning/troubleshooting/README.md'
-    - 'Bases de données': 'learning/databases/README.md'
-
-  - '📝 Suivi & Maintenance':
-    - 'Optimisations Futures': 'Todo/OPTIMISATIONS_FUTURES.md'
-    - 'Nettoyage': 'Todo/TODO_NETTOYAGE.md'
-    - 'Améliorations Documentation': 'Possibilite_amelioration_documentation.md'
+  - '👨‍💻 Pour aller plus loin':
+    - 'Documentation Développeur': 'index-dev.md'
