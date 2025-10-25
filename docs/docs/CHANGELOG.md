@@ -1,3 +1,71 @@
+# 24 Octobre 2025 - Refactoring Complet de la Documentation
+
+## Documentation
+
+### JOUR 3 - Consolidation et Organisation
+
+- **Gestion des utilisateurs** : Consolidation de 3 fichiers en 1 guide complet (850 lignes)
+  - Intégration de la documentation de gestion administrative
+  - Ajout détaillé de la réinitialisation de mot de passe
+  - Documentation du soft delete avec exemples de code
+  - Requêtes ORM courantes ajoutées
+
+- **Stratégie de tests** : Réorganisation complète de la documentation de tests
+  - Ajout d'un "Guide de démarrage" en première section
+  - Consolidation de README.md dans STRATEGIE_TESTS.md
+  - Conservation de TESTS_REINITIALISATION_MDP.md comme exemple complet
+  - Cross-références entre les documents
+
+- **Section Projet** : Enrichissement de la page d'accueil projet
+  - README.md transformé en hub de navigation
+  - Ajout d'un tableau des 7 applications Django
+  - Section Technologies enrichie avec versions et choix techniques
+  - Résumé des fonctionnalités par statut (28 stables, 2 en développement)
+  - Navigation claire entre README.md, FEATURES.md et workflows.md
+
+- **Déploiement Production** : Création d'un guide unique consolidé (1528 lignes)
+  - Intégration de DEPLOIEMENT_PI.md + securite_raspberrypi_checklist.md
+  - Structure chronologique : sécurisation → déploiement → maintenance
+  - 8 sections principales avec 3 étapes obligatoires
+  - Checklist de sécurité en 3 phases (immédiate, renforcement, avancée)
+  - Scripts de backup, monitoring et health check inclus
+  - Configuration Celery en service systemd
+  - Guide de dépannage complet
+  - Checklists de maintenance (hebdo/mensuel/trimestriel)
+
+### JOUR 4 - Correction et Amélioration
+
+- **Correction des liens cassés** : Identification et correction de 7 liens Markdown
+  - 3 liens cassés corrigés (TESTS_MODELES.md, troubleshooting.md, CELERY_DEPLOYMENT.md)
+  - 4 liens obsolètes mis à jour (DEPLOIEMENT_PI.md → production.md)
+  - Vérification des ancres : 1 lien avec ancre validé, 0 cassé
+
+- **Page d'accueil** : Transformation complète de index.md (10 → 185 lignes)
+  - Section "À propos" avec objectifs et statistiques du projet
+  - "Démarrage rapide" avec tableau comparatif dev/prod et premiers pas
+  - "Documentation par thème" : 4 catégories (utilisateurs, développeurs, guides, apprentissage)
+  - "Par cas d'usage" : 5 scénarios d'utilisation (installer, comprendre, utiliser, développer, contribuer)
+  - Architecture avec tableau des 7 applications + technologies
+  - Liens vers Changelog, aide et crédits
+
+## Statistiques Documentation
+
+- **Fichiers consolidés** : 8 fichiers transformés en 4 guides complets
+- **Lignes ajoutées** : +3 000 lignes de documentation structurée
+- **Liens corrigés** : 7 liens Markdown (3 cassés, 4 obsolètes)
+- **Navigation améliorée** : Cross-références et tables de navigation ajoutées partout
+- **Commits** : 6 commits de documentation (4 pour JOUR 3, 2 pour JOUR 4)
+
+## Organisation
+
+- `architecture/domaines/utilisateurs.md` : 850 lignes (était 424)
+- `testing/STRATEGIE_TESTS.md` : version 2.0 avec guide de démarrage
+- `project/README.md` : hub de navigation enrichi
+- `deployment/production.md` : 1528 lignes (nouveau, remplace 2 fichiers)
+- `index.md` : 185 lignes (était 10)
+
+---
+
 # 20 Octobre 2025 - Restructuration de la Documentation
 
 ## Documentation
