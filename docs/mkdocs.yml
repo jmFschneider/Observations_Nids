@@ -16,6 +16,8 @@ theme:
     - search.highlight
     - search.share
     - content.code.copy
+    - toc.follow
+    - toc.integrate
 
 # Plugins (la recherche est incluse par défaut)
 plugins:
@@ -29,43 +31,65 @@ markdown_extensions:
   - codehilite
   - toc:
       permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.details
 
 nav:
-  - 'Accueil': 'index.md'
-  - 'Changelog': 'CHANGELOG.md'
-  - 'Guides':
-    - 'Guides Utilisateur':
-      - 'Navigation Générale': 'aide_utilisateurs/01_navigation_generale.md'
-      - 'Saisie Observation': 'aide_utilisateurs/02_saisie_nouvelle_observation.md'
-      - 'Correction Transcription': 'aide_utilisateurs/03_correction_transcription.md'
-    - 'Guides Techniques':
-      - 'Installation (Développement)': 'installation/development.md'
-      - 'Installation (Production)': 'installation/production.md'
-      - 'Déploiement PI': 'deployment/DEPLOIEMENT_PI.md'
-      - 'Git Workflow': 'learning/git/README.md'
-      - 'CI-CD': 'learning/ci-cd/README.md'
-  - 'Documentation':
-    - 'Architecture':
-      - 'Vue d''ensemble': 'architecture/index.md'
-      - 'Domaines':
-        - 'Fiches d''observation': 'architecture/domaines/observations.md'
-        - 'Gestion utilisateurs': 'architecture/domaines/utilisateurs.md'
-        - 'Données de nidification': 'architecture/domaines/nidification.md'
-        - 'Localisation': 'architecture/domaines/localisation.md'
-        - 'Taxonomie': 'architecture/domaines/taxonomie.md'
-        - 'Workflow de correction': 'architecture/domaines/workflow-correction.md'
-        - 'Validation': 'architecture/domaines/validation.md'
-        - 'Audit & Traçabilité': 'architecture/domaines/audit.md'
-        - 'Import & Transcription': 'architecture/domaines/import-transcription.md'
-      - 'Diagrammes':
-        - 'ERD (Entité-Relation)': 'architecture/diagrammes/erd.md'
-    - 'Ancienne Architecture': 'project/architecture.md'
-    - 'Gestion Utilisateurs (Legacy)': 'account/GESTION_UTILISATEURS.md'
+  - '🏠 Accueil': 'index.md'
+  - '📋 Changelog': 'CHANGELOG.md'
+
+  - '🎯 Projet':
+    - 'Vue d''ensemble': 'project/README.md'
+    - 'Fonctionnalités': 'project/FEATURES.md'
+    - 'Workflows': 'project/workflows.md'
+
+  - '📖 Guides Utilisateur':
+    - 'Navigation Générale': 'aide_utilisateurs/01_navigation_generale.md'
+    - 'Saisir une Observation': 'aide_utilisateurs/02_saisie_nouvelle_observation.md'
+    - 'Corriger des Fiches': 'aide_utilisateurs/03_correction_transcription.md'
+
+  - '🚀 Installation & Déploiement':
+    - 'Installation Développement': 'installation/development.md'
+    - 'Installation Production': 'installation/production.md'
+    - 'Déploiement Production': 'deployment/production.md'
+
+  - '🏗️ Architecture':
+    - 'Vue d''ensemble': 'architecture/index.md'
+    - 'Domaines':
+      - 'Fiches d''observation': 'architecture/domaines/observations.md'
+      - 'Gestion utilisateurs': 'architecture/domaines/utilisateurs.md'
+      - 'Données de nidification': 'architecture/domaines/nidification.md'
+      - 'Localisation': 'architecture/domaines/localisation.md'
+      - 'Taxonomie': 'architecture/domaines/taxonomie.md'
+      - 'Workflow de correction': 'architecture/domaines/workflow-correction.md'
+      - 'Validation': 'architecture/domaines/validation.md'
+      - 'Audit & Traçabilité': 'architecture/domaines/audit.md'
+      - 'Import & Transcription': 'architecture/domaines/import-transcription.md'
+    - 'Diagrammes':
+      - 'ERD (Entité-Relation)': 'architecture/diagrammes/erd.md'
+
+  - '🔧 Guides Fonctionnels':
+    - 'Taxonomie': 'guides/fonctionnalites/taxonomie.md'
+    - 'Géolocalisation': 'guides/fonctionnalites/geolocalisation.md'
+
+  - '🧪 Tests & Qualité':
     - 'Stratégie de Tests': 'testing/STRATEGIE_TESTS.md'
-    - 'API': 'api/API_DOCUMENTATION.md'
+    - 'Exemple : Tests Reset MDP': 'testing/TESTS_REINITIALISATION_MDP.md'
+
+  - '⚙️ Configuration & API':
     - 'Configuration': 'configuration/configuration.md'
+    - 'API Documentation': 'api/API_DOCUMENTATION.md'
     - 'Base de données': 'database/reset_database.md'
-    - 'Suivi de projet':
-      - 'Améliorations': 'Possibilite_amelioration_documentation.md'
-      - 'Optimisations Futures': 'Todo/OPTIMISATIONS_FUTURES.md'
-      - 'Nettoyage': 'Todo/TODO_NETTOYAGE.md'
+
+  - '📚 Apprentissage':
+    - 'Git Workflow': 'learning/git/README.md'
+    - 'CI-CD': 'learning/ci-cd/README.md'
+    - 'Troubleshooting': 'learning/troubleshooting/README.md'
+    - 'Bases de données': 'learning/databases/README.md'
+
+  - '📝 Suivi & Maintenance':
+    - 'Optimisations Futures': 'Todo/OPTIMISATIONS_FUTURES.md'
+    - 'Nettoyage': 'Todo/TODO_NETTOYAGE.md'
+    - 'Améliorations Documentation': 'Possibilite_amelioration_documentation.md'
