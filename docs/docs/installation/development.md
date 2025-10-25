@@ -460,7 +460,7 @@ python manage.py createsuperuser
 
 ## 🆘 Besoin d'aide ?
 
-- Consultez la [section Troubleshooting](./troubleshooting.md) (à créer)
+- Consultez la [section Troubleshooting](../learning/troubleshooting/README.md)
 - Vérifiez les [Issues GitHub](https://github.com/jmFschneider/Observations_Nids/issues)
 - Contactez l'équipe de développement
 

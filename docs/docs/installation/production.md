@@ -864,7 +864,7 @@ sudo systemctl restart celery-worker gunicorn
 
 - [Guide de développement](./development.md)
 - [Architecture du projet](../architecture/index.md)
-- [Sécurité Raspberry Pi](../deployment/DEPLOIEMENT_PI.md)
+- [Déploiement Production](../deployment/production.md)
 - [Guide Git](../learning/git/README.md)
 
 ---

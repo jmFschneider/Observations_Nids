@@ -223,7 +223,8 @@ diff requirements.txt requirements-frozen.txt
 
 ## 📚 Ressources
 
-- [Guide de déploiement Celery](../../deployment/CELERY_DEPLOYMENT.md)
+- [Guide de déploiement Production](../deployment/production.md) (inclut configuration Celery)
+- [Redis et Celery en production](../installation/redis-celery-production.md)
 - [Optimisations futures](./OPTIMISATIONS_FUTURES.md)
 - [Changelog](../CHANGELOG.md)
 

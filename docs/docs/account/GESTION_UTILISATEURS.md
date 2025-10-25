@@ -1108,7 +1108,7 @@ python manage.py shell
 ### Documentation du projet
 - [README principal](../README.md)
 - [Réinitialisation de mot de passe](#réinitialisation-de-mot-de-passe)
-- [Déploiement Celery](../deployment/DEPLOIEMENT_PI.md)
+- [Déploiement Production](../deployment/production.md)
 
 ### Code source
 - Modèles : `accounts/models.py`

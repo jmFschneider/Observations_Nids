@@ -418,7 +418,7 @@ if jour and mois:
 - **[Fiches d'observation](observations.md)** - Modèle `FicheObservation` parent
 - **[Workflow de correction](workflow-correction.md)** - Algorithme de complétude utilisant `ResumeObservation`
 - **[Diagramme ERD](../diagrammes/erd.md)** - Vue d'ensemble des relations
-- **[Tests](../../testing/TESTS_MODELES.md)** - Tests unitaires des contraintes CHECK
+- **[Stratégie de tests](../../testing/STRATEGIE_TESTS.md)** - Tests unitaires des contraintes CHECK
 
 ---
 
