@@ -143,7 +143,11 @@ sudo goaccess /var/log/apache2/access.log -o /var/www/html/stats/index.html --lo
 - Vérifiez que le fichier de log existe : `ls -lh /var/log/apache2/access.log`
 - Vérifiez le format de log dans `/etc/apache2/apache2.conf` (devrait être LogFormat combined)
 
-## Ressources
+## Voir aussi
 
-- Documentation officielle : https://goaccess.io/
+- **[Configuration Apache pour /stats](configuration-apache-stats.md)** - Configuration VirtualHost Apache pour accéder aux statistiques
+
+## Ressources externes
+
+- Documentation officielle GoAccess : https://goaccess.io/
 - Configuration Apache : https://httpd.apache.org/docs/

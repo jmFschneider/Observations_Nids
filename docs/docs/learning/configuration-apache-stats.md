@@ -188,5 +188,5 @@ sudo goaccess /var/log/apache2/weewx-access.log -o /var/www/html/stats/index.htm
 
 ## Ressources
 
-- Documentation GoAccess : voir `docs/learning/goaccess-installation.md`
+- **[Installation GoAccess](goaccess-installation.md)** - Guide complet d'installation et configuration
 - Documentation Apache VirtualHost : https://httpd.apache.org/docs/2.4/vhosts/
