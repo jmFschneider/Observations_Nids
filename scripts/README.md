@@ -21,19 +21,31 @@
 
 | Script | Description | Usage |
 |--------|-------------|-------|
-| `generate_stats.sh` | Génère les statistiques GoAccess multi-sites | `sudo /usr/local/bin/generate_stats.sh` |
+| `generate_stats.sh` | Génère les statistiques GoAccess multi-sites (v1 - sans filtrage bots) | `sudo /usr/local/bin/generate_stats.sh` |
+| `generate_stats_v2.sh` | Génère les statistiques GoAccess avec **filtrage bots/humains** (v2 - recommandé) | `sudo /usr/local/bin/generate_stats_v2.sh` |
 
-**Fonctionnement** :
+**Fonctionnement (v2 - avec filtrage bots)** :
 - Analyse les logs Apache (`access.log` et `django-access.log`)
-- Génère 3 rapports HTML séparés (météo, observations, global)
-- Crée un tableau de bord centralisé
+- **Filtre automatiquement** les bots (15 patterns de détection)
+- Génère 6 rapports HTML : 3 pour humains + 3 pour bots
+- Crée un tableau de bord centralisé avec stats humains/bots
 - Déploie les fichiers dans `/var/www/html/stats/`
 
-**Rapports générés** :
-- `/stats/` - Tableau de bord principal
-- `/stats/meteo/` - Stats meteo-poelley50.fr
-- `/stats/observations/` - Stats observation-nids.meteo-poelley50.fr
-- `/stats/global/` - Stats combinées
+**Rapports générés (v2)** :
+- `/stats/` - Tableau de bord principal (avec stats humains vs bots)
+- `/stats/meteo/` - Stats meteo-poelley50.fr (humains)
+- `/stats/meteo/bots.html` - Stats meteo (bots)
+- `/stats/observations/` - Stats observation-nids (humains)
+- `/stats/observations/bots.html` - Stats observations (bots)
+- `/stats/global/` - Stats combinées (humains)
+- `/stats/global/bots.html` - Stats combinées (bots)
+
+**Bots détectés** :
+- Moteurs de recherche (Googlebot, Bingbot)
+- Réseaux sociaux (Facebot, Twitterbot)
+- Scanners sécurité (Censys, zgrab, XMCO, Palo Alto)
+- Outils monitoring (Go-http-client, curl, wget)
+- Scrapers (Scrapy, Selenium)
 
 **Automatisation** : Configurable via cron (recommandé : toutes les heures)
 

@@ -9,7 +9,8 @@ Ce guide décrit la configuration avancée de GoAccess pour générer des **rapp
 ### Fonctionnalités
 
 ✅ **Rapports séparés** par site (météo vs observations)
-✅ **Tableau de bord** avec vue d'ensemble
+✅ **Filtrage bots vs humains** - Statistiques distinctes pour visiteurs réels et robots
+✅ **Tableau de bord** avec vue d'ensemble et statistiques humains/bots
 ✅ **Rapport global** combinant tous les sites
 ✅ **Génération automatique** via cron
 ✅ **Protection par authentification** HTTP Basic
@@ -18,13 +19,16 @@ Ce guide décrit la configuration avancée de GoAccess pour générer des **rapp
 
 ```
 /stats/
-├── index.html              ← Tableau de bord principal
+├── index.html              ← Tableau de bord principal (avec stats humains/bots)
 ├── meteo/
-│   └── index.html          ← Stats meteo-poelley50.fr
+│   ├── index.html          ← Stats meteo-poelley50.fr (humains uniquement)
+│   └── bots.html           ← Stats meteo-poelley50.fr (bots uniquement)
 ├── observations/
-│   └── index.html          ← Stats observation-nids.meteo-poelley50.fr
+│   ├── index.html          ← Stats observation-nids (humains uniquement)
+│   └── bots.html           ← Stats observation-nids (bots uniquement)
 └── global/
-    └── index.html          ← Stats combinées (tous sites)
+    ├── index.html          ← Stats combinées (humains uniquement)
+    └── bots.html           ← Stats combinées (bots uniquement)
 ```
 
 ### Données disponibles dans chaque rapport
@@ -48,6 +52,83 @@ GoAccess génère automatiquement les statistiques suivantes :
 
 ---
 
+## 🤖 Filtrage Bots vs Humains
+
+### Qu'est-ce qu'un bot ?
+
+Un **bot** (ou robot) est un programme automatisé qui visite votre site web. Il peut s'agir de :
+
+| Type de bot | Exemples | Impact |
+|-------------|----------|--------|
+| **Moteurs de recherche** | Googlebot, Bingbot, YandexBot | ✅ Bénéfique (indexation) |
+| **Réseaux sociaux** | Facebot, Twitterbot | ✅ Bénéfique (aperçus liens) |
+| **Scanners de sécurité** | Censys, zgrab, Shodan | ⚠️ Neutre (surveillance) |
+| **Monitoring** | UptimeRobot, Pingdom | ✅ Utile (disponibilité) |
+| **Scrapers malveillants** | Scrapy non identifié | ❌ Indésirable (vol de contenu) |
+
+### Pourquoi filtrer les bots ?
+
+Les bots peuvent représenter **10 à 50% du trafic** d'un site web. Filtrer permet de :
+
+1. **Voir le trafic réel** : Nombre de visiteurs humains
+2. **Analyser le comportement utilisateur** : Pages consultées par de vraies personnes
+3. **Identifier les bots problématiques** : Scanners agressifs, scrapers
+4. **Optimiser les ressources** : Concentrer l'effort sur les vrais utilisateurs
+
+### Comment fonctionne le filtrage ?
+
+Le script `generate_stats_v2.sh` analyse le **User-Agent** de chaque requête HTTP.
+
+**User-Agent** = Chaîne qui identifie le navigateur/bot :
+- `Mozilla/5.0 ... Firefox/144.0` → Humain (Firefox)
+- `Googlebot/2.1` → Bot (Google)
+- `Go-http-client/1.1` → Bot (outil monitoring)
+
+Le script utilise **15 patterns** pour détecter les bots :
+
+```bash
+# Extrait de generate_stats_v2.sh
+BOT_PATTERNS=(
+    "bot|Bot|BOT"                          # Bots génériques
+    "crawler|Crawler|spider|Spider"        # Crawlers
+    "Go-http-client"                       # Go bots
+    "Facebot|facebookexternalhit"         # Facebook
+    "Twitterbot"                           # Twitter
+    "abuse\.xmco\.fr"                      # Scanner sécurité
+    "CensysInspect|zgrab"                  # Scanners réseau
+    "Googlebot|Bingbot|YandexBot"         # Moteurs recherche
+    "curl|wget|python-requests"            # Outils HTTP
+    "Scrapy|Selenium"                      # Scraping
+)
+```
+
+### Rapports générés
+
+Pour chaque site, **2 rapports** sont créés :
+
+1. **`index.html`** (humains) : Visiteurs réels uniquement
+   - Pages consultées par des humains
+   - Navigateurs utilisés (Chrome, Firefox, Safari)
+   - Heures de visite réelles
+
+2. **`bots.html`** (bots) : Robots uniquement
+   - Quels bots visitent votre site
+   - Fréquence des visites par bot
+   - Pages scannées par les bots
+
+### Statistiques du tableau de bord
+
+Le tableau de bord affiche :
+
+- **Compteurs séparés** : Humains vs Bots
+- **Pourcentages** : Part de bots par site
+- **Badges de couleur** :
+  - 🟢 Vert = Humains
+  - 🔴 Rouge = Bots
+- **Liens** : Accès aux rapports humains et bots
+
+---
+
 ## Installation
 
 ### Prérequis
@@ -62,49 +143,73 @@ Depuis votre machine de développement, transférez le script vers le serveur :
 
 ```bash
 # Depuis votre PC (répertoire du projet)
-scp scripts/generate_stats.sh pi@meteo-poelley50.fr:/tmp/
+scp scripts/generate_stats_v2.sh pi@meteo-poelley50.fr:/tmp/
 
 # Sur le serveur
 ssh pi@meteo-poelley50.fr
-sudo mv /tmp/generate_stats.sh /usr/local/bin/
-sudo chmod +x /usr/local/bin/generate_stats.sh
+sudo mv /tmp/generate_stats_v2.sh /usr/local/bin/
+sudo chmod +x /usr/local/bin/generate_stats_v2.sh
+
+# IMPORTANT : Convertir en format Unix (fin de lignes)
+sudo dos2unix /usr/local/bin/generate_stats_v2.sh
 ```
+
+> ⚠️ **Note** : Le script `generate_stats_v2.sh` inclut le filtrage bots/humains.
+> Si vous ne souhaitez pas filtrer les bots, utilisez `generate_stats.sh` (version 1).
 
 ### Étape 2 : Première génération manuelle
 
 Testez le script pour vérifier qu'il fonctionne :
 
 ```bash
-sudo /usr/local/bin/generate_stats.sh
+sudo /usr/local/bin/generate_stats_v2.sh
 ```
 
 **Sortie attendue :**
 
 ```
-[2025-10-26 10:30:00] INFO: === Génération des statistiques GoAccess ===
+[2025-10-26 10:30:00] INFO: === Génération des statistiques GoAccess avec filtrage bots ===
 [2025-10-26 10:30:00] INFO: Vérification des prérequis...
 [2025-10-26 10:30:00] INFO: Prérequis OK
 [2025-10-26 10:30:00] INFO: Création de la structure de répertoires...
 [2025-10-26 10:30:00] INFO: Répertoires créés
-[2025-10-26 10:30:01] INFO: Génération des statistiques du site météo...
-[2025-10-26 10:30:05] INFO: ✓ Statistiques météo générées
-[2025-10-26 10:30:05] INFO: Génération des statistiques Observations Nids...
-[2025-10-26 10:30:09] INFO: ✓ Statistiques Observations Nids générées
-[2025-10-26 10:30:09] INFO: Génération des statistiques globales...
-[2025-10-26 10:30:15] INFO: ✓ Statistiques globales générées
-[2025-10-26 10:30:15] INFO: Génération du tableau de bord...
-[2025-10-26 10:30:15] INFO: ✓ Tableau de bord généré
-[2025-10-26 10:30:15] INFO: === Génération terminée avec succès ===
+[2025-10-26 10:30:01] INFO: Filtrage des logs (humains vs bots)...
+[2025-10-26 10:30:01] INFO: Météo: 1234 humains, 156 bots
+[2025-10-26 10:30:01] INFO: Django: 656 humains, 103 bots
+[2025-10-26 10:30:02] INFO: Génération des statistiques du site météo (humains)...
+[2025-10-26 10:30:05] INFO: ✓ Statistiques météo (humains) générées
+[2025-10-26 10:30:06] INFO: ✓ Statistiques météo (bots) générées
+[2025-10-26 10:30:07] INFO: Génération des statistiques Observations Nids (humains)...
+[2025-10-26 10:30:10] INFO: ✓ Statistiques Django (humains) générées
+[2025-10-26 10:30:11] INFO: ✓ Statistiques Django (bots) générées
+[2025-10-26 10:30:12] INFO: Génération des statistiques globales (humains)...
+[2025-10-26 10:30:15] INFO: ✓ Statistiques globales (humains) générées
+[2025-10-26 10:30:17] INFO: ✓ Statistiques globales (bots) générées
+[2025-10-26 10:30:17] INFO: Génération du tableau de bord...
+[2025-10-26 10:30:17] INFO: ✓ Tableau de bord généré
+[2025-10-26 10:30:17] INFO: === Génération terminée avec succès ===
+[2025-10-26 10:30:17] INFO:
+[2025-10-26 10:30:17] INFO: Statistiques:
+[2025-10-26 10:30:17] INFO:   Humains: 1890 requêtes
+[2025-10-26 10:30:17] INFO:   Bots:    259 requêtes (12%)
 ```
 
 ### Étape 3 : Vérifier l'accès web
 
 Accédez aux statistiques via votre navigateur :
 
-- **Tableau de bord** : http://meteo-poelley50.fr/stats/
-- **Site météo** : http://meteo-poelley50.fr/stats/meteo/
-- **Observations** : http://meteo-poelley50.fr/stats/observations/
-- **Vue globale** : http://meteo-poelley50.fr/stats/global/
+**Tableau de bord :**
+- http://meteo-poelley50.fr/stats/
+
+**Rapports par site (humains) :**
+- http://meteo-poelley50.fr/stats/meteo/
+- http://meteo-poelley50.fr/stats/observations/
+- http://meteo-poelley50.fr/stats/global/
+
+**Rapports bots :**
+- http://meteo-poelley50.fr/stats/meteo/bots.html
+- http://meteo-poelley50.fr/stats/observations/bots.html
+- http://meteo-poelley50.fr/stats/global/bots.html
 
 L'authentification HTTP Basic sera demandée (voir [Configuration Apache](configuration-apache-stats.md)).
 
@@ -123,14 +228,20 @@ sudo crontab -e
 
 **Par** :
 ```
-0 * * * * /usr/local/bin/generate_stats.sh >> /var/log/goaccess.log 2>&1
+0 * * * * /usr/local/bin/generate_stats_v2.sh >> /var/log/goaccess.log 2>&1
 ```
 
 Cela génère les statistiques **toutes les heures** et enregistre les logs dans `/var/log/goaccess.log`.
 
+> 💡 **Astuce** : Pour voir les statistiques de filtrage dans les logs :
+> ```bash
+> tail -f /var/log/goaccess.log
+> # Vous verrez : "Météo: XXX humains, YYY bots"
+> ```
+
 **Variante : Mise à jour toutes les 30 minutes**
 ```
-*/30 * * * * /usr/local/bin/generate_stats.sh >> /var/log/goaccess.log 2>&1
+*/30 * * * * /usr/local/bin/generate_stats_v2.sh >> /var/log/goaccess.log 2>&1
 ```
 
 ---
