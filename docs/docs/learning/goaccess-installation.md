@@ -146,6 +146,7 @@ sudo goaccess /var/log/apache2/access.log -o /var/www/html/stats/index.html --lo
 ## Voir aussi
 
 - **[Configuration Apache pour /stats](configuration-apache-stats.md)** - Configuration VirtualHost Apache pour accéder aux statistiques
+- **[GoAccess Multi-Sites](goaccess-multi-sites.md)** - Configuration avancée avec rapports séparés par site
 
 ## Ressources externes
 

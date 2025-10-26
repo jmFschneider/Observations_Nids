@@ -186,7 +186,11 @@ sudo crontab -l
 sudo goaccess /var/log/apache2/weewx-access.log -o /var/www/html/stats/index.html --log-format=COMBINED
 ```
 
-## Ressources
+## Voir aussi
 
 - **[Installation GoAccess](goaccess-installation.md)** - Guide complet d'installation et configuration
+- **[GoAccess Multi-Sites](goaccess-multi-sites.md)** - Configuration avancée avec rapports séparés par site
+
+## Ressources externes
+
 - Documentation Apache VirtualHost : https://httpd.apache.org/docs/2.4/vhosts/

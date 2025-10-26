@@ -103,6 +103,7 @@ nav:
     - 'Monitoring & Stats':
       - 'Installation GoAccess': 'learning/goaccess-installation.md'
       - 'Configuration Apache Stats': 'learning/configuration-apache-stats.md'
+      - 'GoAccess Multi-Sites': 'learning/goaccess-multi-sites.md'
 
   - '📖 Guides Utilisateur':
     - 'Navigation Générale': 'aide_utilisateurs/01_navigation_generale.md'
