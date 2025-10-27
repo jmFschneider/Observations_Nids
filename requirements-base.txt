@@ -143,7 +143,7 @@ kombu==5.5.3
     # via
     #   -r requirements-base.in
     #   celery
-markupsafe==3.0.2
+markupsafe==3.0.3
     # via
     #   -r requirements-base.in
     #   jinja2
