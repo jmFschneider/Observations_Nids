@@ -495,35 +495,33 @@ def saisie_observation(request, fiche_id=None):
                         )
                         obs_a_supprimer.delete()
 
-                    # Sauvegarder le formset des remarques
+                    # Sauvegarder le formset des remarques (commit=False pour accéder à deleted_objects)
                     saved_remarques = remarque_formset.save(commit=False)
+
+                    # Traiter les suppressions de remarques (comme pour les observations)
+                    if fiche_id:
+                        # Utiliser deleted_objects du formset pour gérer les suppressions
+                        remarques_a_supprimer = list(remarque_formset.deleted_objects)
+                        for remarque in remarques_a_supprimer:
+                            HistoriqueModification.objects.create(
+                                fiche=fiche,
+                                champ_modifie='remarque_supprimee',
+                                ancienne_valeur=remarque.remarque,
+                                nouvelle_valeur="",
+                                categorie='remarque',
+                                modifie_par=request.user,
+                            )
+                            remarque.delete()
+
+                    # Récupérer les IDs des remarques existantes pour détecter les nouvelles
+                    remarques_existantes_ids = {r.id for r in remarques} if fiche_id else set()
+
                     for remarque in saved_remarques:
                         remarque.fiche = fiche
                         remarque.save()
-                    remarque_formset.save_m2m()
 
-                    # Traiter les suppressions et ajouts de remarques pour l'historique
-                    if fiche_id:
-                        # Récupérer les remarques avant et après
-                        remarques_avant_ids = {r.id for r in remarques}
-                        remarques_apres_ids = {r.id for r in saved_remarques if r.id}
-
-                        # Gestion des suppressions de remarques
-                        remarques_supprimees_ids = remarques_avant_ids - remarques_apres_ids
-                        for remarque in remarques:
-                            if remarque.id in remarques_supprimees_ids:
-                                HistoriqueModification.objects.create(
-                                    fiche=fiche,
-                                    champ_modifie='remarque_supprimee',
-                                    ancienne_valeur=remarque.remarque,
-                                    nouvelle_valeur="",
-                                    categorie='remarque',
-                                    modifie_par=request.user,
-                                )
-
-                    # Gestion de l'ajout de remarques nouvelles
-                    for remarque in saved_remarques:
-                        if not remarque.id or remarque.id not in {r.id for r in remarques}:
+                        # Gestion de l'ajout de remarques nouvelles
+                        if not remarque.id or (fiche_id and remarque.id not in remarques_existantes_ids):
                             HistoriqueModification.objects.create(
                                 fiche=fiche,
                                 champ_modifie='remarque_ajoutee',
@@ -532,6 +530,8 @@ def saisie_observation(request, fiche_id=None):
                                 categorie='remarque',
                                 modifie_par=request.user,
                             )
+
+                    remarque_formset.save_m2m()
 
                     if not fiche_id:
                         remarque_initiale = post_data.get('remarque-initiale')

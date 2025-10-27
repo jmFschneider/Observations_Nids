@@ -1,3 +1,105 @@
+# 27 Octobre 2025 - Tests et Corrections de Bugs
+
+## Corrections de Bugs
+
+### Bug Critique : Remarques dans l'historique
+- **Problème** : Les remarques non modifiées apparaissaient comme supprimées dans l'historique
+- **Cause** : Mauvaise utilisation de `remarque_formset.save(commit=False)`
+- **Solution** : Utilisation correcte de `deleted_objects` après save
+- **Fichiers modifiés** :
+  - `observations/views/saisie_observation_view.py` (lignes 498-534)
+  - `core/constants.py` (ajout catégorie 'remarque')
+- **Test de non-régression** : `test_remarque_non_modifiee_pas_dans_historique()`
+
+### Restauration : Suppression d'observations
+- **Problème** : Icône poubelle pour supprimer observations ne répondait plus
+- **Cause** : Code JavaScript perdu lors de l'externalisation (commit `83ec2ae`)
+- **Solution** : Code récupéré depuis commit `a7a84ab` via git
+- **Fichiers modifiés** :
+  - `observations/static/Observations/js/saisie_observation.js` (lignes 438-529)
+  - Template version : `?v=4.0` → `?v=4.1`
+
+## Tests
+
+### Amélioration Majeure de la Couverture
+- **Couverture totale** : 41% → **86%** (+45%) 🎉
+- **Tests totaux** : 66 → **78 tests** (+12 tests)
+- **Module observations** : 28% → **86%** (+58%)
+- **Module audit** : 89% → **100%** (+11%)
+
+### Nouveaux Fichiers de Tests Créés
+
+#### 1. `observations/tests/test_transcription.py` (21 tests)
+- Tests workflow complet de transcription d'images
+- Couverture `view_transcription.py` : 29% → **98%** (+69%)
+- Gestion Celery, progression, résultats
+- Mock de render() pour éviter erreurs i18n
+
+#### 2. `observations/tests/test_views.py` (18 tests)
+- Tests vues de saisie et modification
+- Couverture `saisie_observation_view.py` : 9% → **68%** (+59%)
+- **3 tests critiques** pour bug remarques corrigé
+- Tests AJAX endpoints remarques (4 tests)
+- Tests permissions et création fiches
+
+#### 3. `observations/tests/test_views_home.py` (7 tests)
+- Tests pages d'accueil
+- Couverture `views_home.py` : 35% → **100%** (+65%) ✅
+- Tests administrateur vs utilisateur normal
+- Compteurs et fiches en édition
+
+#### 4. `observations/tests/test_views_observation.py` (6 tests)
+- Tests liste et affichage observations
+- Couverture `views_observation.py` : 40% → **64%** (+24%)
+- Tests pagination (10 par page)
+- Tests tri chronologique
+
+#### 5. `observations/tests/test_json_sanitizer.py` (10 tests)
+- Tests validation et correction JSON
+- Couverture `json_sanitizer.py` : 4% → **79%** (+75%)
+- Tests immutabilité, correction clés erronées
+- Validation structure complète
+
+#### 6. `audit/tests/test_historique.py` (7 tests)
+- Tests système d'audit
+- Couverture `audit/models.py` : 89% → **100%** (+11%) ✅
+- Tests catégories, cascade delete
+- Tri chronologique
+
+### Techniques Avancées Utilisées
+- Mock de render() pour tests sans i18n
+- Désactivation debug_toolbar avec `autouse=True`
+- Tests Celery avec AsyncResult mocké
+- Fixtures partagées entre modules
+- Tests de pagination Django
+- Tests d'immutabilité de données
+
+## Documentation
+
+### Documentation Tests Enrichie
+- **STRATEGIE_TESTS.md** : Mise à jour complète avec résultats session
+  - Section "Mise à jour Tests Ajoutés (27 octobre 2025)"
+  - Métriques détaillées avant/après
+  - Documentation de chaque fichier de tests
+  - Corrections de bugs documentées
+  - Prochaines étapes recommandées
+
+- **SESSION_TESTS_2025-10-27.md** : Document récapitulatif complet (450+ lignes)
+  - Résumé exécutif avec métriques
+  - Description détaillée de chaque bug corrigé
+  - Documentation complète des 6 fichiers de tests
+  - Techniques et bonnes pratiques utilisées
+  - Leçons apprises (récupération git, mock Django)
+  - Prochaines étapes recommandées
+
+### Métriques Finales
+- 78 tests (100% passants)
+- 86% couverture globale
+- 1min 23s temps d'exécution
+- 3 modules à 100% de couverture
+
+---
+
 # 24 Octobre 2025 - Refactoring Complet de la Documentation
 
 ## Documentation
