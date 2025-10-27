@@ -203,7 +203,7 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements-base.in
     #   celery
-python-dotenv==1.1.0
+python-dotenv==1.2.1
     # via
     #   -r requirements-base.in
     #   pydantic-settings
