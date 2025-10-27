@@ -244,7 +244,7 @@ pyasn1-modules==0.4.2
     # via
     #   -r requirements-base.in
     #   google-auth
-pydantic==2.12.2
+pydantic==2.12.3
     # via
     #   -r requirements-base.in
     #   google-generativeai
