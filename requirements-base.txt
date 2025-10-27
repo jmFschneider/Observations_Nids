@@ -39,7 +39,7 @@ charset-normalizer==3.4.4
     # via
     #   -r requirements-base.in
     #   requests
-click==8.1.8
+click==8.3.0
     # via
     #   -r requirements-base.in
     #   celery
