@@ -11,6 +11,7 @@
 <nav class="navbar">
     <a href="{% url 'home' %}">Accueil</a>
     <a href="{% url 'admin:index' %}">Admin</a>
+    <a href="{% url 'helpdesk:home' %}">Support</a>
 
     {% if user.is_authenticated %}
         <div class="navbar-right">
