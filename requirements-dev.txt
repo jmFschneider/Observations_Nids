@@ -94,7 +94,7 @@ dnspython==2.7.0
     #   eventlet
 eventlet==0.40.3
     # via -r requirements-base.in
-flower==2.0.0
+flower==2.0.1
     # via -r requirements-base.in
 geographiclib==2.1
     # via geopy
