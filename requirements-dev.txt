@@ -139,7 +139,7 @@ greenlet==3.2.1
     # via
     #   -r requirements-base.in
     #   eventlet
-grpcio==1.75.1
+grpcio==1.76.0
     # via
     #   -r requirements-base.in
     #   google-api-core
