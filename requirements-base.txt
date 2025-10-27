@@ -225,7 +225,7 @@ six==1.17.0
     # via
     #   -r requirements-base.in
     #   python-dateutil
-soupsieve==2.6
+soupsieve==2.8
     # via
     #   -r requirements-base.in
     #   beautifulsoup4
