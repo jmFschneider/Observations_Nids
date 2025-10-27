@@ -44,11 +44,7 @@ class TestListeFichesObservations:
         """Test de la pagination de la liste."""
         # Créer plusieurs fiches pour tester la pagination
         for _ in range(15):
-            FicheObservation.objects.create(
-                observateur=user,
-                espece=espece,
-                annee=2024
-            )
+            FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
 
         url = reverse('liste_fiches_observations')
         response = authenticated_client.get(url)
@@ -64,11 +60,7 @@ class TestListeFichesObservations:
         """Test d'accès à la page 2 de la pagination."""
         # Créer 15 fiches
         for _ in range(15):
-            FicheObservation.objects.create(
-                observateur=user,
-                espece=espece,
-                annee=2024
-            )
+            FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
 
         url = reverse('liste_fiches_observations')
         response = authenticated_client.get(url, {'page': '2'})

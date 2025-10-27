@@ -20,7 +20,7 @@ class TestHistoriqueModification:
             ancienne_valeur='Ancienne commune',
             nouvelle_valeur='Nouvelle commune',
             categorie='localisation',
-            modifie_par=user
+            modifie_par=user,
         )
 
         assert historique.id is not None
@@ -38,7 +38,7 @@ class TestHistoriqueModification:
             ancienne_valeur='Paris',
             nouvelle_valeur='Lyon',
             categorie='localisation',
-            modifie_par=user
+            modifie_par=user,
         )
 
         # Le format est: "Modification {champ} ({date}) par {user}"
@@ -53,16 +53,10 @@ class TestHistoriqueModification:
         """Test de récupération de l'historique d'une fiche spécifique."""
         # Créer deux fiches
         fiche1 = FicheObservation.objects.create(
-            observateur=user,
-            espece=espece,
-            annee=2024,
-            transcription=False
+            observateur=user, espece=espece, annee=2024, transcription=False
         )
         fiche2 = FicheObservation.objects.create(
-            observateur=user,
-            espece=espece,
-            annee=2024,
-            transcription=False
+            observateur=user, espece=espece, annee=2024, transcription=False
         )
 
         # Créer des entrées d'historique pour chaque fiche
@@ -72,7 +66,7 @@ class TestHistoriqueModification:
             ancienne_valeur='A',
             nouvelle_valeur='B',
             categorie='localisation',
-            modifie_par=user
+            modifie_par=user,
         )
         HistoriqueModification.objects.create(
             fiche=fiche2,
@@ -80,7 +74,7 @@ class TestHistoriqueModification:
             ancienne_valeur='C',
             nouvelle_valeur='D',
             categorie='localisation',
-            modifie_par=user
+            modifie_par=user,
         )
 
         # Vérifier que chaque fiche a son propre historique
@@ -104,7 +98,7 @@ class TestHistoriqueModification:
             ancienne_valeur='A',
             nouvelle_valeur='B',
             categorie='localisation',
-            modifie_par=user
+            modifie_par=user,
         )
 
         # Attendre un peu
@@ -116,13 +110,13 @@ class TestHistoriqueModification:
             ancienne_valeur='01',
             nouvelle_valeur='02',
             categorie='localisation',
-            modifie_par=user
+            modifie_par=user,
         )
 
         # Récupérer l'historique
-        historique = HistoriqueModification.objects.filter(
-            fiche=fiche_observation
-        ).order_by('-date_modification')
+        historique = HistoriqueModification.objects.filter(fiche=fiche_observation).order_by(
+            '-date_modification'
+        )
 
         # Vérifier l'ordre
         assert historique.count() == 2
@@ -145,7 +139,7 @@ class TestCategories:
             ancienne_valeur='',
             nouvelle_valeur='Test remarque',
             categorie='remarque',
-            modifie_par=user
+            modifie_par=user,
         )
 
         assert historique.categorie == 'remarque'
@@ -159,7 +153,7 @@ class TestCategories:
             ancienne_valeur='A',
             nouvelle_valeur='B',
             categorie='localisation',
-            modifie_par=user
+            modifie_par=user,
         )
 
         HistoriqueModification.objects.create(
@@ -168,7 +162,7 @@ class TestCategories:
             ancienne_valeur='',
             nouvelle_valeur='Test',
             categorie='remarque',
-            modifie_par=user
+            modifie_par=user,
         )
 
         HistoriqueModification.objects.create(
@@ -177,21 +171,18 @@ class TestCategories:
             ancienne_valeur='2024-01-01',
             nouvelle_valeur='2024-01-02',
             categorie='observation',
-            modifie_par=user
+            modifie_par=user,
         )
 
         # Filtrer par catégorie
         historique_localisation = HistoriqueModification.objects.filter(
-            fiche=fiche_observation,
-            categorie='localisation'
+            fiche=fiche_observation, categorie='localisation'
         )
         historique_remarques = HistoriqueModification.objects.filter(
-            fiche=fiche_observation,
-            categorie='remarque'
+            fiche=fiche_observation, categorie='remarque'
         )
         historique_observations = HistoriqueModification.objects.filter(
-            fiche=fiche_observation,
-            categorie='observation'
+            fiche=fiche_observation, categorie='observation'
         )
 
         assert historique_localisation.count() == 1
@@ -212,7 +203,7 @@ class TestSuppressionEnCascade:
             ancienne_valeur='A',
             nouvelle_valeur='B',
             categorie='localisation',
-            modifie_par=user
+            modifie_par=user,
         )
 
         fiche_id = fiche_observation.num_fiche

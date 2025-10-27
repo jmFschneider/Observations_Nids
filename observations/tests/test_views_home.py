@@ -48,9 +48,7 @@ class TestHomeView:
         """Test qu'un administrateur voit les demandes de compte en attente."""
         # Créer un utilisateur non validé
         Utilisateur.objects.create(
-            username='nonvalide',
-            email='nonvalide@test.com',
-            est_valide=False
+            username='nonvalide', email='nonvalide@test.com', est_valide=False
         )
 
         url = reverse('home')

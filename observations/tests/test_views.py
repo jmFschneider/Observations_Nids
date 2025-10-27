@@ -36,7 +36,6 @@ class TestSaisieObservationView:
             # Informations de base
             'espece': fiche_observation.espece.id,
             'annee': 2025,
-
             # Localisation
             'commune': 'Paris',
             'departement': '75',
@@ -46,13 +45,11 @@ class TestSaisieObservationView:
             'altitude': '35',
             'paysage': 'Urbain',
             'alentours': 'Parc',
-
             # Nid
             'nid_prec_t_meme_couple': 'non',
             'hauteur_nid': '150',
             'hauteur_couvert': '200',
             'details_nid': 'Nid dans un arbre',
-
             # Résumé
             'premier_oeuf_pondu_jour': '',
             'premier_oeuf_pondu_mois': '',
@@ -64,16 +61,13 @@ class TestSaisieObservationView:
             'nombre_oeufs_eclos': '',
             'nombre_oeufs_non_eclos': '',
             'nombre_poussins': '',
-
             # Causes d'échec
             'description': 'Aucune cause identifiée',
-
             # Formsets management forms
             'observations-TOTAL_FORMS': '0',
             'observations-INITIAL_FORMS': '0',
             'observations-MIN_NUM_FORMS': '0',
             'observations-MAX_NUM_FORMS': '1000',
-
             'remarques-TOTAL_FORMS': '0',
             'remarques-INITIAL_FORMS': '0',
             'remarques-MIN_NUM_FORMS': '0',
@@ -96,30 +90,30 @@ class TestSaisieObservationView:
 class TestHistoriqueRemarques:
     """Tests pour l'historique des modifications des remarques."""
 
-    def test_remarque_non_modifiee_pas_dans_historique(self, authenticated_client, fiche_observation):
+    def test_remarque_non_modifiee_pas_dans_historique(
+        self, authenticated_client, fiche_observation
+    ):
         """Test que les remarques non modifiées ne sont PAS marquées comme supprimées."""
         # Créer une remarque
-        remarque = Remarque.objects.create(
-            fiche=fiche_observation,
-            remarque="Test remarque"
-        )
+        remarque = Remarque.objects.create(fiche=fiche_observation, remarque="Test remarque")
 
         url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
 
         # Modifier la fiche SANS toucher à la remarque
         data = self._get_base_form_data(fiche_observation)
-        data.update({
-            'remarques-TOTAL_FORMS': '1',
-            'remarques-INITIAL_FORMS': '1',
-            'remarques-0-id': str(remarque.id),
-            'remarques-0-remarque': remarque.remarque,
-            'remarques-0-DELETE': '',  # PAS supprimée
-        })
+        data.update(
+            {
+                'remarques-TOTAL_FORMS': '1',
+                'remarques-INITIAL_FORMS': '1',
+                'remarques-0-id': str(remarque.id),
+                'remarques-0-remarque': remarque.remarque,
+                'remarques-0-DELETE': '',  # PAS supprimée
+            }
+        )
 
         # Compter les entrées d'historique avant
         count_before = HistoriqueModification.objects.filter(
-            fiche=fiche_observation,
-            categorie='remarque'
+            fiche=fiche_observation, categorie='remarque'
         ).count()
 
         response = authenticated_client.post(url, data)
@@ -127,40 +121,40 @@ class TestHistoriqueRemarques:
 
         # Vérifier qu'aucune nouvelle entrée d'historique pour remarque n'a été créée
         count_after = HistoriqueModification.objects.filter(
-            fiche=fiche_observation,
-            categorie='remarque'
+            fiche=fiche_observation, categorie='remarque'
         ).count()
 
-        assert count_after == count_before, "Aucune entrée d'historique ne devrait être créée pour une remarque non modifiée"
+        assert count_after == count_before, (
+            "Aucune entrée d'historique ne devrait être créée pour une remarque non modifiée"
+        )
 
     def test_suppression_remarque_dans_historique(self, authenticated_client, fiche_observation):
         """Test que la suppression d'une remarque est bien enregistrée dans l'historique."""
         # Créer une remarque
         remarque = Remarque.objects.create(
-            fiche=fiche_observation,
-            remarque="Test remarque à supprimer"
+            fiche=fiche_observation, remarque="Test remarque à supprimer"
         )
 
         url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
 
         # Marquer la remarque pour suppression
         data = self._get_base_form_data(fiche_observation)
-        data.update({
-            'remarques-TOTAL_FORMS': '1',
-            'remarques-INITIAL_FORMS': '1',
-            'remarques-0-id': str(remarque.id),
-            'remarques-0-remarque': remarque.remarque,
-            'remarques-0-DELETE': 'on',  # Marquée pour suppression
-        })
+        data.update(
+            {
+                'remarques-TOTAL_FORMS': '1',
+                'remarques-INITIAL_FORMS': '1',
+                'remarques-0-id': str(remarque.id),
+                'remarques-0-remarque': remarque.remarque,
+                'remarques-0-DELETE': 'on',  # Marquée pour suppression
+            }
+        )
 
         response = authenticated_client.post(url, data)
         assert response.status_code == 302
 
         # Vérifier que l'entrée d'historique a été créée
         historique = HistoriqueModification.objects.filter(
-            fiche=fiche_observation,
-            champ_modifie='remarque_supprimee',
-            categorie='remarque'
+            fiche=fiche_observation, champ_modifie='remarque_supprimee', categorie='remarque'
         )
 
         assert historique.exists(), "Une entrée d'historique devrait être créée pour la suppression"
@@ -173,12 +167,14 @@ class TestHistoriqueRemarques:
 
         # Ajouter une nouvelle remarque
         data = self._get_base_form_data(fiche_observation)
-        data.update({
-            'remarques-TOTAL_FORMS': '1',
-            'remarques-INITIAL_FORMS': '0',
-            'remarques-0-remarque': 'Nouvelle remarque',
-            'remarques-0-DELETE': '',
-        })
+        data.update(
+            {
+                'remarques-TOTAL_FORMS': '1',
+                'remarques-INITIAL_FORMS': '0',
+                'remarques-0-remarque': 'Nouvelle remarque',
+                'remarques-0-DELETE': '',
+            }
+        )
 
         response = authenticated_client.post(url, data)
         assert response.status_code == 302
@@ -188,9 +184,7 @@ class TestHistoriqueRemarques:
 
         # Vérifier l'entrée d'historique
         historique = HistoriqueModification.objects.filter(
-            fiche=fiche_observation,
-            champ_modifie='remarque_ajoutee',
-            categorie='remarque'
+            fiche=fiche_observation, champ_modifie='remarque_ajoutee', categorie='remarque'
         )
 
         assert historique.exists(), "Une entrée d'historique devrait être créée pour l'ajout"
@@ -244,7 +238,7 @@ class TestSuppressionObservations:
             date_observation=timezone.now(),
             nombre_oeufs=3,
             nombre_poussins=2,
-            observations="Test observation"
+            observations="Test observation",
         )
 
         url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
@@ -281,7 +275,9 @@ class TestSuppressionObservations:
             'observations-MIN_NUM_FORMS': '0',
             'observations-MAX_NUM_FORMS': '1000',
             'observations-0-id': str(observation.id),
-            'observations-0-date_observation': observation.date_observation.strftime('%Y-%m-%d %H:%M'),
+            'observations-0-date_observation': observation.date_observation.strftime(
+                '%Y-%m-%d %H:%M'
+            ),
             'observations-0-nombre_oeufs': str(observation.nombre_oeufs),
             'observations-0-nombre_poussins': str(observation.nombre_poussins),
             'observations-0-observations': observation.observations,
@@ -300,9 +296,7 @@ class TestSuppressionObservations:
 
         # Vérifier l'entrée d'historique
         historique = HistoriqueModification.objects.filter(
-            fiche=fiche_observation,
-            champ_modifie='observation_supprimee',
-            categorie='observation'
+            fiche=fiche_observation, champ_modifie='observation_supprimee', categorie='observation'
         )
 
         assert historique.exists(), "Une entrée d'historique devrait être créée pour la suppression"
@@ -321,7 +315,7 @@ class TestHistoriqueModifications:
             ancienne_valeur='Ancien',
             nouvelle_valeur='Nouveau',
             categorie='localisation',
-            modifie_par=fiche_observation.observateur
+            modifie_par=fiche_observation.observateur,
         )
 
         url = reverse('historique_modifications', kwargs={'fiche_id': fiche_observation.num_fiche})
@@ -344,9 +338,7 @@ class TestAjaxRemarques:
 
         url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
         response = authenticated_client.get(
-            url,
-            {'get_remarques': '1'},
-            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+            url, {'get_remarques': '1'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
 
         assert response.status_code == 200
@@ -424,8 +416,7 @@ class TestAjaxRemarques:
 
         # Vérifier l'historique
         historique = HistoriqueModification.objects.filter(
-            fiche=fiche_observation,
-            champ_modifie='remarque_modifiee'
+            fiche=fiche_observation, champ_modifie='remarque_modifiee'
         )
         assert historique.exists()
 
@@ -446,9 +437,7 @@ class TestFicheObservationView:
     def test_affichage_fiche_avec_observations(self, authenticated_client, fiche_observation):
         """Test de l'affichage d'une fiche avec observations."""
         Observation.objects.create(
-            fiche=fiche_observation,
-            date_observation=timezone.now(),
-            nombre_oeufs=3
+            fiche=fiche_observation, date_observation=timezone.now(), nombre_oeufs=3
         )
 
         url = reverse('fiche_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
@@ -463,7 +452,9 @@ class TestFicheObservationView:
 class TestPermissions:
     """Tests pour la gestion des permissions."""
 
-    def test_utilisateur_non_autorise_ne_peut_modifier(self, client, fiche_observation, create_user):
+    def test_utilisateur_non_autorise_ne_peut_modifier(
+        self, client, fiche_observation, create_user
+    ):
         """Test qu'un utilisateur non autorisé ne peut pas modifier une fiche en cours de saisie."""
         # Créer un autre utilisateur
         autre_user = create_user(username='autre_user', email='autre@test.com')
@@ -479,7 +470,9 @@ class TestPermissions:
 
         # Devrait être redirigé
         assert response.status_code == 302
-        assert response.url == reverse('fiche_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        assert response.url == reverse(
+            'fiche_observation', kwargs={'fiche_id': fiche_observation.num_fiche}
+        )
 
     def test_fiche_inexistante(self, authenticated_client):
         """Test d'accès à une fiche qui n'existe pas."""
@@ -551,4 +544,7 @@ class TestCreationNouvelleFiche:
         # Vérifier que la fiche a été créée avec le bon observateur
         fiche = FicheObservation.objects.filter(espece=espece, annee=2025).first()
         assert fiche is not None
-        assert fiche.observateur == authenticated_client.session.get('_auth_user_id') or fiche.observateur.id
+        assert (
+            fiche.observateur == authenticated_client.session.get('_auth_user_id')
+            or fiche.observateur.id
+        )

@@ -521,7 +521,9 @@ def saisie_observation(request, fiche_id=None):
                         remarque.save()
 
                         # Gestion de l'ajout de remarques nouvelles
-                        if not remarque.id or (fiche_id and remarque.id not in remarques_existantes_ids):
+                        if not remarque.id or (
+                            fiche_id and remarque.id not in remarques_existantes_ids
+                        ):
                             HistoriqueModification.objects.create(
                                 fiche=fiche,
                                 champ_modifie='remarque_ajoutee',

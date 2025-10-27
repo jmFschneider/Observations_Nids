@@ -22,7 +22,9 @@ class TestSelectDirectory:
     @patch('observations.views.view_transcription.render')
     @patch('os.listdir')
     @patch('os.path.isdir')
-    def test_get_affiche_liste_repertoires(self, mock_isdir, mock_listdir, mock_render, authenticated_client):
+    def test_get_affiche_liste_repertoires(
+        self, mock_isdir, mock_listdir, mock_render, authenticated_client
+    ):
         """Test que la page GET affiche la liste des répertoires disponibles."""
         # Simuler des répertoires
         mock_listdir.return_value = ['dir1', 'dir2', 'file.txt', 'dir3']
@@ -47,7 +49,9 @@ class TestSelectDirectory:
     @patch('observations.views.view_transcription.os.path.isfile')
     @patch('observations.views.view_transcription.os.listdir')
     @patch('observations.views.view_transcription.os.path.isdir')
-    def test_post_repertoire_valide(self, mock_isdir, mock_listdir, mock_isfile, authenticated_client):
+    def test_post_repertoire_valide(
+        self, mock_isdir, mock_listdir, mock_isfile, authenticated_client
+    ):
         """Test de sélection d'un répertoire valide."""
         mock_isdir.return_value = True
         mock_listdir.return_value = ['image1.jpg', 'image2.JPG', 'doc.txt', 'image3.jpeg']
@@ -145,7 +149,9 @@ class TestProcessImages:
     @patch('os.makedirs')
     @patch('observations.views.view_transcription.process_images_task.delay')
     @patch('observations.views.view_transcription.is_celery_operational')
-    def test_lancement_traitement_succes(self, mock_celery_check, mock_task_delay, mock_makedirs, mock_render, authenticated_client):
+    def test_lancement_traitement_succes(
+        self, mock_celery_check, mock_task_delay, mock_makedirs, mock_render, authenticated_client
+    ):
         """Test du lancement réussi du traitement."""
         mock_celery_check.return_value = True
 
@@ -243,7 +249,7 @@ class TestCheckProgress:
             'total': 10,
             'success_count': 8,
             'success_rate': 80.0,
-            'results': [{'file': 'test.jpg', 'status': 'success'}]
+            'results': [{'file': 'test.jpg', 'status': 'success'}],
         }
         mock_async_result.return_value = mock_result
 
@@ -301,8 +307,8 @@ class TestTranscriptionResults:
             'successful_files': 8,
             'results': [
                 {'status': 'success', 'json_path': 'result1.json'},
-                {'status': 'error', 'error': 'File not found'}
-            ]
+                {'status': 'error', 'error': 'File not found'},
+            ],
         }
         session.save()
 

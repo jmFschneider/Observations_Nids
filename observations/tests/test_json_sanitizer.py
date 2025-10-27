@@ -1,6 +1,5 @@
 """Tests pour le module json_sanitizer."""
 
-
 from observations.json_rep.json_sanitizer import corriger_json, validate_json_structure
 
 
@@ -15,13 +14,13 @@ class TestValidateJsonStructure:
                 "observateur": "Test",
                 "n_espece": "1",
                 "espece": "Buse variable",
-                "annee": "2024"
+                "annee": "2024",
             },
             "nid": {
                 "nid_prec_t_meme_c_ple": "non",
                 "haut_nid": "10",
                 "h_c_vert": "15",
-                "nid": "Détails"
+                "nid": "Détails",
             },
             "localisation": {
                 "IGN_50000": "ABC",
@@ -30,7 +29,7 @@ class TestValidateJsonStructure:
                 "coordonnees_et_ou_lieu_dit": "48.8,2.3",
                 "altitude": "35",
                 "paysage": "Urbain",
-                "alentours": "Parc"
+                "alentours": "Parc",
             },
             "tableau_donnees": [],
             "tableau_donnees_2": {
@@ -38,11 +37,9 @@ class TestValidateJsonStructure:
                 "1er_p_eclos": "15/05",
                 "1er_p_volant": "01/07",
                 "nombre_oeufs": "3",
-                "nombre_poussins": "2"
+                "nombre_poussins": "2",
             },
-            "causes_echec": {
-                "causes_d_echec": "Aucune"
-            }
+            "causes_echec": {"causes_d_echec": "Aucune"},
         }
 
         errors = validate_json_structure(data)
@@ -56,7 +53,7 @@ class TestValidateJsonStructure:
             "localisation": {},
             "tableau_donnees": [],
             "tableau_donnees_2": {},
-            "causes_echec": {}
+            "causes_echec": {},
         }
 
         errors = validate_json_structure(data)
@@ -71,10 +68,24 @@ class TestValidateJsonStructure:
                 # Champs manquants
             },
             "nid": {"nid_prec_t_meme_c_ple": "", "haut_nid": "", "h_c_vert": "", "nid": ""},
-            "localisation": {"IGN_50000": "", "commune": "", "dep_t": "", "coordonnees_et_ou_lieu_dit": "", "altitude": "", "paysage": "", "alentours": ""},
+            "localisation": {
+                "IGN_50000": "",
+                "commune": "",
+                "dep_t": "",
+                "coordonnees_et_ou_lieu_dit": "",
+                "altitude": "",
+                "paysage": "",
+                "alentours": "",
+            },
             "tableau_donnees": [],
-            "tableau_donnees_2": {"1er_o_pondu": "", "1er_p_eclos": "", "1er_p_volant": "", "nombre_oeufs": "", "nombre_poussins": ""},
-            "causes_echec": {"causes_d_echec": ""}
+            "tableau_donnees_2": {
+                "1er_o_pondu": "",
+                "1er_p_eclos": "",
+                "1er_p_volant": "",
+                "nombre_oeufs": "",
+                "nombre_poussins": "",
+            },
+            "causes_echec": {"causes_d_echec": ""},
         }
 
         errors = validate_json_structure(data)
@@ -84,12 +95,32 @@ class TestValidateJsonStructure:
     def test_json_tableau_donnees_pas_liste(self):
         """Test que tableau_donnees doit être une liste."""
         data = {
-            "informations_generales": {"n_fiche": "", "observateur": "", "n_espece": "", "espece": "", "annee": ""},
+            "informations_generales": {
+                "n_fiche": "",
+                "observateur": "",
+                "n_espece": "",
+                "espece": "",
+                "annee": "",
+            },
             "nid": {"nid_prec_t_meme_c_ple": "", "haut_nid": "", "h_c_vert": "", "nid": ""},
-            "localisation": {"IGN_50000": "", "commune": "", "dep_t": "", "coordonnees_et_ou_lieu_dit": "", "altitude": "", "paysage": "", "alentours": ""},
+            "localisation": {
+                "IGN_50000": "",
+                "commune": "",
+                "dep_t": "",
+                "coordonnees_et_ou_lieu_dit": "",
+                "altitude": "",
+                "paysage": "",
+                "alentours": "",
+            },
             "tableau_donnees": "pas une liste",  # Erreur
-            "tableau_donnees_2": {"1er_o_pondu": "", "1er_p_eclos": "", "1er_p_volant": "", "nombre_oeufs": "", "nombre_poussins": ""},
-            "causes_echec": {"causes_d_echec": ""}
+            "tableau_donnees_2": {
+                "1er_o_pondu": "",
+                "1er_p_eclos": "",
+                "1er_p_volant": "",
+                "nombre_oeufs": "",
+                "nombre_poussins": "",
+            },
+            "causes_echec": {"causes_d_echec": ""},
         }
 
         errors = validate_json_structure(data)
@@ -98,12 +129,32 @@ class TestValidateJsonStructure:
     def test_json_causes_echec_champ_manquant(self):
         """Test avec le champ causes_d_echec manquant."""
         data = {
-            "informations_generales": {"n_fiche": "", "observateur": "", "n_espece": "", "espece": "", "annee": ""},
+            "informations_generales": {
+                "n_fiche": "",
+                "observateur": "",
+                "n_espece": "",
+                "espece": "",
+                "annee": "",
+            },
             "nid": {"nid_prec_t_meme_c_ple": "", "haut_nid": "", "h_c_vert": "", "nid": ""},
-            "localisation": {"IGN_50000": "", "commune": "", "dep_t": "", "coordonnees_et_ou_lieu_dit": "", "altitude": "", "paysage": "", "alentours": ""},
+            "localisation": {
+                "IGN_50000": "",
+                "commune": "",
+                "dep_t": "",
+                "coordonnees_et_ou_lieu_dit": "",
+                "altitude": "",
+                "paysage": "",
+                "alentours": "",
+            },
             "tableau_donnees": [],
-            "tableau_donnees_2": {"1er_o_pondu": "", "1er_p_eclos": "", "1er_p_volant": "", "nombre_oeufs": "", "nombre_poussins": ""},
-            "causes_echec": {}  # causes_d_echec manquant
+            "tableau_donnees_2": {
+                "1er_o_pondu": "",
+                "1er_p_eclos": "",
+                "1er_p_volant": "",
+                "nombre_oeufs": "",
+                "nombre_poussins": "",
+            },
+            "causes_echec": {},  # causes_d_echec manquant
         }
 
         errors = validate_json_structure(data)
@@ -115,11 +166,7 @@ class TestCorrigerJson:
 
     def test_corriger_cle_tableau_resume(self):
         """Test de correction du nom 'tableau_resume' en 'tableau_donnees_2'."""
-        data = {
-            "tableau_resume": {
-                "1er_o_pondu": "01/04"
-            }
-        }
+        data = {"tableau_resume": {"1er_o_pondu": "01/04"}}
 
         corrected = corriger_json(data)
         assert "tableau_donnees_2" in corrected
@@ -127,11 +174,7 @@ class TestCorrigerJson:
 
     def test_corriger_cle_causes_echec_accent(self):
         """Test de correction de 'causes_d'échec' en 'causes_echec'."""
-        data = {
-            "causes_d'échec": {
-                "causes_d_echec": "Test"
-            }
-        }
+        data = {"causes_d'échec": {"causes_d_echec": "Test"}}
 
         corrected = corriger_json(data)
         assert "causes_echec" in corrected
@@ -144,11 +187,9 @@ class TestCorrigerJson:
                 "n_fiche": "123",
                 "observateur": "Test",
                 "espece": "Buse",
-                "annee": "2024"
+                "annee": "2024",
             },
-            "nid": {
-                "haut_nid": "10"
-            }
+            "nid": {"haut_nid": "10"},
         }
 
         corrected = corriger_json(data)
@@ -165,7 +206,7 @@ class TestCorrigerJson:
         """Test que la fonction ne modifie pas le dictionnaire original."""
         original = {
             "tableau_resume": {"test": "value"},
-            "informations_generales": {"n_fiche": "123"}
+            "informations_generales": {"n_fiche": "123"},
         }
 
         corrected = corriger_json(original)
