@@ -65,13 +65,7 @@ click-repl==0.3.0
     #   -r requirements-base.in
     #   celery
 colorama==0.4.6
-    # via
-    #   -r requirements-base.in
-    #   build
-    #   click
-    #   mkdocs
-    #   pytest
-    #   tqdm
+    # via -r requirements-base.in
 coverage[toml]==7.10.7
     # via pytest-cov
 django==5.2.7
@@ -286,7 +280,7 @@ python-dateutil==2.9.0.post0
     #   -r requirements-base.in
     #   celery
     #   ghp-import
-python-dotenv==1.1.0
+python-dotenv==1.2.1
     # via
     #   -r requirements-base.in
     #   pydantic-settings
@@ -359,7 +353,6 @@ typing-inspection==0.4.2
 tzdata==2025.2
     # via
     #   -r requirements-base.in
-    #   django
     #   kombu
 uritemplate==4.2.0
     # via
