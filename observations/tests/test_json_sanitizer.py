@@ -1,6 +1,5 @@
 """Tests pour le module json_sanitizer."""
 
-import pytest
 
 from observations.json_rep.json_sanitizer import corriger_json, validate_json_structure
 
@@ -10,7 +9,7 @@ class TestValidateJsonStructure:
 
     def test_json_valide_complet(self):
         """Test avec un JSON valide et complet."""
-        data = {
+        data: dict[str, dict[str, str] | list[dict[str, str]]] = {
             "informations_generales": {
                 "n_fiche": "123",
                 "observateur": "Test",
@@ -51,7 +50,7 @@ class TestValidateJsonStructure:
 
     def test_json_cle_manquante_top_level(self):
         """Test avec une clé principale manquante."""
-        data = {
+        data: dict[str, dict[str, str] | list[dict[str, str]]] = {
             "informations_generales": {},
             # "nid" manquant
             "localisation": {},
@@ -158,7 +157,7 @@ class TestCorrigerJson:
 
     def test_corriger_json_vide(self):
         """Test avec un JSON vide."""
-        data = {}
+        data: dict[str, dict[str, str] | list[dict[str, str]]] = {}
         corrected = corriger_json(data)
         assert isinstance(corrected, dict)
 

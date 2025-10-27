@@ -1,13 +1,12 @@
 """Tests pour les vues de transcription."""
 
-import os
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
-from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse
-from django.utils import timezone
+
+from observations.views.view_transcription import is_celery_operational
 
 
 @pytest.fixture(autouse=True)
@@ -95,8 +94,6 @@ class TestIsCeleryOperational:
     @patch('observations.views.view_transcription.app.control.ping')
     def test_celery_operational(self, mock_ping):
         """Test quand Celery est opérationnel."""
-        from observations.views.view_transcription import is_celery_operational
-
         mock_ping.return_value = [{'worker1': {'ok': 'pong'}}]
 
         assert is_celery_operational() is True
@@ -104,8 +101,6 @@ class TestIsCeleryOperational:
     @patch('observations.views.view_transcription.app.control.ping')
     def test_celery_non_operational_no_workers(self, mock_ping):
         """Test quand aucun worker ne répond."""
-        from observations.views.view_transcription import is_celery_operational
-
         mock_ping.return_value = []
 
         assert is_celery_operational() is False
@@ -113,8 +108,6 @@ class TestIsCeleryOperational:
     @patch('observations.views.view_transcription.app.control.ping')
     def test_celery_exception(self, mock_ping):
         """Test quand une exception est levée."""
-        from observations.views.view_transcription import is_celery_operational
-
         mock_ping.side_effect = Exception("Connection error")
 
         assert is_celery_operational() is False

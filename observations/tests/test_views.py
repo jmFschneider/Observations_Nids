@@ -164,7 +164,8 @@ class TestHistoriqueRemarques:
         )
 
         assert historique.exists(), "Une entrée d'historique devrait être créée pour la suppression"
-        assert historique.first().ancienne_valeur == "Test remarque à supprimer"
+        first_hist = historique.first()
+        assert first_hist is not None and first_hist.ancienne_valeur == "Test remarque à supprimer"
 
     def test_ajout_remarque_dans_historique(self, authenticated_client, fiche_observation):
         """Test que l'ajout d'une nouvelle remarque est enregistré dans l'historique."""
@@ -193,7 +194,8 @@ class TestHistoriqueRemarques:
         )
 
         assert historique.exists(), "Une entrée d'historique devrait être créée pour l'ajout"
-        assert historique.first().nouvelle_valeur == "Nouvelle remarque"
+        first_hist = historique.first()
+        assert first_hist is not None and first_hist.nouvelle_valeur == "Nouvelle remarque"
 
     def _get_base_form_data(self, fiche_observation):
         """Retourne les données de base du formulaire."""

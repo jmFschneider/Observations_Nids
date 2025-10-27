@@ -1,7 +1,11 @@
 """Tests pour les vues d'affichage des observations."""
 
+import time
+
 import pytest
 from django.urls import reverse
+
+from observations.models import FicheObservation
 
 
 @pytest.mark.django_db
@@ -39,9 +43,7 @@ class TestListeFichesObservations:
     def test_pagination_liste(self, authenticated_client, user, espece):
         """Test de la pagination de la liste."""
         # Créer plusieurs fiches pour tester la pagination
-        from observations.models import FicheObservation
-
-        for i in range(15):
+        for _ in range(15):
             FicheObservation.objects.create(
                 observateur=user,
                 espece=espece,
@@ -60,10 +62,8 @@ class TestListeFichesObservations:
 
     def test_pagination_page_2(self, authenticated_client, user, espece):
         """Test d'accès à la page 2 de la pagination."""
-        from observations.models import FicheObservation
-
         # Créer 15 fiches
-        for i in range(15):
+        for _ in range(15):
             FicheObservation.objects.create(
                 observateur=user,
                 espece=espece,
@@ -82,13 +82,10 @@ class TestListeFichesObservations:
 
     def test_ordre_fiches_decroissant(self, authenticated_client, user, espece):
         """Test que les fiches sont ordonnées par date de création décroissante."""
-        from observations.models import FicheObservation
-        import time
-
         # Créer 3 fiches avec un petit délai entre chaque
-        fiche1 = FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
+        _fiche1 = FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
         time.sleep(0.01)
-        fiche2 = FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
+        _fiche2 = FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
         time.sleep(0.01)
         fiche3 = FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
 

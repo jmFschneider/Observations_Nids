@@ -1,10 +1,11 @@
 """Tests pour le module d'historique des modifications."""
 
+import time
+
 import pytest
-from django.utils import timezone
 
 from audit.models import HistoriqueModification
-from observations.models import FicheObservation, Remarque
+from observations.models import FicheObservation
 
 
 @pytest.mark.django_db
@@ -41,7 +42,7 @@ class TestHistoriqueModification:
         )
 
         # Le format est: "Modification {champ} ({date}) par {user}"
-        expected_prefix = f"Modification commune"
+        expected_prefix = "Modification commune"
         expected_suffix = f"par {user.username}"
         result = str(historique)
 
@@ -88,8 +89,11 @@ class TestHistoriqueModification:
 
         assert historique_fiche1.count() == 1
         assert historique_fiche2.count() == 1
-        assert historique_fiche1.first().nouvelle_valeur == 'B'
-        assert historique_fiche2.first().nouvelle_valeur == 'D'
+
+        hist1 = historique_fiche1.first()
+        hist2 = historique_fiche2.first()
+        assert hist1 is not None and hist1.nouvelle_valeur == 'B'
+        assert hist2 is not None and hist2.nouvelle_valeur == 'D'
 
     def test_ordre_chronologique_historique(self, fiche_observation, user):
         """Test que l'historique est ordonné par date décroissante."""
@@ -104,7 +108,6 @@ class TestHistoriqueModification:
         )
 
         # Attendre un peu
-        import time
         time.sleep(0.1)
 
         HistoriqueModification.objects.create(
@@ -123,8 +126,11 @@ class TestHistoriqueModification:
 
         # Vérifier l'ordre
         assert historique.count() == 2
-        assert historique.first().champ_modifie == 'departement'  # Plus récent
-        assert historique.last().champ_modifie == 'commune'  # Plus ancien
+
+        first_item = historique.first()
+        last_item = historique.last()
+        assert first_item is not None and first_item.champ_modifie == 'departement'  # Plus récent
+        assert last_item is not None and last_item.champ_modifie == 'commune'  # Plus ancien
 
 
 @pytest.mark.django_db
