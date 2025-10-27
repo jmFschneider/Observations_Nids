@@ -253,7 +253,7 @@ pydantic-core==2.41.4
     # via
     #   -r requirements-base.in
     #   pydantic
-pydantic-settings==2.2.1
+pydantic-settings==2.11.0
     # via -r requirements-base.in
 pygments==2.19.2
     # via pytest
@@ -350,6 +350,7 @@ typing-inspection==0.4.2
     # via
     #   -r requirements-dev.in
     #   pydantic
+    #   pydantic-settings
 tzdata==2025.2
     # via
     #   -r requirements-base.in
