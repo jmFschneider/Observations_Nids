@@ -173,7 +173,7 @@ kombu==5.5.3
     #   celery
 markdown==3.9
     # via mkdocs
-markupsafe==3.0.2
+markupsafe==3.0.3
     # via
     #   -r requirements-base.in
     #   jinja2
