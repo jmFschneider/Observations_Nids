@@ -1,0 +1,206 @@
+{% load static i18n saved_queries load_helpdesk_settings %}
+{% with request|load_helpdesk_settings as helpdesk_settings %}
+{% with user|saved_queries as user_saved_queries_ %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Support - Observations Nids{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'Observations/css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'Observations/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'Observations/css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Helpdesk original styles -->
+    <link href="{% static 'helpdesk/vendor/datatables/css/dataTables.bootstrap4.css' %}" rel="stylesheet">
+    <link href="{% static 'helpdesk/vendor/datatables/css/buttons.dataTables.css' %}" rel="stylesheet">
+    <link href="{% static 'helpdesk/vendor/metisMenu/metisMenu.min.css' %}" rel="stylesheet">
+    <link href="{% static 'helpdesk/css/sb-admin.css' %}" rel="stylesheet">
+    <link rel='stylesheet' href='{% static "helpdesk/helpdesk-extend.css" %}' type='text/css' media="screen">
+
+    <!-- Custom Helpdesk styles integration -->
+    <style>
+        /* Wrapper pour sidebar + content */
+        #wrapper {
+            display: flex !important;
+            min-height: calc(100vh - 200px);
+            position: relative;
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px !important;
+            background-color: #343a40;
+            min-height: 100%;
+            flex-shrink: 0;
+            position: relative !important;
+            z-index: 1;
+            left: auto !important;
+            top: auto !important;
+        }
+
+        .sidebar.navbar-nav {
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+
+        .sidebar .nav-item {
+            list-style: none;
+        }
+
+        .sidebar .nav-link {
+            display: block;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: #4CAF50;
+        }
+
+        .sidebar .nav-item.active .nav-link {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-left-color: #4CAF50;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 8px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar .dropdown-menu {
+            background-color: #2c3136;
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar .dropdown-item {
+            color: rgba(255, 255, 255, 0.7);
+            padding: 8px 20px 8px 45px;
+        }
+
+        .sidebar .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Content wrapper */
+        #content-wrapper {
+            flex: 1;
+            padding: 0;
+            padding-left: 1cm;
+            min-width: 0;
+            overflow-x: auto;
+        }
+
+        /* Overrides pour forcer la mise en page flex */
+        body.fixed-nav #content-wrapper {
+            margin-left: 0 !important;
+        }
+
+        body.fixed-nav .sidebar {
+            position: relative !important;
+        }
+
+        /* Ajustements minimes pour l'intégration */
+        body {
+            background-color: #f4f4f4;
+        }
+
+        main.container {
+            max-width: none !important;
+        }
+
+        /* Override pour les boutons pour utiliser les couleurs du site */
+        .btn-success {
+            background-color: #4CAF50 !important;
+            border-color: #4CAF50 !important;
+        }
+
+        .btn-success:hover {
+            background-color: #45a049 !important;
+            border-color: #45a049 !important;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+
+    <!-- Helpdesk JavaScript libraries -->
+    <script src="{% static 'helpdesk/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'helpdesk/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+    <script src="{% static 'helpdesk/vendor/chart.js/Chart.min.js' %}"></script>
+    <script src="{% static 'helpdesk/vendor/datatables/js/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'helpdesk/vendor/datatables/js/dataTables.bootstrap4.js' %}"></script>
+    <script src="{% static 'helpdesk/vendor/datatables/js/dataTables.buttons.js' %}"></script>
+    <script src="{% static 'helpdesk/vendor/datatables/js/buttons.colVis.js' %}"></script>
+    <script src='{% static "helpdesk/vendor/jquery-ui/jquery-ui.min.js" %}'></script>
+    <link href="{% static 'helpdesk/vendor/jquery-ui/jquery-ui.css' %}" rel="stylesheet">
+    <script src="{% static 'helpdesk/vendor/metisMenu/metisMenu.min.js' %}"></script>
+    <script src="{% static 'helpdesk/js/sb-admin.js' %}"></script>
+</head>
+<body>
+    {% if debug %}
+    <div style="background-color: #dc3545; color: white; text-align: center; padding: 8px 0; font-weight: bold; font-size: 14px; position: sticky; top: 0; z-index: 9999; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+        🔧 ENVIRONNEMENT DE DÉVELOPPEMENT
+    </div>
+    {% endif %}
+
+    {% include "components/navbar.html" %}
+
+    <div id="wrapper">
+        <!-- Sidebar -->
+        {% include "helpdesk/navigation-sidebar.html" %}
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper">
+            <div class="container-fluid">
+                <!-- Breadcrumbs -->
+                <ol class="breadcrumb">
+                    {% block helpdesk_breadcrumb %}
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'helpdesk:home' %}">Support</a>
+                    </li>
+                    {% endblock %}
+                </ol>
+
+                <!-- Messages -->
+                {% if messages %}
+                <div class="messages" style="margin: 0 20px;">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Main Content -->
+                {% block helpdesk_body %}{% endblock %}
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- /#content-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+
+    <footer class="mt-5">
+        {% include "components/footer.html" %}
+    </footer>
+
+    <!-- Additional custom scripts -->
+    {% block helpdesk_js %}{% endblock %}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+{% endwith %}
+{% endwith %}
