@@ -11,35 +11,7 @@
 
 {% block helpdesk_head %}
 <style>
-    /* Aération du texte d'aide sous les champs */
-    .form_help_text {
-        display: block;
-        margin-top: 20px;
-        line-height: 1.8;
-        color: #6c757d;
-        font-size: 14px;
-    }
-
-    /* Si le help_text contient une liste */
-    .form_help_text ul,
-    .form_help_text ol {
-        margin-top: 20px;
-        margin-bottom: 20px;
-        padding-left: 30px;
-    }
-
-    .form_help_text li {
-        margin-bottom: 35px;
-        line-height: 1.6;
-        padding-bottom: 15px;
-    }
-
-    /* Dernier élément de liste n'a pas besoin de marge en bas */
-    .form_help_text li:last-child {
-        margin-bottom: 10px;
-    }
-
-    /* Espacement entre les groupes de formulaires */
+    /* Espacement important entre les groupes de formulaires */
     .form-group {
         margin-bottom: 60px !important;
         padding-bottom: 20px;
@@ -47,15 +19,51 @@
 
     /* Assurer un espacement après les labels */
     .form-group label {
-        margin-bottom: 15px;
+        margin-bottom: 15px !important;
         display: block;
     }
 
     /* Espacement après les champs de saisie */
     .form-group input,
     .form-group textarea,
-    .form-group select {
-        margin-bottom: 20px;
+    .form-group select,
+    .form-control {
+        margin-bottom: 20px !important;
+    }
+
+    /* Aération du texte d'aide sous les champs */
+    .form-text,
+    .help-block,
+    small.form-text {
+        display: block !important;
+        margin-top: 20px !important;
+        margin-bottom: 20px !important;
+        line-height: 1.8 !important;
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    /* Si le help_text contient une liste */
+    .form-text ul,
+    .form-text ol,
+    .help-block ul,
+    .help-block ol {
+        margin-top: 20px !important;
+        margin-bottom: 20px !important;
+        padding-left: 30px;
+    }
+
+    .form-text li,
+    .help-block li {
+        margin-bottom: 35px !important;
+        line-height: 1.6;
+        padding-bottom: 15px;
+    }
+
+    /* Dernier élément de liste */
+    .form-text li:last-child,
+    .help-block li:last-child {
+        margin-bottom: 10px;
     }
 </style>
 {% endblock %}
@@ -76,27 +84,7 @@
 
                 <form method='post' enctype='multipart/form-data'>
                     {% csrf_token %}
-                    {% for field in form %}
-                        {% if field.is_hidden %}
-                            {{ field }}
-                        {% else %}
-                            <div class="form-group">
-                                <label for='id_{{ field.name }}'>
-                                    {{ field.label }}
-                                    {% if not field.field.required %}
-                                        ({% trans "Optional" %})
-                                    {% endif %}
-                                </label>
-                                {{ field }}
-                                {% if field.errors %}
-                                    <small class='error'>{{ field.errors }}</small>
-                                {% endif %}
-                                {% if field.help_text %}
-                                    <small class='form_help_text help-block'>{{ field.help_text|safe }}</small>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+                    {{ form|bootstrap4form }}
                     <button type="submit" class="btn btn-primary btn-lg btn-block">
                         <i class="fa fa-send"></i> {% trans "Submit Ticket" %}
                     </button>

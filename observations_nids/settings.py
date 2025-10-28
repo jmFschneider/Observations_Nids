@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # Requis pour django-helpdesk
     'django.contrib.humanize',
     'django_extensions',
     'accounts.apps.AccountsConfig',
@@ -92,9 +93,10 @@ INSTALLED_APPS = [
     'review.apps.ReviewConfig',
     'ingest.apps.IngestConfig',
     'audit.apps.AuditConfig',
-    'bootstrap4form', # Required for nicer formatting of forms with the default templates
+    'bootstrap4form',  # Required for nicer formatting of forms with the default templates
     'rest_framework',  # required for the API
     'helpdesk',
+    'helpdesk_custom.apps.HelpdeskCustomConfig',  # Personnalisation de Helpdesk
 ]
 
 MIDDLEWARE = [
@@ -315,5 +317,14 @@ if USE_DEBUG_TOOLBAR:
     INTERNAL_IPS = ['127.0.0.1']
 
 # django-helpdesk settings definition
-HELPDESK_TEAMS_MODE_ENABLED=False
+HELPDESK_TEAMS_MODE_ENABLED = False
 SITE_ID = 1
+
+# 🔒 Sécurité : Désactiver l'accès public
+# Seuls les utilisateurs connectés peuvent accéder à Helpdesk
+HELPDESK_SUBMIT_A_TICKET_PUBLIC = False
+HELPDESK_VIEW_A_TICKET_PUBLIC = False
+
+# Utiliser nos formulaires personnalisés
+HELPDESK_PUBLIC_TICKET_FORM_CLASS = 'helpdesk_custom.forms.CustomPublicTicketForm'
+HELPDESK_TICKET_FORM_CLASS = 'helpdesk_custom.forms.CustomTicketForm'
