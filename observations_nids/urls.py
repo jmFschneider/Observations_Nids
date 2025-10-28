@@ -28,6 +28,7 @@ urlpatterns = [
     path('ingest/', include('ingest.urls')),
     path('geo/', include('geo.urls')),
     path('taxonomy/', include('taxonomy.urls')),
+    path('helpdesk/', include('helpdesk.urls')),
 ]
 
 if settings.DEBUG:

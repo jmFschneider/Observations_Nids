@@ -85,6 +85,7 @@ nav:
   - '🔧 Guides Fonctionnels':
     - 'Taxonomie': 'guides/fonctionnalites/taxonomie.md'
     - 'Géolocalisation': 'guides/fonctionnalites/geolocalisation.md'
+    - 'Django-Helpdesk (Support)': 'guides/fonctionnalites/django-helpdesk.md'
 
   - '🧪 Tests & Qualité':
     - 'Stratégie de Tests': 'testing/STRATEGIE_TESTS.md'
