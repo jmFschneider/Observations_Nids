@@ -1,6 +1,39 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<style>
+    /* Style pour les utilisateurs inactifs (supprimés) */
+    .user-inactive {
+        opacity: 0.5;
+        background-color: #f8f9fa !important;
+    }
+
+    .user-inactive td {
+        color: #6c757d !important;
+        text-decoration: line-through;
+    }
+
+    /* Conserver les badges visibles */
+    .user-inactive .badge {
+        opacity: 1;
+        text-decoration: none;
+    }
+
+    /* Boutons toujours visibles */
+    .user-inactive .btn {
+        opacity: 1;
+        text-decoration: none;
+    }
+
+    /* Survol pour indiquer que c'est cliquable */
+    .user-inactive:hover {
+        opacity: 0.7;
+        background-color: #e9ecef !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -34,6 +67,12 @@
                     <option value="non" {% if valide == 'non' %}selected{% endif %}>En attente</option>
                 </select>
 
+                <select name="actif" class="form-control mr-2">
+                    <option value="tous" {% if actif == 'tous' %}selected{% endif %}>Tous les statuts</option>
+                    <option value="oui" {% if actif == 'oui' %}selected{% endif %}>Actifs uniquement</option>
+                    <option value="non" {% if actif == 'non' %}selected{% endif %}>Inactifs uniquement</option>
+                </select>
+
                 <button type="submit" class="btn btn-primary">Filtrer</button>
             </form>
         </div>
@@ -56,6 +95,7 @@
             <tbody>
                 {% for utilisateur in utilisateurs %}
                 <tr id="user-row-{{ utilisateur.id }}" onclick="loadUserDetail({{ utilisateur.id }})"
+                    class="{% if not utilisateur.is_active %}user-inactive{% endif %}"
                     style="cursor: pointer; {% if not utilisateur.est_valide %}background-color: #fff3cd;{% endif %}">
                     <td>
                         {{ utilisateur.username }}
@@ -105,15 +145,15 @@
                             {% if utilisateur.is_active %}
                                 <form method="post" action="{% url 'accounts:desactiver_utilisateur' utilisateur.id %}" style="display: inline;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Êtes-vous sûr de vouloir désactiver cet utilisateur ?');">
-                                        <i class="fas fa-user-slash"></i> Désactiver
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('⚠️ ATTENTION\n\nVoulez-vous vraiment supprimer cet utilisateur ?\n\nL\'utilisateur {{ utilisateur.username }} ne pourra plus se connecter.\nSes observations resteront dans le système.\n\nCette action est réversible via le bouton \'Réactiver\'.');">
+                                        <i class="fas fa-trash-alt"></i> Supprimer
                                     </button>
                                 </form>
                             {% else %}
                                 <form method="post" action="{% url 'accounts:activer_utilisateur' utilisateur.id %}" style="display: inline;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Êtes-vous sûr de vouloir activer cet utilisateur ?');">
-                                        <i class="fas fa-user-check"></i> Activer
+                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Voulez-vous réactiver l\'utilisateur {{ utilisateur.username }} ?\n\nIl pourra à nouveau se connecter à l\'application.');">
+                                        <i class="fas fa-user-check"></i> Réactiver
                                     </button>
                                 </form>
                             {% endif %}

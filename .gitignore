@@ -17,6 +17,8 @@ __pycache__/
 *.swp
 *.swo
 .DS_Store
+*.patch
+*_backup.patch
 
 # Environnements virtuels
 venv/
@@ -43,8 +45,13 @@ db.sqlite3-journal
 .pytest_cache/
 *.cover
 *.coverage
+coverage.xml
 htmlcov/
 
 # OS
 Thumbs.db
 .DS_Storetmp/
+
+# MkDocs
+site/
+docs/docs/todo/

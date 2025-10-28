@@ -1,0 +1,74 @@
+site_name: Observations Nids - Guide Utilisateur
+site_description: Guide utilisateur pour l'application Observations Nids
+dev_addr: '127.0.0.1:8001'
+
+# Thème avec support de recherche
+theme:
+  name: material
+  language: fr
+  palette:
+    - scheme: default
+      primary: green
+      accent: light-green
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - toc.follow
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js
+
+# Plugins
+plugins:
+  - search:
+      lang: fr
+      separator: '[\s\-\.]'
+
+# Extension Markdown
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+
+# Navigation Utilisateurs
+nav:
+  - '🏠 Accueil': 'index.md'
+  - '📋 Changelog': 'CHANGELOG.md'
+
+  - '🎯 Le Projet':
+    - 'Vue d''ensemble': 'project/README.md'
+    - 'Fonctionnalités': 'project/FEATURES.md'
+    - 'Workflows': 'project/workflows.md'
+
+  - '📖 Guides Utilisateur':
+    - 'Navigation Générale': 'aide_utilisateurs/01_navigation_generale.md'
+    - 'Saisir une Observation': 'aide_utilisateurs/02_saisie_nouvelle_observation.md'
+    - 'Corriger des Fiches': 'aide_utilisateurs/03_correction_transcription.md'
+
+  - '🔧 Fonctionnalités':
+    - 'Gestion des Espèces': 'guides/fonctionnalites/taxonomie.md'
+    - 'Géolocalisation': 'guides/fonctionnalites/geolocalisation.md'
+
+  - '🆘 Aide':
+    - 'Dépannage': 'learning/troubleshooting/README.md'
+
+  - '👨‍💻 Pour aller plus loin':
+    - 'Documentation Développeur': 'index-dev.md'

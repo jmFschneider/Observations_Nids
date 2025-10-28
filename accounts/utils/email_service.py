@@ -164,3 +164,63 @@ class EmailService:
                 f"Erreur lors de l'envoi de l'email de refus pour {utilisateur.username}: {e}"
             )
             return False
+
+    @staticmethod
+    def envoyer_email_reinitialisation_mdp(utilisateur, uid, token):
+        """
+        Envoie un email à l'utilisateur avec un lien de réinitialisation de mot de passe.
+
+        Args:
+            utilisateur: L'utilisateur qui demande la réinitialisation
+            uid: L'UID encodé de l'utilisateur
+            token: Le token de réinitialisation
+
+        Returns:
+            bool: True si l'email a été envoyé avec succès, False sinon
+        """
+        if not utilisateur.email:
+            logger.warning(f"L'utilisateur {utilisateur.username} n'a pas d'email")
+            return False
+
+        try:
+            sujet = "[Observations Nids] Réinitialisation de votre mot de passe"
+
+            # Construire l'URL de réinitialisation
+            site_url = settings.ALLOWED_HOSTS[0] if settings.ALLOWED_HOSTS else 'localhost'
+            # Ajouter http:// ou https:// selon la configuration
+            protocole = 'https' if not settings.DEBUG else 'http'
+            reset_url = (
+                f"{protocole}://{site_url}/accounts/reinitialiser-mot-de-passe/{uid}/{token}/"
+            )
+
+            # Contexte pour le template
+            contexte = {
+                'utilisateur': utilisateur,
+                'reset_url': reset_url,
+                'site_url': site_url,
+            }
+
+            # Rendu des templates HTML et texte
+            html_content = render_to_string(
+                'accounts/emails/reinitialisation_mot_de_passe.html', contexte
+            )
+            text_content = strip_tags(html_content)
+
+            # Création et envoi de l'email
+            email = EmailMultiAlternatives(
+                subject=sujet,
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[utilisateur.email],
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send()
+
+            logger.info(f"Email de réinitialisation de mot de passe envoyé à {utilisateur.email}")
+            return True
+
+        except Exception as e:
+            logger.error(
+                f"Erreur lors de l'envoi de l'email de réinitialisation pour {utilisateur.username}: {e}"
+            )
+            return False

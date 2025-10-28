@@ -10,6 +10,15 @@ class Utilisateur(AbstractUser):
     est_valide = models.BooleanField(default=False)
     est_transcription = models.BooleanField(default=False)
 
+    # Rendre l'email obligatoire et unique
+    email = models.EmailField(
+        "adresse email",
+        unique=True,
+        error_messages={
+            'unique': "Un utilisateur avec cette adresse email existe déjà.",
+        },
+    )
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.get_role_display()})"
 
@@ -46,6 +55,7 @@ class Notification(models.Model):
     lien = models.CharField(
         max_length=255,
         blank=True,
+        default='',
         verbose_name="Lien",
         help_text="URL relative vers la ressource concernée",
     )

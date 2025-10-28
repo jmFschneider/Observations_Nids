@@ -1,0 +1,117 @@
+site_name: Observations Nids - Documentation Développeur
+site_description: Documentation technique pour les développeurs d'Observations Nids
+dev_addr: '127.0.0.1:8002'
+
+# Thème avec support de recherche
+theme:
+  name: material
+  language: fr
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: blue
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - toc.follow
+    - toc.integrate
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js
+
+# Plugins
+plugins:
+  - search:
+      lang: fr
+      separator: '[\s\-\.]'
+
+# Extension Markdown
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+# Navigation Développeurs
+nav:
+  - '🏠 Accueil Développeur': 'index-dev.md'
+  - '📋 Changelog': 'CHANGELOG.md'
+
+  - '🎯 Projet':
+    - 'Vue d''ensemble': 'project/README.md'
+    - 'Fonctionnalités': 'project/FEATURES.md'
+    - 'Workflows': 'project/workflows.md'
+
+  - '🚀 Installation & Déploiement':
+    - 'Installation Développement': 'installation/development.md'
+    - 'Installation Production': 'installation/production.md'
+    - 'Déploiement Production': 'deployment/production.md'
+
+  - '🏗️ Architecture':
+    - 'Vue d''ensemble': 'architecture/index.md'
+    - 'Domaines':
+      - 'Fiches d''observation': 'architecture/domaines/observations.md'
+      - 'Gestion utilisateurs': 'architecture/domaines/utilisateurs.md'
+      - 'Données de nidification': 'architecture/domaines/nidification.md'
+      - 'Localisation': 'architecture/domaines/localisation.md'
+      - 'Taxonomie': 'architecture/domaines/taxonomie.md'
+      - 'Workflow de correction': 'architecture/domaines/workflow-correction.md'
+      - 'Validation': 'architecture/domaines/validation.md'
+      - 'Audit & Traçabilité': 'architecture/domaines/audit.md'
+      - 'Import & Transcription': 'architecture/domaines/import-transcription.md'
+    - 'Diagrammes':
+      - 'ERD (Entité-Relation)': 'architecture/diagrammes/erd.md'
+
+  - '🔧 Guides Fonctionnels':
+    - 'Taxonomie': 'guides/fonctionnalites/taxonomie.md'
+    - 'Géolocalisation': 'guides/fonctionnalites/geolocalisation.md'
+    - 'Django-Helpdesk (Support)': 'guides/fonctionnalites/django-helpdesk.md'
+
+  - '🧪 Tests & Qualité':
+    - 'Stratégie de Tests': 'testing/STRATEGIE_TESTS.md'
+    - 'Exemple : Tests Reset MDP': 'testing/TESTS_REINITIALISATION_MDP.md'
+
+  - '⚙️ Configuration & API':
+    - 'Configuration': 'configuration/configuration.md'
+    - 'API Documentation': 'api/API_DOCUMENTATION.md'
+    - 'Base de données': 'database/reset_database.md'
+
+  - '📚 Apprentissage':
+    - 'Git Workflow': 'learning/git/README.md'
+    - 'CI-CD': 'learning/ci-cd/README.md'
+    - 'Troubleshooting': 'learning/troubleshooting/README.md'
+    - 'Bases de données': 'learning/databases/README.md'
+    - 'Monitoring & Stats':
+      - 'Installation GoAccess': 'learning/goaccess-installation.md'
+      - 'Configuration Apache Stats': 'learning/configuration-apache-stats.md'
+      - 'GoAccess Multi-Sites': 'learning/goaccess-multi-sites.md'
+
+  - '📖 Guides Utilisateur':
+    - 'Navigation Générale': 'aide_utilisateurs/01_navigation_generale.md'
+    - 'Saisir une Observation': 'aide_utilisateurs/02_saisie_nouvelle_observation.md'
+    - 'Corriger des Fiches': 'aide_utilisateurs/03_correction_transcription.md'
+
+  - '📝 Suivi & Maintenance':
+    - 'Optimisations Futures': 'Todo/OPTIMISATIONS_FUTURES.md'
+    - 'Nettoyage': 'Todo/TODO_NETTOYAGE.md'
+    - 'Améliorations Documentation': 'Possibilite_amelioration_documentation.md'

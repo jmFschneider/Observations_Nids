@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h2 class="mb-0"><i class="fas fa-key"></i> Mot de passe oublié</h2>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Saisissez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
+                    </p>
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Erreur !</strong>
+                        <ul class="mb-0">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label for="{{ form.email.id_for_label }}"><strong>Adresse email :</strong></label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.email.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Saisissez l'email associé à votre compte.
+                            </small>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-warning btn-lg btn-block">
+                                <i class="fas fa-paper-plane"></i> Envoyer le lien de réinitialisation
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <div class="text-center">
+                        <p class="mb-2">Vous vous souvenez de votre mot de passe ?</p>
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-sign-in-alt"></i> Retour à la connexion
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

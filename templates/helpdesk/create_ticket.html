@@ -1,0 +1,112 @@
+{% extends "helpdesk/base.html" %}{% load i18n bootstrap4form %}
+
+{% block helpdesk_title %}{% trans "Create Ticket" %}{% endblock %}
+
+{% block helpdesk_breadcrumb %}
+    <li class="breadcrumb-item">
+        <a href="#">{% trans "Tickets" %}</a>
+    </li>
+    <li class="breadcrumb-item active">{% trans "Create Ticket" %}</li>
+{% endblock %}
+
+{% block helpdesk_head %}
+<style>
+    /* Espacement important entre les groupes de formulaires */
+    .form-group {
+        margin-bottom: 60px !important;
+        padding-bottom: 20px;
+    }
+
+    /* Assurer un espacement après les labels */
+    .form-group label {
+        margin-bottom: 15px !important;
+        display: block;
+    }
+
+    /* Espacement après les champs de saisie */
+    .form-group input,
+    .form-group textarea,
+    .form-group select,
+    .form-control {
+        margin-bottom: 20px !important;
+    }
+
+    /* Aération du texte d'aide sous les champs */
+    .form-text,
+    .help-block,
+    small.form-text {
+        display: block !important;
+        margin-top: 20px !important;
+        margin-bottom: 20px !important;
+        line-height: 1.8 !important;
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    /* Si le help_text contient une liste */
+    .form-text ul,
+    .form-text ol,
+    .help-block ul,
+    .help-block ol {
+        margin-top: 20px !important;
+        margin-bottom: 20px !important;
+        padding-left: 30px;
+    }
+
+    .form-text li,
+    .help-block li {
+        margin-bottom: 35px !important;
+        line-height: 1.6;
+        padding-bottom: 15px;
+    }
+
+    /* Dernier élément de liste */
+    .form-text li:last-child,
+    .help-block li:last-child {
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block helpdesk_body %}
+    <div class="container">
+        <div class="card card-register mx-auto mt-5">
+            <div class="card-header">{% trans "Submit a Ticket" %}</div>
+            <div class="card-body">
+                <p>
+                    {% trans "Unless otherwise stated, all fields are required." %}
+                    {% trans "Please provide as descriptive a title and description as possible." %}
+                </p>
+
+                {% if form.errors %}
+                    {% include 'helpdesk/include/alert_form_errors.html' %}
+                {% endif %}
+
+                <form method='post' enctype='multipart/form-data'>
+                    {% csrf_token %}
+                    {{ form|bootstrap4form }}
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                        <i class="fa fa-send"></i> {% trans "Submit Ticket" %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block helpdesk_js %}
+    {{ form.media.js }}
+    <script>
+        // this function listens for changes on any file input, and
+        // emits the appropriate event to update the input's text.
+        // Needed to have properly styled file input buttons! (this really shouldn't be this hard...)
+        $(document).on('change', ':file', function () {
+            const input = $(this),
+                inputWidgetNum = $(this).attr('id').split("file")[1],
+                numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+            input.trigger('fileselect', [numFiles, label, inputWidgetNum]);
+        });
+    </script>
+{% endblock %}

@@ -24,4 +24,5 @@ CATEGORIE_MODIFICATION_CHOICES = [
     ('nid', 'Nid'),
     ('resume_observation', 'Résumé Observation'),
     ('causes_echec', 'Causes d\'échec'),
+    ('remarque', 'Remarque'),
 ]

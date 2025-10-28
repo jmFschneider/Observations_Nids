@@ -10,6 +10,7 @@ types-PyYAML
 typing-inspection
 django-debug-toolbar
 django-extensions
+mkdocs
 pytest
 pytest-django
 pytest-cov

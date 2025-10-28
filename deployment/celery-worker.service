@@ -1,0 +1,59 @@
+[Unit]
+Description=Celery Worker pour Observations Nids
+After=network.target redis-server.service mariadb.service
+Wants=redis-server.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/html/Observations_Nids
+
+# Charger les variables d'environnement depuis .env
+EnvironmentFile=/var/www/html/Observations_Nids/.env
+
+# Configuration Python et Django
+Environment="PYTHONPATH=/var/www/html/Observations_Nids"
+Environment="DJANGO_SETTINGS_MODULE=observations_nids.settings"
+Environment="DJANGO_LOG_DIR=/var/www/html/Observations_Nids/logs"
+Environment="C_FORCE_ROOT=true"
+
+# Créer automatiquement le répertoire runtime pour les PID
+RuntimeDirectory=celery
+RuntimeDirectoryMode=0755
+
+# Commande de démarrage (sans --detach car systemd gère le processus)
+ExecStart=/var/www/html/Observations_Nids/.venv/bin/celery -A observations_nids worker \
+    --loglevel=info \
+    --concurrency=2 \
+    --max-tasks-per-child=100 \
+    --logfile=/var/www/html/Observations_Nids/logs/celery-worker.log \
+    --pidfile=/run/celery/worker.pid
+
+# Signaux pour l'arrêt et le rechargement
+ExecStop=/bin/kill -s TERM $MAINPID
+ExecReload=/bin/kill -s HUP $MAINPID
+
+# Redémarrage automatique en cas d'échec
+Restart=always
+RestartSec=10s
+
+# Limites de ressources pour Raspberry Pi
+LimitNOFILE=65536
+MemoryLimit=512M
+CPUQuota=150%
+
+# Sécurité
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/html/Observations_Nids/logs /var/www/html/Observations_Nids/media
+
+# Logs
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=celery-worker
+
+[Install]
+WantedBy=multi-user.target

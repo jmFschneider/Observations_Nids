@@ -12,7 +12,19 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(ruff check:*)",
-      "Bash(ruff format:*)"
+      "Bash(ruff format:*)",
+      "Bash(pytest:*)",
+      "Bash(mypy:*)",
+      "Bash(gh pr list --state open)",
+      "Bash(ruff --version)",
+      "Bash(python -c \"import redis; print(f''Redis: {redis.__version__}'')\")",
+      "WebSearch",
+      "Bash(mkdir -p docs/docs/architecture/domaines docs/docs/architecture/diagrammes)",
+      "Bash(mkdocs build)",
+      "Bash(git log:*)",
+      "Bash(git remote prune:*)",
+      "Bash(tee:*)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

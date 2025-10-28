@@ -2,12 +2,21 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.generic import ListView
 
-from accounts.forms import UtilisateurChangeForm, UtilisateurCreationForm
+from accounts.forms import (
+    MotDePasseOublieForm,
+    NouveauMotDePasseForm,
+    UtilisateurChangeForm,
+    UtilisateurCreationForm,
+)
 from accounts.models import Notification, Utilisateur
 from accounts.utils.email_service import EmailService
 from observations.models import FicheObservation
@@ -39,6 +48,7 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         recherche = self.request.GET.get('recherche', '')
         role = self.request.GET.get('role', 'tous')
         valide = self.request.GET.get('valide', 'tous')
+        actif = self.request.GET.get('actif', 'tous')
 
         if recherche:
             queryset = queryset.filter(
@@ -56,6 +66,11 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         elif valide == 'non':
             queryset = queryset.filter(est_valide=False)
 
+        if actif == 'oui':
+            queryset = queryset.filter(is_active=True)
+        elif actif == 'non':
+            queryset = queryset.filter(is_active=False)
+
         return queryset.order_by('-date_joined')  # Les plus récents en premier
 
     def get_context_data(self, **kwargs):
@@ -63,6 +78,7 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context['recherche'] = self.request.GET.get('recherche', '')
         context['role'] = self.request.GET.get('role', 'tous')
         context['valide'] = self.request.GET.get('valide', 'tous')
+        context['actif'] = self.request.GET.get('actif', 'tous')
         # Ajouter le nombre de demandes en attente
         context['demandes_en_attente'] = Utilisateur.objects.filter(est_valide=False).count()
         return context
@@ -113,12 +129,20 @@ def modifier_utilisateur(request, user_id):
 @login_required
 @user_passes_test(est_admin)
 def desactiver_utilisateur(request, user_id):
-    """Vue pour désactiver un utilisateur"""
+    """Vue pour désactiver un utilisateur (soft delete)"""
     if request.method == 'POST':
         utilisateur = get_object_or_404(Utilisateur, id=user_id)
         utilisateur.is_active = False
         utilisateur.save()
-        messages.success(request, f"L'utilisateur {utilisateur.username} a été désactivé")
+        logger.info(
+            f"Utilisateur {utilisateur.username} supprimé (soft delete) par {request.user.username}"
+        )
+        messages.success(
+            request,
+            f"L'utilisateur {utilisateur.username} a été supprimé. "
+            f"Il ne peut plus se connecter mais ses données sont conservées. "
+            f"Vous pouvez le réactiver à tout moment.",
+        )
 
     return redirect('accounts:liste_utilisateurs')
 
@@ -126,12 +150,17 @@ def desactiver_utilisateur(request, user_id):
 @login_required
 @user_passes_test(est_admin)
 def activer_utilisateur(request, user_id):
-    """Vue pour activer un utilisateur"""
+    """Vue pour réactiver un utilisateur précédemment désactivé"""
     if request.method == 'POST':
         utilisateur = get_object_or_404(Utilisateur, id=user_id)
         utilisateur.is_active = True
         utilisateur.save()
-        messages.success(request, f"L'utilisateur {utilisateur.username} a été activé")
+        logger.info(f"Utilisateur {utilisateur.username} réactivé par {request.user.username}")
+        messages.success(
+            request,
+            f"L'utilisateur {utilisateur.username} a été réactivé. "
+            f"Il peut à nouveau se connecter à l'application.",
+        )
 
     return redirect('accounts:liste_utilisateurs')
 
@@ -267,3 +296,89 @@ def valider_utilisateur(request, user_id):
     logger.info(f"Compte validé pour {utilisateur.username} par {request.user.username}")
 
     return redirect('accounts:liste_utilisateurs')
+
+
+def mot_de_passe_oublie(request):
+    """
+    Vue pour demander une réinitialisation de mot de passe.
+    L'utilisateur saisit son email et reçoit un lien de réinitialisation.
+    """
+    if request.method == 'POST':
+        form = MotDePasseOublieForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+
+            # Récupérer tous les utilisateurs actifs avec cet email
+            utilisateurs = Utilisateur.objects.filter(email=email, is_active=True)
+
+            if utilisateurs.exists():
+                # Envoyer un email à chaque utilisateur trouvé
+                for utilisateur in utilisateurs:
+                    # Générer le token et l'UID
+                    token = default_token_generator.make_token(utilisateur)
+                    uid = urlsafe_base64_encode(force_bytes(utilisateur.pk))
+
+                    # Envoyer l'email avec le lien de réinitialisation
+                    EmailService.envoyer_email_reinitialisation_mdp(utilisateur, uid, token)
+
+                logger.info(
+                    f"Email de réinitialisation envoyé à {email} ({utilisateurs.count()} compte(s))"
+                )
+            else:
+                # Ne pas révéler si l'email existe ou non (sécurité)
+                logger.warning(f"Tentative de réinitialisation pour email inexistant : {email}")
+
+            # Message identique que l'email existe ou non (sécurité)
+            messages.success(
+                request,
+                "Un email contenant les instructions de réinitialisation a été envoyé à votre adresse.",
+            )
+            return redirect('login')
+    else:
+        form = MotDePasseOublieForm()
+
+    return render(request, 'accounts/mot_de_passe_oublie.html', {'form': form})
+
+
+def reinitialiser_mot_de_passe(request, uidb64, token):
+    """
+    Vue pour réinitialiser le mot de passe avec un token valide.
+    L'utilisateur saisit son nouveau mot de passe.
+    """
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        utilisateur = Utilisateur.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, Utilisateur.DoesNotExist):
+        utilisateur = None
+
+    # Vérifier que l'utilisateur et le token sont valides
+    if utilisateur is not None and default_token_generator.check_token(utilisateur, token):
+        if request.method == 'POST':
+            form = NouveauMotDePasseForm(request.POST)
+            if form.is_valid():
+                # Enregistrer le nouveau mot de passe
+                nouveau_mdp = form.cleaned_data['password1']
+                utilisateur.password = make_password(nouveau_mdp)
+                utilisateur.save()
+
+                logger.info(f"Mot de passe réinitialisé pour {utilisateur.username}")
+                messages.success(
+                    request,
+                    "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
+                )
+                return redirect('login')
+        else:
+            form = NouveauMotDePasseForm()
+
+        return render(
+            request,
+            'accounts/reinitialiser_mot_de_passe.html',
+            {'form': form, 'validlink': True},
+        )
+    else:
+        logger.warning("Tentative de réinitialisation avec lien invalide ou expiré")
+        return render(
+            request,
+            'accounts/reinitialiser_mot_de_passe.html',
+            {'validlink': False},
+        )

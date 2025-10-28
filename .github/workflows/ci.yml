@@ -96,6 +96,7 @@ jobs:
           DB_PASSWORD: "testpassword"
           DB_HOST: "127.0.0.1"
           DB_PORT: "3306"
+          ADMIN_EMAIL: "admin@test.com"
         run: pytest --cov --cov-report=xml --cov-report=term-missing
 
       # Étape 8: Uploader le rapport de couverture

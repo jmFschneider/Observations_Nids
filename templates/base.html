@@ -12,6 +12,11 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    {% if debug %}
+    <div style="background-color: #dc3545; color: white; text-align: center; padding: 8px 0; font-weight: bold; font-size: 14px; position: sticky; top: 0; z-index: 9999; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+        🔧 ENVIRONNEMENT DE DÉVELOPPEMENT
+    </div>
+    {% endif %}
     {% include "components/navbar.html" %}
 
     <main class="container mt-4">
