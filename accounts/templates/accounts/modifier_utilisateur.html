@@ -184,6 +184,25 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Transcription -->
+                            <div class="form-row-table">
+                                <div class="form-label-cell">
+                                    <strong>Transcription :</strong>
+                                </div>
+                                <div class="form-input-cell">
+                                    <div class="form-check">
+                                        <input type="checkbox"
+                                               name="{{ form.est_transcription.name }}"
+                                               id="{{ form.est_transcription.id_for_label }}"
+                                               class="form-check-input"
+                                               {% if form.est_transcription.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="{{ form.est_transcription.id_for_label }}">
+                                            Est transcripteur
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group mt-4">
