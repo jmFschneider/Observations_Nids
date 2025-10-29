@@ -12,13 +12,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 from ingest.importation_service import ImportationService
 from ingest.models import ImportationEnCours
 
-from .auth import est_admin
+from .auth import peut_transcrire
 
 logger = logging.getLogger(__name__)
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def importer_json(request):
     """Vue pour importer des fichiers JSON depuis un répertoire"""
     # Chemin vers le répertoire de résultats de transcription
@@ -58,7 +58,7 @@ def importer_json(request):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def extraire_candidats(request):
     """Vue pour extraire les espèces et créer automatiquement les utilisateurs"""
     if request.method == 'POST':
@@ -78,7 +78,7 @@ def extraire_candidats(request):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def preparer_importations(request):
     """Vue pour préparer les importations des transcriptions"""
     if request.method == 'POST':
@@ -93,7 +93,7 @@ def preparer_importations(request):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def liste_importations(request):
     """Vue pour afficher la liste des importations en cours"""
     # Filtre de recherche
@@ -116,7 +116,7 @@ def liste_importations(request):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def detail_importation(request, importation_id):
     """Vue pour afficher les détails d'une importation"""
     importation = get_object_or_404(ImportationEnCours, id=importation_id)
@@ -135,7 +135,7 @@ def detail_importation(request, importation_id):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def finaliser_importation(request, importation_id):
     """Vue pour finaliser une importation"""
     if request.method == 'POST':
@@ -153,7 +153,7 @@ def finaliser_importation(request, importation_id):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def finaliser_importations_multiples(request):
     """Vue pour finaliser plusieurs importations en même temps"""
     if request.method == 'POST':
@@ -186,7 +186,7 @@ def finaliser_importations_multiples(request):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def reinitialiser_importation(request, importation_id):
     """Vue pour réinitialiser une importation spécifique"""
     if request.method == 'POST':
@@ -202,7 +202,7 @@ def reinitialiser_importation(request, importation_id):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def reinitialiser_toutes_importations(request):
     """Vue pour réinitialiser toutes les importations"""
     if request.method == 'POST':
