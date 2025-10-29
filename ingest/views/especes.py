@@ -8,13 +8,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 from ingest.models import EspeceCandidate
 from taxonomy.models import Espece
 
-from .auth import est_admin
+from .auth import peut_transcrire
 
 logger = logging.getLogger(__name__)
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def liste_especes_candidates(request):
     """Vue pour afficher et gérer les espèces candidates"""
     # Filtre de recherche
@@ -51,7 +51,7 @@ def liste_especes_candidates(request):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def valider_espece(request, espece_id):
     """Vue pour valider une espèce candidate"""
     if request.method == 'POST':
@@ -117,7 +117,7 @@ def valider_espece(request, espece_id):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def valider_especes_multiples(request):
     """Vue pour valider plusieurs espèces candidates à la fois avec des valeurs individuelles"""
     if request.method == 'POST':
@@ -206,7 +206,7 @@ def valider_especes_multiples(request):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def creer_nouvelle_espece(request):
     """Vue pour créer une nouvelle espèce à partir d'une transcription"""
     if request.method == 'POST':
