@@ -1,0 +1,344 @@
+/* ===================================
+   SIDEBAR NAVIGATION SYSTEM
+   =================================== */
+
+/* Variables CSS pour faciliter la personnalisation */
+:root {
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 60px;
+    --navbar-height: 56px;
+    --transition-speed: 0.3s;
+}
+
+/* === Layout principal === */
+body {
+    overflow-x: hidden;
+}
+
+/* Navbar supérieure fixe */
+.navbar-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    height: var(--navbar-height);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Wrapper pour sidebar + contenu */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    padding-top: var(--navbar-height);
+    min-height: 100vh;
+}
+
+/* === SIDEBAR === */
+#sidebar {
+    min-width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+    background: #f8f9fa;
+    color: #333;
+    transition: all var(--transition-speed) ease;
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    bottom: 0;
+    z-index: 1020;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+}
+
+/* Sidebar en mode réduit */
+#sidebar.collapsed {
+    min-width: var(--sidebar-collapsed-width);
+    max-width: var(--sidebar-collapsed-width);
+}
+
+/* Contenu de la sidebar */
+.sidebar-sticky {
+    position: sticky;
+    top: 0;
+    padding: 15px 0;
+}
+
+/* === LIENS DE NAVIGATION === */
+#sidebar .nav-link {
+    color: #495057;
+    padding: 12px 20px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    white-space: nowrap;
+}
+
+#sidebar .nav-link i {
+    min-width: 30px;
+    font-size: 18px;
+    transition: all var(--transition-speed);
+}
+
+#sidebar .nav-link:hover {
+    background-color: #e9ecef;
+    border-left-color: #007bff;
+    color: #007bff;
+    text-decoration: none;
+}
+
+#sidebar .nav-link.active {
+    background-color: #007bff;
+    color: white;
+    border-left-color: #0056b3;
+}
+
+#sidebar .nav-link.active:hover {
+    background-color: #0056b3;
+}
+
+/* Texte des liens (caché quand sidebar repliée) */
+#sidebar .link-text {
+    margin-left: 10px;
+    transition: opacity var(--transition-speed);
+}
+
+#sidebar.collapsed .link-text {
+    opacity: 0;
+    display: none;
+}
+
+/* === TITRES DE SECTION === */
+.sidebar-heading {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    padding: 15px 20px 8px;
+    color: #6c757d;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all var(--transition-speed);
+}
+
+#sidebar.collapsed .sidebar-heading {
+    opacity: 0;
+    display: none;
+}
+
+/* Séparateur visuel */
+.sidebar-divider {
+    height: 1px;
+    background-color: #dee2e6;
+    margin: 10px 15px;
+}
+
+/* === CONTENU PRINCIPAL === */
+#content {
+    width: 100%;
+    padding: 0;
+    min-height: 100vh;
+    transition: all var(--transition-speed) ease;
+    margin-left: var(--sidebar-width);
+}
+
+#content.expanded {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+/* Container interne avec padding */
+#content .content-inner {
+    padding: 20px;
+}
+
+/* === BOUTON TOGGLE === */
+.sidebar-toggle {
+    position: fixed;
+    top: calc(var(--navbar-height) + 10px);
+    left: var(--sidebar-width);
+    z-index: 1025;
+    background: white;
+    border: 2px solid #007bff;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.sidebar-toggle:hover {
+    background: #007bff;
+    color: white;
+    transform: scale(1.1);
+}
+
+#sidebar.collapsed ~ .sidebar-toggle {
+    left: var(--sidebar-collapsed-width);
+    transform: rotate(180deg);
+}
+
+#sidebar.collapsed ~ .sidebar-toggle:hover {
+    transform: rotate(180deg) scale(1.1);
+}
+
+/* === BADGE DE NOTIFICATION === */
+.sidebar-badge {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #dc3545;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+#sidebar.collapsed .sidebar-badge {
+    display: none;
+}
+
+/* === RESPONSIVE === */
+
+/* Tablettes (iPad, etc.) */
+@media (max-width: 1024px) {
+    :root {
+        --sidebar-width: 220px;
+    }
+
+    #sidebar .nav-link {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: calc(-1 * var(--sidebar-width));
+    }
+
+    #sidebar.active {
+        margin-left: 0;
+    }
+
+    #content {
+        margin-left: 0;
+    }
+
+    .sidebar-toggle {
+        left: 10px;
+        top: calc(var(--navbar-height) + 10px);
+    }
+
+    #sidebar.collapsed ~ .sidebar-toggle {
+        left: 10px;
+    }
+
+    /* Overlay pour fermer la sidebar en mobile */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: var(--navbar-height);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1015;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+}
+
+/* Très petits écrans */
+@media (max-width: 576px) {
+    #content .content-inner {
+        padding: 15px 10px;
+    }
+
+    .navbar-top .navbar-brand {
+        font-size: 16px;
+    }
+}
+
+/* === SCROLLBAR PERSONNALISÉE === */
+#sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+#sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#sidebar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+#sidebar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* === ANIMATIONS === */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+#sidebar .nav-item {
+    animation: slideIn 0.3s ease forwards;
+}
+
+#sidebar .nav-item:nth-child(1) { animation-delay: 0.05s; }
+#sidebar .nav-item:nth-child(2) { animation-delay: 0.1s; }
+#sidebar .nav-item:nth-child(3) { animation-delay: 0.15s; }
+#sidebar .nav-item:nth-child(4) { animation-delay: 0.2s; }
+#sidebar .nav-item:nth-child(5) { animation-delay: 0.25s; }
+
+/* === ÉTATS SPÉCIAUX === */
+/* Lien actif avec indicateur */
+#sidebar .nav-link.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: white;
+}
+
+/* Tooltip pour sidebar réduite */
+#sidebar.collapsed .nav-link {
+    position: relative;
+}
+
+#sidebar.collapsed .nav-link:hover::after {
+    content: attr(data-title);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-left: 10px;
+    font-size: 13px;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
