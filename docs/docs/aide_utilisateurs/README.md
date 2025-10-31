@@ -55,6 +55,21 @@ Cette documentation vous guide dans l'utilisation de l'application, de l'inscrip
 
 ---
 
+### 4. [Support : Signaler un problème](./04_support_tickets.md)
+
+**Quand le consulter** : Vous rencontrez un problème ou avez une question
+
+**Ce que vous apprendrez** :
+- Créer un ticket de support (Bug, Question, Fonctionnalité, Documentation)
+- Suivre vos tickets
+- Répondre et communiquer avec l'équipe support
+- Comprendre les statuts des tickets
+- Bonnes pratiques pour signaler un problème
+
+**Durée de lecture** : 10 minutes
+
+---
+
 ## 🎯 Par où commencer ?
 
 ### Nouvel utilisateur
@@ -130,9 +145,9 @@ Cette documentation vous guide dans l'utilisation de l'application, de l'inscrip
 
 ### Support
 
-- **Forum** : (À définir)
-- **Email** : (À définir)
-- **Issues GitHub** : (À définir si projet open source)
+- **[Système de tickets](./04_support_tickets.md)** : Signaler un problème ou poser une question
+- **Email direct** : admin@observations-nids.fr (urgences uniquement)
+- **[Documentation Helpdesk complète](../helpdesk/README.md)** : Guides détaillés utilisateur et développeur
 
 ---
 
@@ -158,10 +173,10 @@ Cette documentation vous guide dans l'utilisation de l'application, de l'inscrip
 
 ## 📊 Statistiques de la documentation
 
-- **Nombre de guides** : 3
+- **Nombre de guides** : 4
 - **Pages totales** : ~150 lignes par guide
-- **Temps de lecture total** : ~50 minutes
-- **Dernière mise à jour** : Octobre 2025
+- **Temps de lecture total** : ~60 minutes
+- **Dernière mise à jour** : Octobre 2024
 
 ---
 
@@ -185,7 +200,7 @@ Cette documentation fait partie du projet **Observations Nids**.
 
 ---
 
-*Version 1.0 - Octobre 2025*
+*Version 1.1 - Octobre 2024*
 
 **Auteurs** : Équipe Observations Nids
 **Contributeurs** : Tous les utilisateurs qui ont partagé leurs retours
