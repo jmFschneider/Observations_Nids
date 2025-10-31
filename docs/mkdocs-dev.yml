@@ -54,64 +54,54 @@ markdown_extensions:
 
 # Navigation Développeurs
 nav:
-  - '🏠 Accueil Développeur': 'index-dev.md'
-  - '📋 Changelog': 'CHANGELOG.md'
+  - '🏠 Accueil Développeur': 'developpeurs/index.md'
+  - '📋 Changelog': 'developpeurs/CHANGELOG.md' # Assuming this will be moved
 
   - '🎯 Projet':
-    - 'Vue d''ensemble': 'project/README.md'
-    - 'Fonctionnalités': 'project/FEATURES.md'
-    - 'Workflows': 'project/workflows.md'
+    - 'Vue d''ensemble': 'developpeurs/01_features.md' # This was project/README.md and project/FEATURES.md
+    - 'Roadmap': 'developpeurs/roadmap.md' # This was Todo/OPTIMISATIONS_FUTURES.md
 
   - '🚀 Installation & Déploiement':
-    - 'Installation Développement': 'installation/development.md'
-    - 'Installation Production': 'installation/production.md'
-    - 'Déploiement Production': 'deployment/production.md'
+    - 'Installation Développement': 'developpeurs/installation/01_development_setup.md'
+    - 'Installation Production': 'developpeurs/installation/02_production_deployment.md'
 
   - '🏗️ Architecture':
-    - 'Vue d''ensemble': 'architecture/index.md'
+    - 'Vue d''ensemble': 'developpeurs/architecture/index.md' # Assuming an index will be created or exists
     - 'Domaines':
-      - 'Fiches d''observation': 'architecture/domaines/observations.md'
-      - 'Gestion utilisateurs': 'architecture/domaines/utilisateurs.md'
-      - 'Données de nidification': 'architecture/domaines/nidification.md'
-      - 'Localisation': 'architecture/domaines/localisation.md'
-      - 'Taxonomie': 'architecture/domaines/taxonomie.md'
-      - 'Workflow de correction': 'architecture/domaines/workflow-correction.md'
-      - 'Validation': 'architecture/domaines/validation.md'
-      - 'Audit & Traçabilité': 'architecture/domaines/audit.md'
-      - 'Import & Transcription': 'architecture/domaines/import-transcription.md'
+      - 'Utilisateurs et Authentification': 'developpeurs/architecture/domaines/01_users_and_auth.md'
+      - 'Observations Core': 'developpeurs/architecture/domaines/02_observations_core.md'
+      - 'Importation OCR': 'developpeurs/architecture/domaines/03_ocr_ingestion.md'
+      - 'Audit': 'developpeurs/architecture/domaines/04_audit.md'
+      - 'Localisation': 'developpeurs/architecture/domaines/05_localisation.md'
+      - 'Nidification': 'developpeurs/architecture/domaines/06_nidification.md'
+      - 'Taxonomie': 'developpeurs/architecture/domaines/07_taxonomie.md'
+      - 'Validation': 'developpeurs/architecture/domaines/08_validation.md'
+      - 'Workflow Correction': 'developpeurs/architecture/domaines/09_workflow-correction.md'
     - 'Diagrammes':
-      - 'ERD (Entité-Relation)': 'architecture/diagrammes/erd.md'
+      - 'ERD (Entité-Relation)': 'developpeurs/architecture/diagrammes/erd.md'
 
-  - '🔧 Guides Fonctionnels':
-    - 'Taxonomie': 'guides/fonctionnalites/taxonomie.md'
-    - 'Géolocalisation': 'guides/fonctionnalites/geolocalisation.md'
-    - 'Django-Helpdesk (Support)': 'guides/fonctionnalites/django-helpdesk.md'
+  - '🔧 Guides':
+    - 'Guides Fonctionnels':
+      - 'Taxonomie': 'developpeurs/guides/01_taxonomie.md'
+      - 'Géolocalisation': 'developpeurs/guides/02_geolocalisation.md'
+      - 'Django-Helpdesk (Support)': 'developpeurs/guides/03_django-helpdesk.md'
+    - 'Processus de Développement':
+      - 'Git Workflow': 'developpeurs/guides/development_process/01_git.md'
+      - 'CI-CD': 'developpeurs/guides/development_process/02_ci-cd.md'
+    - 'Dépannage': 'developpeurs/guides/troubleshooting/01_troubleshooting.md'
+    - 'Monitoring & Stats': 'developpeurs/guides/05_monitoring_with_goaccess.md'
 
-  - '🧪 Tests & Qualité':
-    - 'Stratégie de Tests': 'testing/STRATEGIE_TESTS.md'
-    - 'Exemple : Tests Reset MDP': 'testing/TESTS_REINITIALISATION_MDP.md'
+  - '🧪 Qualité & Tests':
+    - 'Stratégie de Tests': 'developpeurs/quality_and_testing/01_STRATEGIE_TESTS.md'
+    - 'Tests Réinitialisation MDP': 'developpeurs/quality_and_testing/02_TESTS_REINITIALISATION_MDP.md'
 
   - '⚙️ Configuration & API':
-    - 'Configuration': 'configuration/configuration.md'
-    - 'API Documentation': 'api/API_DOCUMENTATION.md'
-    - 'Base de données': 'database/reset_database.md'
-
-  - '📚 Apprentissage':
-    - 'Git Workflow': 'learning/git/README.md'
-    - 'CI-CD': 'learning/ci-cd/README.md'
-    - 'Troubleshooting': 'learning/troubleshooting/README.md'
-    - 'Bases de données': 'learning/databases/README.md'
-    - 'Monitoring & Stats':
-      - 'Installation GoAccess': 'learning/goaccess-installation.md'
-      - 'Configuration Apache Stats': 'learning/configuration-apache-stats.md'
-      - 'GoAccess Multi-Sites': 'learning/goaccess-multi-sites.md'
+    - 'Configuration Générale': 'developpeurs/configuration/01_configuration.md'
+    - 'Réinitialisation Base de Données': 'developpeurs/configuration/02_reset_database.md'
+    - 'API Référence': 'developpeurs/api_reference/01_API_DOCUMENTATION.md'
 
   - '📖 Guides Utilisateur':
     - 'Navigation Générale': 'aide_utilisateurs/01_navigation_generale.md'
     - 'Saisir une Observation': 'aide_utilisateurs/02_saisie_nouvelle_observation.md'
     - 'Corriger des Fiches': 'aide_utilisateurs/03_correction_transcription.md'
 
-  - '📝 Suivi & Maintenance':
-    - 'Optimisations Futures': 'Todo/OPTIMISATIONS_FUTURES.md'
-    - 'Nettoyage': 'Todo/TODO_NETTOYAGE.md'
-    - 'Améliorations Documentation': 'Possibilite_amelioration_documentation.md'
