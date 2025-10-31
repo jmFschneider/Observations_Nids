@@ -24,7 +24,15 @@
       "Bash(git log:*)",
       "Bash(git remote prune:*)",
       "Bash(tee:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(mkdir:*)",
+      "Bash(python:*)",
+      "Bash(mkdocs build:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(git checkout:*)",
+      "Bash(gh pr create:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []
