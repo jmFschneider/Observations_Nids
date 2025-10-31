@@ -7,8 +7,8 @@ Ce guide décrit le système de classification taxonomique du projet Observation
 ## 📋 Table des matières
 
 1. [Vue d'ensemble](#1-vue-densemble)
-2. [Modèles de données](#2-modèles-de-données)
-3. [Import LOF (recommandé)](#3-import-lof-recommandé)
+2. [Modèles de données](#2-modeles-de-donnees)
+3. [Import LOF (recommandé)](#3-import-lof-recommande)
 4. [Import TaxRef (alternatif)](#4-import-taxref-alternatif)
 5. [Enrichissement avec oiseaux.net](#5-enrichissement-avec-oiseauxnet)
 6. [Gestion manuelle](#6-gestion-manuelle)

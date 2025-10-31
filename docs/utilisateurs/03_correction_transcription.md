@@ -8,17 +8,17 @@ Ce guide vous accompagne dans l'utilisation de l'outil de **transcription automa
 
 ## Table des matières
 
-1. [Qu'est-ce que la transcription ?](#1-quest-ce-que-la-transcription-)
-2. [Préparer vos images](#2-préparer-vos-images)
-3. [Étape 1 : Upload et sélection du dossier](#3-étape-1--upload-et-sélection-du-dossier)
-4. [Étape 2 : Lancement de la transcription](#4-étape-2--lancement-de-la-transcription)
-5. [Étape 3 : Suivi du traitement](#5-étape-3--suivi-du-traitement)
-6. [Étape 4 : Résultats de la transcription](#6-étape-4--résultats-de-la-transcription)
-7. [Étape 5 : Corriger une fiche](#7-étape-5--corriger-une-fiche)
+1. [Qu'est-ce que la transcription ?](#1-quest-ce-que-la-transcription)
+2. [Préparer vos images](#2-preparer-vos-images)
+3. [Étape 1 : Upload et sélection du dossier](#3-etape-1-upload-et-selection-du-dossier)
+4. [Étape 2 : Lancement de la transcription](#4-etape-2-lancement-de-la-transcription)
+5. [Étape 3 : Suivi du traitement](#5-etape-3-suivi-du-traitement)
+6. [Étape 4 : Résultats de la transcription](#6-etape-4-resultats-de-la-transcription)
+7. [Étape 5 : Corriger une fiche](#7-etape-5-corriger-une-fiche)
 8. [Visualiser les fichiers source (JPEG et JSON)](#8-visualiser-les-fichiers-source-jpeg-et-json)
 9. [Ajouter des observations et remarques](#9-ajouter-des-observations-et-remarques)
 10. [Logique commune avec la saisie manuelle](#10-logique-commune-avec-la-saisie-manuelle)
-11. [Questions fréquentes](#11-questions-fréquentes)
+11. [Questions fréquentes](#11-questions-frequentes)
 
 ---
 

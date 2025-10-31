@@ -8,16 +8,16 @@ Ce guide vous accompagne **pas à pas** dans la saisie d'une nouvelle fiche d'ob
 
 ## Table des matières
 
-1. [Créer une nouvelle fiche](#1-créer-une-nouvelle-fiche)
-2. [Étape 1 : Localisation](#2-étape-1--localisation)
-3. [Étape 2 : Enregistrer la fiche (OBLIGATOIRE)](#3-étape-2--enregistrer-la-fiche-obligatoire)
-4. [Étape 3 : Informations du nid](#4-étape-3--informations-du-nid)
-5. [Étape 4 : Ajouter des observations](#5-étape-4--ajouter-des-observations)
-6. [Étape 5 : Ajouter des remarques](#6-étape-5--ajouter-des-remarques)
-7. [Étape 6 : Résumé et validation](#7-étape-6--résumé-et-validation)
-8. [Le bouton "Enregistrer" - À quoi sert-il ?](#8-le-bouton-enregistrer--à-quoi-sert-il-)
+1. [Créer une nouvelle fiche](#1-creer-une-nouvelle-fiche)
+2. [Étape 1 : Localisation](#2-etape-1-localisation)
+3. [Étape 2 : Enregistrer la fiche (OBLIGATOIRE)](#3-etape-2-enregistrer-la-fiche-obligatoire)
+4. [Étape 3 : Informations du nid](#4-etape-3-informations-du-nid)
+5. [Étape 4 : Ajouter des observations](#5-etape-4-ajouter-des-observations)
+6. [Étape 5 : Ajouter des remarques](#6-etape-5-ajouter-des-remarques)
+7. [Étape 6 : Résumé et validation](#7-etape-6-resume-et-validation)
+8. [Le bouton "Enregistrer" - À quoi sert-il ?](#8-le-bouton-enregistrer-a-quoi-sert-il)
 9. [Modifier une fiche existante](#9-modifier-une-fiche-existante)
-10. [Questions fréquentes](#10-questions-fréquentes)
+10. [Questions fréquentes](#10-questions-frequentes)
 
 ---
 

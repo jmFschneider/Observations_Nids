@@ -333,7 +333,7 @@ for fiche in fiches_avec_taux:
 
 ## Algorithme de complétude
 
-Le `ResumeObservation` contribue au calcul du pourcentage de complétion de la fiche (voir [workflow-correction.md](workflow-correction.md)).
+Le `ResumeObservation` contribue au calcul du pourcentage de complétion de la fiche (voir [09_workflow-correction.md](09_workflow-correction.md)).
 
 **Critère 5** : Résumé avec données d'œufs (+1 point)
 
@@ -415,10 +415,10 @@ if jour and mois:
 
 ## Voir aussi
 
-- **[Fiches d'observation](observations.md)** - Modèle `FicheObservation` parent
-- **[Workflow de correction](workflow-correction.md)** - Algorithme de complétude utilisant `ResumeObservation`
+- **[Fiches d'observation](02_observations_core.md)** - Modèle `FicheObservation` parent
+- **09_workflow-correction.md** - Algorithme de complétude utilisant `ResumeObservation`
 - **[Diagramme ERD](../diagrammes/erd.md)** - Vue d'ensemble des relations
-- **[Stratégie de tests](../../testing/STRATEGIE_TESTS.md)** - Tests unitaires des contraintes CHECK
+- **[Stratégie de tests](../../quality_and_testing/01_STRATEGIE_TESTS.md)** - Tests unitaires des contraintes CHECK
 
 ---
 

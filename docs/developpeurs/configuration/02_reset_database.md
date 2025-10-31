@@ -7,8 +7,8 @@ Ce document explique comment utiliser les commandes de réinitialisation de la b
 1. [Vue d'ensemble](#vue-densemble)
 2. [Commande `reset_importations`](#commande-reset_importations)
 3. [Commande `reset_transcriptions`](#commande-reset_transcriptions)
-4. [Scénarios d'utilisation](#scénarios-dutilisation)
-5. [Précautions et bonnes pratiques](#précautions-et-bonnes-pratiques)
+4. [Scénarios d'utilisation](#scenarios-dutilisation)
+5. [Précautions et bonnes pratiques](#precautions-et-bonnes-pratiques)
 
 ---
 

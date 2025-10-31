@@ -509,10 +509,10 @@ def save(self, *args, **kwargs):
 
 ## Voir aussi
 
-- **[Fiches d'observation](observations.md)** - Modèle `FicheObservation` parent
-- **[Données de nidification](nidification.md)** - Critère 5 (nombre d'œufs)
-- **[Localisation](localisation.md)** - Critère 3 (commune/département)
-- **[Audit](audit.md)** - Traçabilité des changements de statut
+- **[Fiches d'observation](02_observations_core.md)** - Modèle `FicheObservation` parent
+- **[Données de nidification](06_nidification.md)** - Critère 5 (nombre d'œufs)
+- **[Localisation](05_localisation.md)** - Critère 3 (commune/département)
+- **[Audit](04_audit.md)** - Traçabilité des changements de statut
 - **[Diagramme ERD](../diagrammes/erd.md)** - Vue d'ensemble des relations
 
 ---

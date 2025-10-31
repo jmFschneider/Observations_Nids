@@ -502,7 +502,7 @@ especes_menacees = Espece.objects.filter(
 
 ## Voir aussi
 
-- **[Fiches d'observation](observations.md)** - Utilisation de `Espece` dans les fiches
+- **[Fiches d'observation](02_observations_core.md)** - Utilisation de `Espece` dans les fiches
 - **[Référentiel Oiseaux.net](https://www.oiseaux.net/)** - Base de données ornithologique
 - **[UICN - Liste rouge](https://www.iucnredlist.org/)** - Statuts de conservation
 - **[Diagramme ERD](../diagrammes/erd.md)** - Vue d'ensemble des relations

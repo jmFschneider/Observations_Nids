@@ -151,11 +151,7 @@ Seul un administrateur peut fermer un ticket. Quand votre problème est résolu 
 
 ## 📚 Documentation complète
 
-Pour plus de détails, consultez le **[Guide utilisateur complet Helpdesk](../docs/helpdesk/guide-utilisateur.md)** qui contient :
-- Instructions détaillées pour chaque fonction
-- Bonnes pratiques avancées
-- Exemples de tickets bien rédigés
-- Tous les cas d'usage
+
 
 ---
 

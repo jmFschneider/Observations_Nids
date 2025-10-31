@@ -10,13 +10,13 @@ Le domaine utilisateur gère l'authentification, l'autorisation et les notificat
 
 ## Table des matières
 
-1. [Modèles](#modèles)
+1. [Modèles](#modeles)
 2. [Workflow d'inscription](#workflow-dinscription)
 3. [Gestion administrative](#gestion-administrative)
-4. [Réinitialisation de mot de passe](#réinitialisation-de-mot-de-passe)
+4. [Réinitialisation de mot de passe](#reinitialisation-de-mot-de-passe)
 5. [Suppression d'utilisateurs (Soft Delete)](#suppression-dutilisateurs-soft-delete)
-6. [Sécurité](#sécurité)
-7. [Requêtes ORM courantes](#requêtes-orm-courantes)
+6. [Sécurité](#securite)
+7. [Requêtes ORM courantes](#requetes-orm-courantes)
 
 ---
 
@@ -842,8 +842,8 @@ Si un utilisateur est supprimé :
 ## Voir aussi
 
 - **[Diagramme ERD](../diagrammes/erd.md)** - Relations avec autres modèles
-- **[Workflow de correction](workflow-correction.md)** - Interactions avec les utilisateurs
-- **[Configuration](../../configuration/configuration.md)** - Variables d'environnement
+- **[Workflow de correction](09_workflow-correction.md)** - Interactions avec les utilisateurs
+- **[Configuration](../../configuration/01_configuration.md)** - Variables d'environnement
 
 ---
 

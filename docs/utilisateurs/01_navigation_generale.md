@@ -10,9 +10,9 @@ Ce guide vous accompagne dans la découverte de l'application, de l'inscription 
 
 1. [Inscription et connexion](#1-inscription-et-connexion)
 2. [Page d'accueil et navigation](#2-page-daccueil-et-navigation)
-3. [Les différentes sections](#3-les-différentes-sections)
+3. [Les différentes sections](#3-les-differentes-sections)
 4. [Cycle de vie d'une fiche d'observation](#4-cycle-de-vie-dune-fiche-dobservation)
-5. [Rôles et permissions](#5-rôles-et-permissions)
+5. [Rôles et permissions](#5-roles-et-permissions)
 
 ---
 

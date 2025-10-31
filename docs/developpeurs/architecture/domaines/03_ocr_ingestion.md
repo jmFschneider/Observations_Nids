@@ -585,8 +585,8 @@ Dashboard pour valider plusieurs espèces candidates en une fois :
 
 ## Voir aussi
 
-- **[Fiches d'observation](observations.md)** - Modèle `FicheObservation` créé
-- **[Taxonomie](taxonomie.md)** - Modèle `Espece` utilisé pour matching
+- **[Fiches d'observation](02_observations_core.md)** - Modèle `FicheObservation` créé
+- **[Taxonomie](07_taxonomie.md)** - Modèle `Espece` utilisé pour matching
 - **[Azure Computer Vision](https://azure.microsoft.com/services/cognitive-services/computer-vision/)** - OCR cloud
 - **[Tesseract](https://github.com/tesseract-ocr/tesseract)** - OCR open source
 - **[FuzzyWuzzy](https://github.com/seatgeek/fuzzywuzzy)** - Fuzzy string matching

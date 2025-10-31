@@ -6,13 +6,13 @@ Ce document vous guide pour mettre en place un environnement de développement l
 
 ## 📋 Table des matières
 
-1. [Prérequis](#prérequis)
-2. [Installation](#installation)
-3. [Configuration](#configuration)
-4. [Lancement des services](#lancement-des-services)
-5. [Accès à l'application](#accès-à-lapplication)
-6. [Commandes utiles](#commandes-utiles)
-7. [Dépannage](#dépannage)
+1. [Prérequis](#1-prerequis)
+2. [Installation](#2-installation)
+3. [Configuration](#3-configuration)
+4. [Lancement des services](#4-lancement-des-services)
+5. [Accès à l'application](#5-acces-a-lapplication)
+6. [Commandes utiles](#6-commandes-utiles)
+7. [Dépannage](#7-depannage)
 
 ---
 
@@ -451,16 +451,16 @@ python manage.py createsuperuser
 
 ## 📚 Prochaines étapes
 
-- Consultez le [Guide de contribution](../learning/git/README.md) pour comprendre le workflow Git
-- Lisez la [Stratégie de tests](../testing/STRATEGIE_TESTS.md) avant d'écrire du code
+- Consultez le [Guide de contribution](../guides/development_process/01_git.md) pour comprendre le workflow Git
+- Lisez la [Stratégie de tests](../quality_and_testing/01_STRATEGIE_TESTS.md) avant d'écrire du code
 - Explorez l'[Architecture du projet](../architecture/index.md) pour comprendre la structure
-- Consultez la [Documentation API](../api/API_DOCUMENTATION.md) pour les endpoints
+- Consultez la [Documentation API](../api_reference/01_API_DOCUMENTATION.md) pour les endpoints
 
 ---
 
 ## 🆘 Besoin d'aide ?
 
-- Consultez la [section Troubleshooting](../learning/troubleshooting/README.md)
+- Consultez la [section Troubleshooting](../guides/troubleshooting/01_troubleshooting.md)
 - Vérifiez les [Issues GitHub](https://github.com/jmFschneider/Observations_Nids/issues)
 - Contactez l'équipe de développement
 

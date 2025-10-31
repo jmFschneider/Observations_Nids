@@ -408,7 +408,7 @@ importer_communes()
 
 ## Algorithme de complétude
 
-La `Localisation` contribue au calcul du pourcentage de complétion de la fiche (voir [workflow-correction.md](workflow-correction.md)).
+La `Localisation` contribue au calcul du pourcentage de complétion de la fiche (voir [09_workflow-correction.md](09_workflow-correction.md)).
 
 **Critère 3** : Localisation complète (+1 point)
 
@@ -479,8 +479,8 @@ print(f"{nb_geolocalisees}/{nb_total} fiches géolocalisées")
 
 ## Voir aussi
 
-- **[Fiches d'observation](observations.md)** - Modèle `FicheObservation` parent
-- **[Workflow de correction](workflow-correction.md)** - Algorithme de complétude
+- **[Fiches d'observation](02_observations_core.md)** - Modèle `FicheObservation` parent
+- **09_workflow-correction.md** - Algorithme de complétude
 - **[Diagramme ERD](../diagrammes/erd.md)** - Vue d'ensemble des relations
 - **[API Géoplateforme](https://geoservices.ign.fr/)** - Documentation API IGN
 

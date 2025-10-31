@@ -4,8 +4,8 @@
 > Ce document liste les fonctionnalités implémentées dans l'application par module, leur état de développement et leurs dépendances.
 
 **Navigation :**
-- **[← Retour à la page projet](./README.md)** : Vue d'ensemble du projet
-- **[Workflows détaillés →](./workflows.md)** : Processus métier et utilisation des fonctionnalités
+- **[← Retour à la page projet](./index.md)** : Vue d'ensemble du projet
+
 
 ---
 

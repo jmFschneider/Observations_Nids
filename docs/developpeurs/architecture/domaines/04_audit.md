@@ -561,9 +561,9 @@ fiche.validations.first().historique.all()
 
 ## Voir aussi
 
-- **[Validation](validation.md)** - Modèle `HistoriqueValidation` complémentaire
-- **[Workflow de correction](workflow-correction.md)** - Suivi de l'état des fiches
-- **[Gestion des utilisateurs](utilisateurs.md)** - Identification des auteurs
+- **[Validation](08_validation.md)** - Modèle `HistoriqueValidation` complémentaire
+- **[Workflow de correction](09_workflow-correction.md)** - Suivi de l'état des fiches
+- **[Gestion des utilisateurs](01_users_and_auth.md)** - Identification des auteurs
 - **[Diagramme ERD](../diagrammes/erd.md)** - Vue d'ensemble des relations
 - **[Django Signals](https://docs.djangoproject.com/en/stable/topics/signals/)** - Documentation Django
 

@@ -1,6 +1,7 @@
 site_name: Observations Nids - Documentation Développeur
 site_description: Documentation technique pour les développeurs d'Observations Nids
 dev_addr: '127.0.0.1:8002'
+docs_dir: .
 
 # Thème avec support de recherche
 theme:
@@ -55,18 +56,17 @@ markdown_extensions:
 # Navigation Développeurs
 nav:
   - '🏠 Accueil Développeur': 'developpeurs/index.md'
-  - '📋 Changelog': 'developpeurs/CHANGELOG.md' # Assuming this will be moved
 
   - '🎯 Projet':
-    - 'Vue d''ensemble': 'developpeurs/01_features.md' # This was project/README.md and project/FEATURES.md
-    - 'Roadmap': 'developpeurs/roadmap.md' # This was Todo/OPTIMISATIONS_FUTURES.md
+    - 'Vue d''ensemble': 'developpeurs/01_features.md'
+    - 'Roadmap': 'developpeurs/roadmap.md'
 
   - '🚀 Installation & Déploiement':
     - 'Installation Développement': 'developpeurs/installation/01_development_setup.md'
     - 'Installation Production': 'developpeurs/installation/02_production_deployment.md'
 
   - '🏗️ Architecture':
-    - 'Vue d''ensemble': 'developpeurs/architecture/index.md' # Assuming an index will be created or exists
+    - 'Vue d''ensemble': 'developpeurs/architecture/index.md'
     - 'Domaines':
       - 'Utilisateurs et Authentification': 'developpeurs/architecture/domaines/01_users_and_auth.md'
       - 'Observations Core': 'developpeurs/architecture/domaines/02_observations_core.md'
@@ -101,7 +101,8 @@ nav:
     - 'API Référence': 'developpeurs/api_reference/01_API_DOCUMENTATION.md'
 
   - '📖 Guides Utilisateur':
-    - 'Navigation Générale': 'aide_utilisateurs/01_navigation_generale.md'
-    - 'Saisir une Observation': 'aide_utilisateurs/02_saisie_nouvelle_observation.md'
-    - 'Corriger des Fiches': 'aide_utilisateurs/03_correction_transcription.md'
-
+    - 'Accueil': 'utilisateurs/README.md'
+    - 'Navigation Générale': 'utilisateurs/01_navigation_generale.md'
+    - 'Saisir une Observation': 'utilisateurs/02_saisie_nouvelle_observation.md'
+    - 'Corriger des Fiches': 'utilisateurs/03_correction_transcription.md'
+    - 'Support et Tickets': 'utilisateurs/04_support_tickets.md'

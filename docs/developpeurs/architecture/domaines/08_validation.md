@@ -497,10 +497,10 @@ for validation in Validation.objects.select_related(
 
 ## Voir aussi
 
-- **[Workflow de correction](workflow-correction.md)** - Modèle `EtatCorrection` complémentaire
-- **[Gestion des utilisateurs](utilisateurs.md)** - Rôle `reviewer`
-- **[Audit](audit.md)** - Traçabilité complémentaire via `HistoriqueModification`
-- **[Notifications](utilisateurs.md#modèle-notification)** - Système de notifications
+- **[Workflow de correction](09_workflow-correction.md)** - Modèle `EtatCorrection` complémentaire
+- **[Gestion des utilisateurs](01_users_and_auth.md)** - Rôle `reviewer`
+- **[Audit](04_audit.md)** - Traçabilité complémentaire via `HistoriqueModification`
+- **[Notifications](01_users_and_auth.md#modele-notification)** - Système de notifications
 - **[Diagramme ERD](../diagrammes/erd.md)** - Vue d'ensemble des relations
 
 ---

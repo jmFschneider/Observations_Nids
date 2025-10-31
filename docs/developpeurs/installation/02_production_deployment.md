@@ -4,11 +4,11 @@
 > Ce document couvre l'ensemble du processus : de la sécurisation initiale au déploiement, puis la maintenance en production.
 
 **Navigation rapide :**
-- [Étape 1 : Sécurisation préalable](#étape-1--sécurisation-préalable-obligatoire) ⚠️ **À faire en premier**
-- [Étape 2 : Déploiement initial](#étape-2--déploiement-initial)
-- [Étape 3 : Vérification post-déploiement](#étape-3--vérification-post-déploiement)
-- [Mises à jour futures](#mises-à-jour-futures-non-destructives)
-- [Sécurité avancée](#sécurité-avancée-phases-2-et-3)
+- [Étape 1 : Sécurisation préalable](#etape-1-securisation-prealable-obligatoire) ⚠️ **À faire en premier**
+- [Étape 2 : Déploiement initial](#etape-2-deploiement-initial)
+- [Étape 3 : Vérification post-déploiement](#etape-3-verification-post-deploiement)
+- [Mises à jour futures](#mises-a-jour-futures-non-destructives)
+- [Sécurité avancée](#securite-avancee-phases-2-et-3)
 - [Annexes](#annexes)
 
 ---
@@ -388,7 +388,7 @@ Dans sa version actuelle, le script est **DESTRUCTIF** : il **supprime et recré
 
 **Utilisation appropriée :**
 - ✅ **Première installation** sur un serveur vierge
-- ❌ **Mise à jour** d'une application avec données (voir [Mises à jour futures](#mises-à-jour-futures-non-destructives))
+- ❌ **Mise à jour** d'une application avec données (voir [Mises à jour futures](#mises-a-jour-futures-non-destructives))
 
 #### Étapes du déploiement automatisé
 
@@ -1905,7 +1905,7 @@ Ce guide vous a accompagné pour :
 - Charger les communes françaises : `python manage.py charger_communes_france`
 - Créer des utilisateurs de test
 - Tester le workflow de transcription OCR
-- Consulter la [documentation fonctionnelle](../guides/fonctionnalites/)
+- Consulter la [documentation fonctionnelle](../01_features.md)
 
 **Support :**
 

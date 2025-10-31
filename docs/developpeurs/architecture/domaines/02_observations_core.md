@@ -37,22 +37,22 @@ Une fiche d'observation documente la nidification d'une espèce d'oiseau pendant
 
 Lors de la création d'une fiche, **5 objets sont créés automatiquement** :
 
-1. **`Localisation`** → [Voir documentation](localisation.md)
+1. **`Localisation`** → [Voir documentation](05_localisation.md)
    - Commune, lieu-dit, coordonnées GPS
    - Altitude, paysage environnant
 
-2. **`Nid`** → [Voir détails](#modèle-nid)
+2. **`Nid`** → [Voir détails](#modele-nid)
    - Hauteur du nid et du couvert végétal
    - Détails descriptifs
 
-3. **`ResumeObservation`** → [Voir documentation](nidification.md)
+3. **`ResumeObservation`** → [Voir documentation](06_nidification.md)
    - Dates partielles (jour/mois) : premier œuf, premier poussin éclos/volant
    - Compteurs : œufs pondus/éclos/non éclos, poussins
 
-4. **`CausesEchec`** → [Voir détails](#modèle-causesechec)
+4. **`CausesEchec`** → [Voir détails](#modele-causesechec)
    - Description des causes d'échec de la nidification
 
-5. **`EtatCorrection`** → [Voir documentation](workflow-correction.md)
+5. **`EtatCorrection`** → [Voir documentation](09_workflow-correction.md)
    - Statut : nouveau, en_edition, en_cours, valide
    - Pourcentage de complétion
    - Valideur et date de validation
@@ -367,7 +367,7 @@ graph TD
 4. **Validation** : Correcteur valide ou rejette
 5. **Archivage** : Fiche validée archivée
 
-**Voir** : [Workflow de correction détaillé](workflow-correction.md)
+**Voir** : [Workflow de correction détaillé](09_workflow-correction.md)
 
 ---
 
@@ -408,10 +408,10 @@ Actuellement, la suppression d'une fiche est **définitive** (CASCADE).
 
 ## Voir aussi
 
-- **[Données de nidification](nidification.md)** - Modèle `ResumeObservation` avec contraintes complexes
-- **[Workflow de correction](workflow-correction.md)** - Modèle `EtatCorrection` et statuts
-- **[Localisation](localisation.md)** - Géocodage et précision GPS
-- **[Traçabilité](audit.md)** - `HistoriqueModification` sur les fiches
+- **[Données de nidification](06_nidification.md)** - Modèle `ResumeObservation` avec contraintes complexes
+- **09_workflow-correction.md** - Modèle `EtatCorrection` et statuts
+- **[Localisation](05_localisation.md)** - Géocodage et précision GPS
+- **[Traçabilité](04_audit.md)** - `HistoriqueModification` sur les fiches
 - **[Diagramme ERD](../diagrammes/erd.md)** - Vue d'ensemble des relations
 
 ---

@@ -5,7 +5,7 @@ Ce document suit l'avancement de la réorganisation de la documentation du proje
 ## Statut Général
 
 - [x] **Partie 1 : Documentation Utilisateur** - TERMINÉE
-- [ ] **Partie 2 : Documentation Développeur** - EN COURS
+- [x] **Partie 2 : Documentation Développeur** - TERMINÉE
 
 ---
 
@@ -50,5 +50,4 @@ Ce document suit l'avancement de la réorganisation de la documentation du proje
 ### Étape 4 : Finalisation
 
     - [x] Mettre à jour le fichier `docs/mkdocs-dev.yml` pour refléter la nouvelle structure.- [x] Archiver tous les anciens fichiers de `docs/docs/` vers `docs/archives/`.
-- [ ] Vérifier et corriger tous les liens internes dans la documentation développeur.
-- [ ] Marquer ce plan comme terminé.
+    - [x] Vérifier et corriger tous les liens internes dans la documentation développeur.- [x] Marquer ce plan comme terminé.

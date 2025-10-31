@@ -7,14 +7,14 @@ Ce guide complet décrit le système de géolocalisation et de géocodage automa
 ## 📋 Table des matières
 
 1. [Vue d'ensemble](#1-vue-densemble)
-2. [Base de données des communes françaises](#2-base-de-données-des-communes-françaises)
-3. [Stratégie de géocodage](#3-stratégie-de-géocodage)
+2. [Base de données des communes françaises](#2-base-de-donnees-des-communes-francaises)
+3. [Stratégie de géocodage](#3-strategie-de-geocodage)
 4. [Installation et configuration](#4-installation-et-configuration)
 5. [Utilisation](#5-utilisation)
-6. [APIs et intégration](#6-apis-et-intégration)
+6. [APIs et intégration](#6-apis-et-integration)
 7. [Optimisations et performances](#7-optimisations-et-performances)
-8. [Dépannage et maintenance](#8-dépannage-et-maintenance)
-9. [Référence technique](#9-référence-technique)
+8. [Dépannage et maintenance](#8-depannage-et-maintenance)
+9. [Référence technique](#9-reference-technique)
 
 ---
 

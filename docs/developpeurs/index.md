@@ -39,7 +39,7 @@ Le projet est organisé en **8 applications Django modulaires**, chacune ayant u
 
 Pour une description détaillée des modèles, de leurs relations et des choix de conception, consultez la section architecture.
 
-- **[🏗️ Documentation d'Architecture Détaillée](architecture/)**
+- **[🏗️ Documentation d'Architecture Détaillée](architecture/index.md)**
 
 ### Stack Technique Principale
 
@@ -66,20 +66,20 @@ Cette documentation est organisée en plusieurs sections pour vous aider à trou
 - **[Feuille de Route (Roadmap)](roadmap.md)**
   - Les optimisations et améliorations futures prévues pour le projet.
 
-- **[Architecture](architecture/)**
+- **[Architecture](architecture/index.md)**
   - La section la plus détaillée, décrivant les modèles de données, les relations et les règles métier pour chaque domaine de l'application.
 
-- **[Installation](installation/)**
+- **[Installation](installation/01_development_setup.md)**
   - Guides pas à pas pour mettre en place un environnement de développement local ou de production.
 
-- **[Guides Pratiques](guides/)**
+- **[Guides Pratiques](guides/01_taxonomie.md)**
   - Des guides sur des sujets spécifiques comme le processus de développement (Git, CI/CD), le dépannage, la taxonomie, la géolocalisation, etc.
 
-- **[Qualité & Tests](quality_and_testing/)**
+- **[Qualité & Tests](quality_and_testing/01_STRATEGIE_TESTS.md)**
   - La stratégie de test du projet, des exemples de tests et des guides sur la manière de contribuer à la qualité du code.
 
-- **[Configuration](configuration/)**
+- **[Configuration](configuration/01_configuration.md)**
   - Comment configurer le projet, gérer les variables d'environnement et utiliser les commandes de gestion.
 
-- **[Référence API](api_reference/)**
+- **[Référence API](api_reference/01_API_DOCUMENTATION.md)**
   - La liste de toutes les URLs et points d'accès API du projet.

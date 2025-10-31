@@ -343,10 +343,10 @@ graph TD
 ## Voir aussi
 
 - **[Architecture générale](../index.md)** - Vue d'ensemble du projet
-- **[Fiches d'observation](../domaines/observations.md)** - Documentation du modèle pivot
-- **[Données de nidification](../domaines/nidification.md)** - Contraintes CHECK détaillées
-- **[Workflow de correction](../domaines/workflow-correction.md)** - Algorithme de complétude
-- **[Traçabilité](../domaines/audit.md)** - Historique des modifications
+- **[Fiches d'observation](../domaines/02_observations_core.md)** - Documentation du modèle pivot
+- **[Données de nidification](../domaines/06_nidification.md)** - Contraintes CHECK détaillées
+- **[Workflow de correction](../domaines/09_workflow-correction.md)** - Algorithme de complétude
+- **[Traçabilité](../domaines/04_audit.md)** - Historique des modifications
 
 ---
 

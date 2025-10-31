@@ -12,8 +12,8 @@ Ce guide complet vous accompagnera dans l'installation, la configuration et l'ut
     *   [Filtrage Bots vs Humains](#filtrage-bots-vs-humains)
     *   [Installation du script Multi-Sites](#installation-du-script-multi-sites)
     *   [Utilisation du tableau de bord Multi-Sites](#utilisation-du-tableau-de-bord-multi-sites)
-6.  [Options avancées et personnalisation](#6-options-avancées-et-personnalisation)
-7.  [Dépannage](#7-dépannage)
+6.  [Options avancées et personnalisation](#6-options-avancees-et-personnalisation)
+7.  [Dépannage](#7-depannage)
 8.  [Ressources externes](#8-ressources-externes)
 
 ---

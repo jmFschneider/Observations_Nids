@@ -205,16 +205,16 @@ for remarque in remarques_a_supprimer:
 
 ## 📋 Table des matières
 
-1. [Guide de démarrage](#1-guide-de-démarrage)
-2. [État actuel des tests](#2-état-actuel-des-tests)
-3. [Analyse détaillée par module](#3-analyse-détaillée-par-module)
+1. [Guide de démarrage](#1-guide-de-demarrage)
+2. [État actuel des tests](#2-etat-actuel-des-tests)
+3. [Analyse détaillée par module](#3-analyse-detaillee-par-module)
 4. [Zones critiques sans tests](#4-zones-critiques-sans-tests)
 5. [Plan de tests prioritaires](#5-plan-de-tests-prioritaires)
-6. [Résumé du plan](#6-résumé-du-plan)
-7. [Recommandations d'implémentation](#7-recommandations-dimplémentation)
+6. [Résumé du plan](#6-resume-du-plan)
+7. [Recommandations d'implémentation](#7-recommandations-dimplementation)
 8. [Tests prioritaires pour feature actuelle](#8-tests-prioritaires-pour-feature-actuelle)
 9. [Outils et bonnes pratiques](#9-outils-et-bonnes-pratiques)
-10. [Métriques de suivi](#10-métriques-de-suivi)
+10. [Métriques de suivi](#10-metriques-de-suivi)
 11. [Risques et mitigation](#11-risques-et-mitigation)
 12. [Conclusion et recommandations](#12-conclusion-et-recommandations)
 13. [Annexes](#13-annexes)
@@ -344,7 +344,7 @@ N'oubliez pas d'ajouter le marqueur `@pytest.mark.django_db` à tous les tests q
 
 ### 1.6 Exemple Complet
 
-Pour un exemple complet d'implémentation de tests, consultez **[Tests de Réinitialisation de Mot de Passe](TESTS_REINITIALISATION_MDP.md)** qui documente 21 tests couvrant la fonctionnalité de password reset avec tous les cas de sécurité.
+Pour un exemple complet d'implémentation de tests, consultez **[Tests de Réinitialisation de Mot de Passe](02_TESTS_REINITIALISATION_MDP.md)** qui documente 21 tests couvrant la fonctionnalité de password reset avec tous les cas de sécurité.
 
 ---
 
@@ -411,7 +411,7 @@ Racine/
 - Inscription publique (workflow complet)
 - Validation utilisateur par admin
 - **Réinitialisation de mot de passe** (21 tests) ✅ NOUVEAU
-  - Voir détails dans [TESTS_REINITIALISATION_MDP.md](TESTS_REINITIALISATION_MDP.md)
+  - Voir détails dans [02_TESTS_REINITIALISATION_MDP.md](02_TESTS_REINITIALISATION_MDP.md)
 
 **Couverture après tests password_reset :**
 - `accounts/forms.py` : 97% (était 0%)
@@ -606,7 +606,7 @@ Racine/
 
 ✅ **Tests EXISTANTS (21 tests - password reset) :**
 
-Voir détails complets dans [TESTS_REINITIALISATION_MDP.md](TESTS_REINITIALISATION_MDP.md)
+Voir détails complets dans [02_TESTS_REINITIALISATION_MDP.md](02_TESTS_REINITIALISATION_MDP.md)
 
 1. **Réinitialisation de mot de passe** ✅ TESTÉ :
    - ✅ Test token expiré (> 24h)
@@ -780,7 +780,7 @@ Voir détails complets dans [TESTS_REINITIALISATION_MDP.md](TESTS_REINITIALISATI
 **Fichier : `accounts/tests/test_password_reset.py`**
 **Statut :** ✅ Implémenté (21 tests)
 
-*Voir documentation complète dans [TESTS_REINITIALISATION_MDP.md](TESTS_REINITIALISATION_MDP.md)*
+*Voir documentation complète dans [02_TESTS_REINITIALISATION_MDP.md](02_TESTS_REINITIALISATION_MDP.md)*
 
 **Couverture obtenue :**
 - `accounts/forms.py` : 97%
@@ -882,7 +882,7 @@ class TestEmailUnique:
 
 ---
 
-### Phase 2 : INTÉGRITÉ DONNÉES (Semaines 3-4)
+### Phase 2 : INTÉGRITÉ DES DONNÉES (Semaines 3-4)
 
 **Objectif : Couvrir 80% des vues observations**
 
@@ -1316,7 +1316,7 @@ jobs:
 - Couverture `accounts/forms.py` : 97% (+97%)
 - Couverture `accounts/utils/email_service.py` : 78% (+60%)
 
-Voir documentation complète dans **[TESTS_REINITIALISATION_MDP.md](TESTS_REINITIALISATION_MDP.md)**
+Voir documentation complète dans **[02_TESTS_REINITIALISATION_MDP.md](02_TESTS_REINITIALISATION_MDP.md)**
 
 ---
 
@@ -1602,7 +1602,7 @@ pytest --cov=. --cov-fail-under=80
 - Test Pyramid : https://martinfowler.com/articles/practical-test-pyramid.html
 
 **Documentation du projet :**
-- **[Tests de Réinitialisation de Mot de Passe](TESTS_REINITIALISATION_MDP.md)** - Exemple complet de 21 tests
+- **[Tests de Réinitialisation de Mot de Passe](02_TESTS_REINITIALISATION_MDP.md)** - Exemple complet de 21 tests
 
 ---
 
