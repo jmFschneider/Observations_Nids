@@ -8,13 +8,13 @@ from geo.models import CommuneFrance, Localisation
 from ingest.models import EspeceCandidate, ImportationEnCours, TranscriptionBrute
 from observations.models import FicheObservation
 
-from .auth import est_admin
+from .auth import peut_transcrire
 
 logger = logging.getLogger(__name__)
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def accueil_importation(request):
     """Vue d'accueil pour le système d'importation"""
     # Statistiques
@@ -67,7 +67,7 @@ def accueil_importation(request):
 
 
 @login_required
-@user_passes_test(est_admin)
+@user_passes_test(peut_transcrire)
 def resume_importation(request):
     """Vue pour afficher un résumé des importations"""
     # Statistiques

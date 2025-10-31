@@ -23,7 +23,7 @@ class TestSelectDirectory:
     @patch('os.listdir')
     @patch('os.path.isdir')
     def test_get_affiche_liste_repertoires(
-        self, mock_isdir, mock_listdir, mock_render, authenticated_client
+        self, mock_isdir, mock_listdir, mock_render, transcription_client
     ):
         """Test que la page GET affiche la liste des répertoires disponibles."""
         # Simuler des répertoires
@@ -35,7 +35,7 @@ class TestSelectDirectory:
         mock_render.return_value = HttpResponse()
 
         url = reverse('select_directory')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 200
         # Vérifier que render a été appelé avec les bons arguments
@@ -50,7 +50,7 @@ class TestSelectDirectory:
     @patch('observations.views.view_transcription.os.listdir')
     @patch('observations.views.view_transcription.os.path.isdir')
     def test_post_repertoire_valide(
-        self, mock_isdir, mock_listdir, mock_isfile, authenticated_client
+        self, mock_isdir, mock_listdir, mock_isfile, transcription_client
     ):
         """Test de sélection d'un répertoire valide."""
         mock_isdir.return_value = True
@@ -59,7 +59,7 @@ class TestSelectDirectory:
         mock_isfile.side_effect = lambda path: not path.endswith('doc.txt')
 
         url = reverse('select_directory')
-        response = authenticated_client.post(url, {'selected_directory': 'test_dir'})
+        response = transcription_client.post(url, {'selected_directory': 'test_dir'})
 
         assert response.status_code == 200
         response_data = response.json()
@@ -68,15 +68,15 @@ class TestSelectDirectory:
         assert response_data['directory'] == 'test_dir'
 
         # Vérifier que le répertoire est stocké en session
-        assert authenticated_client.session['processing_directory'] == 'test_dir'
+        assert transcription_client.session['processing_directory'] == 'test_dir'
 
     @patch('os.path.isdir')
-    def test_post_repertoire_invalide(self, mock_isdir, authenticated_client):
+    def test_post_repertoire_invalide(self, mock_isdir, transcription_client):
         """Test de sélection d'un répertoire invalide."""
         mock_isdir.return_value = False
 
         url = reverse('select_directory')
-        response = authenticated_client.post(url, {'selected_directory': 'invalid_dir'})
+        response = transcription_client.post(url, {'selected_directory': 'invalid_dir'})
 
         assert response.status_code == 200
         response_data = response.json()
@@ -121,26 +121,26 @@ class TestIsCeleryOperational:
 class TestProcessImages:
     """Tests pour la vue de traitement des images."""
 
-    def test_sans_repertoire_en_session(self, authenticated_client):
+    def test_sans_repertoire_en_session(self, transcription_client):
         """Test sans répertoire sélectionné en session."""
         url = reverse('process_images')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 302  # Redirection
         assert response.url == reverse('select_directory')
 
     @patch('observations.views.view_transcription.is_celery_operational')
-    def test_celery_non_operational(self, mock_celery_check, authenticated_client):
+    def test_celery_non_operational(self, mock_celery_check, transcription_client):
         """Test quand Celery n'est pas opérationnel."""
         mock_celery_check.return_value = False
 
         # Ajouter un répertoire en session
-        session = authenticated_client.session
+        session = transcription_client.session
         session['processing_directory'] = 'test_dir'
         session.save()
 
         url = reverse('process_images')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 302  # Redirection
         assert response.url == reverse('select_directory')
@@ -150,7 +150,7 @@ class TestProcessImages:
     @patch('observations.views.view_transcription.process_images_task.delay')
     @patch('observations.views.view_transcription.is_celery_operational')
     def test_lancement_traitement_succes(
-        self, mock_celery_check, mock_task_delay, mock_makedirs, mock_render, authenticated_client
+        self, mock_celery_check, mock_task_delay, mock_makedirs, mock_render, transcription_client
     ):
         """Test du lancement réussi du traitement."""
         mock_celery_check.return_value = True
@@ -164,12 +164,12 @@ class TestProcessImages:
         mock_render.return_value = HttpResponse()
 
         # Ajouter un répertoire en session
-        session = authenticated_client.session
+        session = transcription_client.session
         session['processing_directory'] = 'test_dir'
         session.save()
 
         url = reverse('process_images')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 200
         # Vérifier que render a été appelé avec les bons arguments
@@ -180,36 +180,36 @@ class TestProcessImages:
         assert context['task_id'] == 'test-task-id-123'
 
         # Vérifier que le task_id est stocké en session
-        assert authenticated_client.session['task_id'] == 'test-task-id-123'
+        assert transcription_client.session['task_id'] == 'test-task-id-123'
 
 
 @pytest.mark.django_db
 class TestCheckProgress:
     """Tests pour l'endpoint de vérification de progression."""
 
-    def test_sans_task_id(self, authenticated_client):
+    def test_sans_task_id(self, transcription_client):
         """Test sans task_id en session."""
         url = reverse('check_progress')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 200
         response_data = response.json()
         assert response_data['status'] == 'NO_TASK'
 
     @patch('observations.views.view_transcription.AsyncResult')
-    def test_etat_pending(self, mock_async_result, authenticated_client):
+    def test_etat_pending(self, mock_async_result, transcription_client):
         """Test avec une tâche en état PENDING."""
         mock_result = MagicMock()
         mock_result.status = 'PENDING'
         mock_result.info = None
         mock_async_result.return_value = mock_result
 
-        session = authenticated_client.session
+        session = transcription_client.session
         session['task_id'] = 'test-task-id'
         session.save()
 
         url = reverse('check_progress')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 200
         response_data = response.json()
@@ -217,19 +217,19 @@ class TestCheckProgress:
         assert 'message' in response_data
 
     @patch('observations.views.view_transcription.AsyncResult')
-    def test_etat_progress(self, mock_async_result, authenticated_client):
+    def test_etat_progress(self, mock_async_result, transcription_client):
         """Test avec une tâche en cours (PROGRESS)."""
         mock_result = MagicMock()
         mock_result.status = 'PROGRESS'
         mock_result.info = {'total': 10, 'processed': 5, 'message': 'Processing...'}
         mock_async_result.return_value = mock_result
 
-        session = authenticated_client.session
+        session = transcription_client.session
         session['task_id'] = 'test-task-id'
         session.save()
 
         url = reverse('check_progress')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 200
         response_data = response.json()
@@ -239,7 +239,7 @@ class TestCheckProgress:
         assert response_data['processed'] == 5
 
     @patch('observations.views.view_transcription.AsyncResult')
-    def test_etat_success(self, mock_async_result, authenticated_client):
+    def test_etat_success(self, mock_async_result, transcription_client):
         """Test avec une tâche terminée avec succès."""
         mock_result = MagicMock()
         mock_result.status = 'SUCCESS'
@@ -253,13 +253,13 @@ class TestCheckProgress:
         }
         mock_async_result.return_value = mock_result
 
-        session = authenticated_client.session
+        session = transcription_client.session
         session['task_id'] = 'test-task-id'
         session['processing_directory'] = 'test_dir'
         session.save()
 
         url = reverse('check_progress')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 200
         response_data = response.json()
@@ -269,22 +269,22 @@ class TestCheckProgress:
         assert 'redirect' in response_data
 
         # Vérifier que les résultats sont stockés en session
-        assert 'transcription_results' in authenticated_client.session
+        assert 'transcription_results' in transcription_client.session
 
     @patch('observations.views.view_transcription.AsyncResult')
-    def test_etat_failure(self, mock_async_result, authenticated_client):
+    def test_etat_failure(self, mock_async_result, transcription_client):
         """Test avec une tâche qui a échoué."""
         mock_result = MagicMock()
         mock_result.status = 'FAILURE'
         mock_result.result = Exception("Task failed")
         mock_async_result.return_value = mock_result
 
-        session = authenticated_client.session
+        session = transcription_client.session
         session['task_id'] = 'test-task-id'
         session.save()
 
         url = reverse('check_progress')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 200
         response_data = response.json()
@@ -298,9 +298,9 @@ class TestTranscriptionResults:
     """Tests pour la vue des résultats de transcription."""
 
     @patch('observations.views.view_transcription.render')
-    def test_avec_resultats_en_session(self, mock_render, authenticated_client):
+    def test_avec_resultats_en_session(self, mock_render, transcription_client):
         """Test avec des résultats stockés en session."""
-        session = authenticated_client.session
+        session = transcription_client.session
         session['transcription_results'] = {
             'directory': 'test_dir',
             'total_files': 10,
@@ -316,7 +316,7 @@ class TestTranscriptionResults:
         mock_render.return_value = HttpResponse()
 
         url = reverse('transcription_results')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 200
         # Vérifier que render a été appelé avec les bons arguments
@@ -326,26 +326,26 @@ class TestTranscriptionResults:
         assert 'total_files' in context
         assert context['total_files'] == 10
 
-    def test_sans_resultats_avec_task_id(self, authenticated_client):
+    def test_sans_resultats_avec_task_id(self, transcription_client):
         """Test sans résultats mais avec une tâche en cours."""
-        session = authenticated_client.session
+        session = transcription_client.session
         session['task_id'] = 'test-task-id'
         session.save()
 
         url = reverse('transcription_results')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 302  # Redirection
         assert response.url == reverse('process_images')
 
     @patch('observations.views.view_transcription.render')
-    def test_sans_resultats_ni_task_id(self, mock_render, authenticated_client):
+    def test_sans_resultats_ni_task_id(self, mock_render, transcription_client):
         """Test sans résultats ni tâche en cours."""
         # Mock render
         mock_render.return_value = HttpResponse()
 
         url = reverse('transcription_results')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         # Devrait afficher une page vide ou avec un message
         assert response.status_code == 200
@@ -355,26 +355,26 @@ class TestTranscriptionResults:
 class TestStartTranscriptionView:
     """Tests pour l'API de démarrage de transcription."""
 
-    def test_sans_repertoire(self, authenticated_client):
+    def test_sans_repertoire(self, transcription_client):
         """Test sans répertoire sélectionné."""
         url = reverse('start_transcription')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 400
         response_data = response.json()
         assert 'error' in response_data
 
     @patch('observations.views.view_transcription.is_celery_operational')
-    def test_celery_non_operational(self, mock_celery_check, authenticated_client):
+    def test_celery_non_operational(self, mock_celery_check, transcription_client):
         """Test quand Celery n'est pas opérationnel."""
         mock_celery_check.return_value = False
 
-        session = authenticated_client.session
+        session = transcription_client.session
         session['processing_directory'] = 'test_dir'
         session.save()
 
         url = reverse('start_transcription')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 503
         response_data = response.json()
@@ -383,7 +383,7 @@ class TestStartTranscriptionView:
 
     @patch('observations.views.view_transcription.process_images_task.delay')
     @patch('observations.views.view_transcription.is_celery_operational')
-    def test_demarrage_succes(self, mock_celery_check, mock_task_delay, authenticated_client):
+    def test_demarrage_succes(self, mock_celery_check, mock_task_delay, transcription_client):
         """Test du démarrage réussi de la transcription."""
         mock_celery_check.return_value = True
 
@@ -391,12 +391,12 @@ class TestStartTranscriptionView:
         mock_task.id = 'new-task-id-456'
         mock_task_delay.return_value = mock_task
 
-        session = authenticated_client.session
+        session = transcription_client.session
         session['processing_directory'] = 'test_dir'
         session.save()
 
         url = reverse('start_transcription')
-        response = authenticated_client.get(url)
+        response = transcription_client.get(url)
 
         assert response.status_code == 200
         response_data = response.json()
@@ -405,4 +405,4 @@ class TestStartTranscriptionView:
         assert 'processing_url' in response_data
 
         # Vérifier que le task_id est stocké en session
-        assert authenticated_client.session['task_id'] == 'new-task-id-456'
+        assert transcription_client.session['task_id'] == 'new-task-id-456'

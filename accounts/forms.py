@@ -22,7 +22,16 @@ class UtilisateurCreationForm(UserCreationForm):
 class UtilisateurChangeForm(UserChangeForm):
     class Meta:
         model = Utilisateur
-        fields = ('username', 'email', 'first_name', 'last_name', 'role', 'est_valide', 'is_active')
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'role',
+            'est_valide',
+            'est_transcription',
+            'is_active',
+        )
 
 
 class MotDePasseOublieForm(forms.Form):

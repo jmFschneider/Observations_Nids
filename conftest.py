@@ -47,6 +47,16 @@ def admin_user(create_user):
 
 
 @pytest.fixture
+def transcription_user(create_user):
+    """Utilisateur avec droits de transcription."""
+    return create_user(
+        username='transcripteur',
+        email='transcripteur@example.com',
+        est_transcription=True,
+    )
+
+
+@pytest.fixture
 def authenticated_client(client, user):
     """Client Django authentifié."""
     client.force_login(user)
@@ -57,4 +67,11 @@ def authenticated_client(client, user):
 def admin_client(client, admin_user):
     """Client Django authentifié en tant qu'admin."""
     client.force_login(admin_user)
+    return client
+
+
+@pytest.fixture
+def transcription_client(client, transcription_user):
+    """Client Django authentifié avec droits de transcription."""
+    client.force_login(transcription_user)
     return client
