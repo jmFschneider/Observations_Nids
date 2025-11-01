@@ -72,6 +72,7 @@
 </div>
 {% endif %}
 
+{% if user.est_transcription or user.role == 'administrateur' %}
 <div class="card mb-4">
     <div class="card-header bg-success text-white">
         <h3>Transcription & Importation</h3>
@@ -83,6 +84,7 @@
         </ul>
     </div>
 </div>
+{% endif %}
 
 {% if user.is_authenticated and user.role == 'administrateur' %}
 <div class="card mb-4">

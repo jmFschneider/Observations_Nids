@@ -6,10 +6,12 @@ from typing import Any, TypedDict, cast
 from celery.result import AsyncResult
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
+
+# Importer le décorateur de permission
+from observations.decorators import transcription_required
 
 # Importer la tâche Celery
 from observations.tasks import process_images_task
@@ -18,7 +20,7 @@ from observations_nids.celery import app
 logger = logging.getLogger(__name__)
 
 
-@login_required
+@transcription_required
 def select_directory(request):
     """Vue pour sélectionner un répertoire d'images à traiter"""
     # Définir un répertoire racine pour les images
@@ -65,7 +67,7 @@ def is_celery_operational():
         return False
 
 
-@login_required
+@transcription_required
 def process_images(request):
     """Vue pour démarrer le traitement des images via Celery"""
     directory = request.session.get('processing_directory')
@@ -121,7 +123,7 @@ class SuccessPayload(TypedDict, total=False):
     success_rate: float
 
 
-@login_required
+@transcription_required
 def check_progress(request: HttpRequest) -> JsonResponse:
     """Endpoint AJAX pour vérifier la progression du traitement"""
     task_id = request.session.get("task_id")
@@ -205,7 +207,7 @@ def check_progress(request: HttpRequest) -> JsonResponse:
     return JsonResponse(response)
 
 
-@login_required
+@transcription_required
 def transcription_results(request):
     """Vue pour afficher les résultats de la transcription"""
     # Récupérer les résultats stockés en session
@@ -234,7 +236,7 @@ def transcription_results(request):
 # Vue pour démarrer la transcription (utilisation de l'API AJAX)
 
 
-@login_required
+@transcription_required
 def start_transcription_view(request):
     """API pour démarrer le traitement des images via AJAX"""
     directory = request.session.get('processing_directory')

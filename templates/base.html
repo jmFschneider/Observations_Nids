@@ -5,9 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Observations Nids{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'Observations/icons/favicon-96x96.png' %}" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="{% static 'Observations/icons/favicon.svg' %}" />
+    <link rel="shortcut icon" href="{% static 'Observations/icons/favicon.ico' %}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'Observations/icons/apple-touch-icon.png' %}" />
+    <link rel="manifest" href="{% static 'Observations/icons/site.webmanifest' %}" />
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="{% static 'Observations/css/normalize.css' %}">
     <link rel="stylesheet" href="{% static 'Observations/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'Observations/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'Observations/css/sidebar.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     {% block extra_css %}{% endblock %}
 </head>
@@ -17,19 +27,161 @@
         🔧 ENVIRONNEMENT DE DÉVELOPPEMENT
     </div>
     {% endif %}
-    {% include "components/navbar.html" %}
 
-    <main class="container mt-4">
-        {% include "components/messages.html" %}
-        {% block content %}{% endblock %}
-    </main>
+    <!-- Navbar supérieure -->
+    <nav class="navbar navbar-dark bg-primary navbar-top">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="fas fa-kiwi-bird"></i> Suivi des nids
+            </span>
+            {% if user.is_authenticated %}
+            <div class="navbar-text text-white d-flex align-items-center">
+                <i class="fas fa-user-circle me-2"></i>
+                <span class="me-3">{{ user.username }}</span>
+                <form method="post" action="{% url 'logout' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-light">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
 
-    <footer class="mt-5">
-        {% include "components/footer.html" %}
-    </footer>
+    <!-- Wrapper principal -->
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <!-- Accueil -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}" data-title="Accueil">
+                            <i class="fas fa-home"></i>
+                            <span class="link-text">Accueil</span>
+                        </a>
+                    </li>
+
+                    {% if user.is_authenticated %}
+                    <!-- Section Observations -->
+                    <li class="nav-item">
+                        <h6 class="sidebar-heading">Observations</h6>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'observations_list' %}" data-title="Nouvelle observation">
+                            <i class="fas fa-plus-circle"></i>
+                            <span class="link-text">Nouvelle observation</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'liste_fiches_observations' %}" data-title="Liste des fiches">
+                            <i class="fas fa-list-alt"></i>
+                            <span class="link-text">Liste des fiches</span>
+                        </a>
+                    </li>
+
+                    <!-- Section Transcription (si autorisé) -->
+                    {% if user.est_transcription or user.role == 'administrateur' %}
+                    <li class="nav-item">
+                        <div class="sidebar-divider"></div>
+                        <h6 class="sidebar-heading">Transcription</h6>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'select_directory' %}" data-title="Transcription d'images">
+                            <i class="fas fa-images"></i>
+                            <span class="link-text">Transcription d'images</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accueil_importation' %}" data-title="Importation JSON">
+                            <i class="fas fa-file-import"></i>
+                            <span class="link-text">Importation JSON</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Section Administration -->
+                    {% if user.role == 'administrateur' %}
+                    <li class="nav-item">
+                        <div class="sidebar-divider"></div>
+                        <h6 class="sidebar-heading">Administration</h6>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:liste_utilisateurs' %}" data-title="Gestion des utilisateurs">
+                            <i class="fas fa-users"></i>
+                            <span class="link-text">Utilisateurs</span>
+                            {% if demandes_en_attente %}
+                            <span class="sidebar-badge">{{ demandes_en_attente }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:creer_utilisateur' %}" data-title="Créer un utilisateur">
+                            <i class="fas fa-user-plus"></i>
+                            <span class="link-text">Créer un utilisateur</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:index' %}" data-title="Admin Django">
+                            <i class="fas fa-tools"></i>
+                            <span class="link-text">Admin Django</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Gestion des espèces -->
+                    {% if user.is_staff %}
+                    <li class="nav-item">
+                        <div class="sidebar-divider"></div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'taxonomy:liste_especes' %}" data-title="Gestion des espèces">
+                            <i class="fas fa-dove"></i>
+                            <span class="link-text">Gestion des espèces</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Support -->
+                    <li class="nav-item">
+                        <div class="sidebar-divider"></div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'helpdesk:home' %}" data-title="Support">
+                            <i class="fas fa-question-circle"></i>
+                            <span class="link-text">Support</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Bouton toggle -->
+        <button class="sidebar-toggle" aria-label="Toggle sidebar">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <!-- Overlay pour mobile -->
+        <div class="sidebar-overlay"></div>
+
+        <!-- Contenu principal -->
+        <div id="content">
+            <div class="content-inner">
+                {% include "components/messages.html" %}
+                {% block content %}{% endblock %}
+            </div>
+
+            <footer class="mt-5">
+                {% include "components/footer.html" %}
+            </footer>
+        </div>
+    </div>
 
     <script src="{% static 'Observations/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'Observations/js/main.js' %}"></script>
+    <script src="{% static 'Observations/js/sidebar.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
