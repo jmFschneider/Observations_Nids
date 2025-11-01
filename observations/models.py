@@ -125,6 +125,9 @@ class Observation(models.Model):
     nombre_poussins = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     observations = models.TextField(blank=True, default='Aucune observation')
 
+    class Meta:
+        ordering = ['date_observation']
+
     def __str__(self):
         return f"Observation du {self.date_observation.strftime('%d/%m/%Y %H:%M')} (Fiche {self.fiche.num_fiche})"
 
