@@ -331,15 +331,7 @@ WorkingDirectory=$PILOTE_DIR
 Environment="PATH=$PILOTE_DIR/.venv/bin"
 EnvironmentFile=$PILOTE_DIR/.env
 
-ExecStart=$PILOTE_DIR/.venv/bin/gunicorn \\
-    --workers 3 \\
-    --worker-class sync \\
-    --timeout 120 \\
-    --bind unix:/run/gunicorn-pilote/gunicorn.sock \\
-    --error-logfile /var/log/gunicorn-pilote-error.log \\
-    --access-logfile /var/log/gunicorn-pilote-access.log \\
-    --log-level info \\
-    observations_nids.wsgi:application
+ExecStart=$PILOTE_DIR/.venv/bin/gunicorn --workers 3 --worker-class sync --timeout 120 --bind unix:/run/gunicorn-pilote/gunicorn.sock --error-logfile /var/log/gunicorn-pilote-error.log --access-logfile /var/log/gunicorn-pilote-access.log --log-level info observations_nids.wsgi:application
 
 ExecReload=/bin/kill -s HUP \$MAINPID
 KillMode=mixed
@@ -383,12 +375,7 @@ WorkingDirectory=$PILOTE_DIR
 Environment="PATH=$PILOTE_DIR/.venv/bin"
 EnvironmentFile=$PILOTE_DIR/.env
 
-ExecStart=$PILOTE_DIR/.venv/bin/celery -A observations_nids worker \\
-    --loglevel=info \\
-    --logfile=/var/log/celery-pilote-worker.log \\
-    --pidfile=/var/run/celery-pilote-worker.pid \\
-    --detach \\
-    --concurrency=2
+ExecStart=$PILOTE_DIR/.venv/bin/celery -A observations_nids worker --loglevel=info --logfile=/var/log/celery-pilote-worker.log --pidfile=/var/run/celery-pilote-worker.pid --detach --concurrency=2
 
 ExecStop=/bin/kill -s TERM \$MAINPID
 Restart=on-failure
