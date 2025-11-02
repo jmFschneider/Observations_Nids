@@ -130,7 +130,7 @@ create_virtualenv() {
     cd "$PILOTE_DIR"
     sudo -u $SUDO_USER python3 -m venv .venv
     sudo -u $SUDO_USER .venv/bin/pip install --upgrade pip
-    sudo -u $SUDO_USER .venv/bin/pip install -r requirements.txt
+    sudo -u $SUDO_USER .venv/bin/pip install -r requirements-prod.txt
 
     print_success "Environnement virtuel créé et dépendances installées"
 }
@@ -266,7 +266,7 @@ configure_nginx() {
     # Créer la configuration
     cat > /etc/nginx/sites-available/observations_nids_pilote <<'EOF'
 upstream django_pilote {
-    server unix:/var/www/observations_nids_pilote/gunicorn.sock fail_timeout=0;
+    server unix:/run/gunicorn-pilote/gunicorn.sock fail_timeout=0;
 }
 
 server {
@@ -323,7 +323,7 @@ Description=Gunicorn daemon for Observations Nids Pilote
 After=network.target
 
 [Service]
-Type=notify
+Type=exec
 User=www-data
 Group=www-data
 RuntimeDirectory=gunicorn-pilote
@@ -335,7 +335,7 @@ ExecStart=$PILOTE_DIR/.venv/bin/gunicorn \\
     --workers 3 \\
     --worker-class sync \\
     --timeout 120 \\
-    --bind unix:$PILOTE_DIR/gunicorn.sock \\
+    --bind unix:/run/gunicorn-pilote/gunicorn.sock \\
     --error-logfile /var/log/gunicorn-pilote-error.log \\
     --access-logfile /var/log/gunicorn-pilote-access.log \\
     --log-level info \\
@@ -480,7 +480,7 @@ echo "→ Activation environnement virtuel..."
 source $VENV_DIR/bin/activate
 
 echo "→ Mise à jour des dépendances..."
-pip install -r requirements.txt --upgrade
+pip install -r requirements-prod.txt --upgrade
 
 echo "→ Application des migrations..."
 python manage.py migrate
