@@ -188,8 +188,8 @@ source .venv/bin/activate
 # Mettre à jour pip
 pip install --upgrade pip
 
-# Installer les dépendances
-pip install -r requirements.txt
+# Installer les dépendances (production uniquement, pas les outils de dev)
+pip install -r requirements-prod.txt
 
 # Vérifier l'installation Django
 python -c "import django; print(django.get_version())"
@@ -338,7 +338,7 @@ sudo nano /etc/nginx/sites-available/observations_nids_pilote
 # /etc/nginx/sites-available/observations_nids_pilote
 
 upstream django_pilote {
-    server unix:/var/www/observations_nids_pilote/gunicorn.sock fail_timeout=0;
+    server unix:/run/gunicorn-pilote/gunicorn.sock fail_timeout=0;
 }
 
 # Redirection HTTP → HTTPS
@@ -411,7 +411,7 @@ Description=Gunicorn daemon for Observations Nids Pilote
 After=network.target
 
 [Service]
-Type=notify
+Type=exec
 User=www-data
 Group=www-data
 RuntimeDirectory=gunicorn-pilote
@@ -423,7 +423,7 @@ ExecStart=/var/www/observations_nids_pilote/.venv/bin/gunicorn \
     --workers 3 \
     --worker-class sync \
     --timeout 120 \
-    --bind unix:/var/www/observations_nids_pilote/gunicorn.sock \
+    --bind unix:/run/gunicorn-pilote/gunicorn.sock \
     --error-logfile /var/log/gunicorn-pilote-error.log \
     --access-logfile /var/log/gunicorn-pilote-access.log \
     --log-level info \
@@ -437,6 +437,14 @@ PrivateTmp=true
 [Install]
 WantedBy=multi-user.target
 ```
+
+**📝 Explications des choix techniques** :
+
+- **`Type=exec`** (au lieu de `notify`) : Systemd considère le service démarré dès le lancement. Plus simple et fiable pour Gunicorn qui n'émet pas toujours le signal "ready" attendu par `Type=notify`.
+
+- **`RuntimeDirectory=gunicorn-pilote`** : Crée automatiquement `/run/gunicorn-pilote/` au démarrage avec `www-data` comme propriétaire. `/run/` est un tmpfs (en RAM) : propre, rapide, sécurisé, et se nettoie au redémarrage.
+
+- **Socket dans `/run/`** : Évite les conflits de permissions avec le code source dans `/var/www/` (propriétaire `schneider`) et la socket (propriétaire `www-data`). Chaque composant a son répertoire dédié.
 
 #### 8.2 Créer les logs et ajuster les permissions
 
@@ -475,8 +483,8 @@ sudo tail -f /var/log/gunicorn-pilote-error.log
 #### 8.4 Vérifier la socket Gunicorn
 
 ```bash
-# La socket devrait être créée
-ls -l /var/www/observations_nids_pilote/gunicorn.sock
+# La socket devrait être créée par RuntimeDirectory
+ls -l /run/gunicorn-pilote/gunicorn.sock
 # Devrait afficher un fichier socket (type srwxrwxrwx)
 
 # Redémarrer Nginx pour prendre en compte la socket
@@ -684,7 +692,7 @@ source $VENV_DIR/bin/activate
 
 # 3. Mettre à jour les dépendances
 echo "→ Mise à jour des dépendances..."
-pip install -r requirements.txt --upgrade
+pip install -r requirements-prod.txt --upgrade
 
 # 4. Appliquer les migrations
 echo "→ Application des migrations..."
@@ -950,7 +958,7 @@ gunicorn observations_nids.wsgi:application --bind 127.0.0.1:8001
 sudo systemctl status gunicorn-pilote
 
 # Vérifier que la socket existe
-ls -l /var/www/observations_nids_pilote/gunicorn.sock
+ls -l /run/gunicorn-pilote/gunicorn.sock
 
 # Vérifier les logs Nginx
 sudo tail -f /var/log/nginx/observations_pilote_error.log
