@@ -84,7 +84,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',  # Requis pour django-helpdesk
     'django.contrib.humanize',
-    'django_extensions',
+    # 'django_extensions' déplacé dans settings_local.py (dev uniquement)
     'accounts.apps.AccountsConfig',
     'core.apps.CoreConfig',
     'taxonomy.apps.TaxonomyConfig',
