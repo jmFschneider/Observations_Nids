@@ -65,7 +65,7 @@ def creer_utilisateur(request):
             messages.success(
                 request, f"L'utilisateur {utilisateur.username} a été créé avec succès"
             )
-            return redirect('liste_utilisateurs')
+            return redirect('accounts:liste_utilisateurs')
     else:
         form = UtilisateurCreationForm()
 
@@ -85,7 +85,7 @@ def modifier_utilisateur(request, user_id):
             messages.success(
                 request, f"L'utilisateur {utilisateur.username} a été modifié avec succès"
             )
-            return redirect('liste_utilisateurs')
+            return redirect('accounts:liste_utilisateurs')
     else:
         form = UtilisateurChangeForm(instance=utilisateur)
 
@@ -106,7 +106,7 @@ def desactiver_utilisateur(request, user_id):
         utilisateur.save()
         messages.success(request, f"L'utilisateur {utilisateur.username} a été désactivé")
 
-    return redirect('liste_utilisateurs')
+    return redirect('accounts:liste_utilisateurs')
 
 
 @login_required
@@ -119,7 +119,7 @@ def activer_utilisateur(request, user_id):
         utilisateur.save()
         messages.success(request, f"L'utilisateur {utilisateur.username} a été activé")
 
-    return redirect('liste_utilisateurs')
+    return redirect('accounts:liste_utilisateurs')
 
 
 @login_required
@@ -164,7 +164,7 @@ def inscription_publique(request):
                 request,
                 "Votre demande d'inscription a été enregistrée. Un administrateur devra l'approuver avant que vous puissiez vous connecter.",
             )
-            return redirect('accueil')  # ou '/' selon ta configuration
+            return redirect('observations:home')
         else:
             logger.warning(f"Formulaire invalide : {form.errors}")  # 👈 AJOUT ESSENTIEL
     else:

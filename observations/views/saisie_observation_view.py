@@ -182,7 +182,7 @@ def saisie_observation(request, fiche_id=None):
                         f"Vous n'êtes pas autorisé à modifier cette fiche. "
                         f"Seul l'auteur ({fiche_instance.observateur.username}) peut continuer la saisie.",
                     )
-                    return redirect('fiche_observation', fiche_id=fiche_id)
+                    return redirect('observations:fiche_observation', fiche_id=fiche_id)
 
             localisation_instance = fiche_instance.localisation
             nid_instance = fiche_instance.nid
@@ -552,7 +552,7 @@ def saisie_observation(request, fiche_id=None):
                         )
 
                     messages.success(request, "Fiche d'observation sauvegardée avec succès!")
-                    return redirect('modifier_observation', fiche_id=fiche.pk)
+                    return redirect('observations:modifier_observation', fiche_id=fiche.pk)
 
             except Exception as e:
                 logger.exception(f"Erreur lors de la sauvegarde: {e}")
@@ -610,7 +610,7 @@ def ajouter_observation(request, fiche_id):
                 modifie_par=request.user,
             )
 
-            return redirect('modifier_observation', fiche_id=fiche_id)
+            return redirect('observations:modifier_observation', fiche_id=fiche_id)
     else:
         form = ObservationForm()
     return render(
@@ -751,7 +751,7 @@ def supprimer_observation(request, observation_id):
         observation.delete()
         messages.success(request, "Observation supprimée avec succès")
 
-    return redirect('modifier_observation', fiche_id=fiche_id)
+    return redirect('observations:modifier_observation', fiche_id=fiche_id)
 
 
 @login_required
@@ -799,7 +799,7 @@ def soumettre_pour_correction(request, fiche_id):
 
         # Rediriger vers la vue de détail (lecture seule)
         logger.info(f"Redirection vers fiche_observation pour fiche {fiche_id}")
-        return redirect('fiche_observation', fiche_id=fiche_id)
+        return redirect('observations:fiche_observation', fiche_id=fiche_id)
 
     logger.info(f"Méthode GET, redirection vers modifier_observation pour fiche {fiche_id}")
-    return redirect('modifier_observation', fiche_id=fiche_id)
+    return redirect('observations:modifier_observation', fiche_id=fiche_id)

@@ -13,15 +13,13 @@ class TestListeFichesObservations:
     """Tests pour la vue liste_fiches_observations()."""
 
     def test_acces_non_authentifie(self, client):
-        """Test qu'un utilisateur non authentifié est redirigé."""
-        url = reverse('liste_fiches_observations')
+        url = reverse('observations:liste_fiches_observations')
         response = client.get(url)
 
         assert response.status_code == 302  # Redirection vers login
 
     def test_liste_vide(self, authenticated_client):
-        """Test de l'affichage d'une liste vide."""
-        url = reverse('liste_fiches_observations')
+        url = reverse('observations:liste_fiches_observations')
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
@@ -29,8 +27,7 @@ class TestListeFichesObservations:
         # La liste peut ne pas être vide selon les fixtures
 
     def test_liste_avec_fiches(self, authenticated_client, fiche_observation):
-        """Test de l'affichage d'une liste avec des fiches."""
-        url = reverse('liste_fiches_observations')
+        url = reverse('observations:liste_fiches_observations')
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
@@ -46,7 +43,7 @@ class TestListeFichesObservations:
         for _ in range(15):
             FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
 
-        url = reverse('liste_fiches_observations')
+        url = reverse('observations:liste_fiches_observations')
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
@@ -62,7 +59,7 @@ class TestListeFichesObservations:
         for _ in range(15):
             FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
 
-        url = reverse('liste_fiches_observations')
+        url = reverse('observations:liste_fiches_observations')
         response = authenticated_client.get(url, {'page': '2'})
 
         assert response.status_code == 200
@@ -81,7 +78,7 @@ class TestListeFichesObservations:
         time.sleep(0.01)
         fiche3 = FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
 
-        url = reverse('liste_fiches_observations')
+        url = reverse('observations:liste_fiches_observations')
         response = authenticated_client.get(url)
 
         assert response.status_code == 200

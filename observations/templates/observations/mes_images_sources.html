@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mes Images Téléversées{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'observations:home' %}">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Mes images téléversées</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Mes images téléversées</h1>
+        <a href="{% url 'observations:upload_image_source' %}" class="btn btn-primary">
+            <i class="fas fa-upload"></i> Téléverser une nouvelle image
+        </a>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">Total</h5>
+                    <h2 class="mb-0">{{ total_images }}</h2>
+                    <small>image{{ total_images|pluralize }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Transcrites</h5>
+                    <h2 class="mb-0">{{ images_transcrites }}</h2>
+                    <small>image{{ images_transcrites|pluralize }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <h5 class="card-title">En attente</h5>
+                    <h2 class="mb-0">{{ images_en_attente }}</h2>
+                    <small>image{{ images_en_attente|pluralize }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if total_images == 0 %}
+    <div class="alert alert-info">
+        <h5><i class="fas fa-info-circle"></i> Aucune image téléversée</h5>
+        <p class="mb-0">Vous n'avez pas encore téléversé d'images. Cliquez sur le bouton "Téléverser une nouvelle image" pour commencer.</p>
+    </div>
+    {% else %}
+    <!-- Grille d'images -->
+    <div class="row">
+        {% for image_source in images %}
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card h-100 shadow-sm">
+                <!-- Image -->
+                <div style="background-color: #f8f9fa; text-align: center; padding: 10px;">
+                    {% if image_source.image %}
+                    <img src="{{ image_source.image.url }}"
+                         class="card-img-top"
+                         alt="Image #{{ image_source.id }}"
+                         style="width: 150px; height: auto; object-fit: contain; cursor: pointer; max-width: 100%;"
+                         onclick="window.open('{{ image_source.image.url }}', '_blank')">
+                    {% else %}
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Badge de statut -->
+                <div class="position-absolute" style="top: 10px; right: 10px;">
+                    {% if image_source.est_transcrite %}
+                    <span class="badge bg-success">
+                        <i class="fas fa-check-circle"></i> Transcrite
+                    </span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">
+                        <i class="fas fa-clock"></i> En attente
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- Informations -->
+                <div class="card-body">
+                    <h6 class="card-title">Image #{{ image_source.id }}</h6>
+                    <p class="card-text text-muted small mb-2">
+                        <i class="fas fa-calendar"></i> {{ image_source.date_televersement|date:"d/m/Y H:i" }}
+                    </p>
+
+                    {% if image_source.est_transcrite and image_source.fiche_observation %}
+                    <div class="alert alert-success py-2 px-2 mb-0 small">
+                        <strong>Fiche #{{ image_source.fiche_observation.num_fiche }}</strong><br>
+                        {% if image_source.fiche_observation.espece %}
+                        <i class="fas fa-dove"></i> {{ image_source.fiche_observation.espece.nom }}<br>
+                        {% endif %}
+                        <a href="{% url 'observations:fiche_observation' fiche_id=image_source.fiche_observation.num_fiche %}"
+                           class="btn btn-sm btn-success mt-1">
+                            <i class="fas fa-eye"></i> Voir la fiche
+                        </a>
+                    </div>
+                    {% elif image_source.est_transcrite %}
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Transcrite mais aucune fiche associée
+                    </p>
+                    {% else %}
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-hourglass-half"></i> Transcription en attente
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if images.has_other_pages %}
+    <nav aria-label="Navigation des pages">
+        <ul class="pagination justify-content-center">
+            {% if images.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="Première">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ images.previous_page_number }}" aria-label="Précédente">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;&laquo;</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+            {% endif %}
+
+            {% for num in images.paginator.page_range %}
+            {% if images.number == num %}
+            <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > images.number|add:'-3' and num < images.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if images.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ images.next_page_number }}" aria-label="Suivante">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ images.paginator.num_pages }}" aria-label="Dernière">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;&raquo;</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% endif %}
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+</style>
+{% endblock %}

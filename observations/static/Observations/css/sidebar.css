@@ -4,8 +4,8 @@
 
 /* Variables CSS pour faciliter la personnalisation */
 :root {
-    --sidebar-width: 260px;
-    --sidebar-collapsed-width: 60px;
+    --sidebar-width: 230px;
+    --sidebar-collapsed-width: 50px;
     --navbar-height: 56px;
     --transition-speed: 0.3s;
 }
@@ -62,24 +62,44 @@ body {
 .sidebar-sticky {
     position: sticky;
     top: 0;
-    padding: 15px 0;
+    padding: 45px 0 5px 0;
+}
+
+/* === LISTE PRINCIPALE === */
+#sidebar ul.nav {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* === ÉLÉMENTS DE LISTE === */
+#sidebar .nav-item {
+    list-style: none;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
 }
 
 /* === LIENS DE NAVIGATION === */
 #sidebar .nav-link {
-    color: #495057;
-    padding: 12px 20px;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
+    color: #495057 !important;
+    padding: 5px 0px 5px 22px !important;
+    font-size: 13px !important;
+    display: flex !important;
+    align-items: center !important;
     transition: all 0.2s;
-    border-left: 3px solid transparent;
-    white-space: nowrap;
+    border-left: 3px solid transparent !important;
+    white-space: nowrap !important;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
+
+/* Accueil sans indentation */
+#sidebar .nav-item:first-child .nav-link {
+    padding-left: 8px !important;
 }
 
 #sidebar .nav-link i {
-    min-width: 30px;
-    font-size: 18px;
+    min-width: 20px;
+    font-size: 15px;
     transition: all var(--transition-speed);
 }
 
@@ -102,7 +122,7 @@ body {
 
 /* Texte des liens (caché quand sidebar repliée) */
 #sidebar .link-text {
-    margin-left: 10px;
+    margin-left: 5px;
     transition: opacity var(--transition-speed);
 }
 
@@ -115,11 +135,13 @@ body {
 .sidebar-heading {
     font-size: 0.75rem;
     text-transform: uppercase;
-    padding: 15px 20px 8px;
-    color: #6c757d;
-    font-weight: 600;
+    padding: 4px 0px 0px 8px !important;
+    color: #343a40;
+    font-weight: 700;
     letter-spacing: 0.5px;
     transition: all var(--transition-speed);
+    margin-bottom: 0;
+    margin-left: 0px !important;
 }
 
 #sidebar.collapsed .sidebar-heading {
@@ -131,7 +153,7 @@ body {
 .sidebar-divider {
     height: 1px;
     background-color: #dee2e6;
-    margin: 10px 15px;
+    margin: 3px 8px;
 }
 
 /* === CONTENU PRINCIPAL === */
@@ -155,48 +177,50 @@ body {
 /* === BOUTON TOGGLE === */
 .sidebar-toggle {
     position: fixed;
-    top: calc(var(--navbar-height) + 10px);
-    left: var(--sidebar-width);
+    top: calc(var(--navbar-height) + 5px);
+    left: calc(var(--sidebar-width) - 40px);
     z-index: 1025;
-    background: white;
-    border: 2px solid #007bff;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    width: 35px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all var(--transition-speed);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 16px;
+    color: #495057;
 }
 
 .sidebar-toggle:hover {
-    background: #007bff;
-    color: white;
-    transform: scale(1.1);
+    background: #e9ecef;
+    border-color: #007bff;
+    color: #007bff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
 }
 
 #sidebar.collapsed ~ .sidebar-toggle {
-    left: var(--sidebar-collapsed-width);
-    transform: rotate(180deg);
+    left: 5px;
 }
 
-#sidebar.collapsed ~ .sidebar-toggle:hover {
-    transform: rotate(180deg) scale(1.1);
+#sidebar.collapsed ~ .sidebar-toggle i {
+    transform: rotate(180deg);
 }
 
 /* === BADGE DE NOTIFICATION === */
 .sidebar-badge {
     position: absolute;
-    right: 15px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
     background-color: #dc3545;
     color: white;
-    border-radius: 10px;
-    padding: 2px 8px;
-    font-size: 11px;
+    border-radius: 8px;
+    padding: 1px 6px;
+    font-size: 10px;
     font-weight: bold;
 }
 
@@ -209,12 +233,12 @@ body {
 /* Tablettes (iPad, etc.) */
 @media (max-width: 1024px) {
     :root {
-        --sidebar-width: 220px;
+        --sidebar-width: 210px;
     }
 
     #sidebar .nav-link {
-        font-size: 14px;
-        padding: 10px 15px;
+        font-size: 12px;
+        padding: 4px 10px;
     }
 }
 
