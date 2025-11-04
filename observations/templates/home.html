@@ -2,7 +2,7 @@
 
 {% block extra_css %}
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'Observations/css/styles.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -26,8 +26,20 @@
     </div>
     <div class="card-body">
         <ul>
-            <li><a href="{% url 'observations_list' %}">Nouvelle observation</a></li>
-            <li><a href="{% url 'liste_fiches_observations' %}">Liste des fiches d'observation</a></li>
+            <li><a href="{% url 'observations:observations_list' %}">Nouvelle observation</a></li>
+            <li><a href="{% url 'observations:liste_fiches_observations' %}">Liste des fiches d'observation</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-secondary text-white">
+        <h3>Mes Images</h3>
+    </div>
+    <div class="card-body">
+        <ul>
+            <li><a href="{% url 'observations:upload_image_source' %}"><i class="fas fa-upload"></i> Téléverser une nouvelle image</a></li>
+            <li><a href="{% url 'observations:mes_images_sources' %}"><i class="fas fa-images"></i> Voir mes images téléversées</a></li>
         </ul>
     </div>
 </div>
@@ -62,7 +74,7 @@
                     </td>
                     <td>{{ fiche.etat_correction.date_derniere_modification|date:"d/m/Y H:i" }}</td>
                     <td>
-                        <a href="{% url 'modifier_observation' fiche_id=fiche.num_fiche %}" class="btn btn-sm btn-primary">Continuer</a>
+                        <a href="{% url 'observations:modifier_observation' fiche_id=fiche.num_fiche %}" class="btn btn-sm btn-primary">Continuer</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -79,7 +91,7 @@
     </div>
     <div class="card-body">
         <ul>
-            <li><a href="{% url 'select_directory' %}">Transcription d'images</a></li>
+            <li><a href="{% url 'observations:select_directory' %}">Transcription d'images</a></li>
             <li><a href="{% url 'accueil_importation' %}">Importation des transcriptions</a></li>
         </ul>
     </div>

@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'observations:home' %}">Accueil</a></li>
             <li class="breadcrumb-item active" aria-current="page">Liste des fiches d'observation</li>
         </ol>
     </nav>
@@ -146,15 +146,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         </td>
                         <td>
                             <div class="d-flex gap-1">
-                                <a href="{% url 'fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Visualiser</a>
+                                <a href="{% url 'observations:fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Visualiser</a>
                                 {% if fiche.etat_correction.statut == 'en_edition' or fiche.etat_correction.statut == 'nouveau' %}
                                     {% if user == fiche.observateur or user.role == 'administrateur' %}
-                                        <a href="{% url 'modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-primary">Continuer</a>
+                                        <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-primary">Continuer</a>
                                     {% else %}
                                         <button class="btn btn-sm btn-secondary" disabled title="Seul l'auteur peut continuer la saisie">Continuer</button>
                                     {% endif %}
                                 {% else %}
-                                    <a href="{% url 'modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-warning">Corriger</a>
+                                    <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-warning">Corriger</a>
                                 {% endif %}
                             </div>
                         </td>
@@ -223,8 +223,8 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <div class="mt-4">
-        <a href="{% url 'home' %}" class="btn btn-secondary">Retour à l'accueil</a>
-        <a href="{% url 'observations_list' %}" class="btn btn-primary">Nouvelle observation</a>
+        <a href="{% url 'observations:home' %}" class="btn btn-secondary">Retour à l'accueil</a>
+        <a href="{% url 'observations:observations_list' %}" class="btn btn-primary">Nouvelle observation</a>
     </div>
 </div>
 {% endblock %}

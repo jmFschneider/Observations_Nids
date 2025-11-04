@@ -40,7 +40,7 @@
     {% endif %}
 
     <div class="buttons">
-        <a href="{% url 'modifier_observation' fiche_id=fiche.num_fiche %}" class="btn btn-secondary">Retour à la fiche</a>
+        <a href="{% url 'observations:modifier_observation' fiche_id=fiche.num_fiche %}" class="btn btn-secondary">Retour à la fiche</a>
     </div>
 </div>
 {% endblock %}

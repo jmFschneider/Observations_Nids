@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="{% static 'Observations/css/normalize.css' %}">
     <link rel="stylesheet" href="{% static 'Observations/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'Observations/css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'Observations/css/sidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'Observations/css/sidebar.css' %}?v=202511043">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     {% block extra_css %}{% endblock %}
 </head>
@@ -38,7 +38,7 @@
             <div class="navbar-text text-white d-flex align-items-center">
                 <i class="fas fa-user-circle me-2"></i>
                 <span class="me-3">{{ user.username }}</span>
-                <form method="post" action="{% url 'logout' %}" class="d-inline">
+                <form method="post" action="{% url 'observations:logout' %}" class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-sm btn-outline-light">
                         <i class="fas fa-sign-out-alt"></i> Déconnexion
@@ -57,7 +57,7 @@
                 <ul class="nav flex-column">
                     <!-- Accueil -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}" data-title="Accueil">
+                        <a class="nav-link" href="{% url 'observations:home' %}" data-title="Accueil">
                             <i class="fas fa-home"></i>
                             <span class="link-text">Accueil</span>
                         </a>
@@ -69,15 +69,33 @@
                         <h6 class="sidebar-heading">Observations</h6>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'observations_list' %}" data-title="Nouvelle observation">
+                        <a class="nav-link" href="{% url 'observations:observations_list' %}" data-title="Nouvelle observation">
                             <i class="fas fa-plus-circle"></i>
                             <span class="link-text">Nouvelle observation</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'liste_fiches_observations' %}" data-title="Liste des fiches">
+                        <a class="nav-link" href="{% url 'observations:liste_fiches_observations' %}" data-title="Liste des fiches">
                             <i class="fas fa-list-alt"></i>
                             <span class="link-text">Liste des fiches</span>
+                        </a>
+                    </li>
+
+                    <!-- Section Mes Images -->
+                    <li class="nav-item">
+                        <div class="sidebar-divider"></div>
+                        <h6 class="sidebar-heading">Mes Images</h6>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'observations:upload_image_source' %}" data-title="Téléverser une image">
+                            <i class="fas fa-upload"></i>
+                            <span class="link-text">Téléverser une image</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'observations:mes_images_sources' %}" data-title="Mes images téléversées">
+                            <i class="fas fa-image"></i>
+                            <span class="link-text">Mes images téléversées</span>
                         </a>
                     </li>
 
@@ -88,7 +106,7 @@
                         <h6 class="sidebar-heading">Transcription</h6>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'select_directory' %}" data-title="Transcription d'images">
+                        <a class="nav-link" href="{% url 'observations:select_directory' %}" data-title="Transcription d'images">
                             <i class="fas fa-images"></i>
                             <span class="link-text">Transcription d'images</span>
                         </a>
@@ -136,6 +154,9 @@
                         <div class="sidebar-divider"></div>
                     </li>
                     <li class="nav-item">
+                        <h6 class="sidebar-heading">Taxonomie</h6>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'taxonomy:liste_especes' %}" data-title="Gestion des espèces">
                             <i class="fas fa-dove"></i>
                             <span class="link-text">Gestion des espèces</span>
@@ -146,6 +167,13 @@
                     <!-- Support -->
                     <li class="nav-item">
                         <div class="sidebar-divider"></div>
+                        <h6 class="sidebar-heading">Aide</h6>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-title="Aide">
+                            <i class="fas fa-book"></i>
+                            <span class="link-text">Aide</span>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'helpdesk:home' %}" data-title="Support">
@@ -160,7 +188,7 @@
 
         <!-- Bouton toggle -->
         <button class="sidebar-toggle" aria-label="Toggle sidebar">
-            <i class="fas fa-chevron-left"></i>
+            <i class="fas fa-angles-left"></i>
         </button>
 
         <!-- Overlay pour mobile -->
