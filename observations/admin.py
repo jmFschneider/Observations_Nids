@@ -46,6 +46,7 @@ class ImageSourceAdmin(admin.ModelAdmin):
     readonly_fields = ("date_televersement", "image_preview")
     raw_id_fields = ("fiche_observation",)
 
+    @admin.display(description="Aperçu")
     def image_thumbnail(self, obj):
         """Affiche une miniature de l'image dans la liste"""
         if obj.image:
@@ -54,8 +55,8 @@ class ImageSourceAdmin(admin.ModelAdmin):
                 obj.image.url
             )
         return "Pas d'image"
-    image_thumbnail.short_description = "Aperçu"
 
+    @admin.display(description="Prévisualisation de l'image")
     def image_preview(self, obj):
         """Affiche une prévisualisation plus grande dans le détail"""
         if obj.image:
@@ -64,8 +65,8 @@ class ImageSourceAdmin(admin.ModelAdmin):
                 obj.image.url
             )
         return "Pas d'image"
-    image_preview.short_description = "Prévisualisation de l'image"
 
+    @admin.display(description="Fiche associée")
     def fiche_liee(self, obj):
         """Lien vers la fiche d'observation associée"""
         if obj.fiche_observation:
@@ -75,7 +76,6 @@ class ImageSourceAdmin(admin.ModelAdmin):
                 obj.fiche_observation.num_fiche
             )
         return "Aucune fiche"
-    fiche_liee.short_description = "Fiche associée"
 
 
 admin.site.register(Nid)
