@@ -36,7 +36,7 @@ class TestMotDePasseOublie:
 
         # Vérifier la redirection
         assert response.status_code == 302
-        assert response.url == reverse('login')
+        assert response.url == reverse('observations:login')
 
         # Vérifier qu'un email a été envoyé
         assert len(mail.outbox) == 1
@@ -107,7 +107,7 @@ class TestMotDePasseOublie:
         response = client.post(url, {'email': user_observateur.email})
 
         assert response.status_code == 302
-        assert response.url == reverse('login')
+        assert response.url == reverse('observations:login')
 
 
 @pytest.mark.django_db
@@ -222,7 +222,7 @@ class TestReinitialiserMotDePasse:
 
         # Vérifier redirection
         assert response.status_code == 302
-        assert response.url == reverse('login')
+        assert response.url == reverse('observations:login')
 
         # Vérifier que le mot de passe a changé
         user_observateur.refresh_from_db()
@@ -246,7 +246,7 @@ class TestReinitialiserMotDePasse:
         )
 
         assert response.status_code == 302
-        assert response.url == reverse('login')
+        assert response.url == reverse('observations:login')
 
     def test_reset_reussi_affiche_message_succes(self, client, user_observateur):
         """Test qu'un message de succès est affiché après reset."""

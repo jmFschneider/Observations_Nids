@@ -390,7 +390,7 @@ class TestHomePageNotifications(TestCase):
             )
 
         self.client.login(username='admin', password='testpass123')
-        response = self.client.get(reverse('home'))
+        response = self.client.get(reverse('observations:home'))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '3 demande(s) de compte en attente')
@@ -411,7 +411,7 @@ class TestHomePageNotifications(TestCase):
             )
 
         self.client.login(username='observateur', password='testpass123')
-        response = self.client.get(reverse('home'))
+        response = self.client.get(reverse('observations:home'))
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'demande(s) de compte en attente')
@@ -419,7 +419,7 @@ class TestHomePageNotifications(TestCase):
     def test_home_page_no_banner_when_no_pending_requests(self):
         """Test que le bandeau n'apparaît pas s'il n'y a pas de demandes"""
         self.client.login(username='admin', password='testpass123')
-        response = self.client.get(reverse('home'))
+        response = self.client.get(reverse('observations:home'))
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'demande(s) de compte en attente')
@@ -437,7 +437,7 @@ class TestHomePageNotifications(TestCase):
             )
 
         self.client.login(username='admin', password='testpass123')
-        response = self.client.get(reverse('home'))
+        response = self.client.get(reverse('observations:home'))
 
         self.assertEqual(response.context['demandes_en_attente'], 2)
 

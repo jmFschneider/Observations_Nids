@@ -236,7 +236,7 @@ def inscription_publique(request):
                 request,
                 "Votre demande d'inscription a été enregistrée. Un administrateur devra l'approuver avant que vous puissiez vous connecter.",
             )
-            return redirect('login')
+            return redirect('observations:login')
     else:
         form = UtilisateurCreationForm()
 
@@ -333,7 +333,7 @@ def mot_de_passe_oublie(request):
                 request,
                 "Un email contenant les instructions de réinitialisation a été envoyé à votre adresse.",
             )
-            return redirect('login')
+            return redirect('observations:login')
     else:
         form = MotDePasseOublieForm()
 
@@ -366,7 +366,7 @@ def reinitialiser_mot_de_passe(request, uidb64, token):
                     request,
                     "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
                 )
-                return redirect('login')
+                return redirect('observations:login')
         else:
             form = NouveauMotDePasseForm()
 
