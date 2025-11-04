@@ -2,7 +2,7 @@
 {% block content %}
 {% block extra_css %}
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Observations/css/styles.css' %}">
 {% endblock %}
 
 <div class="container">
@@ -77,7 +77,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Ajouter l'observation</button>
-                <a href="{% url 'modifier_observation' fiche_id=fiche_id %}" class="btn btn-secondary">Annuler</a>
+                <a href="{% url 'observations:modifier_observation' fiche_id=fiche_id %}" class="btn btn-secondary">Annuler</a>
             </div>
         </form>
     </div>

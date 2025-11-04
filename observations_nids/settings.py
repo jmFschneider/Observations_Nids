@@ -94,6 +94,8 @@ INSTALLED_APPS = [
     'ingest.apps.IngestConfig',
     'audit.apps.AuditConfig',
     'bootstrap4form',  # Required for nicer formatting of forms with the default templates
+    'crispy_forms', # Add crispy_forms
+    'crispy_bootstrap5', # Add crispy_bootstrap5 for Bootstrap 5 integration
     'rest_framework',  # required for the API
     'helpdesk',
     'helpdesk_custom.apps.HelpdeskCustomConfig',  # Personnalisation de Helpdesk
@@ -328,3 +330,7 @@ HELPDESK_VIEW_A_TICKET_PUBLIC = False
 # Utiliser nos formulaires personnalisés
 HELPDESK_PUBLIC_TICKET_FORM_CLASS = 'helpdesk_custom.forms.CustomPublicTicketForm'
 HELPDESK_TICKET_FORM_CLASS = 'helpdesk_custom.forms.CustomTicketForm'
+
+# Crispy Forms Settings
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"

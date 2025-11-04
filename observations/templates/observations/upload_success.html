@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Téléversement Réussi{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Téléversement Réussi</div>
+                <div class="card-body">
+                    <p class="alert alert-success">Votre fiche image a été téléversée avec succès et est en attente de transcription.</p>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'observations:upload_image_source' %}" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Téléverser une autre fiche
+                        </a>
+                        <a href="{% url 'observations:mes_images_sources' %}" class="btn btn-secondary">
+                            <i class="fas fa-images"></i> Voir mes images
+                        </a>
+                        <a href="{% url 'observations:home' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-home"></i> Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
