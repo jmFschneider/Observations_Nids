@@ -615,7 +615,7 @@
 <!-- Formulaire de soumission pour correction (en dehors du formulaire principal) -->
 {% if fiche_form.instance.pk %}
     {% if fiche_form.instance.etat_correction.statut == 'nouveau' or fiche_form.instance.etat_correction.statut == 'en_edition' %}
-    <form method="post" action="{% url 'soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" style="margin-top: 10px;">
+    <form method="post" action="{% url 'observations:soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" style="margin-top: 10px;">
         {% csrf_token %}
         <button type="submit" class="btn btn-success" onclick="return confirm('Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.');">
             Soumettre pour correction

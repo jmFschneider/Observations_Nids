@@ -13,23 +13,21 @@ class TestSaisieObservationView:
     """Tests pour la vue de saisie/modification d'observations."""
 
     def test_acces_page_modification_authentifie(self, authenticated_client, fiche_observation):
-        """Test que l'accès à la page de modification nécessite une authentification."""
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
         assert 'fiche_form' in response.context
 
     def test_acces_page_modification_non_authentifie(self, client, fiche_observation):
-        """Test qu'un utilisateur non authentifié est redirigé."""
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
         response = client.get(url)
 
         assert response.status_code == 302  # Redirection vers login
 
     def test_modification_fiche_observation(self, authenticated_client, fiche_observation):
         """Test de modification des informations de base d'une fiche."""
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
 
         # Données du formulaire
         data = {
@@ -63,7 +61,6 @@ class TestSaisieObservationView:
             'nombre_poussins': '',
             # Causes d'échec
             'description': 'Aucune cause identifiée',
-            # Formsets management forms
             'observations-TOTAL_FORMS': '0',
             'observations-INITIAL_FORMS': '0',
             'observations-MIN_NUM_FORMS': '0',
@@ -72,6 +69,8 @@ class TestSaisieObservationView:
             'remarques-INITIAL_FORMS': '0',
             'remarques-MIN_NUM_FORMS': '0',
             'remarques-MAX_NUM_FORMS': '1000',
+            'coordonnees': '48.8566,2.3522',
+            'remarque-initiale': '',
         }
 
         response = authenticated_client.post(url, data)
@@ -97,7 +96,7 @@ class TestHistoriqueRemarques:
         # Créer une remarque
         remarque = Remarque.objects.create(fiche=fiche_observation, remarque="Test remarque")
 
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
 
         # Modifier la fiche SANS toucher à la remarque
         data = self._get_base_form_data(fiche_observation)
@@ -135,9 +134,7 @@ class TestHistoriqueRemarques:
             fiche=fiche_observation, remarque="Test remarque à supprimer"
         )
 
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
-
-        # Marquer la remarque pour suppression
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
         data = self._get_base_form_data(fiche_observation)
         data.update(
             {
@@ -146,6 +143,7 @@ class TestHistoriqueRemarques:
                 'remarques-0-id': str(remarque.id),
                 'remarques-0-remarque': remarque.remarque,
                 'remarques-0-DELETE': 'on',  # Marquée pour suppression
+                'coordonnees': '0,0',
             }
         )
 
@@ -162,8 +160,7 @@ class TestHistoriqueRemarques:
         assert first_hist is not None and first_hist.ancienne_valeur == "Test remarque à supprimer"
 
     def test_ajout_remarque_dans_historique(self, authenticated_client, fiche_observation):
-        """Test que l'ajout d'une nouvelle remarque est enregistré dans l'historique."""
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
 
         # Ajouter une nouvelle remarque
         data = self._get_base_form_data(fiche_observation)
@@ -173,6 +170,7 @@ class TestHistoriqueRemarques:
                 'remarques-INITIAL_FORMS': '0',
                 'remarques-0-remarque': 'Nouvelle remarque',
                 'remarques-0-DELETE': '',
+                'coordonnees': '0,0',
             }
         )
 
@@ -223,6 +221,7 @@ class TestHistoriqueRemarques:
             'observations-INITIAL_FORMS': '0',
             'observations-MIN_NUM_FORMS': '0',
             'observations-MAX_NUM_FORMS': '1000',
+            'coordonnees': '0,0',
         }
 
 
@@ -241,9 +240,7 @@ class TestSuppressionObservations:
             observations="Test observation",
         )
 
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
-
-        # Données du formulaire avec suppression
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
         data = {
             'espece': fiche_observation.espece.id,
             'annee': fiche_observation.annee,
@@ -286,6 +283,7 @@ class TestSuppressionObservations:
             'remarques-INITIAL_FORMS': '0',
             'remarques-MIN_NUM_FORMS': '0',
             'remarques-MAX_NUM_FORMS': '1000',
+            'coordonnees': '0,0',
         }
 
         response = authenticated_client.post(url, data)
@@ -318,7 +316,7 @@ class TestHistoriqueModifications:
             modifie_par=fiche_observation.observateur,
         )
 
-        url = reverse('historique_modifications', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:historique_modifications', kwargs={'fiche_id': fiche_observation.num_fiche})
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
@@ -336,7 +334,7 @@ class TestAjaxRemarques:
         Remarque.objects.create(fiche=fiche_observation, remarque="Remarque 1")
         Remarque.objects.create(fiche=fiche_observation, remarque="Remarque 2")
 
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
         response = authenticated_client.get(
             url, {'get_remarques': '1'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
@@ -347,8 +345,7 @@ class TestAjaxRemarques:
         assert len(data['remarques']) == 2
 
     def test_update_remarques_ajax_ajout(self, authenticated_client, fiche_observation):
-        """Test d'ajout d'une remarque via AJAX."""
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
 
         data = {
             'action': 'update_remarques',
@@ -367,10 +364,9 @@ class TestAjaxRemarques:
         assert Remarque.objects.filter(fiche=fiche_observation).count() == 1
 
     def test_update_remarques_ajax_suppression(self, authenticated_client, fiche_observation):
-        """Test de suppression d'une remarque via AJAX."""
         remarque = Remarque.objects.create(fiche=fiche_observation, remarque="À supprimer")
 
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
 
         data = {
             'action': 'update_remarques',
@@ -394,7 +390,7 @@ class TestAjaxRemarques:
         """Test de modification d'une remarque via AJAX."""
         remarque = Remarque.objects.create(fiche=fiche_observation, remarque="Texte original")
 
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
 
         data = {
             'action': 'update_remarques',
@@ -426,8 +422,7 @@ class TestFicheObservationView:
     """Tests pour la vue d'affichage d'une fiche."""
 
     def test_affichage_fiche(self, authenticated_client, fiche_observation):
-        """Test de l'affichage d'une fiche d'observation."""
-        url = reverse('fiche_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:fiche_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
@@ -440,7 +435,7 @@ class TestFicheObservationView:
             fiche=fiche_observation, date_observation=timezone.now(), nombre_oeufs=3
         )
 
-        url = reverse('fiche_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:fiche_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
@@ -465,18 +460,16 @@ class TestPermissions:
             fiche_observation.etat_correction.statut = 'en_edition'
             fiche_observation.etat_correction.save()
 
-        url = reverse('modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
         response = client.get(url)
 
         # Devrait être redirigé
         assert response.status_code == 302
-        assert response.url == reverse(
-            'fiche_observation', kwargs={'fiche_id': fiche_observation.num_fiche}
-        )
+        assert response.url == reverse('observations:fiche_observation', kwargs={'fiche_id': fiche_observation.num_fiche})
 
     def test_fiche_inexistante(self, authenticated_client):
         """Test d'accès à une fiche qui n'existe pas."""
-        url = reverse('modifier_observation', kwargs={'fiche_id': 99999})
+        url = reverse('observations:modifier_observation', kwargs={'fiche_id': 99999})
         response = authenticated_client.get(url)
 
         # La vue gère l'exception et retourne une page (peut être 200 avec erreur ou 404)
@@ -490,7 +483,7 @@ class TestCreationNouvelleFiche:
 
     def test_affichage_formulaire_nouvelle_fiche(self, authenticated_client):
         """Test de l'affichage du formulaire pour une nouvelle fiche."""
-        url = reverse('observations_list')  # Sans fiche_id
+        url = reverse('observations:observations_list')  # Sans fiche_id
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
@@ -498,7 +491,7 @@ class TestCreationNouvelleFiche:
 
     def test_creation_fiche_sans_observateur_defini(self, authenticated_client, espece):
         """Test de création d'une fiche où l'observateur est automatiquement défini."""
-        url = reverse('observations_list')
+        url = reverse('observations:observations_list')
 
         data = {
             'espece': espece.id,
@@ -534,6 +527,7 @@ class TestCreationNouvelleFiche:
             'remarques-INITIAL_FORMS': '0',
             'remarques-MIN_NUM_FORMS': '0',
             'remarques-MAX_NUM_FORMS': '1000',
+            'coordonnees': '48.8566,2.3522',
         }
 
         response = authenticated_client.post(url, data)

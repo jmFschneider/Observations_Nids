@@ -35,7 +35,7 @@ urlpatterns = [
     path('', home, name='home'),
     path('tableau-de-bord/', default_view, name='default'),
     # Routes d'authentification
-    path('auth/logout/', LogoutView.as_view(next_page='home'), name='logout'),
+    path('auth/logout/', LogoutView.as_view(next_page='observations:home'), name='logout'),
     path('auth/login/', LoginView.as_view(template_name='login.html'), name='login'),
 
     # Routes de téléversement d'images sources

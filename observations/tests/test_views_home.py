@@ -11,8 +11,7 @@ class TestHomeView:
     """Tests pour la vue home()."""
 
     def test_home_utilisateur_non_authentifie(self, client):
-        """Test que les utilisateurs non authentifiés voient access_restricted."""
-        url = reverse('home')
+        url = reverse('observations:home')
         response = client.get(url)
 
         assert response.status_code == 200
@@ -20,8 +19,7 @@ class TestHomeView:
         assert 'access_restricted.html' in [t.name for t in response.templates]
 
     def test_home_utilisateur_authentifie(self, authenticated_client, user):
-        """Test de la page d'accueil pour un utilisateur authentifié."""
-        url = reverse('home')
+        url = reverse('observations:home')
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
@@ -31,8 +29,7 @@ class TestHomeView:
         assert 'fiches_en_edition' in response.context
 
     def test_home_affiche_compteurs(self, authenticated_client):
-        """Test que la page d'accueil affiche les compteurs corrects."""
-        url = reverse('home')
+        url = reverse('observations:home')
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
@@ -50,8 +47,7 @@ class TestHomeView:
         Utilisateur.objects.create(
             username='nonvalide', email='nonvalide@test.com', est_valide=False
         )
-
-        url = reverse('home')
+        url = reverse('observations:home')
         response = admin_client.get(url)
 
         assert response.status_code == 200
@@ -59,8 +55,7 @@ class TestHomeView:
         assert response.context['demandes_en_attente'] >= 1
 
     def test_home_utilisateur_normal_ne_voit_pas_demandes(self, authenticated_client):
-        """Test qu'un utilisateur normal ne voit pas les demandes en attente."""
-        url = reverse('home')
+        url = reverse('observations:home')
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
@@ -69,7 +64,7 @@ class TestHomeView:
     def test_home_affiche_fiches_en_edition(self, authenticated_client, fiche_observation):
         """Test que la page d'accueil affiche les fiches en édition de l'utilisateur."""
         # La fiche créée par la fixture devrait être visible
-        url = reverse('home')
+        url = reverse('observations:home')
         response = authenticated_client.get(url)
 
         assert response.status_code == 200
@@ -83,7 +78,7 @@ class TestDefaultView:
 
     def test_default_view(self, client):
         """Test de la vue default par défaut."""
-        url = reverse('default')
+        url = reverse('observations:default')
         response = client.get(url)
 
         assert response.status_code == 200
