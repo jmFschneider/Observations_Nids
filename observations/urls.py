@@ -24,6 +24,9 @@ from .views.views_home import (
 from .views.views_observation import (
     liste_fiches_observations,
 )
+from .views.upload_views import mes_images_sources, upload_image_source, upload_success
+
+app_name = 'observations'
 
 app_name = 'observations'
 
