@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
+<<<<<<< HEAD
 from .models import (
     CausesEchec,
     FicheObservation,
@@ -10,6 +11,9 @@ from .models import (
     Remarque,
     ResumeObservation,
 )
+=======
+from .models import CausesEchec, FicheObservation, ImageSource, Nid, Observation, Remarque, ResumeObservation
+>>>>>>> 6644a86754379bab052412bd23b4e43ee718b299
 
 
 @admin.register(FicheObservation)
