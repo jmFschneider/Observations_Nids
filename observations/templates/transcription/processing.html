@@ -11,7 +11,7 @@ window.redirectionDone = false;
 function checkTaskCompletion() {
     if (window.redirectionDone) return;
 
-    fetch('{% url "check_progress" %}')
+    fetch('{% url "observations:check_progress" %}')
         .then(response => response.json())
         .then(data => {
             if (data.status === 'SUCCESS' && !window.redirectionDone) {
@@ -244,7 +244,7 @@ function checkProgress() {
     console.log('Checking progress...');
 
     // Définir un timeout pour la requête fetch
-    const fetchPromise = fetch('{% url "check_progress" %}');
+    const fetchPromise = fetch('{% url "observations:check_progress" %}');
     const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('Request timed out')), 10000)
     );

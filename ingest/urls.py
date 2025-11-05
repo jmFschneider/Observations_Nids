@@ -1,6 +1,8 @@
 # urls.py
 from django.urls import path
 
+app_name = 'ingest'
+
 # from .views.workflow_importation_legacy import (
 #    especes,
 #    home,

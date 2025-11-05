@@ -8,7 +8,7 @@
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'accueil_importation' %}">Importation</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ingest:accueil_importation' %}">Importation</a></li>
             <li class="breadcrumb-item active" aria-current="page">Résumé des importations</li>
         </ol>
     </nav>
@@ -118,7 +118,7 @@
                             <td>{{ importation.date_creation|date:"d/m/Y H:i" }}</td>
                             <td>
                                 {% if importation.fiche_observation %}
-                                    <a href="{% url 'fiche_observation' importation.fiche_observation.num_fiche %}"
+                                    <a href="{% url 'observations:fiche_observation' importation.fiche_observation.num_fiche %}"
                                        class="btn btn-sm btn-primary">
                                         Voir fiche #{{ importation.fiche_observation.num_fiche }}
                                     </a>
@@ -139,7 +139,7 @@
     </div>
 
     <div class="mt-4">
-        <a href="{% url 'accueil_importation' %}" class="btn btn-primary">Retour à l'accueil d'importation</a>
+        <a href="{% url 'ingest:accueil_importation' %}" class="btn btn-primary">Retour à l'accueil d'importation</a>
     </div>
 </div>
 {% endblock %}

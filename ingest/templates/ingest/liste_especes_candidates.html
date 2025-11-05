@@ -8,7 +8,7 @@
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'accueil_importation' %}">Importation</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ingest:accueil_importation' %}">Importation</a></li>
             <li class="breadcrumb-item active" aria-current="page">Espèces candidates</li>
         </ol>
     </nav>
@@ -104,7 +104,7 @@
                         <td>
                             {% if not espece.espece_validee %}
                                 <!-- Un seul formulaire par ligne, utilisé pour validation individuelle ET multiple -->
-                                <form method="post" action="{% url 'valider_espece' espece.id %}" class="espece-form" data-id="{{ espece.id }}">
+                                <form method="post" action="{% url 'ingest:valider_espece' espece.id %}" class="espece-form" data-id="{{ espece.id }}">
                                     {% csrf_token %}
 
                                     <div class="form-group mb-2">
@@ -203,16 +203,16 @@
 
     <!-- Boutons de navigation -->
     <div class="mt-4 d-flex justify-content-between">
-        <a href="{% url 'accueil_importation' %}" class="btn btn-secondary">
+        <a href="{% url 'ingest:accueil_importation' %}" class="btn btn-secondary">
             <i class="bi bi-arrow-left"></i> Retour à l'importation des transcriptions
         </a>
-        <a href="{% url 'preparer_importations' %}" class="btn btn-primary">
+        <a href="{% url 'ingest:preparer_importations' %}" class="btn btn-primary">
             Préparer les importations <i class="bi bi-arrow-right"></i>
         </a>
     </div>
 
     <!-- Formulaire caché pour la validation multiple -->
-    <form id="validation-multiple-form" method="post" action="{% url 'valider_especes_multiples' %}" style="display: none;">
+    <form id="validation-multiple-form" method="post" action="{% url 'ingest:valider_especes_multiples' %}" style="display: none;">
         {% csrf_token %}
         <div id="multiple-validation-data"></div>
     </form>

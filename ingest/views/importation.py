@@ -52,7 +52,7 @@ def importer_json(request):
             f"{len(resultats['erreurs'])} erreurs",
         )
 
-        return redirect('accueil_importation')
+        return redirect('ingest:accueil_importation')
 
     return render(request, 'ingest/importer_json.html', {'directories': directories})
 
@@ -72,7 +72,7 @@ def extraire_candidats(request):
             f"{resultats['communes_geocodees']} communes géocodées",
         )
 
-        return redirect('accueil_importation')
+        return redirect('ingest:accueil_importation')
 
     return render(request, 'ingest/extraire_candidats.html')
 
@@ -87,7 +87,7 @@ def preparer_importations(request):
 
         messages.success(request, f"{importations_creees} importations préparées pour traitement")
 
-        return redirect('liste_importations')
+        return redirect('ingest:liste_importations')
 
     return render(request, 'ingest/preparer_importations.html')
 
@@ -147,7 +147,7 @@ def finaliser_importation(request, importation_id):
         else:
             messages.error(request, f"Erreur lors de l'importation: {message}")
 
-        return redirect('liste_importations')
+        return redirect('ingest:liste_importations')
 
     return redirect('detail_importation', importation_id=importation_id)
 
@@ -161,7 +161,7 @@ def finaliser_importations_multiples(request):
 
         if not importation_ids:
             messages.warning(request, "Aucune importation sélectionnée")
-            return redirect('liste_importations')
+            return redirect('ingest:liste_importations')
 
         service = ImportationService()
         success_count = 0
@@ -180,9 +180,9 @@ def finaliser_importations_multiples(request):
         if error_count > 0:
             messages.warning(request, f"{error_count} importation(s) en erreur")
 
-        return redirect('liste_importations')
+        return redirect('ingest:liste_importations')
 
-    return redirect('liste_importations')
+    return redirect('ingest:liste_importations')
 
 
 @login_required
@@ -198,7 +198,7 @@ def reinitialiser_importation(request, importation_id):
         else:
             messages.error(request, resultat['message'])
 
-    return redirect('liste_importations')
+    return redirect('ingest:liste_importations')
 
 
 @login_required
@@ -235,4 +235,4 @@ def reinitialiser_toutes_importations(request):
         else:
             messages.info(request, "Aucune importation n'a été réinitialisée")
 
-    return redirect('liste_importations')
+    return redirect('ingest:liste_importations')
