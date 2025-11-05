@@ -7,11 +7,11 @@
         <div class="col-md-3">
             <h5>Liens utiles</h5>
             <ul class="list-unstyled">
-                <li><a href="{% url 'home' %}">Accueil</a></li>
+                <li><a href="{% url 'observations:home' %}">Accueil</a></li>
                 {% if user.is_authenticated %}
                 <li><a href="{% url 'accounts:mon_profil' %}">Mon profil</a></li>
                 {% else %}
-                <li><a href="{% url 'login' %}">Connexion</a></li>
+                <li><a href="{% url 'observations:login' %}">Connexion</a></li>
                 {% endif %}
             </ul>
         </div>

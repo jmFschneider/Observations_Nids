@@ -86,6 +86,12 @@ django-celery-results==2.6.0
     # via -r requirements-base.in
 django-cleanup==9.0.0
     # via django-helpdesk
+crispy-bootstrap5==2025.6
+    # via -r requirements-base.in
+django-crispy-forms==2.4
+    # via
+    #   -r requirements-base.in
+    #   crispy-bootstrap5
 django-helpdesk==2.0.2
     # via -r requirements-base.in
 django-model-utils==5.0.0

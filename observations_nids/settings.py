@@ -84,7 +84,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',  # Requis pour django-helpdesk
     'django.contrib.humanize',
-    'django_extensions',
+    # 'django_extensions' déplacé dans settings_local.py (dev uniquement)
     'accounts.apps.AccountsConfig',
     'core.apps.CoreConfig',
     'taxonomy.apps.TaxonomyConfig',
@@ -94,6 +94,8 @@ INSTALLED_APPS = [
     'ingest.apps.IngestConfig',
     'audit.apps.AuditConfig',
     'bootstrap4form',  # Required for nicer formatting of forms with the default templates
+    'crispy_forms',  # Add crispy_forms
+    'crispy_bootstrap5',  # Add crispy_bootstrap5 for Bootstrap 5 integration
     'rest_framework',  # required for the API
     'helpdesk',
     'helpdesk_custom.apps.HelpdeskCustomConfig',  # Personnalisation de Helpdesk
@@ -189,7 +191,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-LOGIN_URL = 'login'
+LOGIN_URL = 'observations:login'
 
 # --- Static & Media configuration (managed for dev/prod) ---
 STATIC_URL = '/static/'
@@ -328,3 +330,7 @@ HELPDESK_VIEW_A_TICKET_PUBLIC = False
 # Utiliser nos formulaires personnalisés
 HELPDESK_PUBLIC_TICKET_FORM_CLASS = 'helpdesk_custom.forms.CustomPublicTicketForm'
 HELPDESK_TICKET_FORM_CLASS = 'helpdesk_custom.forms.CustomTicketForm'
+
+# Crispy Forms Settings
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"

@@ -9,6 +9,7 @@ from .views.saisie_observation_view import (
     saisie_observation,
     soumettre_pour_correction,
 )
+from .views.upload_views import mes_images_sources, upload_image_source, upload_success
 from .views.view_transcription import (
     check_progress,
     process_images,
@@ -24,13 +25,19 @@ from .views.views_observation import (
     liste_fiches_observations,
 )
 
+app_name = 'observations'
+
 urlpatterns = [
     # Routes principales
     path('', home, name='home'),
     path('tableau-de-bord/', default_view, name='default'),
     # Routes d'authentification
-    path('auth/logout/', LogoutView.as_view(next_page='home'), name='logout'),
+    path('auth/logout/', LogoutView.as_view(next_page='observations:home'), name='logout'),
     path('auth/login/', LoginView.as_view(template_name='login.html'), name='login'),
+    # Routes de téléversement d'images sources
+    path('upload-image/', upload_image_source, name='upload_image_source'),
+    path('upload-success/', upload_success, name='upload_success'),
+    path('mes-images/', mes_images_sources, name='mes_images_sources'),
     # Routes d'observations
     path('observations/', saisie_observation, name='observations_list'),
     path('observations/liste/', liste_fiches_observations, name='liste_fiches_observations'),

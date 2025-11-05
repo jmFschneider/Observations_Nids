@@ -370,3 +370,52 @@ class EtatCorrection(models.Model):
         self.validee_par = utilisateur
         self.date_validation = timezone.now()
         self.save()
+
+
+class ImageSource(models.Model):
+    """
+    Représente une image de fiche d'observation téléversée par un utilisateur,
+    en attente de transcription.
+    """
+
+    # LIEN VERS L'UTILISATEUR
+    observateur = models.ForeignKey(
+        Utilisateur,
+        on_delete=models.CASCADE,
+        related_name="images_sources",
+        verbose_name="Observateur",
+    )
+
+    # GESTION DU FICHIER IMAGE
+    image = models.ImageField(upload_to='images_sources/%Y/%m/%d/', verbose_name="Fichier image")
+
+    # STATUT DE LA TRANSCRIPTION
+    est_transcrite = models.BooleanField(
+        default=False,
+        db_index=True,
+        verbose_name="Est transcrite",
+        help_text="Indique si une FicheObservation a été créée à partir de cette image.",
+    )
+
+    # INFORMATIONS DE SUIVI
+    date_televersement = models.DateTimeField(
+        auto_now_add=True, verbose_name="Date de téléversement"
+    )
+
+    # LIEN VERS LA FICHE FINALE (Optionnel mais recommandé)
+    fiche_observation = models.OneToOneField(
+        FicheObservation,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="image_source_originale",
+        verbose_name="Fiche d'observation associée",
+    )
+
+    class Meta:
+        verbose_name = "Image source"
+        verbose_name_plural = "Images sources"
+        ordering = ['-date_televersement']
+
+    def __str__(self):
+        return f"Image {self.id} de {self.observateur.username} ({'transcrite' if self.est_transcrite else 'en attente'})"

@@ -94,6 +94,12 @@ django-cleanup==9.0.0
     # via
     #   -r requirements-base.in
     #   django-helpdesk
+crispy-bootstrap5==2025.6
+    # via -r requirements-base.in
+django-crispy-forms==2.4
+    # via
+    #   -r requirements-base.in
+    #   crispy-bootstrap5
 django-debug-toolbar==6.0.0
     # via -r requirements-dev.in
 django-extensions==4.1

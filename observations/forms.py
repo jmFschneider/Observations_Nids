@@ -4,6 +4,7 @@ from geo.models import Localisation
 from observations.models import (
     CausesEchec,
     FicheObservation,
+    ImageSource,
     Nid,
     Observation,
     Remarque,
@@ -256,6 +257,12 @@ RemarqueFormSet = forms.inlineformset_factory(
     min_num=0,  # Aucune remarque minimum requise
     validate_min=True,
 )
+
+
+class ImageSourceForm(forms.ModelForm):
+    class Meta:
+        model = ImageSource
+        fields = ['image']  # Only allow uploading the image file
 
 
 #

@@ -72,14 +72,13 @@ def process_images(request):
     """Vue pour démarrer le traitement des images via Celery"""
     directory = request.session.get('processing_directory')
     if not directory:
-        # Rediriger vers la sélection de répertoire si aucun n'est défini
-        return redirect('select_directory')
+        return redirect('observations:select_directory')
 
     # Vérifier si Celery est opérationnel
     if not is_celery_operational():
         # Si Celery n'est pas opérationnel, ajouter un message d'erreur et rediriger
         messages.error(request, "Celery n'est pas en fonction sur le serveur")
-        return redirect('select_directory')
+        return redirect('observations:select_directory')
 
     # Créer le répertoire de résultats
     results_dir = os.path.join(settings.MEDIA_ROOT, 'transcription_results', directory)
@@ -151,13 +150,16 @@ def check_progress(request: HttpRequest) -> JsonResponse:
         info: ProgressMeta = cast(ProgressMeta, raw_info if isinstance(raw_info, dict) else {})
 
         # Si tu veux remonter tout le dict de progression côté client :
-        if info:
-            response.update(info)
+        # if info:
+        #     response.update(info)
 
         total = int(info.get("total", 0) or 0)
         processed = int(info.get("processed", 0) or 0)
 
         response["percent"] = int(processed * 100 / total) if total > 0 else 0
+
+        if info:
+            response.update(info)
 
         # Message par défaut si rien fourni par la tâche
         response.setdefault("message", "Traitement en cours...")
@@ -215,7 +217,7 @@ def transcription_results(request):
 
     # Si pas de résultats et une tâche est en cours, rediriger vers la page de suivi
     if not results and request.session.get('task_id'):
-        return redirect('process_images')
+        return redirect('observations:process_images')
 
     # Préparer les chemins complets pour les liens
     if 'results' in results:

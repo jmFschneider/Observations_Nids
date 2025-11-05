@@ -1,6 +1,15 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
-from .models import CausesEchec, FicheObservation, Nid, Observation, Remarque, ResumeObservation
+from .models import (
+    CausesEchec,
+    FicheObservation,
+    ImageSource,
+    Nid,
+    Observation,
+    Remarque,
+    ResumeObservation,
+)
 
 
 @admin.register(FicheObservation)
@@ -27,6 +36,58 @@ class RemarqueAdmin(admin.ModelAdmin):
     list_display = ("fiche", "date_remarque", "remarque")
     list_filter = ("date_remarque",)
     search_fields = ("fiche__num_fiche", "remarque")
+
+
+@admin.register(ImageSource)
+class ImageSourceAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "image_thumbnail",
+        "observateur",
+        "est_transcrite",
+        "date_televersement",
+        "fiche_liee",
+    )
+    list_filter = ("est_transcrite", "date_televersement", "observateur")
+    search_fields = (
+        "observateur__username",
+        "observateur__first_name",
+        "observateur__last_name",
+        "id",
+    )
+    readonly_fields = ("date_televersement", "image_preview")
+    raw_id_fields = ("fiche_observation",)
+
+    @admin.display(description="Aperçu")
+    def image_thumbnail(self, obj):
+        """Affiche une miniature de l'image dans la liste"""
+        if obj.image:
+            return format_html(
+                '<img src="{}" width="50" height="50" style="object-fit: cover; border-radius: 4px;" />',
+                obj.image.url,
+            )
+        return "Pas d'image"
+
+    @admin.display(description="Prévisualisation de l'image")
+    def image_preview(self, obj):
+        """Affiche une prévisualisation plus grande dans le détail"""
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-width: 500px; max-height: 500px; border: 1px solid #ddd; border-radius: 4px;" />',
+                obj.image.url,
+            )
+        return "Pas d'image"
+
+    @admin.display(description="Fiche associée")
+    def fiche_liee(self, obj):
+        """Lien vers la fiche d'observation associée"""
+        if obj.fiche_observation:
+            return format_html(
+                '<a href="/admin/observations/ficheobservation/{}/change/">Fiche #{}</a>',
+                obj.fiche_observation.num_fiche,
+                obj.fiche_observation.num_fiche,
+            )
+        return "Aucune fiche"
 
 
 admin.site.register(Nid)

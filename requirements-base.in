@@ -8,6 +8,8 @@ mysqlclient
 celery
 django-celery-results
 django-helpdesk
+django-crispy-forms
+crispy-bootstrap5
 redis
 amqp
 billiard

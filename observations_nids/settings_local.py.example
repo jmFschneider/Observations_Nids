@@ -1,0 +1,92 @@
+"""
+Fichier de configuration local pour le développement
+Copier ce fichier en settings_local.py et adapter selon vos besoins
+
+Ce fichier n'est PAS versionné (dans .gitignore) - chaque développeur a sa propre config
+"""
+
+import socket
+from pathlib import Path
+
+from .config import get_settings
+
+# Mode debug activé en développement
+DEBUG = True
+USE_DEBUG_TOOLBAR = True
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# Fonction pour tester la connectivité MariaDB
+def test_mariadb_connection():
+    """Test si le serveur MariaDB est accessible."""
+    try:
+        settings = get_settings()
+        db_config = settings.DATABASE
+
+        # Test de connexion socket
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(2)  # 2 secondes de timeout
+        result = sock.connect_ex((db_config.host, int(db_config.port)))
+        sock.close()
+
+        return result == 0
+    except Exception:
+        return False
+
+
+# Configuration automatique des bases de données
+def get_database_config():
+    """Retourne la configuration de base de données avec fallback automatique."""
+
+    # Test si MariaDB est disponible
+    if test_mariadb_connection():
+        print("[OK] MariaDB accessible - Utilisation de MariaDB")
+        settings = get_settings()
+        db_config = settings.DATABASE
+        return {
+            "default": {
+                "ENGINE": "django.db.backends.mysql",
+                "NAME": db_config.name,
+                "USER": db_config.user,
+                "PASSWORD": db_config.password,
+                "HOST": db_config.host,
+                "PORT": db_config.port,
+                "OPTIONS": {
+                    "charset": "utf8mb4",
+                    "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+                },
+            }
+        }
+    else:
+        print("[WARN] MariaDB non accessible - Fallback vers SQLite")
+        sqlite_path = BASE_DIR / "db_local.sqlite3"
+        return {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": str(sqlite_path),
+            }
+        }
+
+
+# Configuration de la base de données
+DATABASES = get_database_config()
+
+# Option pour forcer SQLite (décommentez si nécessaire)
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": str(BASE_DIR / "db_local.sqlite3"),
+#     }
+# }
+
+# ============================================================================
+# Applications de développement (non installées en production)
+# ============================================================================
+INSTALLED_APPS_DEV = [
+    'django_extensions',  # shell_plus, runserver_plus, graph_models, etc.
+    # Ajouter d'autres apps de dev ici si nécessaire
+]
+
+# Importer INSTALLED_APPS depuis settings.py et ajouter les apps dev
+from .settings import INSTALLED_APPS  # noqa: E402
+INSTALLED_APPS = INSTALLED_APPS + INSTALLED_APPS_DEV
