@@ -377,32 +377,29 @@ class ImageSource(models.Model):
     Représente une image de fiche d'observation téléversée par un utilisateur,
     en attente de transcription.
     """
+
     # LIEN VERS L'UTILISATEUR
     observateur = models.ForeignKey(
         Utilisateur,
         on_delete=models.CASCADE,
         related_name="images_sources",
-        verbose_name="Observateur"
+        verbose_name="Observateur",
     )
 
     # GESTION DU FICHIER IMAGE
-    image = models.ImageField(
-        upload_to='images_sources/%Y/%m/%d/',
-        verbose_name="Fichier image"
-    )
+    image = models.ImageField(upload_to='images_sources/%Y/%m/%d/', verbose_name="Fichier image")
 
     # STATUT DE LA TRANSCRIPTION
     est_transcrite = models.BooleanField(
         default=False,
         db_index=True,
         verbose_name="Est transcrite",
-        help_text="Indique si une FicheObservation a été créée à partir de cette image."
+        help_text="Indique si une FicheObservation a été créée à partir de cette image.",
     )
 
     # INFORMATIONS DE SUIVI
     date_televersement = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Date de téléversement"
+        auto_now_add=True, verbose_name="Date de téléversement"
     )
 
     # LIEN VERS LA FICHE FINALE (Optionnel mais recommandé)
@@ -412,7 +409,7 @@ class ImageSource(models.Model):
         null=True,
         blank=True,
         related_name="image_source_originale",
-        verbose_name="Fiche d'observation associée"
+        verbose_name="Fiche d'observation associée",
     )
 
     class Meta:

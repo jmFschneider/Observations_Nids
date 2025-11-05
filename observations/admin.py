@@ -40,9 +40,21 @@ class RemarqueAdmin(admin.ModelAdmin):
 
 @admin.register(ImageSource)
 class ImageSourceAdmin(admin.ModelAdmin):
-    list_display = ("id", "image_thumbnail", "observateur", "est_transcrite", "date_televersement", "fiche_liee")
+    list_display = (
+        "id",
+        "image_thumbnail",
+        "observateur",
+        "est_transcrite",
+        "date_televersement",
+        "fiche_liee",
+    )
     list_filter = ("est_transcrite", "date_televersement", "observateur")
-    search_fields = ("observateur__username", "observateur__first_name", "observateur__last_name", "id")
+    search_fields = (
+        "observateur__username",
+        "observateur__first_name",
+        "observateur__last_name",
+        "id",
+    )
     readonly_fields = ("date_televersement", "image_preview")
     raw_id_fields = ("fiche_observation",)
 
@@ -52,7 +64,7 @@ class ImageSourceAdmin(admin.ModelAdmin):
         if obj.image:
             return format_html(
                 '<img src="{}" width="50" height="50" style="object-fit: cover; border-radius: 4px;" />',
-                obj.image.url
+                obj.image.url,
             )
         return "Pas d'image"
 
@@ -62,7 +74,7 @@ class ImageSourceAdmin(admin.ModelAdmin):
         if obj.image:
             return format_html(
                 '<img src="{}" style="max-width: 500px; max-height: 500px; border: 1px solid #ddd; border-radius: 4px;" />',
-                obj.image.url
+                obj.image.url,
             )
         return "Pas d'image"
 
@@ -73,7 +85,7 @@ class ImageSourceAdmin(admin.ModelAdmin):
             return format_html(
                 '<a href="/admin/observations/ficheobservation/{}/change/">Fiche #{}</a>',
                 obj.fiche_observation.num_fiche,
-                obj.fiche_observation.num_fiche
+                obj.fiche_observation.num_fiche,
             )
         return "Aucune fiche"
 

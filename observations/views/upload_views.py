@@ -15,10 +15,15 @@ def upload_image_source(request):
             image_source = form.save(commit=False)
             image_source.observateur = request.user
             image_source.save()
-            messages.success(request, "Votre fiche image a été téléversée avec succès et est en attente de transcription.")
+            messages.success(
+                request,
+                "Votre fiche image a été téléversée avec succès et est en attente de transcription.",
+            )
             return redirect('observations:upload_success')
         else:
-            messages.error(request, "Une erreur est survenue lors du téléversement de votre fiche image.")
+            messages.error(
+                request, "Une erreur est survenue lors du téléversement de votre fiche image."
+            )
     else:
         form = ImageSourceForm()
     return render(request, 'observations/upload_image_source.html', {'form': form})
@@ -32,9 +37,11 @@ def upload_success(request):
 @login_required
 def mes_images_sources(request):
     """Liste les images téléversées par l'utilisateur connecté"""
-    images = ImageSource.objects.filter(observateur=request.user).select_related(
-        'fiche_observation', 'fiche_observation__espece'
-    ).order_by('-date_televersement')
+    images = (
+        ImageSource.objects.filter(observateur=request.user)
+        .select_related('fiche_observation', 'fiche_observation__espece')
+        .order_by('-date_televersement')
+    )
 
     # Statistiques
     total_images = images.count()

@@ -262,8 +262,7 @@ RemarqueFormSet = forms.inlineformset_factory(
 class ImageSourceForm(forms.ModelForm):
     class Meta:
         model = ImageSource
-        fields = ['image'] # Only allow uploading the image file
-
+        fields = ['image']  # Only allow uploading the image file
 
 
 #

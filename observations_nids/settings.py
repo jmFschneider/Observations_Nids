@@ -94,8 +94,8 @@ INSTALLED_APPS = [
     'ingest.apps.IngestConfig',
     'audit.apps.AuditConfig',
     'bootstrap4form',  # Required for nicer formatting of forms with the default templates
-    'crispy_forms', # Add crispy_forms
-    'crispy_bootstrap5', # Add crispy_bootstrap5 for Bootstrap 5 integration
+    'crispy_forms',  # Add crispy_forms
+    'crispy_bootstrap5',  # Add crispy_bootstrap5 for Bootstrap 5 integration
     'rest_framework',  # required for the API
     'helpdesk',
     'helpdesk_custom.apps.HelpdeskCustomConfig',  # Personnalisation de Helpdesk

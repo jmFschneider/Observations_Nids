@@ -34,12 +34,10 @@ urlpatterns = [
     # Routes d'authentification
     path('auth/logout/', LogoutView.as_view(next_page='observations:home'), name='logout'),
     path('auth/login/', LoginView.as_view(template_name='login.html'), name='login'),
-
     # Routes de téléversement d'images sources
     path('upload-image/', upload_image_source, name='upload_image_source'),
     path('upload-success/', upload_success, name='upload_success'),
     path('mes-images/', mes_images_sources, name='mes_images_sources'),
-
     # Routes d'observations
     path('observations/', saisie_observation, name='observations_list'),
     path('observations/liste/', liste_fiches_observations, name='liste_fiches_observations'),
