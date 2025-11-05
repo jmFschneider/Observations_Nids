@@ -9,7 +9,6 @@ from observations.models import (
     Observation,
     Remarque,
     ResumeObservation,
-    ImageSource,
 )
 
 
