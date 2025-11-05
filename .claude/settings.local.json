@@ -32,7 +32,10 @@
       "Bash(gh pr view:*)",
       "Bash(git checkout:*)",
       "Bash(gh pr create:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(git tag:*)",
+      "Bash(gh release edit:*)",
+      "Bash(gh release create:*)"
     ],
     "deny": [],
     "ask": []
