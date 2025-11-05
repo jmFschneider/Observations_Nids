@@ -8,7 +8,7 @@
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'accueil_importation' %}">Importation</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ingest:accueil_importation' %}">Importation</a></li>
             <li class="breadcrumb-item active" aria-current="page">Observateurs candidats</li>
         </ol>
     </nav>
@@ -121,7 +121,7 @@
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            <form method="post" action="{% url 'valider_observateur' observateur.id %}">
+                                            <form method="post" action="{% url 'ingest:valider_observateur' observateur.id %}">
                                                 {% csrf_token %}
                                                 <div class="form-group">
                                                     <label for="utilisateur_valide{{ observateur.id }}">Sélectionnez l'utilisateur correspondant:</label>
@@ -166,7 +166,7 @@
 
                                         <!-- Remplacez la section du modal pour la création d'un utilisateur -->
                                         <div class="modal-body">
-                                            <form method="post" action="{% url 'creer_nouvel_utilisateur' %}">
+                                            <form method="post" action="{% url 'ingest:creer_nouvel_utilisateur' %}">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="observateur_candidat_id" value="{{ observateur.id }}">
 
@@ -290,7 +290,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{% url 'creer_nouvel_utilisateur' %}">
+                    <form method="post" action="{% url 'ingest:creer_nouvel_utilisateur' %}">
                         {% csrf_token %}
                         
                         <div class="form-group">

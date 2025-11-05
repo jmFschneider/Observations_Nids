@@ -113,7 +113,7 @@ def valider_espece(request, espece_id):
                 "Veuillez soit sélectionner une espèce existante, soit saisir un nouveau nom d'espèce",
             )
 
-    return redirect('liste_especes_candidates')
+    return redirect('ingest:liste_especes_candidates')
 
 
 @login_required
@@ -125,7 +125,7 @@ def valider_especes_multiples(request):
 
         if not selected_especes:
             messages.error(request, "Aucune espèce n'a été sélectionnée.")
-            return redirect('liste_especes_candidates')
+            return redirect('ingest:liste_especes_candidates')
 
         count_success = 0
         count_error = 0
@@ -202,7 +202,7 @@ def valider_especes_multiples(request):
                 f"{count_error} espèce(s) n'ont pas pu être validées. Vérifiez les données saisies.",
             )
 
-    return redirect('liste_especes_candidates')
+    return redirect('ingest:liste_especes_candidates')
 
 
 @login_required
@@ -237,4 +237,4 @@ def creer_nouvelle_espece(request):
             messages.error(request, "Veuillez spécifier un nom d'espèce")
 
     # Rediriger vers la liste des espèces candidates
-    return redirect('liste_especes_candidates')
+    return redirect('ingest:liste_especes_candidates')

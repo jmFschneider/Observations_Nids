@@ -27,7 +27,7 @@
     {% endif %}
     
     <div class="actions mt-3">
-      <a href="{% url 'observations:detail_fiche' observation.fiche.num_fiche %}" class="btn btn-sm btn-primary">Voir détails</a>
+      <a href="{% url 'observations:fiche_observation' observation.fiche.num_fiche %}" class="btn btn-sm btn-primary">Voir détails</a>
       <a href="{% url 'observations:modifier_observation' observation.id %}" class="btn btn-sm btn-secondary">Modifier</a>
     </div>
   </div>

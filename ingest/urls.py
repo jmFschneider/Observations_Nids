@@ -1,17 +1,15 @@
 # urls.py
 from django.urls import path
 
-# from .views.workflow_importation_legacy import (
-#    especes,
-#    home,
-#    importation,
-# )
 from .views import (
     especes,
     home,
     importation,
 )
 from .views.especes import valider_especes_multiples
+
+app_name = 'ingest'
+
 
 urlpatterns = [
     # Accueil et importation initiale

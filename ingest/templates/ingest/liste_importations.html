@@ -8,7 +8,7 @@
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'accueil_importation' %}">Importation</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ingest:accueil_importation' %}">Importation</a></li>
             <li class="breadcrumb-item active" aria-current="page">Liste des importations</li>
         </ol>
     </nav>
@@ -28,7 +28,7 @@
         <div class="card-body">
             <p>Utilisez ces actions pour réinitialiser les importations et recommencer le processus d'importation:</p>
 
-            <form method="post" action="{% url 'reinitialiser_toutes_importations' %}" class="d-inline">
+            <form method="post" action="{% url 'ingest:reinitialiser_toutes_importations' %}" class="d-inline">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="statut_reinit">Réinitialiser les importations:</label>
@@ -165,11 +165,11 @@
                         </td>
                         <td>{{ importation.date_creation|date:"d/m/Y H:i" }}</td>
                         <td>
-                            <a href="{% url 'detail_importation' importation.id %}" class="btn btn-sm btn-info">Voir détails</a>
+                            <a href="{% url 'ingest:detail_importation' importation.id %}" class="btn btn-sm btn-info">Voir détails</a>
 
                             {% if importation.statut == 'en_attente' %}
                                 {% if importation.espece_candidate.espece_validee and importation.observateur %}
-                                    <form method="post" action="{% url 'finaliser_importation' importation.id %}" class="d-inline">
+                                    <form method="post" action="{% url 'ingest:finaliser_importation' importation.id %}" class="d-inline">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-sm btn-success">Finaliser</button>
                                     </form>
@@ -182,7 +182,7 @@
                             {% endif %}
 
                             {% if importation.statut == 'complete' or importation.statut == 'erreur' %}
-                                <form method="post" action="{% url 'reinitialiser_importation' importation.id %}" class="d-inline">
+                                <form method="post" action="{% url 'ingest:reinitialiser_importation' importation.id %}" class="d-inline">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Êtes-vous sûr de vouloir réinitialiser cette importation ? Cette action supprimera la fiche d\'observation associée et ne peut pas être annulée.')">
                                         Réinitialiser
@@ -255,11 +255,11 @@
     </div>
 
     <div class="mt-4">
-        <a href="{% url 'preparer_importations' %}" class="btn btn-primary">Préparer de nouvelles importations</a>
+        <a href="{% url 'ingest:preparer_importations' %}" class="btn btn-primary">Préparer de nouvelles importations</a>
     </div>
 
     <!-- Formulaire caché pour la finalisation multiple -->
-    <form id="finalize-multiple-form" method="post" action="{% url 'finaliser_importations_multiples' %}" style="display: none;">
+    <form id="finalize-multiple-form" method="post" action="{% url 'ingest:finaliser_importations_multiples' %}" style="display: none;">
         {% csrf_token %}
         <div id="finalize-multiple-data"></div>
     </form>

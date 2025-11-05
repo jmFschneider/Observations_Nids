@@ -53,7 +53,7 @@ document.getElementById('directory-form').addEventListener('submit', function(e)
 
             // Option 1: Commencer immédiatement (redirection vers process_images)
             const startButton = document.createElement('a');
-            startButton.href = "{% url 'process_images' %}";
+            startButton.href = "{% url 'observations:process_images' %}";
             startButton.className = "btn btn-success";
             startButton.textContent = "Commencer la transcription";
             startButtonsContainer.appendChild(startButton);
