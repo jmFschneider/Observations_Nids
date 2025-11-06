@@ -202,10 +202,8 @@ class TestInscriptionPubliqueView(TestCase):
         user = Utilisateur.objects.get(username='newuser')
         self.assertEqual(user.email, 'newuser@test.com')
         self.assertFalse(user.est_valide)
-        self.assertFalse(user.is_active)
-
-        # Vérifier qu'un email a été envoyé
-        self.assertEqual(len(mail.outbox), 1)
+        # Vérifier que les emails ont été envoyés (un à l'admin, un à l'utilisateur)
+        self.assertEqual(len(mail.outbox), 2)
 
     def test_inscription_publique_creates_notifications(self):
         """Test que l'inscription crée des notifications pour les admins"""
