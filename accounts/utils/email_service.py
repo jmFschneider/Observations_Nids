@@ -28,7 +28,9 @@ class EmailService:
             bool: True si l'email a été envoyé avec succès, False sinon
         """
         if not utilisateur.email:
-            logger.warning(f"L'utilisateur {utilisateur.username} n'a pas d'email, email de confirmation non envoyé")
+            logger.warning(
+                f"L'utilisateur {utilisateur.username} n'a pas d'email, email de confirmation non envoyé"
+            )
             return False
 
         try:
@@ -38,7 +40,9 @@ class EmailService:
                 'utilisateur': utilisateur,
             }
 
-            html_content = render_to_string('accounts/emails/demande_enregistree_utilisateur.html', contexte)
+            html_content = render_to_string(
+                'accounts/emails/demande_enregistree_utilisateur.html', contexte
+            )
             text_content = strip_tags(html_content)
 
             email = EmailMultiAlternatives(

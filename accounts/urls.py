@@ -31,7 +31,11 @@ urlpatterns = [
     path('inscription-publique/', auth.inscription_publique, name='inscription_publique'),
     path('inscription-completee/', auth.inscription_completee, name='inscription_completee'),
     path('compte-en-attente/<int:user_id>/', auth.compte_en_attente, name='compte_en_attente'),
-    path('renvoyer-notification/<int:user_id>/', auth.renvoyer_notification_admin, name='renvoyer_notification'),
+    path(
+        'renvoyer-notification/<int:user_id>/',
+        auth.renvoyer_notification_admin,
+        name='renvoyer_notification',
+    ),
     # Fonctionnalités d'urgence
     path(
         'urgence/promouvoir-administrateur/',
