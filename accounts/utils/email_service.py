@@ -17,6 +17,53 @@ class EmailService:
     """Service centralisé pour l'envoi d'emails"""
 
     @staticmethod
+    def envoyer_email_demande_enregistree(utilisateur):
+        """
+        Envoie un email à l'utilisateur pour confirmer que sa demande est enregistrée.
+
+        Args:
+            utilisateur: L'utilisateur qui a fait la demande
+
+        Returns:
+            bool: True si l'email a été envoyé avec succès, False sinon
+        """
+        if not utilisateur.email:
+            logger.warning(
+                f"L'utilisateur {utilisateur.username} n'a pas d'email, email de confirmation non envoyé"
+            )
+            return False
+
+        try:
+            sujet = "[Observations Nids] Votre demande d'inscription a été enregistrée"
+
+            contexte = {
+                'utilisateur': utilisateur,
+            }
+
+            html_content = render_to_string(
+                'accounts/emails/demande_enregistree_utilisateur.html', contexte
+            )
+            text_content = strip_tags(html_content)
+
+            email = EmailMultiAlternatives(
+                subject=sujet,
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[utilisateur.email],
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send()
+
+            logger.info(f"Email de confirmation de demande envoyé à {utilisateur.email}")
+            return True
+
+        except Exception as e:
+            logger.error(
+                f"Erreur lors de l'envoi de l'email de confirmation de demande pour {utilisateur.username}: {e}"
+            )
+            return False
+
+    @staticmethod
     def envoyer_email_nouvelle_demande_compte(utilisateur):
         """
         Envoie un email à l'administrateur quand une nouvelle demande de compte est reçue.

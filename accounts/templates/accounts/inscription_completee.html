@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscription terminée{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Merci pour votre inscription !</h3>
+                </div>
+                <div class="card-body">
+                    <p>Votre demande d'inscription a bien été enregistrée et est en cours de validation par notre équipe.</p>
+                    <p>Un e-mail de confirmation vient de vous être envoyé.</p>
+                    <p>Surveillez votre boîte de réception, nous vous préviendrons par e-mail dès que votre accès sera activé.</p>
+                    <hr>
+                    <a href="{% url 'observations:login' %}" class="btn btn-primary">Retour à la page de connexion</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

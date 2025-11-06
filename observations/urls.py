@@ -1,6 +1,8 @@
 # observations/urls.py
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LogoutView
 from django.urls import path
+
+from accounts.views.auth import CustomLoginView
 
 from .views.saisie_observation_view import (
     ajouter_observation,
@@ -33,7 +35,7 @@ urlpatterns = [
     path('tableau-de-bord/', default_view, name='default'),
     # Routes d'authentification
     path('auth/logout/', LogoutView.as_view(next_page='observations:home'), name='logout'),
-    path('auth/login/', LoginView.as_view(template_name='login.html'), name='login'),
+    path('auth/login/', CustomLoginView.as_view(template_name='login.html'), name='login'),
     # Routes de téléversement d'images sources
     path('upload-image/', upload_image_source, name='upload_image_source'),
     path('upload-success/', upload_success, name='upload_success'),

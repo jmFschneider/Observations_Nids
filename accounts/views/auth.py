@@ -1,10 +1,12 @@
 import logging
+from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import LoginView
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.encoding import force_bytes, force_str
@@ -32,6 +34,24 @@ def est_admin(user):
 def est_superuser(user):
     """Vérifie si l'utilisateur est un superuser"""
     return user.is_superuser
+
+
+class CustomLoginView(LoginView):
+    def form_invalid(self, form):
+        # Récupérer le nom d'utilisateur depuis les données du formulaire
+        username = form.cleaned_data.get('username')
+        if username:
+            try:
+                user = Utilisateur.objects.get(username=username)
+                # Si le compte est inactif et non validé, c'est une nouvelle inscription
+                if not user.is_active and not user.est_valide:
+                    # Rediriger vers la page de statut avec l'ID de l'utilisateur
+                    return redirect('accounts:compte_en_attente', user_id=user.id)
+            except Utilisateur.DoesNotExist:
+                # L'utilisateur n'existe pas, laisser le traitement d'erreur normal
+                pass
+        # Pour toutes les autres erreurs, utiliser le comportement par défaut
+        return super().form_invalid(form)
 
 
 class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -232,11 +252,10 @@ def inscription_publique(request):
             # Envoyer un email à l'administrateur principal
             EmailService.envoyer_email_nouvelle_demande_compte(utilisateur)
 
-            messages.success(
-                request,
-                "Votre demande d'inscription a été enregistrée. Un administrateur devra l'approuver avant que vous puissiez vous connecter.",
-            )
-            return redirect('observations:login')
+            # Envoyer un email de confirmation à l'utilisateur
+            EmailService.envoyer_email_demande_enregistree(utilisateur)
+
+            return redirect('accounts:inscription_completee')
     else:
         form = UtilisateurCreationForm()
 
@@ -382,3 +401,72 @@ def reinitialiser_mot_de_passe(request, uidb64, token):
             'accounts/reinitialiser_mot_de_passe.html',
             {'validlink': False},
         )
+
+
+def inscription_completee(request):
+    """Affiche la page de confirmation après une demande d'inscription."""
+    return render(request, 'accounts/inscription_completee.html')
+
+
+def compte_en_attente(request, user_id):
+    """
+    Affiche une page informant l'utilisateur que son compte est en attente.
+    """
+    try:
+        utilisateur = Utilisateur.objects.get(id=user_id)
+    except Utilisateur.DoesNotExist:
+        messages.error(request, "Utilisateur non trouvé.")
+        return redirect('observations:login')
+
+    # Vérifier si l'utilisateur est bien en attente
+    if utilisateur.is_active or utilisateur.est_valide:
+        messages.warning(request, "Ce compte est déjà actif.")
+        return redirect('observations:login')
+
+    return render(request, 'accounts/compte_en_attente.html', {'user_id': user_id})
+
+
+def renvoyer_notification_admin(request, user_id):
+    """
+    Renvoyer l'email de notification de nouvelle demande à l'administrateur.
+    Avec une limite d'un renvoi toutes les 24 heures.
+    """
+    if request.method != 'POST':
+        return redirect('accounts:compte_en_attente', user_id=user_id)
+
+    try:
+        utilisateur = Utilisateur.objects.get(id=user_id)
+    except Utilisateur.DoesNotExist:
+        messages.error(request, "Utilisateur non trouvé.")
+        return redirect('observations:login')
+
+    # Logique anti-spam
+    last_sent_time_str = request.session.get(f'last_resend_{user_id}')
+    if last_sent_time_str:
+        last_sent_time = datetime.fromisoformat(last_sent_time_str)
+        if datetime.now() - last_sent_time < timedelta(hours=24):
+            messages.warning(
+                request, "Une notification a déjà été renvoyée il y a moins de 24 heures."
+            )
+            return redirect('accounts:compte_en_attente', user_id=user_id)
+
+    # Renvoyer l'email et la notification
+    EmailService.envoyer_email_nouvelle_demande_compte(utilisateur)
+
+    # Créer une nouvelle notification pour les administrateurs
+    administrateurs = Utilisateur.objects.filter(role='administrateur', is_active=True)
+    for admin in administrateurs:
+        Notification.objects.create(
+            destinataire=admin,
+            type_notification='demande_compte',
+            titre=f"[RELANCE] Demande de compte : {utilisateur.username}",
+            message=f"Relance pour la demande de compte de {utilisateur.first_name} {utilisateur.last_name} ({utilisateur.email}).",
+            lien=f"/accounts/utilisateurs/{utilisateur.id}/detail/",
+            utilisateur_concerne=utilisateur,
+        )
+
+    # Mettre à jour le timestamp dans la session
+    request.session[f'last_resend_{user_id}'] = datetime.now().isoformat()
+
+    messages.success(request, "La notification a bien été renvoyée à l'administrateur.")
+    return redirect('accounts:compte_en_attente', user_id=user_id)
