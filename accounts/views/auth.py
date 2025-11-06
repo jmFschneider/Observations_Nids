@@ -1,10 +1,12 @@
 import logging
+from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import LoginView
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.encoding import force_bytes, force_str
@@ -32,9 +34,6 @@ def est_admin(user):
 def est_superuser(user):
     """Vérifie si l'utilisateur est un superuser"""
     return user.is_superuser
-
-
-from django.contrib.auth.views import LoginView
 
 
 class CustomLoginView(LoginView):
@@ -403,7 +402,6 @@ def reinitialiser_mot_de_passe(request, uidb64, token):
             {'validlink': False},
         )
 
-from datetime import datetime, timedelta
 
 def inscription_completee(request):
     """Affiche la page de confirmation après une demande d'inscription."""
