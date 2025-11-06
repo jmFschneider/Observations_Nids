@@ -407,6 +407,7 @@ def inscription_completee(request):
     """Affiche la page de confirmation après une demande d'inscription."""
     return render(request, 'accounts/inscription_completee.html')
 
+
 def compte_en_attente(request, user_id):
     """
     Affiche une page informant l'utilisateur que son compte est en attente.
@@ -444,12 +445,14 @@ def renvoyer_notification_admin(request, user_id):
     if last_sent_time_str:
         last_sent_time = datetime.fromisoformat(last_sent_time_str)
         if datetime.now() - last_sent_time < timedelta(hours=24):
-            messages.warning(request, "Une notification a déjà été renvoyée il y a moins de 24 heures.")
+            messages.warning(
+                request, "Une notification a déjà été renvoyée il y a moins de 24 heures."
+            )
             return redirect('accounts:compte_en_attente', user_id=user_id)
 
     # Renvoyer l'email et la notification
     EmailService.envoyer_email_nouvelle_demande_compte(utilisateur)
-    
+
     # Créer une nouvelle notification pour les administrateurs
     administrateurs = Utilisateur.objects.filter(role='administrateur', is_active=True)
     for admin in administrateurs:
