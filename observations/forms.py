@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 
 from geo.models import Localisation
 from observations.models import (
@@ -120,8 +121,9 @@ class ObservationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Make sure date_observation is properly formatted for the datetime-local input
         if self.instance.pk and self.instance.date_observation:
-            # Format the existing date for the datetime-local input
-            self.initial['date_observation'] = self.instance.date_observation.strftime(
+            # Convert the stored UTC time to the local timezone before formatting
+            local_dt = timezone.localtime(self.instance.date_observation)
+            self.initial['date_observation'] = local_dt.strftime(
                 '%Y-%m-%dT%H:%M'
             )
 
