@@ -101,16 +101,37 @@ def rechercher_communes(request):
         - limit: Nombre maximum de résultats (défaut: 10)
 
     Returns:
-        JSON: Liste des communes correspondantes
+        JSON: Liste des communes correspondantes, filtrées par rayon de 10km si GPS fourni
     """
     query = request.GET.get('q', '').strip()
     lat = request.GET.get('lat', '').strip()
     lon = request.GET.get('lon', '').strip()
     limit = int(request.GET.get('limit', 10))
 
-    # Recherche par nom de commune (prioritaire)
+    # Recherche par nom de commune
     if query and len(query) >= 2:
-        communes = CommuneFrance.objects.filter(nom__icontains=query).values(
+        communes_queryset = CommuneFrance.objects.filter(nom__icontains=query)
+
+        # Si coordonnées GPS fournies, filtrer par bounding box (~10 km)
+        if lat and lon:
+            try:
+                lat_float = float(lat)
+                lon_float = float(lon)
+
+                # Rayon approximatif : 0.1° ≈ 11 km
+                # Filtrage rapide par bounding box avant calcul exact
+                delta = 0.1
+
+                communes_queryset = communes_queryset.filter(
+                    latitude__gte=lat_float - delta,
+                    latitude__lte=lat_float + delta,
+                    longitude__gte=lon_float - delta,
+                    longitude__lte=lon_float + delta,
+                )
+            except ValueError:
+                logger.warning(f"Coordonnées GPS invalides: lat={lat}, lon={lon}")
+
+        communes = communes_queryset.values(
             'nom',
             'departement',
             'code_departement',
@@ -119,23 +140,31 @@ def rechercher_communes(request):
             'latitude',
             'longitude',
             'altitude',
-        )[:limit]
+        )[:100]  # Récupérer plus pour filtrer ensuite
 
     else:
         return JsonResponse({'communes': []})
 
-    # Formater les résultats
+    # Formater les résultats et calculer les distances
     results = []
 
     # Précalculer les conversions si on a des coordonnées GPS
     if lat and lon:
-        lat_rad = radians(float(lat))
-        lon_rad = radians(float(lon))
+        try:
+            lat_rad = radians(float(lat))
+            lon_rad = radians(float(lon))
+            has_gps = True
+        except ValueError:
+            has_gps = False
+    else:
+        has_gps = False
 
     for commune in communes:
-        # Calculer la distance si on a des coordonnées GPS
+        distance_km = None
         distance_info = ''
-        if lat and lon:
+
+        # Calculer la distance exacte si on a des coordonnées GPS
+        if has_gps:
             try:
                 # Formule de Haversine complète
                 lat2_rad = radians(float(commune['latitude']))
@@ -149,12 +178,17 @@ def rechercher_communes(request):
                 c = 2 * atan2(sqrt(a), sqrt(1 - a))
                 distance_km = 6371 * c  # Rayon de la Terre en km
 
+                # Filtrer : ne garder que les communes à moins de 10 km
+                if distance_km > 10:
+                    continue
+
                 if distance_km < 1:
                     distance_info = f" - {int(distance_km * 1000)}m"
                 else:
                     distance_info = f" - {distance_km:.1f}km"
             except Exception as e:
                 logger.debug(f"Erreur calcul distance: {e}")
+                distance_km = None
 
         results.append(
             {
@@ -167,7 +201,21 @@ def rechercher_communes(request):
                 'latitude': str(commune['latitude']),
                 'longitude': str(commune['longitude']),
                 'altitude': commune['altitude'] if commune.get('altitude') is not None else None,
+                'distance_km': distance_km,  # Pour le tri
             }
         )
+
+    # Trier par distance si GPS fourni, sinon par ordre alphabétique
+    if has_gps:
+        results.sort(key=lambda x: x['distance_km'] if x['distance_km'] is not None else 999)
+    else:
+        results.sort(key=lambda x: x['nom'])
+
+    # Limiter le nombre de résultats
+    results = results[:limit]
+
+    # Retirer distance_km de la réponse (utilisé uniquement pour le tri)
+    for result in results:
+        result.pop('distance_km', None)
 
     return JsonResponse({'communes': results})

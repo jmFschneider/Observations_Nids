@@ -769,7 +769,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (latInput && lonInput) {
                         latInput.value = lat;
                         lonInput.value = lon;
-                        alert(`Position GPS récupérée:\nLatitude: ${lat}\nLongitude: ${lon}`);
+
+                        // Afficher automatiquement les communes à proximité
+                        const communeInput = document.getElementById('id_commune');
+                        if (communeInput) {
+                            // Si le champ est vide, on affiche un message encourageant à taper
+                            if (!communeInput.value.trim()) {
+                                alert(`Position GPS récupérée:\nLatitude: ${lat}\nLongitude: ${lon}\n\nVous pouvez maintenant taper dans le champ "Commune".\nLes résultats seront automatiquement filtrés dans un rayon de 10 km.`);
+                                // Mettre le focus sur le champ commune
+                                communeInput.focus();
+                            } else {
+                                // Si le champ contient déjà du texte, relancer la recherche
+                                alert(`Position GPS récupérée:\nLatitude: ${lat}\nLongitude: ${lon}\n\nMise à jour de la liste des communes (rayon 10 km)...`);
+                                const event = new Event('input', { bubbles: true });
+                                communeInput.dispatchEvent(event);
+                            }
+                        } else {
+                            alert(`Position GPS récupérée:\nLatitude: ${lat}\nLongitude: ${lon}`);
+                        }
                     }
 
                     // Restaurer le bouton
