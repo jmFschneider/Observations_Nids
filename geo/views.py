@@ -112,22 +112,24 @@ def rechercher_communes(request):
     if query and len(query) >= 2:
         communes_queryset = CommuneFrance.objects.filter(nom__icontains=query)
 
-        # Si coordonnées GPS fournies, filtrer par bounding box (~10 km)
+        # Si coordonnées GPS fournies ET valides (pas 0,0), filtrer par bounding box (~10 km)
         if lat and lon:
             try:
                 lat_float = float(lat)
                 lon_float = float(lon)
 
-                # Rayon approximatif : 0.1° ≈ 11 km
-                # Filtrage rapide par bounding box avant calcul exact
-                delta = 0.1
+                # Ignorer les coordonnées par défaut (0,0 = non renseigné)
+                if lat_float != 0.0 and lon_float != 0.0:
+                    # Rayon approximatif : 0.1° ≈ 11 km
+                    # Filtrage rapide par bounding box avant calcul exact
+                    delta = 0.1
 
-                communes_queryset = communes_queryset.filter(
-                    latitude__gte=lat_float - delta,
-                    latitude__lte=lat_float + delta,
-                    longitude__gte=lon_float - delta,
-                    longitude__lte=lon_float + delta,
-                )
+                    communes_queryset = communes_queryset.filter(
+                        latitude__gte=lat_float - delta,
+                        latitude__lte=lat_float + delta,
+                        longitude__gte=lon_float - delta,
+                        longitude__lte=lon_float + delta,
+                    )
             except ValueError:
                 logger.warning(f"Coordonnées GPS invalides: lat={lat}, lon={lon}")
 
@@ -148,12 +150,18 @@ def rechercher_communes(request):
     # Formater les résultats et calculer les distances
     results = []
 
-    # Précalculer les conversions si on a des coordonnées GPS
+    # Précalculer les conversions si on a des coordonnées GPS valides (pas 0,0)
     if lat and lon:
         try:
-            lat_rad = radians(float(lat))
-            lon_rad = radians(float(lon))
-            has_gps = True
+            lat_float = float(lat)
+            lon_float = float(lon)
+            # Vérifier que ce ne sont pas les coordonnées par défaut (0,0 = non renseigné)
+            if lat_float != 0.0 and lon_float != 0.0:
+                lat_rad = radians(lat_float)
+                lon_rad = radians(lon_float)
+                has_gps = True
+            else:
+                has_gps = False
         except ValueError:
             has_gps = False
     else:

@@ -76,9 +76,7 @@ class FicheObservation(models.Model):
             )
 
             # Créer l'objet CausesEchec s'il n'existe pas
-            CausesEchec.objects.get_or_create(
-                fiche=self, defaults={'description': ''}
-            )
+            CausesEchec.objects.get_or_create(fiche=self, defaults={'description': ''})
 
             # Créer l'objet EtatCorrection s'il n'existe pas
             EtatCorrection.objects.get_or_create(

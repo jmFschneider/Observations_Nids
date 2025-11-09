@@ -66,7 +66,7 @@ class TestSaisieObservationView:
             'nombre_oeufs_non_eclos': '',
             'nombre_poussins': '',
             # Causes d'échec
-            'description': 'Aucune cause identifiée',
+            'description': '',  # Champ vide (placeholder dans le formulaire)
             'observations-TOTAL_FORMS': '0',
             'observations-INITIAL_FORMS': '0',
             'observations-MIN_NUM_FORMS': '0',
@@ -280,7 +280,7 @@ class TestSuppressionObservations:
             'nombre_oeufs_eclos': '',
             'nombre_oeufs_non_eclos': '',
             'nombre_poussins': '',
-            'description': 'Aucune cause identifiée',
+            'description': '',  # Champ vide (placeholder dans le formulaire)
             'observations-TOTAL_FORMS': '1',
             'observations-INITIAL_FORMS': '1',
             'observations-MIN_NUM_FORMS': '0',
@@ -551,7 +551,7 @@ class TestCreationNouvelleFiche:
             'nombre_oeufs_eclos': '',
             'nombre_oeufs_non_eclos': '',
             'nombre_poussins': '',
-            'description': 'Aucune cause identifiée',
+            'description': '',  # Champ vide (placeholder dans le formulaire)
             'observations-TOTAL_FORMS': '0',
             'observations-INITIAL_FORMS': '0',
             'observations-MIN_NUM_FORMS': '0',

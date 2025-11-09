@@ -35,11 +35,11 @@ class TestFicheObservation:
         assert hasattr(fiche_observation, 'resume')
         assert hasattr(fiche_observation, 'causes_echec')
 
-        # Vérifier les valeurs par défaut
-        assert fiche_observation.localisation.commune == 'Non spécifiée'
+        # Vérifier les valeurs par défaut (champs vides avec placeholders)
+        assert fiche_observation.localisation.commune == ''
         assert fiche_observation.nid.hauteur_nid == 0
         assert fiche_observation.resume.nombre_oeufs_pondus is None
-        assert fiche_observation.causes_echec.description == 'Aucune cause identifiée'
+        assert fiche_observation.causes_echec.description == ''
 
     def test_str_representation(self, fiche_observation):
         """Test de la représentation string."""
@@ -126,7 +126,7 @@ class TestLocalisation:
         """Test des valeurs par défaut de localisation."""
         loc = fiche_observation.localisation
 
-        assert loc.commune == 'Non spécifiée'
+        assert loc.commune == ''  # Champ vide avec placeholder
         assert loc.departement == '00'
         assert loc.altitude == '0'
 

@@ -84,10 +84,18 @@ class LocalisationForm(forms.ModelForm):
             'longitude': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Longitude'}),
             'altitude': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Altitude'}),
             'paysage': forms.Textarea(
-                attrs={'class': 'section-content', 'rows': 2, 'placeholder': 'Description du paysage'}
+                attrs={
+                    'class': 'section-content',
+                    'rows': 2,
+                    'placeholder': 'Description du paysage',
+                }
             ),
             'alentours': forms.Textarea(
-                attrs={'class': 'section-content', 'rows': 2, 'placeholder': 'Description des alentours'}
+                attrs={
+                    'class': 'section-content',
+                    'rows': 2,
+                    'placeholder': 'Description des alentours',
+                }
             ),
         }
 
@@ -127,9 +135,7 @@ class ObservationForm(forms.ModelForm):
         if self.instance.pk and self.instance.date_observation:
             # Convert the stored UTC time to the local timezone before formatting
             local_dt = timezone.localtime(self.instance.date_observation)
-            self.initial['date_observation'] = local_dt.strftime(
-                '%Y-%m-%dT%H:%M'
-            )
+            self.initial['date_observation'] = local_dt.strftime('%Y-%m-%dT%H:%M')
 
     def clean_date_observation(self):
         """
