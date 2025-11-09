@@ -1,6 +1,6 @@
 # requirements-base.in
 
-Django
+Django>=5.2.8
 asgiref
 sqlparse
 tzdata
@@ -69,3 +69,4 @@ greenlet
 packaging
 uritemplate
 wcwidth
+radicale>=1.1.2
