@@ -1,0 +1,9 @@
+{
+  "exceptions": [
+    {
+      "file": "maintenance.html",
+      "reason": "Utilisé par Apache lors de la mise en maintenance du site",
+      "category": "Infrastructure"
+    }
+  ]
+}
