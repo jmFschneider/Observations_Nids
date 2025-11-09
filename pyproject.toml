@@ -7,7 +7,7 @@ skip-string-normalization = true
 # Ruff = linter ultra-rapide (remplace flake8 + isort + pyupgrade + bugbear + django)
 target-version = "py311"
 line-length = 100
-extend-exclude = ["migrations", "venv", ".venv", ".git", ".mypy_cache", ".ruff_cache"]
+extend-exclude = ["migrations", "venv", ".venv", ".git", ".mypy_cache", ".ruff_cache", "scripts"]
 
 [tool.ruff.lint]
 # Règles utiles pour Django + qualité
@@ -49,6 +49,7 @@ check_untyped_defs = true
 disallow_any_generics = true
 ignore_missing_imports = true
 plugins = ["mypy_django_plugin.main"]
+exclude = ["scripts/"]
 
 [tool.django-stubs]
 django_settings_module = "observations_nids.settings"

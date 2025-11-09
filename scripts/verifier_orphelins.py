@@ -8,29 +8,52 @@ des recherches approfondies pour déterminer si les fichiers sont vraiment orphe
 Génère un rapport Markdown avec un tableau de vérification.
 """
 
+import json
 import os
 import re
-import json
-from pathlib import Path
-from typing import List, Dict, Set, Optional
+import sys
 from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+
+# Ajouter le répertoire scripts au path pour importer archiver_orphelins
+_BASE_DIR = Path(__file__).resolve().parent.parent
+_SCRIPTS_DIR = _BASE_DIR / 'scripts'
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from archiver_orphelins import archive_orphans  # noqa: E402
 
 # Configuration
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = _BASE_DIR
+SCRIPTS_DIR = _SCRIPTS_DIR
 REPORT_PATH = BASE_DIR / 'scripts' / 'rapport_fichiers_orphelins.md'
 OUTPUT_PATH = BASE_DIR / 'scripts' / 'verification_orphelins.md'
 EXCEPTIONS_PATH = BASE_DIR / 'scripts' / 'exceptions_orphelins.json'
 
 IGNORE_DIRS = {
-    '.git', '.venv', '__pycache__', '.pytest_cache', '.mypy_cache',
-    'migrations', 'htmlcov', '.ruff_cache', 'staticfiles', 'media',
-    '.idea', '.github', '.claude', 'node_modules', 'deployment'
+    '.git',
+    '.venv',
+    '__pycache__',
+    '.pytest_cache',
+    '.mypy_cache',
+    'migrations',
+    'htmlcov',
+    '.ruff_cache',
+    'staticfiles',
+    'media',
+    '.idea',
+    '.github',
+    '.claude',
+    'node_modules',
+    'deployment',
 }
 
 
 @dataclass
 class FileException:
     """Exception pour un fichier orphelin avec justification."""
+
     file: str
     reason: str
     category: str
@@ -39,6 +62,7 @@ class FileException:
 @dataclass
 class VerificationResult:
     """Résultat de vérification pour un fichier."""
+
     filename: str
     file_type: str
     found_in_global_py: bool
@@ -46,39 +70,39 @@ class VerificationResult:
     found_in_urls: bool
     found_in_views: bool
     found_in_templates: bool
-    references_found: List[str]  # Liste des endroits où le fichier est référencé
+    references_found: list[str]  # Liste des endroits où le fichier est référencé
     score: int
     is_orphan: bool
-    exception: Optional[FileException] = None  # Exception si connue
+    exception: FileException | None = None  # Exception si connue
 
 
 class OrphanVerifier:
     """Classe pour vérifier les fichiers orphelins."""
 
     def __init__(self):
-        self.orphan_files: List[str] = []
-        self.all_python_files: List[Path] = []
-        self.all_html_files: List[Path] = []
-        self.urls_files: List[Path] = []
-        self.views_files: List[Path] = []
-        self.verification_results: List[VerificationResult] = []
-        self.exceptions: Dict[str, FileException] = {}  # key = filepath
+        self.orphan_files: list[str] = []
+        self.all_python_files: list[Path] = []
+        self.all_html_files: list[Path] = []
+        self.urls_files: list[Path] = []
+        self.views_files: list[Path] = []
+        self.verification_results: list[VerificationResult] = []
+        self.exceptions: dict[str, FileException] = {}  # key = filepath
         self.load_exceptions()
 
     def load_exceptions(self):
         """Charge le fichier JSON des exceptions."""
         if EXCEPTIONS_PATH.exists():
             try:
-                with open(EXCEPTIONS_PATH, 'r', encoding='utf-8') as f:
+                with open(EXCEPTIONS_PATH, encoding='utf-8') as f:
                     data = json.load(f)
                     for exc in data.get('exceptions', []):
                         file_exc = FileException(
-                            file=exc['file'],
-                            reason=exc['reason'],
-                            category=exc['category']
+                            file=exc['file'], reason=exc['reason'], category=exc['category']
                         )
                         self.exceptions[exc['file']] = file_exc
-                print(f"[*] {len(self.exceptions)} exception(s) chargee(s) depuis {EXCEPTIONS_PATH.name}\n")
+                print(
+                    f"[*] {len(self.exceptions)} exception(s) chargee(s) depuis {EXCEPTIONS_PATH.name}\n"
+                )
             except Exception as e:
                 print(f"[WARN] Erreur lors du chargement des exceptions : {e}\n")
         else:
@@ -88,11 +112,7 @@ class OrphanVerifier:
         """Sauvegarde les exceptions dans le fichier JSON."""
         data = {
             "exceptions": [
-                {
-                    "file": exc.file,
-                    "reason": exc.reason,
-                    "category": exc.category
-                }
+                {"file": exc.file, "reason": exc.reason, "category": exc.category}
                 for exc in self.exceptions.values()
             ]
         }
@@ -131,7 +151,7 @@ class OrphanVerifier:
         print(f"   [OK] {len(self.views_files)} fichiers views.py")
         print(f"   [OK] {len(self.all_html_files)} fichiers HTML")
 
-    def parse_markdown_report(self) -> Dict[str, List[str]]:
+    def parse_markdown_report(self) -> dict[str, list[str]]:
         """Parse le rapport Markdown pour extraire les fichiers orphelins."""
         print("\n[*] Lecture du rapport Markdown...")
 
@@ -140,15 +160,10 @@ class OrphanVerifier:
             print("Veuillez d'abord executer find_orphan_files.py")
             return {}
 
-        with open(REPORT_PATH, 'r', encoding='utf-8') as f:
+        with open(REPORT_PATH, encoding='utf-8') as f:
             content = f.read()
 
-        orphans = {
-            'python': [],
-            'html': [],
-            'css': [],
-            'js': []
-        }
+        orphans = {'python': [], 'html': [], 'css': [], 'js': []}
 
         # Parser le Markdown pour extraire les fichiers
         current_section = None
@@ -179,13 +194,13 @@ class OrphanVerifier:
 
         return orphans
 
-    def search_in_files(self, search_term: str, files: List[Path]) -> List[str]:
+    def search_in_files(self, search_term: str, files: list[Path]) -> list[str]:
         """Recherche un terme dans une liste de fichiers."""
         references = []
 
         for file_path in files:
             try:
-                with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                with open(file_path, encoding='utf-8', errors='ignore') as f:
                     content = f.read()
 
                     if search_term in content:
@@ -252,13 +267,15 @@ class OrphanVerifier:
                 # Déjà compté dans global_html, mais on marque quand même
 
         # Calculer le score
-        score = sum([
-            found_in_global_py,
-            found_in_global_html,
-            found_in_urls,
-            found_in_views,
-            found_in_templates
-        ])
+        score = sum(
+            [
+                found_in_global_py,
+                found_in_global_html,
+                found_in_urls,
+                found_in_views,
+                found_in_templates,
+            ]
+        )
 
         # Déterminer si vraiment orphelin
         is_orphan = score == 0
@@ -277,14 +294,11 @@ class OrphanVerifier:
             references_found=all_references,
             score=score,
             is_orphan=is_orphan,
-            exception=exception
+            exception=exception,
         )
 
     def get_file_dates(self, filepath: str) -> tuple[str, str]:
         """Récupère les dates de création et modification d'un fichier."""
-        from datetime import datetime
-        import os
-
         # Convertir le chemin relatif en absolu
         full_path = BASE_DIR / filepath.replace('/', os.sep)
 
@@ -306,7 +320,7 @@ class OrphanVerifier:
         except Exception:
             return "N/A", "N/A"
 
-    def verify_all_orphans(self, orphans: Dict[str, List[str]]):
+    def verify_all_orphans(self, orphans: dict[str, list[str]]):
         """Vérifie tous les fichiers orphelins détectés."""
         print("\n[*] Verification des fichiers orphelins...\n")
 
@@ -322,13 +336,15 @@ class OrphanVerifier:
 
                 # Afficher l'exception si elle existe
                 if result.exception:
-                    print(f"       [i] Exception connue : \"{result.exception.reason}\" ({result.exception.category})")
+                    print(
+                        f"       [i] Exception connue : \"{result.exception.reason}\" ({result.exception.category})"
+                    )
                 elif result.is_orphan:
                     print(f"       [!] Aucune reference trouvee (Score {result.score}/5)")
 
                 self.verification_results.append(result)
 
-        print(f"\n[OK] Verification terminee !")
+        print("\n[OK] Verification terminee !")
 
     def interactive_exceptions_update(self):
         """Mode interactif pour documenter/modifier les exceptions."""
@@ -340,12 +356,14 @@ class OrphanVerifier:
 
         exceptions_count = sum(1 for r in orphans_list if r.exception is not None)
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         if exceptions_count > 0:
-            print(f"{len(orphans_list)} fichiers vraiment orphelins (dont {exceptions_count} exception(s) connue(s)).")
+            print(
+                f"{len(orphans_list)} fichiers vraiment orphelins (dont {exceptions_count} exception(s) connue(s))."
+            )
         else:
             print(f"{len(orphans_list)} fichiers vraiment orphelins detectes.")
-        print("="*80)
+        print("=" * 80)
 
         response = input("\nVoulez-vous mettre a jour les exceptions ? (o/n): ").strip().lower()
 
@@ -362,8 +380,16 @@ class OrphanVerifier:
 
             if result.exception:
                 # Exception existante
-                print(f'  Exception actuelle : "{result.exception.reason}" ({result.exception.category})')
-                choice = input("  [m]odifier / [s]upprimer exception / [d]etruire fichier / [c]onserver : ").strip().lower()
+                print(
+                    f'  Exception actuelle : "{result.exception.reason}" ({result.exception.category})'
+                )
+                choice = (
+                    input(
+                        "  [m]odifier / [s]upprimer exception / [d]etruire fichier / [c]onserver : "
+                    )
+                    .strip()
+                    .lower()
+                )
 
                 if choice == 'm':
                     # Modifier
@@ -382,17 +408,15 @@ class OrphanVerifier:
                             '2': 'Bibliotheque externe',
                             '3': 'Inclusion dynamique',
                             '4': 'Deploiement',
-                            '5': 'Autre'
+                            '5': 'Autre',
                         }
                         category = categories.get(cat_choice, 'Autre')
 
                         self.exceptions[result.filename] = FileException(
-                            file=result.filename,
-                            reason=reason,
-                            category=category
+                            file=result.filename, reason=reason, category=category
                         )
                         result.exception = self.exceptions[result.filename]
-                        print(f"  [OK] Exception modifiee\n")
+                        print("  [OK] Exception modifiee\n")
                         updated = True
                     else:
                         print("  [!] Raison vide, modification annulee\n")
@@ -402,7 +426,7 @@ class OrphanVerifier:
                     if result.filename in self.exceptions:
                         del self.exceptions[result.filename]
                         result.exception = None
-                        print(f"  [OK] Exception supprimee\n")
+                        print("  [OK] Exception supprimee\n")
                         updated = True
 
                 elif choice == 'd':
@@ -413,14 +437,14 @@ class OrphanVerifier:
                         del self.exceptions[result.filename]
                         result.exception = None
                         updated = True
-                    print(f"  [OK] Marque pour suppression\n")
+                    print("  [OK] Marque pour suppression\n")
 
                 elif choice == 'c':
                     # Conserver
-                    print(f"  [OK] Exception conservee\n")
+                    print("  [OK] Exception conservee\n")
 
                 else:
-                    print(f"  [!] Choix invalide, exception conservee\n")
+                    print("  [!] Choix invalide, exception conservee\n")
 
             else:
                 # Pas d'exception
@@ -444,17 +468,15 @@ class OrphanVerifier:
                             '2': 'Bibliotheque externe',
                             '3': 'Inclusion dynamique',
                             '4': 'Deploiement',
-                            '5': 'Autre'
+                            '5': 'Autre',
                         }
                         category = categories.get(cat_choice, 'Autre')
 
                         self.exceptions[result.filename] = FileException(
-                            file=result.filename,
-                            reason=reason,
-                            category=category
+                            file=result.filename, reason=reason, category=category
                         )
                         result.exception = self.exceptions[result.filename]
-                        print(f"  [OK] Exception ajoutee\n")
+                        print("  [OK] Exception ajoutee\n")
                         updated = True
                     else:
                         print("  [!] Raison vide, ajout annule\n")
@@ -462,11 +484,11 @@ class OrphanVerifier:
                 elif choice == 'd':
                     # Marquer pour suppression/archivage
                     files_to_delete.append(result.filename)
-                    print(f"  [OK] Marque pour suppression\n")
+                    print("  [OK] Marque pour suppression\n")
 
                 else:
                     # Ignorer (n ou autre)
-                    print(f"  [!] Ignore\n")
+                    print("  [!] Ignore\n")
 
         # Sauvegarder les exceptions si modifiées
         if updated:
@@ -482,10 +504,6 @@ class OrphanVerifier:
 
             if confirm == 'o':
                 try:
-                    import sys
-                    sys.path.insert(0, str(BASE_DIR / 'scripts'))
-                    from archiver_orphelins import archive_orphans
-
                     archived, deleted = archive_orphans(files_to_delete, dry_run=False)
                     print(f"\n[OK] {archived} fichier(s) archive(s) et {deleted} supprime(s).")
                 except Exception as e:
@@ -497,8 +515,6 @@ class OrphanVerifier:
 
     def generate_markdown_report(self):
         """Génère le rapport Markdown avec tableau de vérification."""
-        from datetime import datetime
-
         print("\n[*] Generation du rapport Markdown...")
 
         lines = []
@@ -518,11 +534,17 @@ class OrphanVerifier:
 
         # Tableau de vérification
         lines.append("## 📋 Tableau de Vérification\n\n")
-        lines.append("| Fichier | Type | Recherche Python | Recherche HTML | Dans URLs | Dans Views | Dans Templates | Score | Exception | Verdict |\n")
-        lines.append("|---------|------|------------------|----------------|-----------|------------|----------------|-------|-----------|----------|\n")
+        lines.append(
+            "| Fichier | Type | Recherche Python | Recherche HTML | Dans URLs | Dans Views | Dans Templates | Score | Exception | Verdict |\n"
+        )
+        lines.append(
+            "|---------|------|------------------|----------------|-----------|------------|----------------|-------|-----------|----------|\n"
+        )
 
         # Trier par score (orphelins d'abord)
-        sorted_results = sorted(self.verification_results, key=lambda r: (r.is_orphan, -r.score), reverse=True)
+        sorted_results = sorted(
+            self.verification_results, key=lambda r: (r.is_orphan, -r.score), reverse=True
+        )
 
         for result in sorted_results:
             # Raccourcir le nom du fichier si trop long
@@ -557,19 +579,25 @@ class OrphanVerifier:
                     verdict = "🔴 **ORPHELIN**"
 
             # Créer la ligne avec le nom du fichier et les dates sur deux lignes
-            file_cell = f"`{filename}`<br><small>Créé: {created_date} - Modifié: {modified_date}</small>"
+            file_cell = (
+                f"`{filename}`<br><small>Créé: {created_date} - Modifié: {modified_date}</small>"
+            )
 
-            lines.append(f"| {file_cell} | {result.file_type.upper()} | {py_icon} | {html_icon} | {urls_icon} | {views_icon} | {templates_icon} | {result.score}/5 | {exception_cell} | {verdict} |\n")
+            lines.append(
+                f"| {file_cell} | {result.file_type.upper()} | {py_icon} | {html_icon} | {urls_icon} | {views_icon} | {templates_icon} | {result.score}/5 | {exception_cell} | {verdict} |\n"
+            )
 
         # Section exceptions connues
         exceptions_list = [r for r in sorted_results if r.exception is not None]
         if exceptions_list:
             lines.append("\n---\n\n")
             lines.append("## 🟣 Exceptions Connues\n\n")
-            lines.append("Ces fichiers sont marqués comme orphelins mais ont une justification :\n\n")
+            lines.append(
+                "Ces fichiers sont marqués comme orphelins mais ont une justification :\n\n"
+            )
 
             # Grouper par catégorie
-            by_category: Dict[str, List[VerificationResult]] = {}
+            by_category: dict[str, list[VerificationResult]] = {}
             for result in exceptions_list:
                 category = result.exception.category
                 if category not in by_category:
@@ -587,7 +615,9 @@ class OrphanVerifier:
         if vraiment_orphelins_list:
             lines.append("\n---\n\n")
             lines.append("## 🔴 Fichiers Vraiment Orphelins\n\n")
-            lines.append("Ces fichiers n'ont **aucune référence** dans le projet et **aucune justification** :\n\n")
+            lines.append(
+                "Ces fichiers n'ont **aucune référence** dans le projet et **aucune justification** :\n\n"
+            )
 
             for result in vraiment_orphelins_list:
                 lines.append(f"- `{result.filename}` ({result.file_type.upper()})\n")
@@ -613,12 +643,16 @@ class OrphanVerifier:
         lines.append("- **Dans Views** : Fichier référencé dans views.py\n")
         lines.append("- **Dans Templates** : Template inclus/étendu par d'autres templates\n")
         lines.append("- **Score** : Nombre de types de références trouvées (sur 5)\n\n")
-        lines.append("- **Exception** : Fichier marqué comme exception connue avec justification\n\n")
+        lines.append(
+            "- **Exception** : Fichier marqué comme exception connue avec justification\n\n"
+        )
         lines.append("### Verdicts\n\n")
         lines.append("- 🔴 **ORPHELIN** : Aucune référence trouvée (score = 0)\n")
         lines.append("- 🟡 **À vérifier** : Peu de références (score 1-2)\n")
         lines.append("- 🟢 **Faux positif** : Plusieurs références (score ≥ 3)\n")
-        lines.append("- 🟣 **Exception connue** : Fichier justifié comme nécessaire malgré l'absence de références\n")
+        lines.append(
+            "- 🟣 **Exception connue** : Fichier justifié comme nécessaire malgré l'absence de références\n"
+        )
 
         content = ''.join(lines)
 
@@ -632,9 +666,9 @@ class OrphanVerifier:
 
     def run(self):
         """Lance la vérification complète."""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("VERIFICATION DES FICHIERS ORPHELINS")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         # Collecter les fichiers du projet
         self.collect_project_files()
@@ -659,14 +693,15 @@ class OrphanVerifier:
         total = len(self.verification_results)
         vraiment_orphelins = sum(1 for r in self.verification_results if r.is_orphan)
 
-        print("="*80)
+        print("=" * 80)
         print(f"TOTAL: {total} fichiers verifies")
         print(f"Vraiment orphelins: {vraiment_orphelins}")
         print(f"Faux positifs: {total - vraiment_orphelins}")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
 
 if __name__ == '__main__':
     import os
+
     verifier = OrphanVerifier()
     verifier.run()

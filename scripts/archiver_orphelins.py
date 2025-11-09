@@ -10,12 +10,11 @@ Ce script :
 - Supprime les fichiers originaux
 """
 
+import contextlib
 import os
 import shutil
-from pathlib import Path
 from datetime import datetime
-from typing import List
-
+from pathlib import Path
 
 # Configuration
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +24,7 @@ ARCHIVE_BASE_DIR = BASE_DIR / '.archived_orphans'
 class OrphanArchiver:
     """Classe pour archiver les fichiers orphelins."""
 
-    def __init__(self, orphan_files: List[str], dry_run: bool = False):
+    def __init__(self, orphan_files: list[str], dry_run: bool = False):
         """
         Initialise l'archiveur.
 
@@ -46,9 +45,9 @@ class OrphanArchiver:
 
         if not self.dry_run:
             self.archive_dir.mkdir(parents=True, exist_ok=True)
-            print(f"   [OK] Dossier d'archive cree")
+            print("   [OK] Dossier d'archive cree")
         else:
-            print(f"   [DRY-RUN] Dossier d'archive serait cree")
+            print("   [DRY-RUN] Dossier d'archive serait cree")
 
     def archive_file(self, filepath: str) -> bool:
         """
@@ -109,7 +108,7 @@ class OrphanArchiver:
             print(f"   [ERROR] Erreur lors de la suppression de {filepath}: {e}")
             return False
 
-    def generate_readme(self, archived_files: List[str], deleted_files: List[str]):
+    def generate_readme(self, archived_files: list[str], deleted_files: list[str]):
         """Génère un README.md dans le dossier d'archive."""
         readme_path = self.archive_dir / 'README.md'
 
@@ -159,11 +158,11 @@ rm -rf {self.archive_dir.relative_to(BASE_DIR)}
         if not self.dry_run:
             with open(readme_path, 'w', encoding='utf-8') as f:
                 f.write(content)
-            print(f"\n[OK] README.md genere")
+            print("\n[OK] README.md genere")
         else:
-            print(f"\n[DRY-RUN] README.md serait genere")
+            print("\n[DRY-RUN] README.md serait genere")
 
-    def generate_restore_script(self, archived_files: List[str]):
+    def generate_restore_script(self, archived_files: list[str]):
         """Génère un script restore.sh pour restaurer les fichiers."""
         restore_path = self.archive_dir / 'restore.sh'
 
@@ -203,14 +202,12 @@ echo "Verifiez que les fichiers ont ete correctement restaures."
                 f.write(content)
 
             # Rendre le script exécutable (Unix)
-            try:
+            with contextlib.suppress(Exception):
                 restore_path.chmod(0o755)
-            except Exception:
-                pass
 
-            print(f"[OK] Script restore.sh genere")
+            print("[OK] Script restore.sh genere")
         else:
-            print(f"[DRY-RUN] Script restore.sh serait genere")
+            print("[DRY-RUN] Script restore.sh serait genere")
 
     def run(self) -> tuple[int, int]:
         """
@@ -223,11 +220,11 @@ echo "Verifiez que les fichiers ont ete correctement restaures."
             print("[*] Aucun fichier a archiver.")
             return 0, 0
 
-        print("\n" + "="*80)
-        print(f"ARCHIVAGE DES FICHIERS ORPHELINS")
+        print("\n" + "=" * 80)
+        print("ARCHIVAGE DES FICHIERS ORPHELINS")
         if self.dry_run:
             print("MODE DRY-RUN (simulation uniquement)")
-        print("="*80)
+        print("=" * 80)
 
         # Créer la structure d'archive
         self.create_archive_structure()
@@ -244,7 +241,7 @@ echo "Verifiez que les fichiers ont ete correctement restaures."
 
         # Supprimer les fichiers originaux
         if not self.dry_run:
-            print(f"\n[*] Suppression des fichiers originaux...\n")
+            print("\n[*] Suppression des fichiers originaux...\n")
             for filepath in archived_files:
                 if self.delete_file(filepath):
                     deleted_files.append(filepath)
@@ -255,22 +252,22 @@ echo "Verifiez que les fichiers ont ete correctement restaures."
             self.generate_restore_script(archived_files)
 
         # Résumé
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         if not self.dry_run:
-            print(f"ARCHIVAGE TERMINE")
+            print("ARCHIVAGE TERMINE")
             print(f"Fichiers archives : {len(archived_files)}")
             print(f"Fichiers supprimes : {len(deleted_files)}")
             print(f"Archive creee dans : {self.archive_dir.relative_to(BASE_DIR)}")
         else:
-            print(f"DRY-RUN TERMINE")
+            print("DRY-RUN TERMINE")
             print(f"Fichiers qui seraient archives : {len(archived_files)}")
             print(f"Fichiers qui seraient supprimes : {len(archived_files)}")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         return len(archived_files), len(deleted_files)
 
 
-def archive_orphans(orphan_files: List[str], dry_run: bool = False) -> tuple[int, int]:
+def archive_orphans(orphan_files: list[str], dry_run: bool = False) -> tuple[int, int]:
     """
     Fonction principale pour archiver des fichiers orphelins.
 

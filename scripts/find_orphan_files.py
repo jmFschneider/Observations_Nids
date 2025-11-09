@@ -14,8 +14,8 @@ Et identifie les fichiers qui ne sont jamais référencés.
 import ast
 import os
 import re
+from datetime import datetime
 from pathlib import Path
-from typing import Set, Dict, List
 
 # Configuration du projet
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,24 +33,38 @@ APPS = [
 
 # Fichiers et dossiers à ignorer
 IGNORE_DIRS = {
-    '.git', '.venv', '__pycache__', '.pytest_cache', '.mypy_cache',
-    'migrations', 'htmlcov', '.ruff_cache', 'staticfiles', 'media',
-    '.idea', '.github', '.claude', 'node_modules', 'deployment',
-    'goaccess', 'IA_directives', 'docs'
+    '.git',
+    '.venv',
+    '__pycache__',
+    '.pytest_cache',
+    '.mypy_cache',
+    'migrations',
+    'htmlcov',
+    '.ruff_cache',
+    'staticfiles',
+    'media',
+    '.idea',
+    '.github',
+    '.claude',
+    'node_modules',
+    'deployment',
+    'goaccess',
+    'IA_directives',
+    'docs',
 }
 
 IGNORE_FILES = {
     '__init__.py',  # Toujours nécessaires
-    'apps.py',      # Config Django
-    'admin.py',     # Interface admin Django
-    'tests.py',     # Tests
+    'apps.py',  # Config Django
+    'admin.py',  # Interface admin Django
+    'tests.py',  # Tests
     'conftest.py',  # Config pytest
-    'manage.py',    # Point d'entrée Django
-    'wsgi.py',      # Déploiement
-    'asgi.py',      # Déploiement
+    'manage.py',  # Point d'entrée Django
+    'wsgi.py',  # Déploiement
+    'asgi.py',  # Déploiement
     'settings.py',  # Configuration
-    'celery.py',    # Configuration Celery
-    'config.py',    # Configuration
+    'celery.py',  # Configuration Celery
+    'config.py',  # Configuration
 }
 
 
@@ -58,26 +72,25 @@ class OrphanFileFinder:
     """Classe pour trouver les fichiers orphelins dans le projet."""
 
     def __init__(self):
-        self.all_python_files: Set[Path] = set()
-        self.all_html_files: Set[Path] = set()
-        self.all_css_files: Set[Path] = set()
-        self.all_js_files: Set[Path] = set()
+        self.all_python_files: set[Path] = set()
+        self.all_html_files: set[Path] = set()
+        self.all_css_files: set[Path] = set()
+        self.all_js_files: set[Path] = set()
 
-        self.referenced_python_files: Set[Path] = set()
-        self.referenced_html_files: Set[Path] = set()
-        self.referenced_css_files: Set[Path] = set()
-        self.referenced_js_files: Set[Path] = set()
+        self.referenced_python_files: set[Path] = set()
+        self.referenced_html_files: set[Path] = set()
+        self.referenced_css_files: set[Path] = set()
+        self.referenced_js_files: set[Path] = set()
 
-        self.python_imports: Dict[Path, Set[str]] = {}
-        self.template_references: Dict[Path, Set[str]] = {}
-        self.static_references: Dict[Path, Set[str]] = {}
+        self.python_imports: dict[Path, set[str]] = {}
+        self.template_references: dict[Path, set[str]] = {}
+        self.static_references: dict[Path, set[str]] = {}
 
     def should_ignore(self, path: Path) -> bool:
         """Vérifie si un chemin doit être ignoré."""
-        # Ignorer les dossiers
-        for part in path.parts:
-            if part in IGNORE_DIRS:
-                return True
+        # Ignorer les dossiers dans IGNORE_DIRS
+        if any(part in IGNORE_DIRS for part in path.parts):
+            return True
 
         # Ignorer certains fichiers spécifiques
         if path.name in IGNORE_FILES:
@@ -87,23 +100,12 @@ class OrphanFileFinder:
         if path.name.startswith('test_') or path.name.endswith('_test.py'):
             return True
 
-        # Ignorer les management commands (toujours utilisés via manage.py)
-        if 'management' in path.parts and 'commands' in path.parts:
-            return True
-
-        # Ignorer les scripts utilitaires (scripts/)
-        if 'scripts' in path.parts and path.suffix == '.py':
-            return True
-
-        # Ignorer les fichiers urls.py (toujours utilisés)
-        if path.name == 'urls.py':
-            return True
-
-        # Ignorer les fichiers models.py (toujours utilisés par Django)
-        if path.name == 'models.py':
-            return True
-
-        return False
+        # Ignorer les management commands, scripts, urls.py et models.py
+        return (
+            ('management' in path.parts and 'commands' in path.parts)
+            or ('scripts' in path.parts and path.suffix == '.py')
+            or path.name in ('urls.py', 'models.py')
+        )
 
     def collect_all_files(self):
         """Collecte tous les fichiers du projet."""
@@ -141,7 +143,7 @@ class OrphanFileFinder:
 
         for py_file in self.all_python_files:
             try:
-                with open(py_file, 'r', encoding='utf-8') as f:
+                with open(py_file, encoding='utf-8') as f:
                     content = f.read()
 
                 tree = ast.parse(content, filename=str(py_file))
@@ -154,9 +156,8 @@ class OrphanFileFinder:
                             imports.add(alias.name)
 
                     # Import from: from module import name
-                    elif isinstance(node, ast.ImportFrom):
-                        if node.module:
-                            imports.add(node.module)
+                    elif isinstance(node, ast.ImportFrom) and node.module:
+                        imports.add(node.module)
 
                 self.python_imports[py_file] = imports
 
@@ -171,7 +172,7 @@ class OrphanFileFinder:
                         relative_path = py_candidate.relative_to(BASE_DIR)
                         path_parts = list(relative_path.parts[:-1]) + [relative_path.stem]
 
-                        if path_parts == parts or path_parts[-len(parts):] == parts:
+                        if path_parts == parts or path_parts[-len(parts) :] == parts:
                             self.referenced_python_files.add(py_candidate)
 
             except Exception as e:
@@ -188,7 +189,7 @@ class OrphanFileFinder:
 
         for urls_file in urls_files:
             try:
-                with open(urls_file, 'r', encoding='utf-8') as f:
+                with open(urls_file, encoding='utf-8') as f:
                     content = f.read()
 
                 # Parser le fichier Python
@@ -206,10 +207,12 @@ class OrphanFileFinder:
                                 relative_path = py_file.relative_to(BASE_DIR)
                                 path_parts = list(relative_path.parts[:-1]) + [relative_path.stem]
 
-                                if 'views' in str(py_file):
-                                    # Vérifier si le chemin correspond
-                                    if path_parts[-len(module_parts):] == module_parts:
-                                        self.referenced_python_files.add(py_file)
+                                # Vérifier si le chemin correspond
+                                if (
+                                    'views' in str(py_file)
+                                    and path_parts[-len(module_parts) :] == module_parts
+                                ):
+                                    self.referenced_python_files.add(py_file)
 
                     # Import simple: import app.views
                     elif isinstance(node, ast.Import):
@@ -217,13 +220,15 @@ class OrphanFileFinder:
                             if 'views' in alias.name:
                                 # Marquer comme référencé
                                 for py_file in self.all_python_files:
-                                    if 'views' in str(py_file) and alias.name.split('.')[0] in str(py_file):
+                                    if 'views' in str(py_file) and alias.name.split('.')[0] in str(
+                                        py_file
+                                    ):
                                         self.referenced_python_files.add(py_file)
 
             except Exception as e:
                 print(f"   [WARN] Erreur lors de l'analyse de {urls_file.name}: {e}")
 
-        print(f"   [OK] Analyse des URLs terminee")
+        print("   [OK] Analyse des URLs terminee")
 
     def parse_settings_py(self):
         """Parse settings.py pour détecter middleware et autres fichiers référencés."""
@@ -233,7 +238,7 @@ class OrphanFileFinder:
 
         if settings_file.exists():
             try:
-                with open(settings_file, 'r', encoding='utf-8') as f:
+                with open(settings_file, encoding='utf-8') as f:
                     content = f.read()
 
                 # Chercher les middleware
@@ -254,7 +259,7 @@ class OrphanFileFinder:
             except Exception as e:
                 print(f"   [WARN] Erreur lors de l'analyse de settings.py: {e}")
 
-        print(f"   [OK] Analyse de settings.py terminee")
+        print("   [OK] Analyse de settings.py terminee")
 
     def parse_template_references(self):
         """Parse les références de templates dans les vues Python."""
@@ -271,7 +276,7 @@ class OrphanFileFinder:
 
         for py_file in self.all_python_files:
             try:
-                with open(py_file, 'r', encoding='utf-8') as f:
+                with open(py_file, encoding='utf-8') as f:
                     content = f.read()
 
                 templates = set()
@@ -312,7 +317,7 @@ class OrphanFileFinder:
 
         for html_file in self.all_html_files:
             try:
-                with open(html_file, 'r', encoding='utf-8') as f:
+                with open(html_file, encoding='utf-8') as f:
                     content = f.read()
 
                 templates = set()
@@ -332,7 +337,7 @@ class OrphanFileFinder:
             except Exception as e:
                 print(f"   [WARN] Erreur lors de l'analyse de {html_file.name}: {e}")
 
-        print(f"   [OK] Templates inclus/etendus detectes")
+        print("   [OK] Templates inclus/etendus detectes")
 
     def parse_static_references(self):
         """Parse les références de fichiers statiques dans les templates."""
@@ -341,16 +346,16 @@ class OrphanFileFinder:
         # Patterns pour trouver les fichiers statiques
         patterns = [
             r"{%\s*static\s+['\"]([^'\"]+\.css)['\"]",  # {% static 'file.css' %}
-            r"{%\s*static\s+['\"]([^'\"]+\.js)['\"]",   # {% static 'file.js' %}
+            r"{%\s*static\s+['\"]([^'\"]+\.js)['\"]",  # {% static 'file.js' %}
             r'<link[^>]+href=[\'"]([^>\'"]+\.css)[\'"]',  # <link href="file.css">
             r'<script[^>]+src=[\'"]([^>\'"]+\.js)[\'"]',  # <script src="file.js">
             r'href=[\'"]([^>\'"]+\.css)[\'"]',  # href="file.css"
-            r'src=[\'"]([^>\'"]+\.js)[\'"]',    # src="file.js"
+            r'src=[\'"]([^>\'"]+\.js)[\'"]',  # src="file.js"
         ]
 
         for html_file in self.all_html_files:
             try:
-                with open(html_file, 'r', encoding='utf-8') as f:
+                with open(html_file, encoding='utf-8') as f:
                     content = f.read()
 
                 static_files = set()
@@ -364,23 +369,25 @@ class OrphanFileFinder:
                 # Marquer les fichiers statiques référencés
                 for static_name in static_files:
                     # Nettoyer le nom (enlever /static/ au début si présent)
-                    static_name = static_name.lstrip('/').replace('static/', '')
+                    cleaned_static_name = static_name.lstrip('/').replace('static/', '')
 
                     # Normaliser le chemin (remplacer \ par /)
-                    static_name_normalized = static_name.replace('\\', '/')
+                    static_name_normalized = cleaned_static_name.replace('\\', '/')
 
                     for css_file in self.all_css_files:
                         css_normalized = str(css_file).replace('\\', '/')
                         # Chercher par nom de fichier simple ou par chemin complet
-                        if css_normalized.endswith(static_name_normalized) or \
-                           css_normalized.endswith('/' + static_name_normalized.split('/')[-1]):
+                        if css_normalized.endswith(
+                            static_name_normalized
+                        ) or css_normalized.endswith('/' + static_name_normalized.split('/')[-1]):
                             self.referenced_css_files.add(css_file)
 
                     for js_file in self.all_js_files:
                         js_normalized = str(js_file).replace('\\', '/')
                         # Chercher par nom de fichier simple ou par chemin complet
-                        if js_normalized.endswith(static_name_normalized) or \
-                           js_normalized.endswith('/' + static_name_normalized.split('/')[-1]):
+                        if js_normalized.endswith(static_name_normalized) or js_normalized.endswith(
+                            '/' + static_name_normalized.split('/')[-1]
+                        ):
                             self.referenced_js_files.add(js_file)
 
             except Exception as e:
@@ -389,7 +396,7 @@ class OrphanFileFinder:
         print(f"   [OK] {len(self.referenced_css_files)} fichiers CSS references")
         print(f"   [OK] {len(self.referenced_js_files)} fichiers JS references")
 
-    def find_orphans(self) -> Dict[str, List[Path]]:
+    def find_orphans(self) -> dict[str, list[Path]]:
         """Identifie les fichiers orphelins."""
         print("\n[*] Identification des fichiers orphelins...")
 
@@ -402,10 +409,8 @@ class OrphanFileFinder:
 
         return orphans
 
-    def generate_markdown_report(self, orphans: Dict[str, List[Path]]) -> str:
+    def generate_markdown_report(self, orphans: dict[str, list[Path]]) -> str:
         """Génère le contenu du rapport au format Markdown."""
-        from datetime import datetime
-
         lines = []
         lines.append("# Rapport des Fichiers Orphelins\n")
         lines.append(f"**Date de génération** : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
@@ -450,12 +455,12 @@ class OrphanFileFinder:
 
         return ''.join(lines)
 
-    def generate_report(self, orphans: Dict[str, List[Path]]):
+    def generate_report(self, orphans: dict[str, list[Path]]):
         """Génère un rapport des fichiers orphelins (console + fichier Markdown)."""
         # Affichage console
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("RAPPORT DES FICHIERS ORPHELINS")
-        print("="*80)
+        print("=" * 80)
 
         total_orphans = sum(len(files) for files in orphans.values())
 
@@ -468,24 +473,24 @@ class OrphanFileFinder:
                 if not files:
                     continue
 
-                print(f"\n{'='*80}")
+                print(f"\n{'=' * 80}")
                 print(f"{file_type.upper()} - {len(files)} fichiers orphelins")
-                print(f"{'='*80}\n")
+                print(f"{'=' * 80}\n")
 
                 for file_path in files:
                     relative_path = file_path.relative_to(BASE_DIR)
                     print(f"  - {relative_path}")
 
-            print(f"\n{'='*80}")
+            print(f"\n{'=' * 80}")
             print("NOTES")
-            print(f"{'='*80}\n")
+            print(f"{'=' * 80}\n")
             print("Ce rapport peut contenir des faux positifs :")
             print("  - Fichiers importes dynamiquement")
             print("  - Templates/static utilises via des variables")
             print("  - Fichiers utilises par des bibliotheques externes")
             print("  - Fichiers necessaires pour le deploiement")
             print("\n[!] Verifiez manuellement avant de supprimer un fichier !")
-            print(f"\n{'='*80}\n")
+            print(f"\n{'=' * 80}\n")
 
         # Génération du fichier Markdown
         markdown_content = self.generate_markdown_report(orphans)
