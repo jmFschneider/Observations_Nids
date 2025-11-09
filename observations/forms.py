@@ -83,8 +83,12 @@ class LocalisationForm(forms.ModelForm):
             'latitude': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Latitude'}),
             'longitude': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Longitude'}),
             'altitude': forms.TextInput(attrs={'class': 'form-field', 'placeholder': 'Altitude'}),
-            'paysage': forms.Textarea(attrs={'class': 'section-content', 'rows': 2}),
-            'alentours': forms.Textarea(attrs={'class': 'section-content', 'rows': 2}),
+            'paysage': forms.Textarea(
+                attrs={'class': 'section-content', 'rows': 2, 'placeholder': 'Description du paysage'}
+            ),
+            'alentours': forms.Textarea(
+                attrs={'class': 'section-content', 'rows': 2, 'placeholder': 'Description des alentours'}
+            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -230,7 +234,9 @@ class CausesEchecForm(forms.ModelForm):
             'description',
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'placeholder': 'description'}),
+            'description': forms.Textarea(
+                attrs={'placeholder': 'Description des causes d\'échec', 'rows': 2}
+            ),
         }
 
 

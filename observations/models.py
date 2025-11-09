@@ -42,13 +42,13 @@ class FicheObservation(models.Model):
             Localisation.objects.get_or_create(
                 fiche=self,
                 defaults={
-                    'commune': 'Non spécifiée',
-                    'lieu_dit': 'Non spécifiée',
+                    'commune': '',
+                    'lieu_dit': '',
                     'departement': '00',
                     'coordonnees': '0,0',
                     'altitude': '0',
-                    'paysage': 'Non spécifié',
-                    'alentours': 'Non spécifié',
+                    'paysage': '',
+                    'alentours': '',
                 },
             )
 
@@ -59,7 +59,7 @@ class FicheObservation(models.Model):
                     'nid_prec_t_meme_couple': False,
                     'hauteur_nid': 0,
                     'hauteur_couvert': 0,
-                    'details_nid': 'Aucun détail',
+                    'details_nid': '',
                 },
             )
 
@@ -77,7 +77,7 @@ class FicheObservation(models.Model):
 
             # Créer l'objet CausesEchec s'il n'existe pas
             CausesEchec.objects.get_or_create(
-                fiche=self, defaults={'description': 'Aucune cause identifiée'}
+                fiche=self, defaults={'description': ''}
             )
 
             # Créer l'objet EtatCorrection s'il n'existe pas
@@ -110,7 +110,7 @@ class Nid(models.Model):
     nid_prec_t_meme_couple = models.BooleanField(default=False)
     hauteur_nid = models.IntegerField(null=True, blank=True, default=0)
     hauteur_couvert = models.IntegerField(null=True, blank=True, default=0)
-    details_nid = models.TextField(blank=True, default='Aucun détail')
+    details_nid = models.TextField(blank=True, default='')
 
     def __str__(self):
         return f"Nid de la fiche {self.fiche.num_fiche}"
@@ -123,7 +123,7 @@ class Observation(models.Model):
     date_observation = models.DateTimeField(blank=False, null=False, db_index=True)
     nombre_oeufs = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     nombre_poussins = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    observations = models.TextField(blank=True, default='Aucune observation')
+    observations = models.TextField(blank=True, default='')
 
     class Meta:
         ordering = ['date_observation']
@@ -246,7 +246,7 @@ class CausesEchec(models.Model):
     fiche = models.OneToOneField(
         FicheObservation, on_delete=models.CASCADE, related_name="causes_echec"
     )
-    description = models.TextField(blank=True, default='Aucune cause identifiée')
+    description = models.TextField(blank=True, default='')
 
     def __str__(self):
         return f"Causes d'échec Fiche {self.fiche.num_fiche}"
@@ -254,7 +254,7 @@ class CausesEchec(models.Model):
 
 class Remarque(models.Model):
     fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="remarques")
-    remarque = models.CharField(max_length=200, default='RAS')
+    remarque = models.CharField(max_length=200, blank=True, default='')
     date_remarque = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -321,7 +321,7 @@ class EtatCorrection(models.Model):
             loc = self.fiche.localisation
             if (
                 loc.commune
-                and loc.commune != 'Non spécifiée'
+                and loc.commune.strip()  # Vérifier que la commune n'est pas vide
                 and loc.departement
                 and loc.departement != '00'
             ):

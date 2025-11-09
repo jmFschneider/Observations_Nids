@@ -54,15 +54,15 @@ class Localisation(models.Model):
     fiche = models.OneToOneField(
         'observations.FicheObservation', on_delete=models.CASCADE, related_name="localisation"
     )
-    commune = models.CharField(max_length=100, default='Non spécifiée')
-    lieu_dit = models.CharField(max_length=100, default='Non spécifiée', blank=True)
+    commune = models.CharField(max_length=100, blank=True, default='')
+    lieu_dit = models.CharField(max_length=100, blank=True, default='')
     departement = models.CharField(max_length=100, default='00')
     coordonnees = models.CharField(max_length=30, default='0,0')
     latitude = models.CharField(max_length=15, default='0.0')
     longitude = models.CharField(max_length=15, default='0.0')
     altitude = models.IntegerField(default=0, help_text="Altitude en mètres")
-    paysage = models.TextField(default='Non spécifié')
-    alentours = models.TextField(default='Non spécifié')
+    paysage = models.TextField(blank=True, default='')
+    alentours = models.TextField(blank=True, default='')
 
     # Nouveaux champs pour le géocodage
     precision_gps = models.IntegerField(
