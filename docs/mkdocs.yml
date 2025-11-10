@@ -3,6 +3,7 @@ site_description: Guide utilisateur pour l'application Observations Nids
 dev_addr: '127.0.0.1:8001'
 
 docs_dir: .
+site_dir: ../site-user
 
 # Thème avec support de recherche
 theme:
@@ -16,16 +17,23 @@ theme:
     - navigation.instant
     - navigation.tracking
     - navigation.tabs
-    - navigation.sections
-    - navigation.expand
+    # - navigation.sections  # Désactivé pour permettre le repli
+    # - navigation.expand  # Désactivé : menu replié par défaut
+    - navigation.prune  # Élague automatiquement les sections non pertinentes
     - navigation.top
+    - navigation.indexes  # Permet des pages index pour les sections
     - search.suggest
     - search.highlight
     - search.share
     - content.code.copy
     - toc.follow
+    # - toc.integrate  # Désactivé : TOC séparée à droite au lieu d'intégrée au menu
+
+extra_css:
+  - stylesheets/extra.css
 
 extra_javascript:
+  - javascripts/navigation.js
   - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js
 
 # Plugins
