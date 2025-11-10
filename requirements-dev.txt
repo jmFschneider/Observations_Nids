@@ -121,7 +121,7 @@ django-stubs-ext==5.2.7
     #   django-stubs
 djangorestframework==3.16.1
     # via django-helpdesk
-dnspython==2.7.0
+dnspython==2.8.0
     # via
     #   -r requirements-base.in
     #   eventlet
