@@ -212,7 +212,7 @@ prometheus-client==0.23.1
     # via
     #   -r requirements-base.in
     #   flower
-prompt-toolkit==3.0.51
+prompt-toolkit==3.0.52
     # via
     #   -r requirements-base.in
     #   click-repl
