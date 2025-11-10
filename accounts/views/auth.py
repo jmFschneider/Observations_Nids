@@ -178,17 +178,13 @@ def envoyer_email_rappel_utilisateur(request, user_id):
                 request,
                 f"Un email de rappel a été envoyé à {utilisateur.email}.",
             )
-            logger.info(
-                f"Email de rappel envoyé à {utilisateur.email} par {request.user.username}"
-            )
+            logger.info(f"Email de rappel envoyé à {utilisateur.email} par {request.user.username}")
         else:
             messages.error(
                 request,
                 f"Erreur lors de l'envoi de l'email à {utilisateur.email}.",
             )
-            logger.error(
-                f"Échec de l'envoi de l'email de rappel pour {utilisateur.username}"
-            )
+            logger.error(f"Échec de l'envoi de l'email de rappel pour {utilisateur.username}")
 
         return redirect('accounts:modifier_utilisateur', user_id=user_id)
 
