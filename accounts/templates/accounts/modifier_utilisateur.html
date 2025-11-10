@@ -214,6 +214,45 @@
                             </a>
                         </div>
                     </form>
+
+                    <!-- Formulaire séparé pour envoyer l'email de rappel -->
+                    <div class="mt-4 pt-4 border-top">
+                        <h5 class="mb-3">Actions supplémentaires</h5>
+                        <form method="post" action="{% url 'accounts:envoyer_rappel_utilisateur' utilisateur.id %}">
+                            {% csrf_token %}
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="width: 30%; padding-right: 20px; vertical-align: top;">
+                                        <p class="mb-1"><strong>Email de rappel</strong></p>
+                                        <small class="text-muted">
+                                            Envoie un email à <strong>{{ utilisateur.email }}</strong> avec les informations de son compte et un lien optionnel de réinitialisation de mot de passe.
+                                        </small>
+                                    </td>
+
+                                    <td style="width: 50%; padding-right: 20px; vertical-align: top;">
+                                        <div class="form-group">
+                                            <label for="messagePersonnalise"><strong>Message personnalisé (optionnel) :</strong></label>
+                                            <textarea
+                                                class="form-control"
+                                                id="messagePersonnalise"
+                                                name="message_personnalise"
+                                                rows="4"
+                                                placeholder="Ajoutez un message personnalisé qui sera affiché dans l'email..."></textarea>
+                                            <small class="form-text text-muted">
+                                                Ce message sera affiché en haut de l'email, avant les informations du compte.
+                                            </small>
+                                        </div>
+                                    </td>
+
+                                    <td style="width: 20%; vertical-align: middle; text-align: center;">
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="fas fa-paper-plane"></i> Envoyer l'email
+                                        </button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

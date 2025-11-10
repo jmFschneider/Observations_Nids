@@ -14,9 +14,10 @@ Le domaine utilisateur gère l'authentification, l'autorisation et les notificat
 2. [Workflow d'inscription](#workflow-dinscription)
 3. [Gestion administrative](#gestion-administrative)
 4. [Réinitialisation de mot de passe](#reinitialisation-de-mot-de-passe)
-5. [Suppression d'utilisateurs (Soft Delete)](#suppression-dutilisateurs-soft-delete)
-6. [Sécurité](#securite)
-7. [Requêtes ORM courantes](#requetes-orm-courantes)
+5. [Email de rappel avec message personnalisé](#email-de-rappel-avec-message-personnalise)
+6. [Suppression d'utilisateurs (Soft Delete)](#suppression-dutilisateurs-soft-delete)
+7. [Sécurité](#securite)
+8. [Requêtes ORM courantes](#requetes-orm-courantes)
 
 ---
 
@@ -540,6 +541,395 @@ logger.warning(f"Tentative de réinitialisation avec lien invalide ou expiré")
 
 ---
 
+## Email de rappel avec message personnalisé
+
+### Vue d'ensemble
+
+Cette fonctionnalité permet aux administrateurs d'envoyer un email de rappel aux utilisateurs depuis la page de modification du compte. L'email contient les informations du compte et un lien optionnel de réinitialisation de mot de passe. L'administrateur peut ajouter un message personnalisé qui sera affiché dans l'email.
+
+### Interface utilisateur
+
+**URL** : `/accounts/utilisateurs/<user_id>/modifier/`
+**Permission requise** : Administrateur
+
+#### Présentation
+
+La fonctionnalité est accessible depuis la section "Actions supplémentaires" de la page de modification d'un utilisateur. Elle se présente sous forme d'un tableau à 3 colonnes :
+
+**Colonne 1 (30%)** - Description :
+- Titre : "Email de rappel"
+- Information sur le destinataire (email de l'utilisateur)
+- Explication du contenu de l'email
+
+**Colonne 2 (50%)** - Message personnalisé :
+- Zone de texte (textarea) pour saisir un message optionnel
+- Le message sera affiché dans un encadré en haut de l'email
+- Support des sauts de ligne
+
+**Colonne 3 (20%)** - Action :
+- Bouton "Envoyer l'email"
+- Soumission directe du formulaire
+- Pas de boîte de dialogue modale
+
+### Workflow utilisateur (admin)
+
+```
+1. Admin accède à la page de modification d'un utilisateur
+   └─> Section "Actions supplémentaires"
+       └─> 2. (Optionnel) Saisie d'un message personnalisé
+           └─> 3. Clic sur "Envoyer l'email"
+               └─> 4. Génération du token de réinitialisation
+                   └─> 5. Envoi de l'email avec message personnalisé
+                       └─> 6. Confirmation affichée à l'admin
+```
+
+### Composants implémentés
+
+#### Vue (`accounts/views/auth.py`)
+
+**`envoyer_email_rappel_utilisateur(request, user_id)`**
+
+```python
+@login_required
+@user_passes_test(est_admin)
+def envoyer_email_rappel_utilisateur(request, user_id):
+    """Vue pour envoyer un email de rappel avec message personnalisé"""
+    if request.method == 'POST':
+        utilisateur = get_object_or_404(Utilisateur, id=user_id)
+
+        # Vérifier que l'utilisateur a un email
+        if not utilisateur.email:
+            messages.error(request, f"L'utilisateur n'a pas d'adresse email.")
+            return redirect('accounts:modifier_utilisateur', user_id=user_id)
+
+        # Récupérer le message personnalisé (optionnel)
+        message_personnalise = request.POST.get('message_personnalise', '').strip()
+
+        # Générer le token et l'UID pour la réinitialisation
+        token = default_token_generator.make_token(utilisateur)
+        uid = urlsafe_base64_encode(force_bytes(utilisateur.pk))
+
+        # Envoyer l'email
+        succes = EmailService.envoyer_email_rappel_compte(
+            utilisateur, uid, token, message_personnalise=message_personnalise
+        )
+
+        if succes:
+            messages.success(request, f"Un email de rappel a été envoyé à {utilisateur.email}.")
+            logger.info(f"Email de rappel envoyé à {utilisateur.email} par {request.user.username}")
+        else:
+            messages.error(request, f"Erreur lors de l'envoi de l'email.")
+
+        return redirect('accounts:modifier_utilisateur', user_id=user_id)
+```
+
+**Sécurité** :
+- Accès réservé aux administrateurs via `@user_passes_test(est_admin)`
+- Validation de l'existence de l'utilisateur avec `get_object_or_404`
+- Vérification de la présence d'un email
+- Token sécurisé généré par Django
+
+#### Service Email (`accounts/utils/email_service.py`)
+
+**`EmailService.envoyer_email_rappel_compte(utilisateur, uid, token, message_personnalise="")`**
+
+```python
+@staticmethod
+def envoyer_email_rappel_compte(utilisateur, uid, token, message_personnalise=""):
+    """
+    Envoie un email de rappel avec les données du compte et un lien de
+    réinitialisation de mot de passe optionnel.
+
+    Args:
+        utilisateur: L'utilisateur à qui envoyer le rappel
+        uid: L'UID encodé de l'utilisateur pour le lien de réinitialisation
+        token: Le token de réinitialisation de mot de passe
+        message_personnalise: Message optionnel de l'administrateur (défaut: "")
+
+    Returns:
+        bool: True si l'email a été envoyé avec succès, False sinon
+    """
+```
+
+**Contenu de l'email** :
+- Sujet : `[Observations Nids] Rappel des informations de votre compte`
+- Template : `accounts/emails/rappel_compte_utilisateur.html`
+- Informations du compte (username, nom, prénom, email, rôle, statut)
+- Message personnalisé (si fourni) dans un encadré bleu
+- Lien de connexion
+- Lien de réinitialisation de mot de passe (optionnel, valide 7 jours)
+
+#### Template Email (`accounts/templates/accounts/emails/rappel_compte_utilisateur.html`)
+
+**Structure** :
+```html
+<!-- En-tête -->
+<div class="header">Rappel des informations de votre compte</div>
+
+<!-- Contenu -->
+<div class="content">
+    <p>Bonjour {{ utilisateur.first_name }},</p>
+
+    <!-- Message personnalisé (conditionnel) -->
+    {% if message_personnalise %}
+    <div style="background-color: #e7f3ff; border-left: 4px solid #2196F3; ...">
+        <h4>Message de l'administrateur</h4>
+        <p style="white-space: pre-wrap;">{{ message_personnalise }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Informations du compte -->
+    <div class="info-box">
+        <h3>Informations de votre compte</h3>
+        <p><strong>Nom d'utilisateur :</strong> {{ utilisateur.username }}</p>
+        <p><strong>Email :</strong> {{ utilisateur.email }}</p>
+        <p><strong>Rôle :</strong> {{ utilisateur.get_role_display }}</p>
+        ...
+    </div>
+
+    <!-- Bouton de connexion -->
+    <a href="http://{{ site_url }}/login/" class="button">Se connecter</a>
+
+    <!-- Section réinitialisation (optionnelle) -->
+    <div class="reset-box">
+        <h3>Réinitialisation du mot de passe (optionnel)</h3>
+        <p>Important : Si vous n'utilisez pas ce lien, votre mot de passe
+           reste inchangé.</p>
+    </div>
+
+    <a href="{{ reset_url }}" class="button button-warning">
+        Réinitialiser mon mot de passe
+    </a>
+</div>
+```
+
+**Design** :
+- Email HTML responsive
+- Style inline pour compatibilité email
+- Encadré bleu pour le message personnalisé
+- Support des sauts de ligne (`white-space: pre-wrap`)
+- Boutons CTA distincts pour connexion et réinitialisation
+
+#### Template Page (`accounts/templates/accounts/modifier_utilisateur.html`)
+
+**Section "Actions supplémentaires"** :
+
+```html
+<div class="mt-4 pt-4 border-top">
+    <h5 class="mb-3">Actions supplémentaires</h5>
+    <form method="post" action="{% url 'accounts:envoyer_rappel_utilisateur' utilisateur.id %}">
+        {% csrf_token %}
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <!-- Colonne 1 : Description -->
+                <td style="width: 30%; padding-right: 20px; vertical-align: top;">
+                    <p class="mb-1"><strong>Email de rappel</strong></p>
+                    <small class="text-muted">
+                        Envoie un email à <strong>{{ utilisateur.email }}</strong>
+                        avec les informations de son compte et un lien optionnel
+                        de réinitialisation de mot de passe.
+                    </small>
+                </td>
+
+                <!-- Colonne 2 : Message personnalisé -->
+                <td style="width: 50%; padding-right: 20px; vertical-align: top;">
+                    <div class="form-group">
+                        <label for="messagePersonnalise">
+                            <strong>Message personnalisé (optionnel) :</strong>
+                        </label>
+                        <textarea
+                            class="form-control"
+                            id="messagePersonnalise"
+                            name="message_personnalise"
+                            rows="4"
+                            placeholder="Ajoutez un message personnalisé...">
+                        </textarea>
+                        <small class="form-text text-muted">
+                            Ce message sera affiché en haut de l'email,
+                            avant les informations du compte.
+                        </small>
+                    </div>
+                </td>
+
+                <!-- Colonne 3 : Bouton d'action -->
+                <td style="width: 20%; vertical-align: middle; text-align: center;">
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-paper-plane"></i> Envoyer l'email
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+```
+
+**Avantages de cette présentation** :
+- ✅ Tout visible en un coup d'œil
+- ✅ Pas de modal à ouvrir
+- ✅ Saisie rapide du message
+- ✅ Action directe en un clic
+
+#### URLs (`accounts/urls.py`)
+
+```python
+path(
+    'utilisateurs/<int:user_id>/envoyer-rappel/',
+    auth.envoyer_email_rappel_utilisateur,
+    name='envoyer_rappel_utilisateur',
+),
+```
+
+### Cas d'usage
+
+#### 1. Rappel simple sans message
+
+**Situation** : Un utilisateur a demandé ses identifiants.
+
+**Actions** :
+1. Admin accède à `/accounts/utilisateurs/<id>/modifier/`
+2. Clique sur "Envoyer l'email" (sans message personnalisé)
+3. L'utilisateur reçoit un email avec ses informations
+
+**Email reçu** :
+- Informations du compte
+- Lien de connexion
+- Lien de réinitialisation de mot de passe (optionnel)
+
+#### 2. Rappel avec message personnalisé
+
+**Situation** : Suite à un contact téléphonique, l'admin veut envoyer un message personnalisé.
+
+**Exemple de message** :
+```
+Bonjour,
+
+Suite à notre discussion téléphonique de ce jour, voici un rappel
+de vos informations de connexion.
+
+Si vous rencontrez des difficultés, n'hésitez pas à me recontacter.
+
+Cordialement,
+L'équipe Observations Nids
+```
+
+**Email reçu** :
+- **Encadré bleu** avec le message de l'admin
+- Informations du compte
+- Lien de connexion
+- Lien de réinitialisation de mot de passe (optionnel)
+
+#### 3. Réinitialisation guidée
+
+**Situation** : L'utilisateur a perdu son mot de passe mais contacter l'admin.
+
+**Message admin** :
+```
+Vous avez signalé avoir perdu votre mot de passe.
+
+Utilisez le lien de réinitialisation ci-dessous pour créer un nouveau
+mot de passe. Ce lien est valide pendant 7 jours.
+
+Si vous n'utilisez pas le lien, votre mot de passe actuel reste valide.
+```
+
+**Email reçu** :
+- Encadré avec instructions personnalisées
+- Informations du compte
+- **Mise en avant** du lien de réinitialisation
+
+### Sécurité
+
+#### Token de réinitialisation
+
+- Utilise `django.contrib.auth.tokens.default_token_generator`
+- Token unique basé sur le timestamp et le hash du mot de passe
+- Valide pendant 7 jours par défaut
+- Invalide automatiquement après changement de mot de passe
+- UID encodé en base64 URL-safe
+
+#### Protection des données
+
+- Seuls les administrateurs peuvent envoyer ces emails
+- Vérification de l'existence de l'utilisateur
+- Message personnalisé non stocké (transmission directe)
+- Email envoyé uniquement à l'adresse enregistrée
+
+#### Logs
+
+```python
+# Email envoyé avec succès
+logger.info(f"Email de rappel envoyé à {utilisateur.email} par {request.user.username}")
+
+# Erreur d'envoi
+logger.error(f"Échec de l'envoi de l'email de rappel pour {utilisateur.username}")
+```
+
+### Configuration requise
+
+#### Variables d'environnement
+
+Voir [Réinitialisation de mot de passe](#reinitialisation-de-mot-de-passe) pour la configuration SMTP.
+
+#### Settings Django
+
+```python
+# Expéditeur des emails
+DEFAULT_FROM_EMAIL = 'noreply@observations-nids.fr'
+
+# Hôte pour construire les URLs
+ALLOWED_HOSTS = ['127.0.0.1', 'observations-nids.fr']
+
+# Mode développement/production
+DEBUG = True  # False en production
+```
+
+### Différences avec la réinitialisation de mot de passe
+
+| Fonctionnalité | Email de rappel | Réinitialisation MDP |
+|----------------|-----------------|----------------------|
+| **Initié par** | Administrateur | Utilisateur |
+| **Accès** | Page admin | Page publique |
+| **Message personnalisé** | ✅ Oui | ❌ Non |
+| **Informations compte** | ✅ Oui | ❌ Non |
+| **Lien réinitialisation** | ✅ Optionnel | ✅ Principal |
+| **Lien connexion** | ✅ Oui | ❌ Non |
+| **Cas d'usage** | Support utilisateur | Mot de passe oublié |
+
+### Points d'attention
+
+**⚠️ Message personnalisé**
+- Non stocké en base de données
+- Transmis directement dans l'email
+- Support des sauts de ligne (`\n`)
+- Pas de limite de caractères (raisonnable pour un email)
+
+**⚠️ Lien de réinitialisation**
+- Toujours inclus dans l'email
+- L'utilisateur peut choisir de l'utiliser ou non
+- Si non utilisé, le mot de passe actuel reste valide
+- Même système de sécurité que la réinitialisation standard
+
+**⚠️ Différence avec email automatique**
+- Email de validation : Automatique lors de la validation du compte
+- Email de rappel : Manuel, à la demande de l'admin, avec message personnalisé
+
+### Monitoring et logs
+
+**Événements logués** :
+
+```python
+# Succès
+logger.info(f"Email de rappel envoyé à {utilisateur.email} par {request.user.username}")
+
+# Échec
+logger.error(f"Échec de l'envoi de l'email de rappel pour {utilisateur.username}")
+
+# Utilisateur sans email
+logger.warning(f"L'utilisateur {utilisateur.username} n'a pas d'email")
+```
+
+---
+
 ## Suppression d'utilisateurs (Soft Delete)
 
 ### Concept
@@ -847,4 +1237,4 @@ Si un utilisateur est supprimé :
 
 ---
 
-*Dernière mise à jour : 2025-10-24*
+*Dernière mise à jour : 2025-11-10*
