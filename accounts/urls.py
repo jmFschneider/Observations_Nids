@@ -14,6 +14,11 @@ urlpatterns = [
         name='modifier_utilisateur',
     ),
     path(
+        'utilisateurs/<int:user_id>/envoyer-rappel/',
+        auth.envoyer_email_rappel_utilisateur,
+        name='envoyer_rappel_utilisateur',
+    ),
+    path(
         'utilisateurs/<int:user_id>/desactiver/',
         auth.desactiver_utilisateur,
         name='desactiver_utilisateur',

@@ -148,6 +148,52 @@ def modifier_utilisateur(request, user_id):
 
 @login_required
 @user_passes_test(est_admin)
+def envoyer_email_rappel_utilisateur(request, user_id):
+    """Vue pour envoyer un email de rappel des informations du compte à l'utilisateur"""
+    if request.method == 'POST':
+        utilisateur = get_object_or_404(Utilisateur, id=user_id)
+
+        # Vérifier que l'utilisateur a un email
+        if not utilisateur.email:
+            messages.error(
+                request,
+                f"L'utilisateur {utilisateur.username} n'a pas d'adresse email.",
+            )
+            return redirect('accounts:modifier_utilisateur', user_id=user_id)
+
+        # Récupérer le message personnalisé (optionnel)
+        message_personnalise = request.POST.get('message_personnalise', '').strip()
+
+        # Générer le token et l'UID pour la réinitialisation de mot de passe
+        token = default_token_generator.make_token(utilisateur)
+        uid = urlsafe_base64_encode(force_bytes(utilisateur.pk))
+
+        # Envoyer l'email
+        succes = EmailService.envoyer_email_rappel_compte(
+            utilisateur, uid, token, message_personnalise=message_personnalise
+        )
+
+        if succes:
+            messages.success(
+                request,
+                f"Un email de rappel a été envoyé à {utilisateur.email}.",
+            )
+            logger.info(f"Email de rappel envoyé à {utilisateur.email} par {request.user.username}")
+        else:
+            messages.error(
+                request,
+                f"Erreur lors de l'envoi de l'email à {utilisateur.email}.",
+            )
+            logger.error(f"Échec de l'envoi de l'email de rappel pour {utilisateur.username}")
+
+        return redirect('accounts:modifier_utilisateur', user_id=user_id)
+
+    # Si ce n'est pas une requête POST, rediriger vers la page de modification
+    return redirect('accounts:modifier_utilisateur', user_id=user_id)
+
+
+@login_required
+@user_passes_test(est_admin)
 def desactiver_utilisateur(request, user_id):
     """Vue pour désactiver un utilisateur (soft delete)"""
     if request.method == 'POST':
