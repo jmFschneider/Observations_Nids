@@ -1,3 +1,101 @@
+# 12 Janvier 2025 - Gestion Heure d'Observation et Bandeaux Environnement
+
+## Fonctionnalités
+
+### Gestion Flexible de l'Heure d'Observation (#HObservation)
+- **Nouveau champ** : Ajout du champ booléen `heure_connue` au modèle `Observation`
+- **Contexte** : Certaines fiches papier historiques ne mentionnent pas l'heure d'observation
+- **Comportement** :
+  - Par défaut : `heure_connue=True` (heure renseignée)
+  - Si `heure_connue=False` : Heure automatiquement mise à 00:00:00
+  - Interface utilisateur : Checkbox "Heure connue" dans les formulaires
+
+- **Interaction intelligente (JavaScript)** :
+  - ✅ Décocher "Heure connue" → L'heure passe automatiquement à 00:00
+  - ✅ Saisir une heure ≠ 00:00 → La checkbox se coche automatiquement
+  - ✅ Fonctionne sur toutes les lignes d'observations indépendamment
+
+- **Affichage conditionnel** :
+  - Si `heure_connue=True` : Affichage "15/01/2025 14:30"
+  - Si `heure_connue=False` : Affichage "15/01/2025" (sans heure)
+
+- **Fichiers modifiés** :
+  - Backend :
+    - `observations/models.py` : Ajout champ `heure_connue` + modification `__str__()`
+    - `observations/forms.py` : Ajout au formulaire avec validation automatique
+    - `observations/views/saisie_observation_view.py` : Intégration dans les formsets
+    - Migration : `observations/migrations/0008_observation_heure_connue.py`
+  - Frontend :
+    - `observations/templates/saisie/saisie_observation_optimise.html` : Colonne "Heure connue"
+    - `observations/templates/saisie/ajouter_observation.html` : Champ + JavaScript
+    - `observations/templates/fiche_observation.html` : Affichage conditionnel
+    - `observations/static/Observations/js/saisie_observation.js` : Logique interactive (93 lignes)
+
+### Système de Bandeaux d'Environnement
+- **Nouvelle configuration** : Variable `ENVIRONMENT` pour identifier l'environnement d'exécution
+- **Valeurs possibles** :
+  - `development` : 🔧 Bandeau rouge "ENVIRONNEMENT DE DÉVELOPPEMENT"
+  - `pilote` : 🧪 Bandeau vert "ENVIRONNEMENT PILOTE"
+  - `production` : Aucun bandeau
+
+- **Avantages** :
+  - ✅ Visibilité immédiate de l'environnement
+  - ✅ Évite les confusions entre dev/pilote/prod
+  - ✅ Gestion centralisée via fichier `.env`
+  - ✅ Bandeau sticky (reste visible lors du scroll)
+
+- **Configuration `.env`** :
+  ```env
+  # Développement
+  ENVIRONMENT=development
+  DEBUG=True
+
+  # Pilote
+  ENVIRONMENT=pilote
+  DEBUG=False
+
+  # Production
+  ENVIRONMENT=production
+  DEBUG=False
+  ```
+
+- **Fichiers modifiés** :
+  - `observations_nids/config.py` : Ajout champ `ENVIRONMENT` dans Settings
+  - `observations_nids/settings.py` : Lecture de `ENVIRONMENT`
+  - `observations_nids/context_processors.py` : Nouveau context processor
+  - `templates/base.html` : Affichage conditionnel des bandeaux
+  - `observations_nids/settings.py` : Enregistrement du context processor
+
+## Techniques Utilisées
+
+### JavaScript Avancé
+- **querySelector sur ligne spécifique** : Utilisation de `observationRow.querySelector()` au lieu de `document.querySelector()` pour gérer correctement les formsets multiples
+- **Protection contre double initialisation** : Flag `heureConnueInitialized` pour éviter d'attacher plusieurs fois les event listeners
+- **MutationObserver** : Détection automatique des nouvelles lignes ajoutées dynamiquement au tableau
+
+### Django Best Practices
+- **Context processor custom** : Injection automatique de `environment` dans tous les templates
+- **Pydantic Settings** : Validation de la variable `ENVIRONMENT` avec valeur par défaut
+- **Migration backward-compatible** : Toutes les observations existantes gardent `heure_connue=True`
+- **Form validation** : Méthode `clean()` pour normaliser automatiquement l'heure à 00:00
+
+## Statistiques
+
+- **Migration de données** : 1 nouvelle colonne `heure_connue` (default=True)
+- **Code JavaScript** : +93 lignes pour la gestion interactive
+- **Templates modifiés** : 3 templates (saisie, ajout, visualisation)
+- **Nouveaux fichiers** : 1 context processor, 1 migration
+- **Tests recommandés** : Vérifier le comportement sur fiches avec/sans heure
+
+## Documentation Utilisateur
+
+**Pour les observateurs** :
+- Lors de la saisie d'une observation, si l'heure n'est pas connue, il suffit de décocher la case "Heure connue"
+- L'heure sera automatiquement enregistrée à 00:00 mais ne s'affichera pas dans les vues
+- Si vous saisissez une heure par erreur, décochez simplement la case pour la masquer
+
+---
+
 # 1 Novembre 2025 - Amélioration Interface et Nettoyage
 
 ## Interface Utilisateur

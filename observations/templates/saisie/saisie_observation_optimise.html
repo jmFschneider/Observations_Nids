@@ -222,6 +222,7 @@
                     <thead>
                         <tr>
                             <th>Date</th>
+                            <th style="text-align: center;">Heure connue</th>
                             <th>Nombre d'œufs</th>
                             <th>Nombre de poussins</th>
                             <th>Observations</th>
@@ -239,6 +240,10 @@
                                 <td>
                                     {% if form.date_observation.errors %}<div class="error">{{ form.date_observation.errors }}</div>{% endif %}
                                     {{ form.date_observation }}
+                                </td>
+                                <td style="text-align: center;">
+                                    {{ form.heure_connue }}
+                                    <label for="{{ form.heure_connue.id_for_label }}" style="margin-left: 5px; font-size: 0.9em; cursor: pointer;">Heure connue</label>
                                 </td>
                                 <td>
                                     {% if form.nombre_oeufs.errors %}<div class="error">{{ form.nombre_oeufs.errors }}</div>{% endif %}

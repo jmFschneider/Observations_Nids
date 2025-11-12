@@ -119,6 +119,9 @@ class Observation(models.Model):
         'FicheObservation', on_delete=models.CASCADE, related_name="observations"
     )
     date_observation = models.DateTimeField(blank=False, null=False, db_index=True)
+    heure_connue = models.BooleanField(
+        default=True, help_text="Indique si l'heure d'observation est connue"
+    )
     nombre_oeufs = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     nombre_poussins = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     observations = models.TextField(blank=True, default='')
@@ -127,7 +130,11 @@ class Observation(models.Model):
         ordering = ['date_observation']
 
     def __str__(self):
-        return f"Observation du {self.date_observation.strftime('%d/%m/%Y %H:%M')} (Fiche {self.fiche.num_fiche})"
+        if self.heure_connue:
+            date_str = self.date_observation.strftime('%d/%m/%Y %H:%M')
+        else:
+            date_str = self.date_observation.strftime('%d/%m/%Y')
+        return f"Observation du {date_str} (Fiche {self.fiche.num_fiche})"
 
     def save(self, *args, **kwargs):
         logger.info(

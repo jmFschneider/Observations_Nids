@@ -25,7 +25,13 @@
                 <tbody>
                     {% for observation in fiche.observations.all %}
                     <tr>
-                        <td>{{ observation.date_observation|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if observation.heure_connue %}
+                                {{ observation.date_observation|date:"d/m/Y H:i" }}
+                            {% else %}
+                                {{ observation.date_observation|date:"d/m/Y" }}
+                            {% endif %}
+                        </td>
                         <td>{{ observation.nombre_oeufs }}</td>
                         <td>{{ observation.nombre_poussins }}</td>
                         <td>{{ observation.observations }}</td>
@@ -49,6 +55,18 @@
                 {% if form.date_observation.errors %}
                     <div class="error">{{ form.date_observation.errors }}</div>
                 {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.heure_connue.id_for_label }}">
+                    {{ form.heure_connue }} {{ form.heure_connue.label }}
+                </label>
+                {% if form.heure_connue.errors %}
+                    <div class="error">{{ form.heure_connue.errors }}</div>
+                {% endif %}
+                <small style="display: block; color: #6c757d; margin-top: 5px;">
+                    Décochez cette case si l'heure d'observation n'est pas connue
+                </small>
             </div>
 
             <div class="form-group">
@@ -201,6 +219,51 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    // Gestion du champ "Heure connue"
+    const dateInput = document.querySelector('input[name="date_observation"]');
+    const heureCheckbox = document.querySelector('input[name="heure_connue"]');
+
+    if (dateInput && heureCheckbox) {
+        // Fonction pour mettre l'heure à 00:00
+        function setTimeToMidnight() {
+            const dateValue = dateInput.value;
+            if (!dateValue) return;
+
+            const dateOnly = dateValue.split('T')[0];
+            if (dateOnly) {
+                dateInput.value = dateOnly + 'T00:00';
+            }
+        }
+
+        // Quand la checkbox change
+        heureCheckbox.addEventListener('change', function() {
+            if (!this.checked) {
+                setTimeToMidnight();
+            }
+        });
+
+        // Quand l'utilisateur modifie la date/heure
+        dateInput.addEventListener('change', function() {
+            const dateValue = this.value;
+            if (!dateValue) return;
+
+            const timePart = dateValue.split('T')[1];
+            if (timePart && timePart !== '00:00') {
+                heureCheckbox.checked = true;
+            }
+        });
+
+        dateInput.addEventListener('input', function() {
+            const dateValue = this.value;
+            if (!dateValue) return;
+
+            const timePart = dateValue.split('T')[1];
+            if (timePart && timePart !== '00:00') {
+                heureCheckbox.checked = true;
+            }
+        });
+    }
 });
 </script>
 

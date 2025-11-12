@@ -96,7 +96,13 @@
 			<tbody>
 				{% for observation in observations %}
 				<tr>
-					<td>{{ observation.date_observation|date:"d/m/Y H:i" }}</td>
+					<td>
+						{% if observation.heure_connue %}
+							{{ observation.date_observation|date:"d/m/Y H:i" }}
+						{% else %}
+							{{ observation.date_observation|date:"d/m/Y" }}
+						{% endif %}
+					</td>
 					<td>{{ observation.nombre_oeufs }}</td>
 					<td>{{ observation.nombre_poussins }}</td>
 					<td>{{ observation.observations }}</td>
