@@ -58,3 +58,7 @@ docs/docs/todo/
 
 # Archives de fichiers orphelins
 .archived_orphans/
+/site-dev/
+
+# Claude
+.claude/settings.local.json
