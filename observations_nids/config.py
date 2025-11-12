@@ -55,6 +55,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     DEBUG: bool = False
     ALLOWED_HOSTS: list[str] = Field(default_factory=lambda: ["localhost", "127.0.0.1"])
+    ENVIRONMENT: str = "production"  # Valeurs possibles : production, pilote, development
 
     gemini_api_key: str | None = None
     celery: CelerySettings = Field(default_factory=CelerySettings)

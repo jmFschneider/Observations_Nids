@@ -816,4 +816,105 @@ document.addEventListener('DOMContentLoaded', function() {
             );
         });
     }
+
+    // ====================================
+    // Gestion du champ "Heure connue" pour les observations
+    // ====================================
+
+    // Fonction pour obtenir/définir uniquement la date (sans heure) d'un datetime-local
+    function getDateOnly(datetimeValue) {
+        if (!datetimeValue) return '';
+        return datetimeValue.split('T')[0];
+    }
+
+    function setTimeToMidnight(dateInput) {
+        const dateOnly = getDateOnly(dateInput.value);
+        if (dateOnly) {
+            dateInput.value = dateOnly + 'T00:00';
+        }
+    }
+
+    // Fonction pour initialiser les gestionnaires d'événements pour une ligne d'observation
+    function initHeureConnueHandlers(observationRow) {
+        // Éviter d'initialiser deux fois la même ligne
+        if (observationRow.dataset.heureConnueInitialized === 'true') {
+            return;
+        }
+
+        const prefix = observationRow.dataset.formPrefix;
+        if (!prefix) return;
+
+        // IMPORTANT: Chercher dans la ligne (observationRow) plutôt que dans tout le document
+        const dateInput = observationRow.querySelector(`input[name="${prefix}-date_observation"]`);
+        const heureCheckbox = observationRow.querySelector(`input[name="${prefix}-heure_connue"]`);
+
+        if (!dateInput || !heureCheckbox) return;
+
+        // Marquer comme initialisé
+        observationRow.dataset.heureConnueInitialized = 'true';
+
+        // Initialisation : si heure_connue est décoché, mettre l'heure à 00:00
+        if (!heureCheckbox.checked && dateInput.value) {
+            setTimeToMidnight(dateInput);
+        }
+
+        // Gestionnaire pour la checkbox
+        heureCheckbox.addEventListener('change', function() {
+            if (!this.checked) {
+                // Si décoché, mettre l'heure à 00:00
+                setTimeToMidnight(dateInput);
+            }
+        });
+
+        // Gestionnaire pour le champ date/heure
+        dateInput.addEventListener('change', function() {
+            const dateValue = this.value;
+            if (!dateValue) return;
+
+            // Extraire l'heure
+            const timePart = dateValue.split('T')[1];
+
+            // Si l'utilisateur a saisi une heure différente de 00:00, cocher la checkbox
+            if (timePart && timePart !== '00:00') {
+                heureCheckbox.checked = true;
+            }
+        });
+
+        // Aussi surveiller l'input en temps réel (pour les modifications manuelles)
+        dateInput.addEventListener('input', function() {
+            const dateValue = this.value;
+            if (!dateValue) return;
+
+            const timePart = dateValue.split('T')[1];
+
+            // Si l'utilisateur modifie l'heure manuellement et que ce n'est pas 00:00
+            if (timePart && timePart !== '00:00') {
+                heureCheckbox.checked = true;
+            }
+        });
+    }
+
+    // Initialiser tous les gestionnaires pour les lignes d'observation existantes
+    document.querySelectorAll('.observation-row').forEach(row => {
+        initHeureConnueHandlers(row);
+    });
+
+    // Observer les changements dans le DOM pour gérer les nouvelles lignes ajoutées dynamiquement
+    const observationsTable = document.querySelector('.observations-table tbody');
+    if (observationsTable) {
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType === 1 && node.classList.contains('observation-row')) {
+                        initHeureConnueHandlers(node);
+                    }
+                });
+            });
+        });
+
+        observer.observe(observationsTable, {
+            childList: true,
+            subtree: true
+        });
+    }
 });

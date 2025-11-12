@@ -40,6 +40,9 @@ SECRET_KEY = settings.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = settings.DEBUG
 
+# Environment identifier (production, pilote, development)
+ENVIRONMENT = settings.ENVIRONMENT
+
 _local: ModuleType | None  # <- type déclaré une fois
 
 # Surcharge via settings_local.py (facultatif)
@@ -140,6 +143,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.media',
                 'django.contrib.messages.context_processors.messages',
+                'observations_nids.context_processors.environment',
             ],
         },
     },

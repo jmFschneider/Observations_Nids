@@ -197,7 +197,7 @@ def saisie_observation(request, fiche_id=None):
         FicheObservation,
         Observation,
         form=ObservationForm,
-        fields=['date_observation', 'nombre_oeufs', 'nombre_poussins', 'observations'],
+        fields=['date_observation', 'heure_connue', 'nombre_oeufs', 'nombre_poussins', 'observations'],
         extra=0,
         can_delete=True,
         validate_min=False,
@@ -466,6 +466,7 @@ def saisie_observation(request, fiche_id=None):
                             # Nouvelle observation
                             for field_name in [
                                 'date_observation',
+                                'heure_connue',
                                 'nombre_oeufs',
                                 'nombre_poussins',
                                 'observations',
