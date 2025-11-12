@@ -1,6 +1,7 @@
 """
 Context processors for observations_nids project.
 """
+
 from django.conf import settings
 
 

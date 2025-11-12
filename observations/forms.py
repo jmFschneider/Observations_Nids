@@ -108,7 +108,13 @@ class LocalisationForm(forms.ModelForm):
 class ObservationForm(forms.ModelForm):
     class Meta:
         model = Observation
-        fields = ['date_observation', 'heure_connue', 'nombre_oeufs', 'nombre_poussins', 'observations']
+        fields = [
+            'date_observation',
+            'heure_connue',
+            'nombre_oeufs',
+            'nombre_poussins',
+            'observations',
+        ]
         widgets = {
             'date_observation': forms.DateTimeInput(
                 attrs={'type': 'datetime-local', 'class': 'clear-on-focus'}, format='%Y-%m-%dT%H:%M'
@@ -154,7 +160,9 @@ class ObservationForm(forms.ModelForm):
 
         # Si l'heure n'est pas connue, on la met à 00:00:00
         if not heure_connue:
-            cleaned_data['date_observation'] = date_observation.replace(hour=0, minute=0, second=0, microsecond=0)
+            cleaned_data['date_observation'] = date_observation.replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
 
         return cleaned_data
 
