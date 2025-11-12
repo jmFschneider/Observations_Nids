@@ -130,12 +130,9 @@
                     <td onclick="event.stopPropagation();">
                         <div class="btn-group" role="group">
                             {% if not utilisateur.est_valide %}
-                                <form method="post" action="{% url 'accounts:valider_utilisateur' utilisateur.id %}" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Valider le compte de {{ utilisateur.username }} ?');">
-                                        <i class="fas fa-check-circle"></i> Valider
-                                    </button>
-                                </form>
+                                <a href="{% url 'accounts:page_validation_utilisateur' utilisateur.id %}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-user-check"></i> Traiter la demande
+                                </a>
                             {% endif %}
 
                             <a href="{% url 'accounts:modifier_utilisateur' utilisateur.id %}" class="btn btn-sm btn-info">

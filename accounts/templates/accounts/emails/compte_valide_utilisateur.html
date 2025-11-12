@@ -73,6 +73,13 @@
     <div class="content">
         <p>Bonjour {{ utilisateur.first_name }},</p>
 
+        {% if message_personnalise %}
+        <div class="info-box" style="background-color: #e7f3ff; border-left: 4px solid #007bff;">
+            <p style="margin: 0;"><strong>Message de l'administrateur :</strong></p>
+            <p style="margin: 10px 0 0 0;">{{ message_personnalise|linebreaks }}</p>
+        </div>
+        {% endif %}
+
         <div class="success-box">
             <h2>Félicitations !</h2>
             <p>Votre demande de compte sur <strong>Observations Nids</strong> a été approuvée par un administrateur.</p>

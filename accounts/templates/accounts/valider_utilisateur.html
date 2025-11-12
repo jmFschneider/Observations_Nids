@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-clock"></i> Validation du compte de l'utilisateur {{ utilisateur.username }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Ce compte est en attente de validation. Vous pouvez modifier certaines informations ci-dessous avant de prendre une décision.
+                    </div>
+
+                    <!-- Formulaire de modification des informations -->
+                    <form method="post" action="{% url 'accounts:valider_utilisateur' utilisateur.id %}" id="formValidation">
+                        {% csrf_token %}
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 30%;">Nom d'utilisateur :</th>
+                                    <td>{{ utilisateur.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Prénom :</th>
+                                    <td>{{ utilisateur.first_name|default:"<em>Non renseigné</em>" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nom :</th>
+                                    <td>{{ utilisateur.last_name|default:"<em>Non renseigné</em>" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email :</th>
+                                    <td>
+                                        <input type="email" name="email" class="form-control" value="{{ utilisateur.email }}" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Rôle :</th>
+                                    <td>
+                                        <select name="role" class="form-control">
+                                            <option value="observateur" {% if utilisateur.role == 'observateur' %}selected{% endif %}>Observateur</option>
+                                            <option value="reviewer" {% if utilisateur.role == 'reviewer' %}selected{% endif %}>Reviewer</option>
+                                            <option value="administrateur" {% if utilisateur.role == 'administrateur' %}selected{% endif %}>Administrateur</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Validation :</th>
+                                    <td>
+                                        <div class="form-check">
+                                            <input type="checkbox" name="est_valide" id="est_valide" class="form-check-input" {% if utilisateur.est_valide %}checked{% endif %}>
+                                            <label class="form-check-label" for="est_valide">Utilisateur validé</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Statut :</th>
+                                    <td>
+                                        <div class="form-check">
+                                            <input type="checkbox" name="is_active" id="is_active" class="form-check-input" {% if utilisateur.is_active %}checked{% endif %}>
+                                            <label class="form-check-label" for="is_active">Utilisateur actif</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Transcription :</th>
+                                    <td>
+                                        <div class="form-check">
+                                            <input type="checkbox" name="est_transcription" id="est_transcription" class="form-check-input" {% if utilisateur.est_transcription %}checked{% endif %}>
+                                            <label class="form-check-label" for="est_transcription">Est transcripteur</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Date d'inscription :</th>
+                                    <td>{{ utilisateur.date_joined|date:"d/m/Y à H:i" }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    <!-- Actions de validation/refus -->
+                    <div class="mt-4">
+                        <h5 class="mb-3">Décision :</h5>
+
+                        <div class="d-flex gap-2 mb-4">
+                            <!-- Bouton Valider le compte (submit du formulaire) -->
+                            <button type="submit" class="btn btn-success btn-lg" onclick="return confirm('Valider le compte de {{ utilisateur.username }} ?\n\nLes modifications seront enregistrées et l\'utilisateur recevra un email de confirmation.');">
+                                <i class="fas fa-check-circle"></i> Valider le compte
+                            </button>
+
+                            <!-- Boutons hors formulaire -->
+                            <button type="button" class="btn btn-danger btn-lg ml-2" id="btnAfficherRefus">
+                                <i class="fas fa-times-circle"></i> Refuser le compte
+                            </button>
+
+                            <a href="{% url 'accounts:liste_utilisateurs' %}" class="btn btn-secondary btn-lg ml-2">
+                                <i class="fas fa-arrow-left"></i> Retour à la liste
+                            </a>
+                        </div>
+
+                        <!-- Message personnalisé pour l'email de validation -->
+                        <div class="form-group mt-4">
+                            <label for="messagePersonnalise"><strong>Message personnalisé (optionnel) :</strong></label>
+                            <textarea class="form-control" id="messagePersonnalise" name="message_personnalise" rows="4"
+                                      placeholder="Ajoutez un message personnalisé qui sera affiché dans l'email de validation..."></textarea>
+                            <small class="form-text text-muted">Ce message sera affiché dans l'email envoyé à l'utilisateur lors de la validation de son compte.</small>
+                        </div>
+                    </form>
+
+                        <!-- Formulaire de refus (caché par défaut) -->
+                        <div id="formulaireRefus" style="display: none;">
+                            <div class="card border-danger">
+                                <div class="card-header bg-danger text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-exclamation-triangle"></i> Refuser la demande de {{ utilisateur.username }}
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-warning">
+                                        <strong>Attention :</strong> Cette action enverra un email de refus à l'utilisateur.
+                                    </div>
+
+                                    <form method="post" action="{% url 'accounts:refuser_utilisateur' utilisateur.id %}">
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                            <label for="raison"><strong>Raison du refus (optionnelle) :</strong></label>
+                                            <textarea class="form-control" id="raison" name="raison" rows="4"
+                                                      placeholder="Expliquez pourquoi la demande est refusée..."></textarea>
+                                            <small class="form-text text-muted">Cette raison sera communiquée à l'utilisateur par email.</small>
+                                        </div>
+
+                                        <div class="mt-3">
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="fas fa-times-circle"></i> Confirmer le refus
+                                            </button>
+                                            <button type="button" class="btn btn-secondary ml-2" id="btnAnnulerRefus">
+                                                Annuler
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Script pour afficher/masquer le formulaire de refus
+document.getElementById('btnAfficherRefus').addEventListener('click', function() {
+    document.getElementById('formulaireRefus').style.display = 'block';
+    this.style.display = 'none';
+});
+
+document.getElementById('btnAnnulerRefus').addEventListener('click', function() {
+    document.getElementById('formulaireRefus').style.display = 'none';
+    document.getElementById('btnAfficherRefus').style.display = 'inline-block';
+});
+</script>
+{% endblock %}
