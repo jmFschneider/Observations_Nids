@@ -30,6 +30,9 @@ urlpatterns = [
     path(
         'utilisateurs/<int:user_id>/valider/', auth.valider_utilisateur, name='valider_utilisateur'
     ),
+    path(
+        'utilisateurs/<int:user_id>/refuser/', auth.refuser_utilisateur, name='refuser_utilisateur'
+    ),
     # Profil utilisateur
     path('mon-profil/', auth.mon_profil, name='mon_profil'),
     # Inscription publique

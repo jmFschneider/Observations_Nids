@@ -363,6 +363,54 @@ def valider_utilisateur(request, user_id):
     return redirect('accounts:liste_utilisateurs')
 
 
+@login_required
+@user_passes_test(est_admin)
+def refuser_utilisateur(request, user_id):
+    """Vue pour refuser une demande de compte utilisateur"""
+    if request.method == 'POST':
+        utilisateur = get_object_or_404(Utilisateur, id=user_id)
+        raison = request.POST.get('raison', '').strip()
+
+        # Marquer le compte comme non validé et inactif
+        utilisateur.est_valide = False
+        utilisateur.is_active = False
+        utilisateur.save()
+
+        # Créer une notification pour l'utilisateur
+        message_notification = (
+            f"Votre demande a été refusée. Raison : {raison}"
+            if raison
+            else "Votre demande a été refusée."
+        )
+        Notification.objects.create(
+            destinataire=utilisateur,
+            type_notification='compte_refuse',
+            titre="Votre demande de compte",
+            message=message_notification,
+        )
+
+        # Envoyer un email à l'utilisateur avec la raison du refus
+        EmailService.envoyer_email_compte_refuse(utilisateur, raison)
+
+        # Marquer les notifications des admins comme lues
+        Notification.objects.filter(
+            type_notification='demande_compte', utilisateur_concerne=utilisateur, est_lue=False
+        ).update(est_lue=True)
+
+        messages.success(
+            request,
+            f"La demande de {utilisateur.username} a été refusée et l'utilisateur notifié par email.",
+        )
+        logger.info(
+            f"Compte refusé pour {utilisateur.username} par {request.user.username}. Raison : {raison or 'Non spécifiée'}"
+        )
+
+        return redirect('accounts:liste_utilisateurs')
+
+    # Si ce n'est pas une requête POST, rediriger vers la liste
+    return redirect('accounts:liste_utilisateurs')
+
+
 def mot_de_passe_oublie(request):
     """
     Vue pour demander une réinitialisation de mot de passe.
