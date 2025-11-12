@@ -102,9 +102,9 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context['valide'] = self.request.GET.get('valide', 'tous')
         context['actif'] = self.request.GET.get('actif', 'tous')
         # Ajouter le nombre de demandes en attente (les refusés sont déjà exclus du queryset)
-        context['demandes_en_attente'] = Utilisateur.objects.filter(
-            est_valide=False
-        ).exclude(est_refuse=True).count()
+        context['demandes_en_attente'] = (
+            Utilisateur.objects.filter(est_valide=False).exclude(est_refuse=True).count()
+        )
         return context
 
 
