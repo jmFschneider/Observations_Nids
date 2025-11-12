@@ -6,6 +6,7 @@ Centralise la logique d'envoi d'emails avec templates HTML et texte.
 import logging
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -15,6 +16,24 @@ logger = logging.getLogger(__name__)
 
 class EmailService:
     """Service centralisé pour l'envoi d'emails"""
+
+    @staticmethod
+    def _get_site_url():
+        """
+        Récupère l'URL du site depuis la configuration Django Sites.
+
+        Returns:
+            str: Le domaine du site configuré (ex: 'pilote.observation-nids.meteo-poelley50.fr')
+        """
+        try:
+            site = Site.objects.get_current()
+            # Retirer le slash final si présent
+            domain = site.domain.rstrip('/')
+            return domain
+        except Exception as e:
+            logger.warning(f"Impossible de récupérer le site configuré : {e}")
+            # Fallback sur ALLOWED_HOSTS
+            return settings.ALLOWED_HOSTS[0] if settings.ALLOWED_HOSTS else 'localhost'
 
     @staticmethod
     def envoyer_email_demande_enregistree(utilisateur):
@@ -84,7 +103,7 @@ class EmailService:
             # Contexte pour le template
             contexte = {
                 'utilisateur': utilisateur,
-                'site_url': settings.ALLOWED_HOSTS[0] if settings.ALLOWED_HOSTS else 'localhost',
+                'site_url': EmailService._get_site_url(),
             }
 
             # Rendu des templates HTML et texte
@@ -133,7 +152,7 @@ class EmailService:
             # Contexte pour le template
             contexte = {
                 'utilisateur': utilisateur,
-                'site_url': settings.ALLOWED_HOSTS[0] if settings.ALLOWED_HOSTS else 'localhost',
+                'site_url': EmailService._get_site_url(),
             }
 
             # Rendu des templates HTML et texte
@@ -184,7 +203,7 @@ class EmailService:
             contexte = {
                 'utilisateur': utilisateur,
                 'raison': raison,
-                'site_url': settings.ALLOWED_HOSTS[0] if settings.ALLOWED_HOSTS else 'localhost',
+                'site_url': EmailService._get_site_url(),
             }
 
             # Rendu des templates HTML et texte
@@ -233,7 +252,7 @@ class EmailService:
             sujet = "[Observations Nids] Réinitialisation de votre mot de passe"
 
             # Construire l'URL de réinitialisation
-            site_url = settings.ALLOWED_HOSTS[0] if settings.ALLOWED_HOSTS else 'localhost'
+            site_url = EmailService._get_site_url()
             # Ajouter http:// ou https:// selon la configuration
             protocole = 'https' if not settings.DEBUG else 'http'
             reset_url = (
@@ -295,7 +314,7 @@ class EmailService:
             sujet = "[Observations Nids] Rappel des informations de votre compte"
 
             # Construire l'URL de réinitialisation de mot de passe
-            site_url = settings.ALLOWED_HOSTS[0] if settings.ALLOWED_HOSTS else 'localhost'
+            site_url = EmailService._get_site_url()
             # Ajouter http:// ou https:// selon la configuration
             protocole = 'https' if not settings.DEBUG else 'http'
             reset_url = (
