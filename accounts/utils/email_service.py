@@ -132,12 +132,13 @@ class EmailService:
             return False
 
     @staticmethod
-    def envoyer_email_compte_valide(utilisateur):
+    def envoyer_email_compte_valide(utilisateur, message_personnalise=""):
         """
         Envoie un email à l'utilisateur quand son compte est validé par l'admin.
 
         Args:
             utilisateur: L'utilisateur dont le compte a été validé
+            message_personnalise: Message personnalisé de l'admin (optionnel)
 
         Returns:
             bool: True si l'email a été envoyé avec succès, False sinon
@@ -153,6 +154,7 @@ class EmailService:
             contexte = {
                 'utilisateur': utilisateur,
                 'site_url': EmailService._get_site_url(),
+                'message_personnalise': message_personnalise,
             }
 
             # Rendu des templates HTML et texte

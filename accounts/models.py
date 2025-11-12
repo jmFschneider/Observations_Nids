@@ -8,6 +8,7 @@ from core.constants import ROLE_CHOICES
 class Utilisateur(AbstractUser):
     role = models.CharField(max_length=15, choices=ROLE_CHOICES, default='observateur')
     est_valide = models.BooleanField(default=False)
+    est_refuse = models.BooleanField(default=False)
     est_transcription = models.BooleanField(default=False)
 
     # Rendre l'email obligatoire et unique

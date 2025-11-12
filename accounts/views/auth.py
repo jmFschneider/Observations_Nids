@@ -64,7 +64,9 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return est_admin(self.request.user)
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        # Exclure les utilisateurs refusés par défaut
+        queryset = super().get_queryset().exclude(est_refuse=True)
+
         recherche = self.request.GET.get('recherche', '')
         role = self.request.GET.get('role', 'tous')
         valide = self.request.GET.get('valide', 'tous')
@@ -99,8 +101,10 @@ class ListeUtilisateursView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context['role'] = self.request.GET.get('role', 'tous')
         context['valide'] = self.request.GET.get('valide', 'tous')
         context['actif'] = self.request.GET.get('actif', 'tous')
-        # Ajouter le nombre de demandes en attente
-        context['demandes_en_attente'] = Utilisateur.objects.filter(est_valide=False).count()
+        # Ajouter le nombre de demandes en attente (les refusés sont déjà exclus du queryset)
+        context['demandes_en_attente'] = Utilisateur.objects.filter(
+            est_valide=False
+        ).exclude(est_refuse=True).count()
         return context
 
 
@@ -331,10 +335,29 @@ def promouvoir_administrateur(request):
 
 @login_required
 @user_passes_test(est_admin)
+def page_validation_utilisateur(request, user_id):
+    """Vue pour afficher la page de validation d'un compte utilisateur"""
+    utilisateur = get_object_or_404(Utilisateur, id=user_id)
+    return render(request, 'accounts/valider_utilisateur.html', {'utilisateur': utilisateur})
+
+
+@login_required
+@user_passes_test(est_admin)
 def valider_utilisateur(request, user_id):
     utilisateur = get_object_or_404(Utilisateur, id=user_id)
+
+    # Si des données POST sont présentes, enregistrer les modifications avant validation
+    message_personnalise = ""
+    if request.method == 'POST':
+        utilisateur.email = request.POST.get('email', utilisateur.email)
+        utilisateur.role = request.POST.get('role', utilisateur.role)
+        utilisateur.est_transcription = request.POST.get('est_transcription') == 'on'
+        message_personnalise = request.POST.get('message_personnalise', '').strip()
+
+    # Valider et activer le compte (réinitialiser le statut de refus si existant)
     utilisateur.est_valide = True
-    utilisateur.is_active = True  # Activer le compte
+    utilisateur.is_active = True
+    utilisateur.est_refuse = False
     utilisateur.save()
 
     # Créer une notification pour l'utilisateur
@@ -346,8 +369,8 @@ def valider_utilisateur(request, user_id):
         lien="/login/",
     )
 
-    # Envoyer un email à l'utilisateur
-    EmailService.envoyer_email_compte_valide(utilisateur)
+    # Envoyer un email à l'utilisateur avec message personnalisé optionnel
+    EmailService.envoyer_email_compte_valide(utilisateur, message_personnalise)
 
     # Marquer les notifications des admins comme lues
     Notification.objects.filter(
@@ -371,9 +394,10 @@ def refuser_utilisateur(request, user_id):
         utilisateur = get_object_or_404(Utilisateur, id=user_id)
         raison = request.POST.get('raison', '').strip()
 
-        # Marquer le compte comme non validé et inactif
+        # Marquer le compte comme non validé, inactif et refusé
         utilisateur.est_valide = False
         utilisateur.is_active = False
+        utilisateur.est_refuse = True
         utilisateur.save()
 
         # Créer une notification pour l'utilisateur

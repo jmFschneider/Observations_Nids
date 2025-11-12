@@ -130,16 +130,9 @@
                     <td onclick="event.stopPropagation();">
                         <div class="btn-group" role="group">
                             {% if not utilisateur.est_valide %}
-                                <form method="post" action="{% url 'accounts:valider_utilisateur' utilisateur.id %}" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Valider le compte de {{ utilisateur.username }} ?');">
-                                        <i class="fas fa-check-circle"></i> Valider
-                                    </button>
-                                </form>
-
-                                <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#refuserModal{{ utilisateur.id }}">
-                                    <i class="fas fa-times-circle"></i> Refuser
-                                </button>
+                                <a href="{% url 'accounts:page_validation_utilisateur' utilisateur.id %}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-user-check"></i> Traiter la demande
+                                </a>
                             {% endif %}
 
                             <a href="{% url 'accounts:modifier_utilisateur' utilisateur.id %}" class="btn btn-sm btn-info">
@@ -164,45 +157,6 @@
                         </div>
                     </td>
                 </tr>
-
-                <!-- Modal pour refuser la demande avec raison -->
-                {% if not utilisateur.est_valide %}
-                <div class="modal fade" id="refuserModal{{ utilisateur.id }}" tabindex="-1" role="dialog" aria-labelledby="refuserModalLabel{{ utilisateur.id }}" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title" id="refuserModalLabel{{ utilisateur.id }}">
-                                    Refuser la demande de {{ utilisateur.username }}
-                                </h5>
-                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <form method="post" action="{% url 'accounts:refuser_utilisateur' utilisateur.id %}">
-                                {% csrf_token %}
-                                <div class="modal-body">
-                                    <div class="alert alert-warning">
-                                        <strong>Attention :</strong> Cette action enverra un email de refus à l'utilisateur.
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="raison{{ utilisateur.id }}"><strong>Raison du refus (optionnelle) :</strong></label>
-                                        <textarea class="form-control" id="raison{{ utilisateur.id }}" name="raison" rows="4"
-                                                  placeholder="Expliquez pourquoi la demande est refusée..."></textarea>
-                                        <small class="form-text text-muted">Cette raison sera communiquée à l'utilisateur par email.</small>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fas fa-times-circle"></i> Refuser la demande
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
                 {% empty %}
                 <tr>
                     <td colspan="8" class="text-center">Aucun utilisateur trouvé</td>
