@@ -827,10 +827,33 @@ document.addEventListener('DOMContentLoaded', function() {
         return datetimeValue.split('T')[0];
     }
 
-    function setTimeToMidnight(dateInput) {
-        const dateOnly = getDateOnly(dateInput.value);
-        if (dateOnly) {
-            dateInput.value = dateOnly + 'T00:00';
+    function setTimeToMidnight(timeInput) {
+        if (timeInput) {
+            timeInput.value = '00:00';
+        }
+    }
+
+    // Fonction pour basculer le style de l'heure selon l'état de la checkbox
+    function toggleTimeStyle(observationRow, isTimeKnown) {
+        const dateTimeContainer = observationRow.querySelector('.date-time-container');
+
+        console.log('toggleTimeStyle appelé:', {
+            row: observationRow,
+            isTimeKnown: isTimeKnown,
+            dateTimeContainer: dateTimeContainer,
+            hasClass: dateTimeContainer ? dateTimeContainer.classList.contains('time-unknown') : 'N/A'
+        });
+
+        if (dateTimeContainer) {
+            if (isTimeKnown) {
+                dateTimeContainer.classList.remove('time-unknown');
+                console.log('Classe time-unknown RETIRÉE du container');
+            } else {
+                dateTimeContainer.classList.add('time-unknown');
+                console.log('Classe time-unknown AJOUTÉE au container');
+            }
+        } else {
+            console.error('Element .date-time-container NON TROUVÉ dans la ligne');
         }
     }
 
@@ -844,58 +867,83 @@ document.addEventListener('DOMContentLoaded', function() {
         const prefix = observationRow.dataset.formPrefix;
         if (!prefix) return;
 
-        // IMPORTANT: Chercher dans la ligne (observationRow) plutôt que dans tout le document
-        const dateInput = observationRow.querySelector(`input[name="${prefix}-date_observation"]`);
+        // IMPORTANT: Avec SplitDateTimeWidget, Django crée deux inputs séparés
+        const dateInput = observationRow.querySelector(`input[name="${prefix}-date_observation_0"]`);
+        const timeInput = observationRow.querySelector(`input[name="${prefix}-date_observation_1"]`);
         const heureCheckbox = observationRow.querySelector(`input[name="${prefix}-heure_connue"]`);
 
-        if (!dateInput || !heureCheckbox) return;
+        if (!dateInput || !timeInput || !heureCheckbox) return;
 
         // Marquer comme initialisé
         observationRow.dataset.heureConnueInitialized = 'true';
 
-        // Initialisation : si heure_connue est décoché, mettre l'heure à 00:00
-        if (!heureCheckbox.checked && dateInput.value) {
-            setTimeToMidnight(dateInput);
+        // Utiliser l'attribut data-heure-connue de la row pour l'initialisation
+        // Cela garantit que le style correspond à la valeur en BDD
+        const heureConnueData = observationRow.dataset.heureConnue;
+        const isTimeKnown = heureConnueData === 'true' || heureCheckbox.checked;
+
+        console.log('=== Initialisation ligne:', prefix, '===');
+        console.log('heureConnueData:', heureConnueData);
+        console.log('heureCheckbox.checked:', heureCheckbox.checked);
+        console.log('isTimeKnown:', isTimeKnown);
+        console.log('dateInput:', dateInput);
+        console.log('timeInput:', timeInput);
+
+        // Initialisation : appliquer le style selon la valeur de heure_connue
+        if (!isTimeKnown) {
+            console.log('→ Heure NON CONNUE - application du style grisé');
+            if (timeInput.value) {
+                setTimeToMidnight(timeInput);
+            }
+            toggleTimeStyle(observationRow, false);
+        } else {
+            console.log('→ Heure CONNUE - style normal');
+            toggleTimeStyle(observationRow, true);
         }
 
         // Gestionnaire pour la checkbox
         heureCheckbox.addEventListener('change', function() {
             if (!this.checked) {
-                // Si décoché, mettre l'heure à 00:00
-                setTimeToMidnight(dateInput);
+                // Si décoché, mettre l'heure à 00:00 et griser
+                setTimeToMidnight(timeInput);
+                toggleTimeStyle(observationRow, false);
+            } else {
+                // Si coché, enlever le grisage
+                toggleTimeStyle(observationRow, true);
             }
         });
 
-        // Gestionnaire pour le champ date/heure
-        dateInput.addEventListener('change', function() {
-            const dateValue = this.value;
-            if (!dateValue) return;
-
-            // Extraire l'heure
-            const timePart = dateValue.split('T')[1];
+        // Gestionnaire pour le champ heure
+        timeInput.addEventListener('change', function() {
+            const timeValue = this.value;
+            if (!timeValue) return;
 
             // Si l'utilisateur a saisi une heure différente de 00:00, cocher la checkbox
-            if (timePart && timePart !== '00:00') {
+            if (timeValue !== '00:00') {
                 heureCheckbox.checked = true;
+                toggleTimeStyle(observationRow, true);
             }
         });
 
         // Aussi surveiller l'input en temps réel (pour les modifications manuelles)
-        dateInput.addEventListener('input', function() {
-            const dateValue = this.value;
-            if (!dateValue) return;
-
-            const timePart = dateValue.split('T')[1];
+        timeInput.addEventListener('input', function() {
+            const timeValue = this.value;
+            if (!timeValue) return;
 
             // Si l'utilisateur modifie l'heure manuellement et que ce n'est pas 00:00
-            if (timePart && timePart !== '00:00') {
+            if (timeValue && timeValue !== '00:00') {
                 heureCheckbox.checked = true;
+                toggleTimeStyle(observationRow, true);
             }
         });
     }
 
     // Initialiser tous les gestionnaires pour les lignes d'observation existantes
-    document.querySelectorAll('.observation-row').forEach(row => {
+    const observationRows = document.querySelectorAll('.observation-row');
+    console.log('=== Nombre de lignes d\'observation trouvées:', observationRows.length, '===');
+
+    observationRows.forEach((row, index) => {
+        console.log(`Initialisation ligne ${index + 1}:`, row);
         initHeureConnueHandlers(row);
     });
 

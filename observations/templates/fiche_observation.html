@@ -3,6 +3,21 @@
 {% block extra_css %}
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'Observations/css/styles.css' %}">
+    <style>
+        /* Style pour l'affichage séparé de la date et de l'heure en lecture seule */
+        .observation-date-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .observation-time.time-unknown {
+            background-color: #e9ecef;
+            color: #6c757d;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
 {% endblock %}
 
 
@@ -87,7 +102,7 @@
 		<table>
 			<thead>
 				<tr>
-					<th>Date</th>
+					<th>Date et heure</th>
 					<th>Nombre d'œufs</th>
 					<th>Nombre de poussins</th>
 					<th>Observations</th>
@@ -97,11 +112,10 @@
 				{% for observation in observations %}
 				<tr>
 					<td>
-						{% if observation.heure_connue %}
-							{{ observation.date_observation|date:"d/m/Y H:i" }}
-						{% else %}
-							{{ observation.date_observation|date:"d/m/Y" }}
-						{% endif %}
+						<span class="observation-date-time">
+							<span class="observation-date">{{ observation.date_observation|date:"d/m/Y" }}</span>
+							<span class="observation-time {% if not observation.heure_connue %}time-unknown{% endif %}">{{ observation.date_observation|date:"H:i" }}</span>
+						</span>
 					</td>
 					<td>{{ observation.nombre_oeufs }}</td>
 					<td>{{ observation.nombre_poussins }}</td>
@@ -109,7 +123,7 @@
 				</tr>
 				{% empty %}
 				<tr>
-					<td colspan="5">Aucune observation enregistrée.</td>
+					<td colspan="4">Aucune observation enregistrée.</td>
 				</tr>
 				{% endfor %}
 			</tbody>

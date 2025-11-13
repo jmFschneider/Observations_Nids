@@ -34,11 +34,32 @@
 .delete-confirmation-banner .alert-warning {
     margin: 0;
 }
+
+/* Styles pour l'affichage séparé de la date et de l'heure */
+.date-time-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.date-time-container input {
+    margin: 0;
+}
+
+/* Style pour l'heure non connue - cibler l'input de type time */
+.date-time-container.time-unknown input[type="time"] {
+    background-color: #e9ecef !important;
+    color: #6c757d !important;
+    padding: 2px 5px !important;
+    border-radius: 3px !important;
+    border-color: #ced4da !important;
+}
 </style>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'Observations/js/saisie_observation.js' %}?v=4.3"></script>
+<script src="{% static 'Observations/js/saisie_observation.js' %}?v=4.6"></script>
 <!-- Store fiche_id for JS access -->
 {% if fiche_form.instance.pk %}
 <div data-fiche-id="{{ fiche_form.instance.pk }}" style="display: none;"></div>
@@ -221,7 +242,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Date</th>
+                            <th>Date et heure</th>
                             <th style="text-align: center;">Heure connue</th>
                             <th>Nombre d'œufs</th>
                             <th>Nombre de poussins</th>
@@ -232,14 +253,16 @@
                     <tbody>
                         {# Afficher TOUTES les formes du formset dans l'ordre #}
                         {% for form in observation_formset %}
-                            <tr class="observation-row" data-form-prefix="{{ form.prefix }}">
+                            <tr class="observation-row" data-form-prefix="{{ form.prefix }}" data-heure-connue="{% if form.instance.pk %}{{ form.instance.heure_connue|yesno:'true,false' }}{% else %}true{% endif %}">
                         <!--         {% comment %}{{ form.id }}{% endcomment %}
                                 <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk|default:'' }}">
                                 -->
                                 {{ form.id }}
-                                <td>
+                                <td class="date-time-cell" data-observation-id="{{ form.instance.pk|default:'' }}">
                                     {% if form.date_observation.errors %}<div class="error">{{ form.date_observation.errors }}</div>{% endif %}
-                                    {{ form.date_observation }}
+                                    <div class="date-time-container {% if form.instance.pk and not form.instance.heure_connue %}time-unknown{% endif %}">
+                                        {{ form.date_observation }}
+                                    </div>
                                 </td>
                                 <td style="text-align: center;">
                                     {{ form.heure_connue }}
