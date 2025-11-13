@@ -3,6 +3,10 @@
 
 {% block title %}Modifier {{ commune.nom }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'geo/css/commune_autocomplete.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="row">
@@ -84,14 +88,23 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="commune_actuelle_id" class="form-label">Commune actuelle (si fusionnée)</label>
-                            <input type="number" class="form-control" id="commune_actuelle_id" name="commune_actuelle"
-                                   value="{% if commune.commune_actuelle %}{{ commune.commune_actuelle.id }}{% endif %}"
-                                   placeholder="ID de la commune actuelle">
+                            <label for="commune_actuelle_search" class="form-label">Commune actuelle (si fusionnée)</label>
+                            <input type="text" class="form-control commune-autocomplete-input"
+                                   id="commune_actuelle_search"
+                                   placeholder="Tapez le nom de la commune..."
+                                   autocomplete="off">
+                            <input type="hidden" id="commune_actuelle_id" name="commune_actuelle"
+                                   value="{% if commune.commune_actuelle %}{{ commune.commune_actuelle.id }}{% endif %}">
+                            {% if commune.commune_actuelle %}
+                            <input type="hidden" id="commune_actuelle_name_hidden"
+                                   value="{{ commune.commune_actuelle.nom }}">
+                            {% endif %}
+                            <div id="commune-actuelle-info"></div>
                             <small class="text-muted">
-                                Entrez l'ID de la commune actuelle (visible dans l'URL de la page de détail).
+                                <i class="fas fa-info-circle"></i>
+                                Commencez à taper le nom d'une commune pour voir les suggestions.
                                 {% if commune.commune_actuelle %}
-                                <br>Actuellement liée à : <strong>{{ commune.commune_actuelle.nom }}</strong> (ID: {{ commune.commune_actuelle.id }})
+                                <br>Actuellement liée à : <strong>{{ commune.commune_actuelle.nom }}</strong> ({{ commune.commune_actuelle.code_departement }})
                                 {% endif %}
                             </small>
                         </div>
@@ -116,4 +129,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'geo/js/commune_autocomplete.js' %}"></script>
 {% endblock %}

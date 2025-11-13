@@ -134,6 +134,7 @@ def rechercher_communes(request):
                 logger.warning(f"Coordonnées GPS invalides: lat={lat}, lon={lon}")
 
         communes = communes_queryset.values(
+            'id',  # Ajout de l'ID pour l'autocomplétion
             'nom',
             'departement',
             'code_departement',
@@ -200,6 +201,7 @@ def rechercher_communes(request):
 
         results.append(
             {
+                'id': commune['id'],  # ID pour l'autocomplétion
                 'nom': commune['nom'],
                 'departement': commune['departement'],
                 'code_departement': commune['code_departement'],
