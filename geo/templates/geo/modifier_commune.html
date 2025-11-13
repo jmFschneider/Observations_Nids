@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Modifier {{ commune.nom }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'geo:liste_communes' %}">Communes</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'geo:detail_commune' commune.id %}">{{ commune.nom }}</a></li>
+                    <li class="breadcrumb-item active">Modifier</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h3 class="mb-0"><i class="fas fa-edit"></i> Modifier {{ commune.nom }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <h5 class="mb-3"><i class="fas fa-info-circle"></i> Identification</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nom" name="nom" value="{{ commune.nom }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="code_insee" class="form-label">Code INSEE <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="code_insee" name="code_insee" value="{{ commune.code_insee }}" maxlength="5" required>
+                                <small class="text-muted">5 caractères (ex: 74056)</small>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3 mt-4"><i class="fas fa-map"></i> Localisation administrative</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="code_postal" class="form-label">Code postal</label>
+                                <input type="text" class="form-control" id="code_postal" name="code_postal" value="{{ commune.code_postal }}" maxlength="5">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="code_departement" class="form-label">Code département</label>
+                                <input type="text" class="form-control" id="code_departement" name="code_departement" value="{{ commune.code_departement }}" maxlength="3">
+                                <small class="text-muted">Ex: 74, 2A, 971</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="departement" class="form-label">Nom département</label>
+                                <input type="text" class="form-control" id="departement" name="departement" value="{{ commune.departement }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="region" class="form-label">Région</label>
+                            <input type="text" class="form-control" id="region" name="region" value="{{ commune.region }}">
+                        </div>
+
+                        <h5 class="mb-3 mt-4"><i class="fas fa-map-pin"></i> Coordonnées GPS</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="latitude" class="form-label">Latitude <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="latitude" name="latitude" value="{{ commune.latitude }}" step="0.000001" required>
+                                <small class="text-muted">Ex: 45.923700</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="longitude" class="form-label">Longitude <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="longitude" name="longitude" value="{{ commune.longitude }}" step="0.000001" required>
+                                <small class="text-muted">Ex: 6.869400</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="altitude" class="form-label">Altitude (m)</label>
+                                <input type="number" class="form-control" id="altitude" name="altitude" value="{{ commune.altitude|default:'' }}">
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3 mt-4"><i class="fas fa-tags"></i> Informations complémentaires</h5>
+                        <div class="mb-3">
+                            <label for="autres_noms" class="form-label">Autres noms / Alias</label>
+                            <input type="text" class="form-control" id="autres_noms" name="autres_noms" value="{{ commune.autres_noms }}">
+                            <small class="text-muted">Séparés par des virgules. Ex: "Les Praz, Les Praz-de-Chamonix"</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="commune_actuelle_id" class="form-label">Commune actuelle (si fusionnée)</label>
+                            <input type="number" class="form-control" id="commune_actuelle_id" name="commune_actuelle"
+                                   value="{% if commune.commune_actuelle %}{{ commune.commune_actuelle.id }}{% endif %}"
+                                   placeholder="ID de la commune actuelle">
+                            <small class="text-muted">
+                                Entrez l'ID de la commune actuelle (visible dans l'URL de la page de détail).
+                                {% if commune.commune_actuelle %}
+                                <br>Actuellement liée à : <strong>{{ commune.commune_actuelle.nom }}</strong> (ID: {{ commune.commune_actuelle.id }})
+                                {% endif %}
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="commentaire" class="form-label">Commentaire</label>
+                            <textarea class="form-control" id="commentaire" name="commentaire" rows="3">{{ commune.commentaire }}</textarea>
+                            <small class="text-muted">Notes sur l'origine, fusion, etc.</small>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="fas fa-save"></i> Enregistrer les modifications
+                            </button>
+                            <a href="{% url 'geo:detail_commune' commune.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

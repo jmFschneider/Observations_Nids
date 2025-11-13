@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ commune.nom }} - Détail Commune{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- En-tête -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'geo:liste_communes' %}">Communes</a></li>
+                            <li class="breadcrumb-item active">{{ commune.nom }}</li>
+                        </ol>
+                    </nav>
+                    <h1>
+                        <i class="fas fa-map-marker-alt text-primary"></i>
+                        {{ commune.nom }}
+                        {% if commune.commune_actuelle %}
+                        <span class="badge bg-warning text-dark">Commune fusionnée</span>
+                        {% endif %}
+                    </h1>
+                </div>
+                <div>
+                    <a href="{% url 'geo:modifier_commune' commune.id %}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    <a href="{% url 'geo:supprimer_commune' commune.id %}" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Colonne principale -->
+                <div class="col-md-8">
+                    <!-- Informations de base -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-info-circle"></i> Informations générales</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <th style="width: 30%;">Nom officiel</th>
+                                        <td><strong>{{ commune.nom }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Code INSEE</th>
+                                        <td><code>{{ commune.code_insee }}</code></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Code postal</th>
+                                        <td><code>{{ commune.code_postal }}</code></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Département</th>
+                                        <td>{{ commune.departement }} ({{ commune.code_departement }})</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Région</th>
+                                        <td>{{ commune.region|default:"Non renseignée" }}</td>
+                                    </tr>
+                                    {% if commune.population %}
+                                    <tr>
+                                        <th>Population</th>
+                                        <td>{{ commune.population }} habitants</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if commune.superficie %}
+                                    <tr>
+                                        <th>Superficie</th>
+                                        <td>{{ commune.superficie }} km²</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Coordonnées GPS -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-map-pin"></i> Coordonnées géographiques</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <th style="width: 30%;">Latitude</th>
+                                        <td class="font-monospace">{{ commune.latitude }}°</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Longitude</th>
+                                        <td class="font-monospace">{{ commune.longitude }}°</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Altitude</th>
+                                        <td>{{ commune.altitude|default:"Non renseignée" }}{% if commune.altitude %} m{% endif %}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Coordonnées GPS</th>
+                                        <td>
+                                            <code>{{ commune.coordonnees_gps }}</code>
+                                            <a href="https://www.google.com/maps?q={{ commune.latitude }},{{ commune.longitude }}"
+                                               target="_blank" class="btn btn-sm btn-outline-primary ms-2">
+                                                <i class="fas fa-external-link-alt"></i> Voir sur Google Maps
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Autres appellations -->
+                    {% if commune.autres_noms %}
+                    <div class="card mb-4">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0"><i class="fas fa-tags"></i> Autres appellations</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0">{{ commune.autres_noms }}</p>
+                            <small class="text-muted">
+                                Ces noms alternatifs permettent de retrouver la commune lors du géocodage.
+                            </small>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Commune actuelle (si fusionnée) -->
+                    {% if commune.commune_actuelle %}
+                    <div class="card mb-4 border-warning">
+                        <div class="card-header bg-warning">
+                            <h5 class="mb-0"><i class="fas fa-code-branch"></i> Commune fusionnée</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Cette commune a fusionné avec :</p>
+                            <p class="mb-0">
+                                <a href="{% url 'geo:detail_commune' commune.commune_actuelle.id %}" class="btn btn-primary">
+                                    <i class="fas fa-arrow-right"></i> {{ commune.commune_actuelle.nom }}
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Anciennes communes rattachées -->
+                    {% if anciennes_communes %}
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-project-diagram"></i> Anciennes communes rattachées</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Les communes suivantes ont fusionné avec {{ commune.nom }} :</p>
+                            <ul class="list-group">
+                                {% for ancienne in anciennes_communes %}
+                                <li class="list-group-item">
+                                    <a href="{% url 'geo:detail_commune' ancienne.id %}">{{ ancienne.nom }}</a>
+                                    <span class="text-muted ms-2">({{ ancienne.code_insee }})</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Commentaire -->
+                    {% if commune.commentaire %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-comment"></i> Notes</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0" style="white-space: pre-wrap;">{{ commune.commentaire }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Colonne latérale -->
+                <div class="col-md-4">
+                    <!-- Métadonnées -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-database"></i> Métadonnées</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th style="width: 50%;">Source</th>
+                                        <td>
+                                            {% if commune.source_ajout == 'api_geo' %}
+                                            <span class="badge bg-info">API Géoplateforme</span>
+                                            {% elif commune.source_ajout == 'nominatim' %}
+                                            <span class="badge bg-success">Nominatim</span>
+                                            {% elif commune.source_ajout == 'manuel' %}
+                                            <span class="badge bg-warning">Manuel</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% if commune.ajoutee_par %}
+                                    <tr>
+                                        <th>Ajoutée par</th>
+                                        <td>{{ commune.ajoutee_par.username }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if commune.date_creation %}
+                                    <tr>
+                                        <th>Date d'ajout</th>
+                                        <td>{{ commune.date_creation|date:"d/m/Y H:i" }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <th>Dernière MAJ</th>
+                                        <td>{{ commune.date_maj|date:"d/m/Y H:i" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Utilisation -->
+                    <div class="card mb-4">
+                        <div class="card-header {% if nombre_fiches > 0 %}bg-success text-white{% else %}bg-light{% endif %}">
+                            <h5 class="mb-0"><i class="fas fa-file-alt"></i> Utilisation</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if nombre_fiches > 0 %}
+                            <div class="alert alert-success mb-0">
+                                <i class="fas fa-check-circle"></i>
+                                Cette commune est utilisée dans <strong>{{ nombre_fiches }}</strong> fiche(s) d'observation.
+                            </div>
+                            <p class="text-muted small mt-2 mb-0">
+                                <i class="fas fa-info-circle"></i> La suppression n'est pas possible.
+                            </p>
+                            {% else %}
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Cette commune n'est pas encore utilisée dans des observations.
+                            </div>
+                            <p class="text-muted small mt-2 mb-0">
+                                <i class="fas fa-info-circle"></i> La suppression est possible.
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Actions rapides -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-bolt"></i> Actions rapides</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'geo:modifier_commune' commune.id %}" class="btn btn-warning">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                                {% if nombre_fiches == 0 %}
+                                <a href="{% url 'geo:supprimer_commune' commune.id %}" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </a>
+                                {% else %}
+                                <button class="btn btn-danger" disabled title="Commune utilisée dans des observations">
+                                    <i class="fas fa-trash"></i> Supprimer (impossible)
+                                </button>
+                                {% endif %}
+                                <a href="{% url 'geo:liste_communes' %}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

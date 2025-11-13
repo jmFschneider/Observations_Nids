@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -31,6 +32,48 @@ class CommuneFrance(models.Model):
     )
     date_maj = models.DateTimeField(auto_now=True)
 
+    # Traçabilité et gestion des sources
+    source_ajout = models.CharField(
+        max_length=50,
+        choices=[
+            ('api_geo', 'API Découpage administratif'),
+            ('nominatim', 'Nominatim (OpenStreetMap)'),
+            ('manuel', 'Ajout manuel par administrateur'),
+        ],
+        default='api_geo',
+        help_text="Source d'origine des données",
+    )
+    autres_noms = models.TextField(
+        blank=True,
+        help_text="Autres appellations ou anciens noms (séparés par des virgules). "
+        "Ex: 'Les Praz, Les Praz-de-Chamonix' pour une commune fusionnée",
+    )
+    commentaire = models.TextField(
+        blank=True,
+        help_text="Notes sur l'origine (fusion, ancienne commune, erreur OCR récurrente, etc.)",
+    )
+    ajoutee_par = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text="Utilisateur ayant ajouté cette commune manuellement",
+    )
+    date_creation = models.DateTimeField(
+        auto_now_add=True,
+        null=True,
+        blank=True,
+        help_text="Date d'ajout dans la base de données",
+    )
+    commune_actuelle = models.ForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='anciennes_communes',
+        help_text="Si cette commune a fusionné, référence vers la commune actuelle",
+    )
+
     class Meta:
         db_table = 'geo_commune_france'
         verbose_name = 'Commune française'
@@ -48,6 +91,28 @@ class CommuneFrance(models.Model):
     def coordonnees_gps(self):
         """Retourne les coordonnées au format 'lat,lon'"""
         return f"{self.latitude},{self.longitude}"
+
+    @property
+    def tous_les_noms(self):
+        """Retourne une liste avec le nom principal + tous les alias"""
+        noms = [self.nom]
+        if self.autres_noms:
+            noms.extend([n.strip() for n in self.autres_noms.split(',') if n.strip()])
+        return noms
+
+    def nombre_observations(self):
+        """Retourne le nombre de fiches d'observation utilisant cette commune"""
+        from geo.models import Localisation
+
+        return Localisation.objects.filter(code_insee=self.code_insee).count()
+
+    def est_utilisee(self):
+        """Vérifie si la commune est utilisée dans des observations"""
+        return self.nombre_observations() > 0
+
+    def est_ancienne_commune(self):
+        """Vérifie si cette commune a fusionné avec une autre"""
+        return self.commune_actuelle is not None
 
 
 class Localisation(models.Model):

@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rechercher sur Nominatim{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <!-- En-tête -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'geo:liste_communes' %}">Communes</a></li>
+                    <li class="breadcrumb-item active">Rechercher sur Nominatim</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-search-location"></i> Rechercher une commune sur Nominatim
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>À quoi sert cet outil ?</strong>
+                        <p class="mb-0">
+                            Recherchez une commune qui n'existe pas dans la base de données (ancienne commune, commune étrangère, lieu-dit, etc.)
+                            et ajoutez-la facilement avec ses coordonnées GPS automatiquement récupérées depuis Nominatim (OpenStreetMap).
+                        </p>
+                    </div>
+
+                    <!-- Formulaire de recherche -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="rechercher">
+
+                        <div class="row">
+                            <div class="col-md-7 mb-3">
+                                <label for="nom" class="form-label">
+                                    Nom de la commune <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="nom" name="nom" required
+                                       placeholder="Ex: Les Praz, Genève, Blonville-sur-Mer...">
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label for="departement" class="form-label">
+                                    Département / Pays <small class="text-muted">(optionnel)</small>
+                                </label>
+                                <input type="text" class="form-control" id="departement" name="departement"
+                                       placeholder="Ex: Haute-Savoie, Suisse, Calvados...">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-search"></i> Rechercher sur Nominatim
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Résultat de la recherche -->
+            {% if result %}
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-check-circle"></i> Commune trouvée !
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="ajouter">
+                        <input type="hidden" name="nom_trouve" value="{{ result.nom_recherche }}">
+                        <input type="hidden" name="latitude" value="{{ result.lat }}">
+                        <input type="hidden" name="longitude" value="{{ result.lon }}">
+                        <input type="hidden" name="altitude" value="{{ result.altitude|default:'' }}">
+                        <input type="hidden" name="adresse" value="{{ result.adresse_complete }}">
+                        <input type="hidden" name="source" value="{{ result.source }}">
+                        {% if result.code_insee %}
+                        <input type="hidden" name="code_insee" value="{{ result.code_insee }}">
+                        {% endif %}
+
+                        <table class="table table-sm mb-4">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 30%;">Adresse complète</th>
+                                    <td><strong>{{ result.adresse_complete }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <th>Latitude</th>
+                                    <td class="font-monospace">{{ result.lat }}°</td>
+                                </tr>
+                                <tr>
+                                    <th>Longitude</th>
+                                    <td class="font-monospace">{{ result.lon }}°</td>
+                                </tr>
+                                <tr>
+                                    <th>Altitude</th>
+                                    <td>{{ result.altitude|default:"Non renseignée" }}{% if result.altitude %} m{% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <th>Source</th>
+                                    <td>
+                                        {% if result.source == 'base_locale' %}
+                                        <span class="badge bg-info">Base locale</span>
+                                        {% elif result.source == 'nominatim' %}
+                                        <span class="badge bg-success">Nominatim (OpenStreetMap)</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if result.code_insee %}
+                                <tr>
+                                    <th>Code INSEE</th>
+                                    <td><code>{{ result.code_insee }}</code></td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <th>Précision</th>
+                                    <td>{{ result.precision_metres|default:"5000" }} mètres ({{ result.precision|default:"commune" }})</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Carte -->
+                        <div class="mb-4">
+                            <label class="form-label">Localisation sur la carte :</label>
+                            <a href="https://www.google.com/maps?q={{ result.lat }},{{ result.lon }}"
+                               target="_blank" class="btn btn-outline-primary btn-sm ms-2">
+                                <i class="fas fa-external-link-alt"></i> Voir sur Google Maps
+                            </a>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Avant d'ajouter :</strong>
+                            <ul class="mb-0">
+                                <li>Vérifiez que la commune n'existe pas déjà dans la base</li>
+                                <li>Pour les communes françaises, préférez l'API Géoplateforme (chargement initial)</li>
+                                <li>Après ajout, pensez à compléter le code département et le code postal</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-plus-circle"></i> Ajouter cette commune à la base de données
+                            </button>
+                            <a href="{% url 'geo:rechercher_nominatim' %}" class="btn btn-secondary">
+                                <i class="fas fa-redo"></i> Nouvelle recherche
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Erreur de recherche -->
+            {% if error %}
+            <div class="alert alert-danger">
+                <i class="fas fa-times-circle"></i>
+                <strong>Erreur de recherche :</strong> {{ error }}
+            </div>
+            {% endif %}
+
+            <!-- Aide -->
+            {% if not result %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-question-circle"></i> Aide</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Quand utiliser cet outil ?</h6>
+                    <ul>
+                        <li><strong>Anciennes communes</strong> : Communes fusionnées depuis 2010 (ex: "Les Praz" → "Chamonix-Mont-Blanc")</li>
+                        <li><strong>Communes étrangères</strong> : Observations en Suisse, Belgique, etc.</li>
+                        <li><strong>Lieux-dits</strong> : Hameaux ou lieux-dits non référencés comme commune officielle</li>
+                        <li><strong>Erreurs OCR récurrentes</strong> : Variantes orthographiques détectées par l'OCR</li>
+                    </ul>
+
+                    <h6 class="mt-4">Exemples de recherches :</h6>
+                    <ul>
+                        <li><code>Les Praz</code> + <code>Haute-Savoie</code> → Lieu-dit de Chamonix</li>
+                        <li><code>Genève</code> + <code>Suisse</code> → Ville suisse</li>
+                        <li><code>Blonville-sur-Mer</code> → Commune du Calvados</li>
+                    </ul>
+
+                    <h6 class="mt-4">Limitations :</h6>
+                    <ul>
+                        <li>Limite de <strong>1 requête par seconde</strong> sur Nominatim (respectez les règles d'usage)</li>
+                        <li>Les coordonnées sont approximatives (centre de la commune, ~5 km de précision)</li>
+                        <li>Le code INSEE et le code postal devront être complétés manuellement après ajout</li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
