@@ -106,6 +106,19 @@ class LocalisationForm(forms.ModelForm):
 
 
 class ObservationForm(forms.ModelForm):
+    # Déclarer explicitement le champ date_observation avec SplitDateTimeField
+    date_observation = forms.SplitDateTimeField(
+        widget=forms.SplitDateTimeWidget(
+            date_attrs={'type': 'date', 'class': 'clear-on-focus date-input'},
+            time_attrs={'type': 'time', 'class': 'clear-on-focus time-input'},
+            date_format='%Y-%m-%d',
+            time_format='%H:%M',
+        ),
+        input_date_formats=['%Y-%m-%d'],
+        input_time_formats=['%H:%M', '%H:%M:%S'],
+        required=True,
+    )
+
     class Meta:
         model = Observation
         fields = [
@@ -116,9 +129,6 @@ class ObservationForm(forms.ModelForm):
             'observations',
         ]
         widgets = {
-            'date_observation': forms.DateTimeInput(
-                attrs={'type': 'datetime-local', 'class': 'clear-on-focus'}, format='%Y-%m-%dT%H:%M'
-            ),
             'heure_connue': forms.CheckboxInput(
                 attrs={'class': 'form-check-input', 'id': 'id_heure_connue'}
             ),
@@ -140,11 +150,12 @@ class ObservationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make sure date_observation is properly formatted for the datetime-local input
+        # Make sure date_observation is properly formatted for the split date/time inputs
         if self.instance.pk and self.instance.date_observation:
-            # Convert the stored UTC time to the local timezone before formatting
+            # Convert the stored UTC time to the local timezone
             local_dt = timezone.localtime(self.instance.date_observation)
-            self.initial['date_observation'] = local_dt.strftime('%Y-%m-%dT%H:%M')
+            # SplitDateTimeField expects a datetime object, Django will handle the split
+            self.initial['date_observation'] = local_dt
 
     def clean(self):
         """
