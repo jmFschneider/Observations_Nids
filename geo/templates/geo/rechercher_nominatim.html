@@ -132,11 +132,59 @@
                             </a>
                         </div>
 
+                        <!-- Vérification dans la base de données -->
+                        {% if result.communes_existantes or result.anciennes_communes_existantes %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Commune(s) trouvée(s) dans la base de données :</strong>
+
+                            {% if result.communes_existantes %}
+                            <div class="mt-2">
+                                <strong>Communes actuelles :</strong>
+                                <ul class="mb-0">
+                                    {% for commune in result.communes_existantes %}
+                                    <li>
+                                        <strong>{{ commune.nom }}</strong>
+                                        {% if commune.departement %} ({{ commune.departement }}){% endif %}
+                                        - Code INSEE: {{ commune.code_insee }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            {% if result.anciennes_communes_existantes %}
+                            <div class="mt-2">
+                                <strong>Anciennes communes (fusionnées) :</strong>
+                                <ul class="mb-0">
+                                    {% for ancienne in result.anciennes_communes_existantes %}
+                                    <li>
+                                        <strong>{{ ancienne.nom }}</strong>
+                                        → Fusionnée avec <strong>{{ ancienne.commune_actuelle.nom }}</strong>
+                                        {% if ancienne.date_fusion %} le {{ ancienne.date_fusion|date:"d/m/Y" }}{% endif %}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            <div class="mt-3">
+                                <a href="{% url 'geo:liste_communes' %}?q={{ result.nom_recherche|urlencode }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-search"></i> Voir dans la liste des communes
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+
                         <div class="alert alert-warning">
                             <i class="fas fa-exclamation-triangle"></i>
                             <strong>Avant d'ajouter :</strong>
                             <ul class="mb-0">
-                                <li>Vérifiez que la commune n'existe pas déjà dans la base</li>
+                                {% if not result.communes_existantes and not result.anciennes_communes_existantes %}
+                                <li>Cette commune n'existe pas dans la base de données</li>
+                                {% else %}
+                                <li><strong>⚠️ Attention :</strong> Des communes similaires existent déjà dans la base (voir ci-dessus)</li>
+                                {% endif %}
                                 <li>Pour les communes françaises, préférez l'API Géoplateforme (chargement initial)</li>
                                 <li>Après ajout, pensez à compléter le code département et le code postal</li>
                             </ul>

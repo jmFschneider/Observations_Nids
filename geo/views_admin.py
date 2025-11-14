@@ -12,7 +12,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from geo.models import CommuneFrance
+from geo.models import CommuneFrance, AncienneCommune
 from geo.utils.geocoding import get_geocodeur
 
 logger = logging.getLogger(__name__)
@@ -36,13 +36,19 @@ def liste_communes(request):
     # Requête de base
     communes = CommuneFrance.objects.all()
 
-    # Appliquer la recherche (nom + alias)
+    # Appliquer la recherche (nom + alias + anciennes communes)
     if search_query:
+        # 1. Chercher si c'est une ancienne commune
+        anciennes = AncienneCommune.objects.filter(nom__icontains=search_query)
+        communes_actuelles_ids = list(anciennes.values_list('commune_actuelle_id', flat=True))
+
+        # 2. Chercher dans les communes actuelles (nom, alias, codes) + communes liées aux anciennes
         communes = communes.filter(
             Q(nom__icontains=search_query)
             | Q(autres_noms__icontains=search_query)
             | Q(code_postal__icontains=search_query)
             | Q(code_insee__icontains=search_query)
+            | Q(id__in=communes_actuelles_ids)  # Ajouter les communes actuelles liées aux anciennes communes trouvées
         )
 
     # Appliquer les filtres
@@ -52,6 +58,9 @@ def liste_communes(request):
         communes = communes.filter(region__icontains=region_filter)
     if source_filter:
         communes = communes.filter(source_ajout=source_filter)
+
+    # Précharger les anciennes communes pour éviter N+1 queries
+    communes = communes.prefetch_related('anciennes_communes')
 
     # Pagination
     paginator = Paginator(communes.order_by('nom'), 50)
@@ -65,7 +74,7 @@ def liste_communes(request):
         'source_nominatim': CommuneFrance.objects.filter(source_ajout='nominatim').count(),
         'source_manuelle': CommuneFrance.objects.filter(source_ajout='manuel').count(),
         'avec_alias': CommuneFrance.objects.exclude(autres_noms='').count(),
-        'communes_fusionnees': CommuneFrance.objects.filter(commune_actuelle__isnull=False).count(),
+        'communes_fusionnees': AncienneCommune.objects.count(),  # Anciennes communes dans table séparée
     }
 
     # Listes pour les filtres
@@ -150,7 +159,7 @@ def creer_commune(request):
                     )
                 else:
                     # Créer la commune
-                    # Note : commune_actuelle peut être défini après création via modification
+                    # Normaliser les virgules en points pour les nombres décimaux
                     commune = CommuneFrance.objects.create(
                         nom=nom,
                         code_insee=code_insee,
@@ -158,14 +167,13 @@ def creer_commune(request):
                         departement=departement,
                         code_departement=code_departement,
                         region=region,
-                        latitude=float(latitude),
-                        longitude=float(longitude),
-                        altitude=int(altitude) if altitude else None,
+                        latitude=float(latitude.replace(',', '.')),
+                        longitude=float(longitude.replace(',', '.')),
+                        altitude=int(float(altitude.replace(',', '.'))) if altitude else None,
                         autres_noms=autres_noms,
                         commentaire=commentaire,
                         source_ajout='manuel',
                         ajoutee_par=request.user,
-                        commune_actuelle=None,
                     )
                     messages.success(
                         request, f"La commune '{commune.nom}' a été créée avec succès."
@@ -174,9 +182,6 @@ def creer_commune(request):
 
             except Exception as e:
                 messages.error(request, f"Erreur lors de la création : {e}")
-
-    # Note : Le champ "commune actuelle" n'est pas disponible lors de la création
-    # Il peut être défini après création via la page de modification
 
     context = {}
 
@@ -202,7 +207,6 @@ def modifier_commune(request, commune_id):
         altitude = request.POST.get('altitude', '').strip()
         autres_noms = request.POST.get('autres_noms', '').strip()
         commentaire = request.POST.get('commentaire', '').strip()
-        commune_actuelle_id = request.POST.get('commune_actuelle', '').strip()
 
         # Validation
         if not nom or not code_insee:
@@ -228,26 +232,12 @@ def modifier_commune(request, commune_id):
                     commune.departement = departement
                     commune.code_departement = code_departement
                     commune.region = region
-                    commune.latitude = float(latitude)
-                    commune.longitude = float(longitude)
-                    commune.altitude = int(altitude) if altitude else None
+                    # Normaliser les virgules en points pour les nombres décimaux
+                    commune.latitude = float(latitude.replace(',', '.'))
+                    commune.longitude = float(longitude.replace(',', '.'))
+                    commune.altitude = int(float(altitude.replace(',', '.'))) if altitude else None
                     commune.autres_noms = autres_noms
                     commune.commentaire = commentaire
-
-                    # Gestion de la commune actuelle (fusion)
-                    if commune_actuelle_id:
-                        try:
-                            commune.commune_actuelle = CommuneFrance.objects.get(
-                                pk=int(commune_actuelle_id)
-                            )
-                        except (CommuneFrance.DoesNotExist, ValueError):
-                            messages.warning(
-                                request,
-                                f"L'ID {commune_actuelle_id} ne correspond à aucune commune. "
-                                f"Le champ 'commune actuelle' n'a pas été modifié.",
-                            )
-                    else:
-                        commune.commune_actuelle = None
 
                     commune.save()
 
@@ -258,9 +248,6 @@ def modifier_commune(request, commune_id):
 
             except Exception as e:
                 messages.error(request, f"Erreur lors de la modification : {e}")
-
-    # Note : Le champ "commune actuelle" a été retiré du formulaire pour éviter
-    # de charger 35 000+ communes. Utilisez la page de détail pour gérer les fusions.
 
     context = {
         'commune': commune,
@@ -332,6 +319,16 @@ def rechercher_nominatim(request):
                         result = coords
                         result['nom_recherche'] = nom
                         result['departement_recherche'] = departement
+
+                        # Rechercher si la commune existe déjà dans la base
+                        result['communes_existantes'] = CommuneFrance.objects.filter(
+                            nom__icontains=nom
+                        )
+
+                        # Rechercher dans les anciennes communes
+                        result['anciennes_communes_existantes'] = AncienneCommune.objects.filter(
+                            nom__icontains=nom
+                        ).select_related('commune_actuelle')
                     else:
                         error = f"Commune '{nom}' non trouvée sur Nominatim."
                 except Exception as e:
@@ -361,15 +358,16 @@ def rechercher_nominatim(request):
                     departement = parts[1] if len(parts) > 1 else ''
                     code_dept = '99'  # Code par défaut
 
+                    # Normaliser les virgules en points pour les nombres décimaux
                     commune = CommuneFrance.objects.create(
                         nom=nom,
                         code_insee=code_insee,
                         code_postal='00000',  # À renseigner manuellement ensuite
                         departement=departement,
                         code_departement=code_dept,
-                        latitude=float(latitude),
-                        longitude=float(longitude),
-                        altitude=int(altitude) if altitude else None,
+                        latitude=float(latitude.replace(',', '.')),
+                        longitude=float(longitude.replace(',', '.')),
+                        altitude=int(float(altitude.replace(',', '.'))) if altitude else None,
                         source_ajout='nominatim',
                         ajoutee_par=request.user,
                         commentaire=f"Ajouté via Nominatim - Adresse complète: {adresse}",
