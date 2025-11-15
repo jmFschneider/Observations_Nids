@@ -7,10 +7,11 @@ Ce script :
 3. Ajoute les communes manquantes avec toutes les informations disponibles
 """
 
+
 import requests
-import sys
 from django.core.management.base import BaseCommand
 from django.db import transaction
+
 from geo.models import AncienneCommune, CommuneFrance
 
 
@@ -71,24 +72,23 @@ class Command(BaseCommand):
 
         # Étape 2 : Vérifier lesquelles sont absentes de la BDD
         self.stdout.write("Vérification des communes manquantes...")
-        codes_insee_existants = set(
-            AncienneCommune.objects.values_list('code_insee', flat=True)
-        )
+        codes_insee_existants = set(AncienneCommune.objects.values_list('code_insee', flat=True))
         self.stdout.write(f"Actuellement {len(codes_insee_existants)} anciennes communes en BDD\n")
 
         # Étape 3 : Traiter les communes manquantes
         communes_a_traiter = [
-            c for c in communes_deleguees
-            if c.get('code') not in codes_insee_existants
+            c for c in communes_deleguees if c.get('code') not in codes_insee_existants
         ]
 
         if self.limit > 0:
-            communes_a_traiter = communes_a_traiter[:self.limit]
+            communes_a_traiter = communes_a_traiter[: self.limit]
 
         self.stdout.write(f"Communes déléguées à ajouter : {len(communes_a_traiter)}\n")
 
         if not communes_a_traiter:
-            self.stdout.write(self.style.SUCCESS("Base de données à jour ! Aucune commune à ajouter."))
+            self.stdout.write(
+                self.style.SUCCESS("Base de données à jour ! Aucune commune à ajouter.")
+            )
             self.afficher_statistiques()
             return
 
@@ -104,13 +104,9 @@ class Command(BaseCommand):
     def recuperer_communes_deleguees(self):
         """Récupère toutes les communes déléguées depuis l'API"""
         try:
-            params = {
-                'fields': 'nom,code,chefLieu,centre,codesPostaux'
-            }
+            params = {'fields': 'nom,code,chefLieu,centre,codesPostaux'}
             response = requests.get(
-                f"{self.API_BASE_URL}/communes_associees_deleguees",
-                params=params,
-                timeout=30
+                f"{self.API_BASE_URL}/communes_associees_deleguees", params=params, timeout=30
             )
             response.raise_for_status()
             return response.json()
@@ -128,9 +124,7 @@ class Command(BaseCommand):
                 'fields': 'nom,code,codesPostaux,departement,region,population,surface,centre'
             }
             response = requests.get(
-                f"{self.API_BASE_URL}/communes/{code_insee}",
-                params=params,
-                timeout=10
+                f"{self.API_BASE_URL}/communes/{code_insee}", params=params, timeout=10
             )
             response.raise_for_status()
             data = response.json()
@@ -159,9 +153,7 @@ class Command(BaseCommand):
 
         if not code_chef_lieu:
             if self.verbose:
-                self.stdout.write(
-                    self.style.WARNING(f"  Pas de chef-lieu pour {nom_deleguee}")
-                )
+                self.stdout.write(self.style.WARNING(f"  Pas de chef-lieu pour {nom_deleguee}"))
             self.stats['erreurs'] += 1
             return
 
@@ -221,9 +213,7 @@ class Command(BaseCommand):
                     )
             except Exception as e:
                 self.stats['erreurs'] += 1
-                self.stdout.write(
-                    self.style.ERROR(f"  Erreur création {nom_deleguee}: {e}")
-                )
+                self.stdout.write(self.style.ERROR(f"  Erreur création {nom_deleguee}: {e}"))
         else:
             self.stats['ajoutees'] += 1
             if self.verbose:
@@ -283,7 +273,9 @@ class Command(BaseCommand):
                 longitude=longitude,
                 altitude=None,
                 population=info.get('population'),
-                superficie=info.get('surface', 0) / 100 if info.get('surface') else None,  # hectares -> km²
+                superficie=info.get('surface', 0) / 100
+                if info.get('surface')
+                else None,  # hectares -> km²
                 source_ajout='api_geo',
                 commentaire="Créée automatiquement lors de l'import des communes déléguées",
             )
@@ -306,15 +298,15 @@ class Command(BaseCommand):
         """Affiche les statistiques finales"""
         self.stdout.write(
             self.style.SUCCESS(
-                f"\n{'='*60}\n"
+                f"\n{'=' * 60}\n"
                 f"RÉSULTATS\n"
-                f"{'='*60}\n"
+                f"{'=' * 60}\n"
                 f"Communes déléguées dans l'API    : {self.stats['total_api']}\n"
                 f"Anciennes communes ajoutées      : {self.stats['ajoutees']}\n"
                 f"Communes nouvelles créées        : {self.stats['communes_nouvelles_creees']}\n"
                 f"Communes nouvelles introuvables  : {self.stats['communes_nouvelles_manquantes']}\n"
                 f"Erreurs                          : {self.stats['erreurs']}\n"
-                f"{'='*60}"
+                f"{'=' * 60}"
             )
         )
 

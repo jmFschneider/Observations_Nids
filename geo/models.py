@@ -65,6 +65,7 @@ class CommuneFrance(models.Model):
         blank=True,
         help_text="Date d'ajout dans la base de données",
     )
+
     class Meta:
         db_table = 'geo_commune_france'
         verbose_name = 'Commune française'
@@ -93,7 +94,6 @@ class CommuneFrance(models.Model):
 
     def nombre_observations(self):
         """Retourne le nombre de fiches d'observation utilisant cette commune"""
-        from geo.models import Localisation
 
         return Localisation.objects.filter(code_insee=self.code_insee).count()
 
@@ -190,13 +190,10 @@ class Localisation(models.Model):
         max_length=100,
         blank=True,
         default='',
-        help_text="Nom exact de la commune saisi par l'observateur (peut être une ancienne commune)"
+        help_text="Nom exact de la commune saisi par l'observateur (peut être une ancienne commune)",
     )
     commune = models.CharField(
-        max_length=100,
-        blank=True,
-        default='',
-        help_text="Nom de la commune actuelle (normalisé)"
+        max_length=100, blank=True, default='', help_text="Nom de la commune actuelle (normalisé)"
     )
     lieu_dit = models.CharField(max_length=100, blank=True, default='')
     departement = models.CharField(max_length=100, default='00')
