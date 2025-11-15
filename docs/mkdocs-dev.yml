@@ -92,6 +92,8 @@ nav:
       - 'Taxonomie': 'developpeurs/guides/01_taxonomie.md'
       - 'Géolocalisation': 'developpeurs/guides/02_geolocalisation.md'
       - 'Django-Helpdesk (Support)': 'developpeurs/guides/03_django-helpdesk.md'
+      - 'Gestion des Communes': 'developpeurs/guides/08_gestion_communes.md'
+      - 'Anciennes Communes (Fusions)': 'developpeurs/guides/09_anciennes_communes.md'
     - 'Processus de Développement':
       - 'Git Workflow': 'developpeurs/guides/development_process/01_git.md'
       - 'CI-CD': 'developpeurs/guides/development_process/02_ci-cd.md'
