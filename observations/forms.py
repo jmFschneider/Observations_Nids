@@ -2,6 +2,7 @@ from django import forms
 from django.utils import timezone
 
 from geo.models import Localisation
+from geo.services.geocodeur import geocoder_commune_unifiee
 from observations.models import (
     CausesEchec,
     FicheObservation,
@@ -103,6 +104,30 @@ class LocalisationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if not self.instance.coordonnees:
             self.fields['coordonnees'].initial = '0,0'
+
+    def save(self, commit=True):
+        """
+        Surcharge pour gérer automatiquement commune_saisie et commune
+        selon qu'il s'agit d'une ancienne commune ou non
+        """
+
+        instance = super().save(commit=False)
+
+        # Si une commune est renseignée, vérifier s'il s'agit d'une ancienne commune
+        if instance.commune:
+            resultat = geocoder_commune_unifiee(instance.commune)
+            if resultat:
+                # Enregistrer le nom saisi par l'utilisateur
+                instance.commune_saisie = instance.commune
+
+                # Si c'est une ancienne commune fusionnée, normaliser vers la commune actuelle
+                if resultat['est_fusionnee']:
+                    instance.commune = resultat['commune_actuelle']
+                # Sinon, on garde tel quel (commune actuelle)
+
+        if commit:
+            instance.save()
+        return instance
 
 
 class ObservationForm(forms.ModelForm):

@@ -152,18 +152,24 @@
                     </li>
                     {% endif %}
 
-                    <!-- Gestion des espèces -->
+                    <!-- Référentiels -->
                     {% if user.is_staff %}
                     <li class="nav-item">
                         <div class="sidebar-divider"></div>
                     </li>
                     <li class="nav-item">
-                        <h6 class="sidebar-heading">Taxonomie</h6>
+                        <h6 class="sidebar-heading">Référentiels</h6>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'taxonomy:liste_especes' %}" data-title="Gestion des espèces">
+                        <a class="nav-link" href="{% url 'taxonomy:liste_especes' %}" data-title="Espèces">
                             <i class="fas fa-dove"></i>
-                            <span class="link-text">Gestion des espèces</span>
+                            <span class="link-text">Espèces</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'geo:liste_communes' %}" data-title="Communes">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span class="link-text">Communes</span>
                         </a>
                     </li>
                     {% endif %}

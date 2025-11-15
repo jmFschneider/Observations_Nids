@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Supprimer {{ commune.nom }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'geo:liste_communes' %}">Communes</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'geo:detail_commune' commune.id %}">{{ commune.nom }}</a></li>
+                    <li class="breadcrumb-item active">Supprimer</li>
+                </ol>
+            </nav>
+
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Confirmer la suppression
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if nombre_fiches > 0 %}
+                    <!-- Commune utilisée : suppression impossible -->
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-ban"></i> Suppression impossible</h5>
+                        <p class="mb-0">
+                            Cette commune est utilisée dans <strong>{{ nombre_fiches }}</strong> fiche(s) d'observation
+                            et ne peut donc pas être supprimée.
+                        </p>
+                    </div>
+
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6><i class="fas fa-info-circle"></i> Informations de la commune :</h6>
+                            <ul class="mb-0">
+                                <li><strong>Nom :</strong> {{ commune.nom }}</li>
+                                <li><strong>Code INSEE :</strong> {{ commune.code_insee }}</li>
+                                <li><strong>Département :</strong> {{ commune.departement }} ({{ commune.code_departement }})</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{% url 'geo:detail_commune' commune.id %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> Retour au détail
+                        </a>
+                    </div>
+
+                    {% else %}
+                    <!-- Commune non utilisée : suppression possible -->
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Attention</h5>
+                        <p>
+                            Vous êtes sur le point de supprimer définitivement la commune suivante :
+                        </p>
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ commune.nom }}</h5>
+                            <table class="table table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th style="width: 40%;">Code INSEE :</th>
+                                        <td>{{ commune.code_insee }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Code postal :</th>
+                                        <td>{{ commune.code_postal }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Département :</th>
+                                        <td>{{ commune.departement }} ({{ commune.code_departement }})</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Coordonnées GPS :</th>
+                                        <td class="font-monospace">{{ commune.coordonnees_gps }}</td>
+                                    </tr>
+                                    {% if commune.autres_noms %}
+                                    <tr>
+                                        <th>Autres noms :</th>
+                                        <td>{{ commune.autres_noms }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <th>Source :</th>
+                                        <td>{{ commune.get_source_ajout_display }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Cette commune n'est pas utilisée dans des observations et peut être supprimée en toute sécurité.
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash"></i> Oui, supprimer définitivement
+                            </button>
+                            <a href="{% url 'geo:detail_commune' commune.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Non, annuler
+                            </a>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Créer une commune{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'geo:liste_communes' %}">Communes</a></li>
+                    <li class="breadcrumb-item active">Créer</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0"><i class="fas fa-plus-circle"></i> Créer une nouvelle commune</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb"></i>
+                        <strong>Astuce :</strong> Pour ajouter une commune plus facilement avec géocodage automatique,
+                        utilisez plutôt <a href="{% url 'geo:rechercher_nominatim' %}">la recherche Nominatim</a>.
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <h5 class="mb-3"><i class="fas fa-info-circle"></i> Identification</h5>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td style="width: 25%; text-align: right; vertical-align: middle; padding-right: 15px;">
+                                    <label for="nom" class="mb-0">Nom <span class="text-danger">*</span></label>
+                                </td>
+                                <td style="width: 75%;">
+                                    <input type="text" class="form-control" id="nom" name="nom" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; vertical-align: middle; padding-right: 15px;">
+                                    <label for="code_insee" class="mb-0">Code INSEE <span class="text-danger">*</span></label>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" id="code_insee" name="code_insee" maxlength="5" required>
+                                    <small class="text-muted">5 caractères (ex: 74056)</small>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <h5 class="mb-3 mt-4"><i class="fas fa-map"></i> Localisation administrative</h5>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td style="width: 25%; text-align: right; vertical-align: middle; padding-right: 15px;">
+                                    <label for="code_postal" class="mb-0">Code postal</label>
+                                </td>
+                                <td style="width: 75%;">
+                                    <input type="text" class="form-control" id="code_postal" name="code_postal" maxlength="5">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; vertical-align: middle; padding-right: 15px;">
+                                    <label for="code_departement" class="mb-0">Code département</label>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" id="code_departement" name="code_departement" maxlength="3">
+                                    <small class="text-muted">Ex: 74, 2A, 971</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; vertical-align: middle; padding-right: 15px;">
+                                    <label for="departement" class="mb-0">Nom département</label>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" id="departement" name="departement">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; vertical-align: middle; padding-right: 15px;">
+                                    <label for="region" class="mb-0">Région</label>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" id="region" name="region">
+                                </td>
+                            </tr>
+                        </table>
+
+                        <h5 class="mb-3 mt-4"><i class="fas fa-map-pin"></i> Coordonnées GPS</h5>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td style="width: 25%; text-align: right; vertical-align: middle; padding-right: 15px;">
+                                    <label for="latitude" class="mb-0">Latitude <span class="text-danger">*</span></label>
+                                </td>
+                                <td style="width: 75%;">
+                                    <input type="text" class="form-control" id="latitude" name="latitude" step="0.000001" required>
+                                    <small class="text-muted">Ex: 45.923700 ou 45,923700</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; vertical-align: middle; padding-right: 15px;">
+                                    <label for="longitude" class="mb-0">Longitude <span class="text-danger">*</span></label>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" id="longitude" name="longitude" step="0.000001" required>
+                                    <small class="text-muted">Ex: 6.869400 ou 6,869400</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; vertical-align: middle; padding-right: 15px;">
+                                    <label for="altitude" class="mb-0">Altitude (m)</label>
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="altitude" name="altitude">
+                                </td>
+                            </tr>
+                        </table>
+
+                        <h5 class="mb-3 mt-4"><i class="fas fa-tags"></i> Informations complémentaires</h5>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td style="width: 25%; text-align: right; vertical-align: middle; padding-right: 15px;">
+                                    <label for="autres_noms" class="mb-0">Autres noms / Alias</label>
+                                </td>
+                                <td style="width: 75%;">
+                                    <input type="text" class="form-control" id="autres_noms" name="autres_noms">
+                                    <small class="text-muted">Séparés par des virgules. Ex: "Les Praz, Les Praz-de-Chamonix"</small>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Note :</strong> La gestion des fusions de communes (champ "Commune actuelle")
+                            sera disponible après la création, via la page de modification.
+                        </div>
+
+                        <table class="table table-borderless">
+                            <tr>
+                                <td style="width: 25%; text-align: right; vertical-align: top; padding-right: 15px; padding-top: 10px;">
+                                    <label for="commentaire" class="mb-0">Commentaire</label>
+                                </td>
+                                <td style="width: 75%;">
+                                    <textarea class="form-control" id="commentaire" name="commentaire" rows="3"></textarea>
+                                    <small class="text-muted">Notes sur l'origine, fusion, etc.</small>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save"></i> Créer la commune
+                            </button>
+                            <a href="{% url 'geo:liste_communes' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

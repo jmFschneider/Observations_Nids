@@ -43,7 +43,15 @@
    <table class="localisation-table">
 		<tr>
 			<th>Commune</th>
-			<td>{{ localisation.commune }}</td>
+			<td>
+				{% if localisation.commune_saisie and localisation.commune_saisie != localisation.commune %}
+					{{ localisation.commune_saisie }} → {{ localisation.commune }}
+				{% elif localisation.commune_saisie %}
+					{{ localisation.commune_saisie }}
+				{% else %}
+					{{ localisation.commune }}
+				{% endif %}
+			</td>
 			<th>Département</th>
 			<td>{{ localisation.departement }}</td>
 		</tr>

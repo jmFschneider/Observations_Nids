@@ -1,0 +1,75 @@
+/**
+ * Styles pour l'autocomplétion des communes
+ */
+
+.autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-top: none;
+    border-radius: 0 0 0.25rem 0.25rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: -1px;
+}
+
+.autocomplete-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f1f1;
+    transition: background-color 0.2s ease;
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.autocomplete-active {
+    background-color: #e9ecef;
+}
+
+.autocomplete-item strong {
+    color: #495057;
+    font-weight: 600;
+}
+
+.autocomplete-details {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-left: 5px;
+}
+
+.autocomplete-no-result {
+    color: #6c757d;
+    font-style: italic;
+    cursor: default;
+    text-align: center;
+}
+
+.autocomplete-no-result:hover {
+    background-color: transparent;
+}
+
+/* Style du champ de recherche */
+input.commune-autocomplete-input:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Animation de chargement */
+.autocomplete-loading {
+    padding: 10px 15px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.autocomplete-loading::after {
+    content: "Recherche en cours...";
+}
