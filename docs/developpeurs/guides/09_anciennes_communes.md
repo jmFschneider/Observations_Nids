@@ -62,7 +62,7 @@ Cette séparation permet :
                 │ (ForeignKey)
                 │
 ┌─────────────────────────────────────┐
-│     AncienneCommune (1 587)         │
+│     AncienneCommune (2 933)         │
 │   Communes fusionnées/déléguées     │
 ├─────────────────────────────────────┤
 │ id                                  │
@@ -82,7 +82,8 @@ Cette séparation permet :
 |---------|------|
 | `geo/models.py` | Modèle `AncienneCommune` (lignes 105-183) |
 | `geo/migrations/0007_*.py` | Migration de création de la table |
-| `geo/management/commands/importer_anciennes_communes.py` | Script d'import |
+| `geo/management/commands/importer_anciennes_communes.py` | Script d'import depuis CSV (~1587 communes) |
+| `geo/management/commands/verifier_communes_deleguees.py` | Script d'import depuis API (+1346 communes) |
 | `communes_nouvelles.csv` | Données officielles (data.gouv.fr) |
 
 ---
@@ -136,7 +137,45 @@ Erreurs : 0
 ============================================================
 ```
 
-### Étape 4 : Vérifier l'import
+### Étape 4 : Compléter avec les communes déléguées de l'API
+
+Le fichier CSV ne contient que ~1587 communes. Pour avoir la liste complète (~2933 communes), utilisez le script qui récupère les données depuis l'API geo.api.gouv.fr :
+
+```bash
+# Mode simulation (recommandé en premier)
+python manage.py verifier_communes_deleguees --dry-run
+
+# Import réel
+python manage.py verifier_communes_deleguees
+```
+
+**Résultat attendu** :
+```
+Récupération des communes déléguées depuis l'API geo.api.gouv.fr...
+Trouvé 2628 communes déléguées dans l'API
+Vérification des communes manquantes...
+Actuellement 1587 anciennes communes en BDD
+Communes déléguées à ajouter : 1346
+Progression : 100/1346
+...
+============================================================
+RÉSULTATS
+============================================================
+Communes déléguées dans l'API    : 2628
+Anciennes communes ajoutées      : 1346
+Communes nouvelles créées        : 0
+Communes nouvelles introuvables  : 0
+Erreurs                          : 0
+============================================================
+```
+
+**Avantages de ce script** :
+- ✅ Ajoute les coordonnées GPS de chaque ancienne commune
+- ✅ Import automatique des codes postaux
+- ✅ Idempotent : peut être relancé plusieurs fois sans doublons
+- ✅ Crée automatiquement les communes nouvelles si manquantes
+
+### Étape 5 : Vérifier l'import complet
 
 ```bash
 python manage.py shell
@@ -146,7 +185,7 @@ python manage.py shell
 from geo.models import AncienneCommune, CommuneFrance
 
 # Nombre d'anciennes communes
-print(f"Anciennes communes : {AncienneCommune.objects.count()}")  # → 1587
+print(f"Anciennes communes : {AncienneCommune.objects.count()}")  # → 2933
 
 # Exemple
 ancienne = AncienneCommune.objects.filter(nom__icontains="Praz").first()
@@ -235,22 +274,24 @@ result = geocoder_observation("Les Praz")
 
 ---
 
-## 5. Script d'import
+## 5. Scripts d'import
 
-### Commande
+### 5.1 Import depuis CSV (importer_anciennes_communes)
+
+#### Commande
 
 ```bash
 python manage.py importer_anciennes_communes [OPTIONS]
 ```
 
-### Options
+#### Options
 
 | Option | Description |
 |--------|-------------|
 | `--file PATH` | Chemin vers le fichier CSV (défaut: `communes_nouvelles.csv`) |
 | `--clear` | Supprimer toutes les anciennes communes avant import |
 
-### Exemples
+#### Exemples
 
 ```bash
 # Import standard
@@ -262,6 +303,54 @@ python manage.py importer_anciennes_communes --clear
 # Avec fichier personnalisé
 python manage.py importer_anciennes_communes --file /chemin/vers/fichier.csv
 ```
+
+### 5.2 Import depuis API (verifier_communes_deleguees)
+
+Ce script complète la base avec les communes déléguées manquantes en récupérant les données directement depuis l'API geo.api.gouv.fr.
+
+#### Commande
+
+```bash
+python manage.py verifier_communes_deleguees [OPTIONS]
+```
+
+#### Options
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Mode simulation : affiche ce qui serait fait sans modifier la base |
+| `--verbose` | Affiche plus de détails sur chaque commune ajoutée |
+| `--limit N` | Limite le nombre de communes à traiter (0 = illimité) |
+
+#### Exemples
+
+```bash
+# Mode simulation (recommandé en premier)
+python manage.py verifier_communes_deleguees --dry-run
+
+# Import réel
+python manage.py verifier_communes_deleguees
+
+# Import avec détails
+python manage.py verifier_communes_deleguees --verbose
+
+# Test avec 10 communes seulement
+python manage.py verifier_communes_deleguees --dry-run --verbose --limit 10
+```
+
+#### Avantages par rapport au CSV
+
+- **Coordonnées GPS** : Chaque ancienne commune obtient ses propres coordonnées
+- **Codes postaux** : Import automatique des codes postaux
+- **Mise à jour automatique** : L'API contient toujours les dernières données
+- **Idempotent** : Peut être relancé sans créer de doublons
+- **Création automatique** : Crée les communes nouvelles si absentes
+
+#### Prérequis
+
+- Connexion internet (accès à geo.api.gouv.fr)
+- Base des communes actuelles (CommuneFrance) déjà remplie
+- Librairie `requests` installée (déjà dans requirements)
 
 ### Format du fichier CSV
 
