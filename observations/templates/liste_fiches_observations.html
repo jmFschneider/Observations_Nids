@@ -105,7 +105,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         </td>
                         <td>
                             {% if fiche.localisation %}
-                                {{ fiche.localisation.commune }}
+                                {% if fiche.localisation.commune_saisie and fiche.localisation.commune_saisie != fiche.localisation.commune %}
+                                    {{ fiche.localisation.commune_saisie }} → {{ fiche.localisation.commune }}
+                                {% elif fiche.localisation.commune_saisie %}
+                                    {{ fiche.localisation.commune_saisie }}
+                                {% else %}
+                                    {{ fiche.localisation.commune }}
+                                {% endif %}
                             {% else %}
                                 <span class="text-muted">Non renseignée</span>
                             {% endif %}

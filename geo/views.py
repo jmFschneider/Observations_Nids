@@ -5,8 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 
-from geo.models import CommuneFrance
+from geo.models import CommuneFrance, AncienneCommune
 from geo.utils.geocoding import get_geocodeur
+from geo.services.geocodeur import geocoder_commune_unifiee
 from observations.models import FicheObservation
 
 logger = logging.getLogger(__name__)
@@ -48,11 +49,23 @@ def geocoder_commune_manuelle(request):
             coords = geocodeur.geocoder_commune(commune, departement)
 
         if coords:
+            # Vérifier si c'est une ancienne commune
+            resultat_geocodage = geocoder_commune_unifiee(commune)
+
             # Mise à jour de la localisation
             fiche.localisation.coordonnees = coords['coordonnees_gps']
             fiche.localisation.latitude = str(coords['lat'])
             fiche.localisation.longitude = str(coords['lon'])
-            fiche.localisation.commune = commune
+
+            # Enregistrer le nom saisi ET le nom normalisé
+            fiche.localisation.commune_saisie = commune  # Ce que l'utilisateur a saisi
+            if resultat_geocodage and resultat_geocodage['est_fusionnee']:
+                # Si c'est une ancienne commune, enregistrer la commune actuelle
+                fiche.localisation.commune = resultat_geocodage['commune_actuelle']
+            else:
+                # Sinon, enregistrer tel quel
+                fiche.localisation.commune = commune
+
             if departement:
                 fiche.localisation.departement = departement
             if lieu_dit:
@@ -110,6 +123,7 @@ def rechercher_communes(request):
 
     # Recherche par nom de commune
     if query and len(query) >= 2:
+        # 1. Rechercher dans les communes actuelles
         communes_queryset = CommuneFrance.objects.filter(nom__icontains=query)
 
         # Si coordonnées GPS fournies ET valides (pas 0,0), filtrer par bounding box (~10 km)
@@ -133,7 +147,7 @@ def rechercher_communes(request):
             except ValueError:
                 logger.warning(f"Coordonnées GPS invalides: lat={lat}, lon={lon}")
 
-        communes = communes_queryset.values(
+        communes = list(communes_queryset.values(
             'id',  # Ajout de l'ID pour l'autocomplétion
             'nom',
             'departement',
@@ -143,7 +157,47 @@ def rechercher_communes(request):
             'latitude',
             'longitude',
             'altitude',
-        )[:100]  # Récupérer plus pour filtrer ensuite
+        )[:50])  # Récupérer 50 communes actuelles
+
+        # 2. Rechercher dans les anciennes communes
+        anciennes_queryset = AncienneCommune.objects.filter(nom__icontains=query).select_related('commune_actuelle')
+
+        # Appliquer le même filtrage GPS si nécessaire
+        if lat and lon:
+            try:
+                lat_float = float(lat)
+                lon_float = float(lon)
+                if lat_float != 0.0 and lon_float != 0.0:
+                    delta = 0.1
+                    anciennes_queryset = anciennes_queryset.filter(
+                        commune_actuelle__latitude__gte=lat_float - delta,
+                        commune_actuelle__latitude__lte=lat_float + delta,
+                        commune_actuelle__longitude__gte=lon_float - delta,
+                        commune_actuelle__longitude__lte=lon_float + delta,
+                    )
+            except ValueError:
+                pass
+
+        # Ajouter les anciennes communes au résultat
+        for ancienne in anciennes_queryset[:50]:
+            # Utiliser les coordonnées de l'ancienne commune si disponibles, sinon celles de la commune actuelle
+            lat_ancienne = ancienne.latitude if ancienne.latitude else ancienne.commune_actuelle.latitude
+            lon_ancienne = ancienne.longitude if ancienne.longitude else ancienne.commune_actuelle.longitude
+            alt_ancienne = ancienne.altitude if ancienne.altitude else ancienne.commune_actuelle.altitude
+
+            communes.append({
+                'id': f"ancienne_{ancienne.id}",  # Préfixe pour différencier
+                'nom': ancienne.nom,
+                'nom_actuel': ancienne.commune_actuelle.nom,  # Nom de la commune actuelle
+                'departement': ancienne.departement or ancienne.commune_actuelle.departement,
+                'code_departement': ancienne.code_departement,
+                'code_postal': ancienne.code_postal or ancienne.commune_actuelle.code_postal,
+                'code_insee': ancienne.commune_actuelle.code_insee,  # Code INSEE actif
+                'latitude': lat_ancienne,
+                'longitude': lon_ancienne,
+                'altitude': alt_ancienne,
+                'est_fusionnee': True,  # Marqueur pour affichage différent
+            })
 
     else:
         return JsonResponse({'communes': []})
@@ -199,18 +253,26 @@ def rechercher_communes(request):
                 logger.debug(f"Erreur calcul distance: {e}")
                 distance_km = None
 
+        # Construire le label selon que c'est une ancienne commune ou non
+        if commune.get('est_fusionnee'):
+            label = f"{commune['nom']} → {commune['nom_actuel']} ({commune['code_departement']}) - {commune['departement']}{distance_info}"
+        else:
+            label = f"{commune['nom']} ({commune['code_departement']}) - {commune['departement']}{distance_info}"
+
         results.append(
             {
                 'id': commune['id'],  # ID pour l'autocomplétion
                 'nom': commune['nom'],
+                'nom_actuel': commune.get('nom_actuel'),  # Seulement pour les anciennes communes
                 'departement': commune['departement'],
                 'code_departement': commune['code_departement'],
                 'code_postal': commune['code_postal'],
                 'code_insee': commune['code_insee'],
-                'label': f"{commune['nom']} ({commune['code_departement']}) - {commune['departement']}{distance_info}",
+                'label': label,
                 'latitude': str(commune['latitude']),
                 'longitude': str(commune['longitude']),
                 'altitude': commune['altitude'] if commune.get('altitude') is not None else None,
+                'est_fusionnee': commune.get('est_fusionnee', False),
                 'distance_km': distance_km,  # Pour le tri
             }
         )
