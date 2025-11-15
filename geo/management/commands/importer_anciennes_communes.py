@@ -1,6 +1,8 @@
 import csv
 from datetime import datetime
+
 from django.core.management.base import BaseCommand
+
 from geo.models import AncienneCommune, CommuneFrance
 
 
@@ -31,7 +33,7 @@ class Command(BaseCommand):
         self.stdout.write(f"Lecture du fichier {fichier_csv}...")
 
         try:
-            with open(fichier_csv, 'r', encoding='utf-8') as csvfile:
+            with open(fichier_csv, encoding='utf-8') as csvfile:
                 reader = csv.DictReader(csvfile)
 
                 stats = {
@@ -58,7 +60,9 @@ class Command(BaseCommand):
 
                         # Chercher la commune actuelle dans notre base
                         try:
-                            commune_actuelle = CommuneFrance.objects.get(code_insee=code_insee_nouvelle)
+                            commune_actuelle = CommuneFrance.objects.get(
+                                code_insee=code_insee_nouvelle
+                            )
                         except CommuneFrance.DoesNotExist:
                             self.stdout.write(
                                 self.style.WARNING(
@@ -91,26 +95,22 @@ class Command(BaseCommand):
 
                     except KeyError as e:
                         stats['erreurs'] += 1
-                        self.stdout.write(
-                            self.style.ERROR(f"Colonne manquante dans le CSV: {e}")
-                        )
+                        self.stdout.write(self.style.ERROR(f"Colonne manquante dans le CSV: {e}"))
                     except Exception as e:
                         stats['erreurs'] += 1
-                        self.stdout.write(
-                            self.style.ERROR(f"Erreur lors de l'import: {e}")
-                        )
+                        self.stdout.write(self.style.ERROR(f"Erreur lors de l'import: {e}"))
 
                 # Afficher les statistiques
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f"\n{'='*60}\n"
+                        f"\n{'=' * 60}\n"
                         f"Import terminé !\n"
-                        f"{'='*60}\n"
+                        f"{'=' * 60}\n"
                         f"Anciennes communes importées : {stats['importees']}\n"
                         f"Lignes ignorées (commune siège) : {stats['ignorees']}\n"
                         f"Communes actuelles introuvables : {stats['commune_actuelle_introuvable']}\n"
                         f"Erreurs : {stats['erreurs']}\n"
-                        f"{'='*60}"
+                        f"{'=' * 60}"
                     )
                 )
 

@@ -2,6 +2,7 @@ from django import forms
 from django.utils import timezone
 
 from geo.models import Localisation
+from geo.services.geocodeur import geocoder_commune_unifiee
 from observations.models import (
     CausesEchec,
     FicheObservation,
@@ -109,7 +110,6 @@ class LocalisationForm(forms.ModelForm):
         Surcharge pour gérer automatiquement commune_saisie et commune
         selon qu'il s'agit d'une ancienne commune ou non
         """
-        from geo.services.geocodeur import geocoder_commune_unifiee
 
         instance = super().save(commit=False)
 

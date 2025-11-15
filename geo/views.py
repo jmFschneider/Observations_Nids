@@ -5,9 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 
-from geo.models import CommuneFrance, AncienneCommune
-from geo.utils.geocoding import get_geocodeur
+from geo.models import AncienneCommune, CommuneFrance
 from geo.services.geocodeur import geocoder_commune_unifiee
+from geo.utils.geocoding import get_geocodeur
 from observations.models import FicheObservation
 
 logger = logging.getLogger(__name__)
@@ -147,20 +147,24 @@ def rechercher_communes(request):
             except ValueError:
                 logger.warning(f"Coordonnées GPS invalides: lat={lat}, lon={lon}")
 
-        communes = list(communes_queryset.values(
-            'id',  # Ajout de l'ID pour l'autocomplétion
-            'nom',
-            'departement',
-            'code_departement',
-            'code_postal',
-            'code_insee',
-            'latitude',
-            'longitude',
-            'altitude',
-        )[:50])  # Récupérer 50 communes actuelles
+        communes = list(
+            communes_queryset.values(
+                'id',  # Ajout de l'ID pour l'autocomplétion
+                'nom',
+                'departement',
+                'code_departement',
+                'code_postal',
+                'code_insee',
+                'latitude',
+                'longitude',
+                'altitude',
+            )[:50]
+        )  # Récupérer 50 communes actuelles
 
         # 2. Rechercher dans les anciennes communes
-        anciennes_queryset = AncienneCommune.objects.filter(nom__icontains=query).select_related('commune_actuelle')
+        anciennes_queryset = AncienneCommune.objects.filter(nom__icontains=query).select_related(
+            'commune_actuelle'
+        )
 
         # Appliquer le même filtrage GPS si nécessaire
         if lat and lon:
@@ -181,23 +185,31 @@ def rechercher_communes(request):
         # Ajouter les anciennes communes au résultat
         for ancienne in anciennes_queryset[:50]:
             # Utiliser les coordonnées de l'ancienne commune si disponibles, sinon celles de la commune actuelle
-            lat_ancienne = ancienne.latitude if ancienne.latitude else ancienne.commune_actuelle.latitude
-            lon_ancienne = ancienne.longitude if ancienne.longitude else ancienne.commune_actuelle.longitude
-            alt_ancienne = ancienne.altitude if ancienne.altitude else ancienne.commune_actuelle.altitude
+            lat_ancienne = (
+                ancienne.latitude if ancienne.latitude else ancienne.commune_actuelle.latitude
+            )
+            lon_ancienne = (
+                ancienne.longitude if ancienne.longitude else ancienne.commune_actuelle.longitude
+            )
+            alt_ancienne = (
+                ancienne.altitude if ancienne.altitude else ancienne.commune_actuelle.altitude
+            )
 
-            communes.append({
-                'id': f"ancienne_{ancienne.id}",  # Préfixe pour différencier
-                'nom': ancienne.nom,
-                'nom_actuel': ancienne.commune_actuelle.nom,  # Nom de la commune actuelle
-                'departement': ancienne.departement or ancienne.commune_actuelle.departement,
-                'code_departement': ancienne.code_departement,
-                'code_postal': ancienne.code_postal or ancienne.commune_actuelle.code_postal,
-                'code_insee': ancienne.commune_actuelle.code_insee,  # Code INSEE actif
-                'latitude': lat_ancienne,
-                'longitude': lon_ancienne,
-                'altitude': alt_ancienne,
-                'est_fusionnee': True,  # Marqueur pour affichage différent
-            })
+            communes.append(
+                {
+                    'id': f"ancienne_{ancienne.id}",  # Préfixe pour différencier
+                    'nom': ancienne.nom,
+                    'nom_actuel': ancienne.commune_actuelle.nom,  # Nom de la commune actuelle
+                    'departement': ancienne.departement or ancienne.commune_actuelle.departement,
+                    'code_departement': ancienne.code_departement,
+                    'code_postal': ancienne.code_postal or ancienne.commune_actuelle.code_postal,
+                    'code_insee': ancienne.commune_actuelle.code_insee,  # Code INSEE actif
+                    'latitude': lat_ancienne,
+                    'longitude': lon_ancienne,
+                    'altitude': alt_ancienne,
+                    'est_fusionnee': True,  # Marqueur pour affichage différent
+                }
+            )
 
     else:
         return JsonResponse({'communes': []})

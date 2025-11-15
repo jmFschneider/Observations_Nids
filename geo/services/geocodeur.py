@@ -3,7 +3,7 @@ Service de géocodage unifié pour les communes françaises.
 Cherche automatiquement dans les communes actuelles ET les anciennes communes fusionnées.
 """
 
-from geo.models import CommuneFrance, AncienneCommune
+from geo.models import AncienneCommune, CommuneFrance
 
 
 def geocoder_commune_unifiee(nom_commune, code_departement=None):
@@ -113,24 +113,32 @@ def rechercher_communes_autocomplete(terme_recherche, code_departement=None, lim
     # 1. Communes actuelles
     communes_actuelles = CommuneFrance.objects.filter(**filters).order_by('nom')[:limit]
     for commune in communes_actuelles:
-        resultats.append({
-            'nom_affiche': f"{commune.nom} ({commune.code_departement})",
-            'nom_saisie': commune.nom,
-            'code_insee': commune.code_insee,
-            'code_departement': commune.code_departement,
-            'est_fusionnee': False,
-        })
+        resultats.append(
+            {
+                'nom_affiche': f"{commune.nom} ({commune.code_departement})",
+                'nom_saisie': commune.nom,
+                'code_insee': commune.code_insee,
+                'code_departement': commune.code_departement,
+                'est_fusionnee': False,
+            }
+        )
 
     # 2. Anciennes communes (seulement si on n'a pas atteint la limite)
     if len(resultats) < limit:
-        anciennes_communes = AncienneCommune.objects.filter(**filters).select_related('commune_actuelle').order_by('nom')[:(limit - len(resultats))]
+        anciennes_communes = (
+            AncienneCommune.objects.filter(**filters)
+            .select_related('commune_actuelle')
+            .order_by('nom')[: (limit - len(resultats))]
+        )
         for ancienne in anciennes_communes:
-            resultats.append({
-                'nom_affiche': f"{ancienne.nom} → {ancienne.commune_actuelle.nom} ({ancienne.code_departement})",
-                'nom_saisie': ancienne.nom,
-                'code_insee': ancienne.commune_actuelle.code_insee,
-                'code_departement': ancienne.code_departement,
-                'est_fusionnee': True,
-            })
+            resultats.append(
+                {
+                    'nom_affiche': f"{ancienne.nom} → {ancienne.commune_actuelle.nom} ({ancienne.code_departement})",
+                    'nom_saisie': ancienne.nom,
+                    'code_insee': ancienne.commune_actuelle.code_insee,
+                    'code_departement': ancienne.code_departement,
+                    'est_fusionnee': True,
+                }
+            )
 
     return resultats
