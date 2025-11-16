@@ -439,6 +439,36 @@ class TestHomePageNotifications(TestCase):
 
         self.assertEqual(response.context['demandes_en_attente'], 2)
 
+    def test_home_page_excludes_refused_users_from_count(self):
+        """Test que les utilisateurs refusés ne sont pas comptés dans les demandes en attente"""
+        # Créer 2 demandes en attente
+        for i in range(2):
+            Utilisateur.objects.create_user(
+                username=f'pending{i}',
+                email=f'pending{i}@test.com',
+                password='testpass123',
+                est_valide=False,
+                is_active=False,
+            )
+
+        # Créer 3 utilisateurs refusés (ne doivent pas être comptés)
+        for i in range(3):
+            Utilisateur.objects.create_user(
+                username=f'refused{i}',
+                email=f'refused{i}@test.com',
+                password='testpass123',
+                est_valide=False,
+                est_refuse=True,
+                is_active=False,
+            )
+
+        self.client.login(username='admin', password='testpass123')
+        response = self.client.get(reverse('observations:home'))
+
+        # Seules les 2 demandes en attente doivent être comptées, pas les 3 refusés
+        self.assertEqual(response.context['demandes_en_attente'], 2)
+        self.assertContains(response, '2 demande(s) de compte en attente')
+
 
 @pytest.mark.django_db
 class TestListeUtilisateursView(TestCase):

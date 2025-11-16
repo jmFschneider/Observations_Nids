@@ -57,8 +57,8 @@ class FicheObservation(models.Model):
                 fiche=self,
                 defaults={
                     'nid_prec_t_meme_couple': False,
-                    'hauteur_nid': 0,
-                    'hauteur_couvert': 0,
+                    'hauteur_nid': None,
+                    'hauteur_couvert': None,
                     'details_nid': '',
                 },
             )
@@ -106,8 +106,8 @@ class FicheObservation(models.Model):
 class Nid(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="nid")
     nid_prec_t_meme_couple = models.BooleanField(default=False)
-    hauteur_nid = models.IntegerField(null=True, blank=True, default=0)
-    hauteur_couvert = models.IntegerField(null=True, blank=True, default=0)
+    hauteur_nid = models.IntegerField(null=True, blank=True, default=None)
+    hauteur_couvert = models.IntegerField(null=True, blank=True, default=None)
     details_nid = models.TextField(blank=True, default='')
 
     def __str__(self):

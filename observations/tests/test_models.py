@@ -37,7 +37,8 @@ class TestFicheObservation:
 
         # Vérifier les valeurs par défaut (champs vides avec placeholders)
         assert fiche_observation.localisation.commune == ''
-        assert fiche_observation.nid.hauteur_nid == 0
+        assert fiche_observation.nid.hauteur_nid is None
+        assert fiche_observation.nid.hauteur_couvert is None
         assert fiche_observation.resume.nombre_oeufs_pondus is None
         assert fiche_observation.causes_echec.description == ''
 
