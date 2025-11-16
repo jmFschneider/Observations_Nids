@@ -177,7 +177,9 @@ def saisie_observation(request, fiche_id=None):
                         request,
                         "Cette fiche a été validée et ne peut plus être modifiée.",
                     )
-                    redirect_response = redirect('observations:fiche_observation', fiche_id=fiche_id)
+                    redirect_response = redirect(
+                        'observations:fiche_observation', fiche_id=fiche_id
+                    )
                 # Si la fiche est en cours de saisie (nouveau ou en_edition),
                 # seul l'auteur ou un administrateur peut l'éditer
                 elif (
@@ -190,7 +192,9 @@ def saisie_observation(request, fiche_id=None):
                         f"Vous n'êtes pas autorisé à modifier cette fiche. "
                         f"Seul l'auteur ({fiche_instance.observateur.username}) peut continuer la saisie.",
                     )
-                    redirect_response = redirect('observations:fiche_observation', fiche_id=fiche_id)
+                    redirect_response = redirect(
+                        'observations:fiche_observation', fiche_id=fiche_id
+                    )
 
             if redirect_response:
                 return redirect_response
