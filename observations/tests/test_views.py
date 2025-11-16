@@ -203,6 +203,9 @@ class TestHistoriqueRemarques:
 
     def _get_base_form_data(self, fiche_observation):
         """Retourne les données de base du formulaire."""
+        # Gérer les valeurs None pour les champs numériques
+        hauteur_nid = fiche_observation.nid.hauteur_nid
+        hauteur_couvert = fiche_observation.nid.hauteur_couvert
         return {
             'espece': fiche_observation.espece.id,
             'annee': fiche_observation.annee,
@@ -215,8 +218,8 @@ class TestHistoriqueRemarques:
             'paysage': fiche_observation.localisation.paysage or '',
             'alentours': fiche_observation.localisation.alentours or '',
             'nid_prec_t_meme_couple': fiche_observation.nid.nid_prec_t_meme_couple,
-            'hauteur_nid': str(fiche_observation.nid.hauteur_nid),
-            'hauteur_couvert': str(fiche_observation.nid.hauteur_couvert),
+            'hauteur_nid': str(hauteur_nid) if hauteur_nid is not None else '',
+            'hauteur_couvert': str(hauteur_couvert) if hauteur_couvert is not None else '',
             'details_nid': fiche_observation.nid.details_nid or '',
             'premier_oeuf_pondu_jour': '',
             'premier_oeuf_pondu_mois': '',
