@@ -364,6 +364,17 @@ def saisie_observation(request, fiche_id=None):
 
                     if not hasattr(fiche, 'observateur') or not fiche.observateur:
                         fiche.observateur = request.user
+
+                    # Gérer le numéro personnel
+                    numero_personnel = request.POST.get('numero_personnel')
+                    if numero_personnel:
+                        try:
+                            fiche.numero_personnel = int(numero_personnel)
+                        except (ValueError, TypeError):
+                            fiche.numero_personnel = None
+                    else:
+                        fiche.numero_personnel = None
+
                     fiche.save()
 
                     if fiche_id and fiche_avant:
@@ -877,3 +888,60 @@ def valider_correction(request, fiche_id):
 
     logger.info(f"Méthode GET, redirection vers modifier_observation pour fiche {fiche_id}")
     return redirect('observations:modifier_observation', fiche_id=fiche_id)
+
+
+@login_required
+def rechercher_fiches(request):
+    """
+    Endpoint AJAX pour rechercher des fiches d'observation.
+    Permet de filtrer par observateur, année, espèce, numéro personnel.
+    """
+    if request.headers.get('X-Requested-With') != 'XMLHttpRequest':
+        return JsonResponse({'error': 'Requête AJAX uniquement'}, status=400)
+
+    # Récupérer les paramètres de recherche
+    observateur_id = request.GET.get('observateur')
+    annee = request.GET.get('annee')
+    espece_id = request.GET.get('espece')
+    numero_personnel = request.GET.get('numero_personnel')
+    fiche_id_min = request.GET.get('fiche_id_min')
+    fiche_id_max = request.GET.get('fiche_id_max')
+
+    # Construire la requête
+    fiches = FicheObservation.objects.select_related('observateur', 'espece', 'localisation')
+
+    if observateur_id:
+        fiches = fiches.filter(observateur_id=observateur_id)
+    if annee:
+        fiches = fiches.filter(annee=annee)
+    if espece_id:
+        fiches = fiches.filter(espece_id=espece_id)
+    if numero_personnel:
+        fiches = fiches.filter(numero_personnel=numero_personnel)
+    if fiche_id_min:
+        fiches = fiches.filter(num_fiche__gte=fiche_id_min)
+    if fiche_id_max:
+        fiches = fiches.filter(num_fiche__lte=fiche_id_max)
+
+    # Limiter les résultats
+    fiches = fiches.order_by('-annee', '-num_fiche')[:50]
+
+    # Formater les résultats
+    resultats = []
+    for fiche in fiches:
+        commune = ''
+        if hasattr(fiche, 'localisation') and fiche.localisation:
+            commune = fiche.localisation.commune or ''
+
+        resultats.append(
+            {
+                'num_fiche': fiche.num_fiche,
+                'observateur': f"{fiche.observateur.first_name} {fiche.observateur.last_name}",
+                'espece': fiche.espece.nom,
+                'annee': fiche.annee,
+                'numero_personnel': fiche.numero_personnel or '',
+                'commune': commune,
+            }
+        )
+
+    return JsonResponse({'fiches': resultats})

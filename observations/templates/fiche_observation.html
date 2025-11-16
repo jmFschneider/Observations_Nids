@@ -30,12 +30,14 @@
         <th>Observateur</th>
         <th>Espèce</th>
         <th>Année</th>
+        <th>N° Personnel</th>
     </tr>
     <tr>
         <td>{{ fiche.num_fiche }}</td>
         <td>{{ fiche.observateur.first_name }} {{ fiche.observateur.last_name }}</td>
         <td>{{ fiche.espece.nom }}</td>
         <td>{{ fiche.annee }}</td>
+        <td>{% if fiche.numero_personnel %}{{ fiche.numero_personnel }}{% else %}-{% endif %}</td>
     </tr>
 </table>
 
@@ -88,14 +90,34 @@
 		<h3>Description du Nid</h3>
 	<table class="nid-table">
 		<tr>
-			<th>Utilisé par le même couple</th>
-			<th>Hauteur du nid (cm)</th>
-			<th>Hauteur du couvert (cm)</th>
+			<th style="width: 25%; text-align: center;">Nid précédent</th>
+			<th style="width: 25%; text-align: center;">Nid suivant</th>
+			<th style="width: 25%; text-align: center;">Hauteur du nid (cm)</th>
+			<th style="width: 25%; text-align: center;">Hauteur du couvert (cm)</th>
 		</tr>
 		<tr>
-			<td>{% if fiche.nid.nid_prec_t_meme_couple %}Oui{% else %}Non{% endif %}</td>
-			<td>{{ fiche.nid.hauteur_nid }}</td>
-			<td>{{ fiche.nid.hauteur_couvert }}</td>
+			<td style="text-align: center; background-color: #f8f9fa;">
+				{% if fiche.nid.fiche_precedente %}
+					<a href="{% url 'observations:fiche_observation' fiche_id=fiche.nid.fiche_precedente.num_fiche %}" style="color: #0d6efd; text-decoration: none; font-weight: bold;">
+						#{{ fiche.nid.fiche_precedente.num_fiche }}
+					</a>
+				{% else %}
+					<span style="color: #6c757d;">-</span>
+				{% endif %}
+			</td>
+			<td style="text-align: center; background-color: #f8f9fa;">
+				{% if fiche.nids_suivants.exists %}
+					{% for nid_suivant in fiche.nids_suivants.all %}
+						<a href="{% url 'observations:fiche_observation' fiche_id=nid_suivant.fiche.num_fiche %}" style="color: #0d6efd; text-decoration: none; font-weight: bold;">
+							#{{ nid_suivant.fiche.num_fiche }}
+						</a>{% if not forloop.last %}, {% endif %}
+					{% endfor %}
+				{% else %}
+					<span style="color: #6c757d;">-</span>
+				{% endif %}
+			</td>
+			<td style="text-align: center;">{% if fiche.nid.hauteur_nid is not None %}{{ fiche.nid.hauteur_nid }}{% else %}-{% endif %}</td>
+			<td style="text-align: center;">{% if fiche.nid.hauteur_couvert is not None %}{{ fiche.nid.hauteur_couvert }}{% else %}-{% endif %}</td>
 		</tr>
 	</table>
 	<!-- Section Détails du Nid sous forme de cadre -->

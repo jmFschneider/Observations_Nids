@@ -8,6 +8,7 @@ from .views.saisie_observation_view import (
     ajouter_observation,
     fiche_observation_view,
     historique_modifications,
+    rechercher_fiches,
     saisie_observation,
     soumettre_pour_correction,
     valider_correction,
@@ -72,6 +73,12 @@ urlpatterns = [
         'observations/valider/<int:fiche_id>/',
         valider_correction,
         name='valider_correction',
+    ),
+    # Route AJAX pour rechercher des fiches
+    path(
+        'observations/rechercher/',
+        rechercher_fiches,
+        name='rechercher_fiches',
     ),
 ]
 '''

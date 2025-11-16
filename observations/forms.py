@@ -17,7 +17,7 @@ from observations.models import (
 class FicheObservationForm(forms.ModelForm):
     class Meta:
         model = FicheObservation
-        fields = ["observateur", "espece", "annee", "chemin_image"]
+        fields = ["observateur", "espece", "annee", "numero_personnel", "chemin_image"]
         widgets = {
             "observateur": forms.HiddenInput(),  # Changer pour HiddenInput
             "espece": forms.Select(
@@ -25,6 +25,14 @@ class FicheObservationForm(forms.ModelForm):
                     'class': 'form-control espece-select',
                     'data-live-search': 'true',
                     'data-search-delay': '800',  # Délai de 800ms entre les frappes
+                }
+            ),
+            "numero_personnel": forms.NumberInput(
+                attrs={
+                    'class': 'form-control form-control-sm',
+                    'placeholder': 'N°',
+                    'min': 1,
+                    'style': 'width: 80px;',
                 }
             ),
         }
@@ -270,12 +278,21 @@ class NidForm(forms.ModelForm):
         model = Nid
         fields = [
             'nid_prec_t_meme_couple',
+            'fiche_precedente',
             'hauteur_nid',
             'hauteur_couvert',
             'details_nid',
         ]
         widgets = {
             'nid_prec_t_meme_couple': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'fiche_precedente': forms.NumberInput(
+                attrs={
+                    'class': 'form-field',
+                    'placeholder': 'N° fiche précédente',
+                    'min': 1,
+                    'style': 'width: 120px;',
+                }
+            ),
             'hauteur_nid': forms.NumberInput(
                 attrs={'class': 'form-field', 'placeholder': 'hauteur_nid', 'min': 0}
             ),

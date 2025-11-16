@@ -64,6 +64,219 @@
 {% if fiche_form.instance.pk %}
 <div data-fiche-id="{{ fiche_form.instance.pk }}" style="display: none;"></div>
 {% endif %}
+
+<!-- JavaScript pour la modale de recherche de fiche précédente -->
+<script>
+// Attendre que la page soit complètement chargée (pas juste le DOM)
+window.addEventListener('load', function() {
+    console.log('Page complètement chargée, initialisation de la modale...');
+    console.log('Bootstrap disponible:', typeof bootstrap !== 'undefined');
+
+    // Charger les observateurs et espèces disponibles
+    chargerFiltresRecherche();
+
+    // Gérer la recherche
+    var btnRechercher = document.getElementById('btnRechercher');
+    if (btnRechercher) {
+        btnRechercher.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Bouton Rechercher cliqué');
+            rechercherFiches();
+        });
+        console.log('Event listener ajouté sur btnRechercher');
+    } else {
+        console.error('Bouton btnRechercher non trouvé');
+    }
+
+    // Permettre la recherche avec Entrée
+    ['filtreAnnee', 'filtreNumPersonnel', 'filtreFicheMin', 'filtreFicheMax'].forEach(function(id) {
+        var element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    rechercherFiches();
+                }
+            });
+        }
+    });
+
+    console.log('Initialisation modale terminée');
+});
+
+function chargerFiltresRecherche() {
+    var selectObservateur = document.getElementById('filtreObservateur');
+    var selectEspece = document.getElementById('filtreEspece');
+
+    {% if fiche_form.instance.observateur %}
+    var observateurOption = document.createElement('option');
+    observateurOption.value = '{{ fiche_form.instance.observateur.id }}';
+    observateurOption.text = '{{ fiche_form.instance.observateur.first_name }} {{ fiche_form.instance.observateur.last_name }}';
+    observateurOption.selected = true;
+    selectObservateur.appendChild(observateurOption);
+    {% endif %}
+
+    {% if fiche_form.instance.espece %}
+    var especeOption = document.createElement('option');
+    especeOption.value = '{{ fiche_form.instance.espece.id }}';
+    especeOption.text = '{{ fiche_form.instance.espece.nom }}';
+    especeOption.selected = true;
+    selectEspece.appendChild(especeOption);
+    {% endif %}
+}
+
+function rechercherFiches() {
+    console.log('Début de la recherche...');
+    var params = new URLSearchParams();
+
+    var observateur = document.getElementById('filtreObservateur').value;
+    var annee = document.getElementById('filtreAnnee').value;
+    var espece = document.getElementById('filtreEspece').value;
+    var numPersonnel = document.getElementById('filtreNumPersonnel').value;
+    var ficheMin = document.getElementById('filtreFicheMin').value;
+    var ficheMax = document.getElementById('filtreFicheMax').value;
+
+    if (observateur) params.append('observateur', observateur);
+    if (annee) params.append('annee', annee);
+    if (espece) params.append('espece', espece);
+    if (numPersonnel) params.append('numero_personnel', numPersonnel);
+    if (ficheMin) params.append('fiche_id_min', ficheMin);
+    if (ficheMax) params.append('fiche_id_max', ficheMax);
+
+    console.log('Paramètres:', params.toString());
+
+    var tbody = document.getElementById('resultatsRecherche');
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i> Recherche en cours...</td></tr>';
+
+    var url = '{% url "observations:rechercher_fiches" %}?' + params.toString();
+    console.log('URL:', url);
+
+    fetch(url, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(function(response) {
+        console.log('Réponse reçue:', response.status);
+        if (!response.ok) {
+            throw new Error('Erreur HTTP: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(function(data) {
+        console.log('Données reçues:', data);
+        if (data.fiches && data.fiches.length > 0) {
+            tbody.innerHTML = '';
+            data.fiches.forEach(function(fiche) {
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td><strong>' + fiche.num_fiche + '</strong></td>' +
+                    '<td>' + fiche.observateur + '</td>' +
+                    '<td>' + (fiche.numero_personnel || '-') + '</td>' +
+                    '<td>' + fiche.espece + '</td>' +
+                    '<td>' + fiche.annee + '</td>' +
+                    '<td>' + fiche.commune + '</td>' +
+                    '<td><button type="button" class="btn btn-sm btn-success" onclick="selectionnerFiche(' + fiche.num_fiche + ')"><i class="fas fa-check"></i> Sélectionner</button></td>';
+                tbody.appendChild(tr);
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Aucune fiche trouvée avec ces critères</td></tr>';
+        }
+    })
+    .catch(function(error) {
+        console.error('Erreur:', error);
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erreur lors de la recherche: ' + error.message + '</td></tr>';
+    });
+}
+
+function selectionnerFiche(numFiche) {
+    console.log('Sélection de la fiche:', numFiche);
+
+    var input = document.getElementById('id_fiche_precedente');
+    if (input) {
+        input.value = numFiche;
+        console.log('Champ mis à jour avec:', numFiche);
+
+        // Mettre à jour l'affichage visuel avec un lien cliquable
+        var affichage = document.getElementById('affichageNidPrecedent');
+        if (affichage) {
+            var lien = '<a href="/observations/' + numFiche + '/" target="_blank" style="color: #0d6efd; text-decoration: none;" title="Voir la fiche ' + numFiche + '">#' + numFiche + '</a>';
+            affichage.innerHTML = lien;
+        }
+    } else {
+        console.error('Champ id_fiche_precedente non trouvé');
+    }
+
+    // Fermer la modale (utiliser notre fonction de fermeture)
+    fermerModalRecherche();
+    console.log('Modale fermée après sélection');
+}
+
+function ouvrirModalRecherche() {
+    console.log('Ouverture de la modale...');
+    var modalElement = document.getElementById('modalRechercheFiche');
+    if (modalElement) {
+        console.log('Élément modal trouvé');
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            console.log('Bootstrap Modal disponible');
+            var modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            console.error('Bootstrap Modal non disponible - utilisation du fallback');
+            // Fallback: affichage manuel complet
+            modalElement.classList.remove('fade'); // Retirer l'animation fade
+            modalElement.classList.add('show');
+            modalElement.style.cssText = 'display: block !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; z-index: 1050 !important; opacity: 1 !important; overflow-x: hidden !important; overflow-y: auto !important;';
+            modalElement.setAttribute('aria-modal', 'true');
+            modalElement.removeAttribute('aria-hidden');
+            document.body.classList.add('modal-open');
+
+            // Forcer le positionnement du dialog
+            var modalDialog = modalElement.querySelector('.modal-dialog');
+            if (modalDialog) {
+                modalDialog.style.cssText = 'position: relative !important; margin: 1.75rem auto !important; max-width: 800px !important;';
+            }
+            var modalContent = modalElement.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.style.cssText = 'background-color: white !important; border-radius: 0.3rem !important; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5) !important;';
+            }
+
+            // Créer le backdrop s'il n'existe pas
+            var backdrop = document.getElementById('modalBackdrop');
+            if (!backdrop) {
+                backdrop = document.createElement('div');
+                backdrop.id = 'modalBackdrop';
+                backdrop.className = 'modal-backdrop fade show';
+                backdrop.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1040;';
+                backdrop.onclick = fermerModalRecherche;
+                document.body.appendChild(backdrop);
+            }
+            backdrop.style.display = 'block';
+
+            console.log('Modale ouverte manuellement');
+        }
+    } else {
+        console.error('Élément modalRechercheFiche non trouvé');
+        alert('Erreur: modale non trouvée');
+    }
+}
+
+function fermerModalRecherche() {
+    var modalElement = document.getElementById('modalRechercheFiche');
+    if (modalElement) {
+        modalElement.classList.remove('show');
+        modalElement.style.display = 'none';
+        modalElement.setAttribute('aria-hidden', 'true');
+        modalElement.removeAttribute('aria-modal');
+        document.body.classList.remove('modal-open');
+
+        var backdrop = document.getElementById('modalBackdrop');
+        if (backdrop) {
+            backdrop.style.display = 'none';
+        }
+    }
+}
+</script>
 {% endblock %}
 
 {% block content %}
@@ -111,10 +324,11 @@
             <table class="fiche-table table table-bordered">
                 <thead>
                     <tr>
-                        <th scope="col">N° Fiche</th>
-                        <th scope="col">Observateur</th>
-                        <th scope="col">Espèce</th>
-                        <th scope="col">Année</th>
+                        <th scope="col" style="width: 10%;">N° Fiche</th>
+                        <th scope="col" style="width: 45%;">Observateur</th>
+                        <th scope="col" style="width: 15%;">N° Personnel</th>
+                        <th scope="col" style="width: 20%;">Espèce</th>
+                        <th scope="col" style="width: 10%;">Année</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -127,6 +341,7 @@
                             {% endif %}
                         </td>
                         <td>{{ fiche_form.instance.observateur.first_name }} {{ fiche_form.instance.observateur.last_name }}</td>
+                        <td>{{ fiche_form.numero_personnel }}</td>
                         <td>{{ fiche_form.espece }}</td>
                         <td>{{ fiche_form.annee }}</td>
                     </tr>
@@ -191,27 +406,62 @@
             <h2 class="mb-0 h5">Description du Nid</h2>
         </header>
         <div class="card-body">
-            <table class="nid-table">
-                <tr>
-                    <th>Utilisé par le même couple</th>
-                    <th>Hauteur du nid (cm)</th>
-                    <th>Hauteur du couvert (cm)</th>
-                </tr>
-                <tr>
-                    <td>{{ nid_form.nid_prec_t_meme_couple }}</td>
-                    <td>
-                        <div class="form-field">
-                            <label for="{{ nid_form.hauteur_nid.id_for_label }}">cm</label>
-                            {{ nid_form.hauteur_nid }}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-field">
-                            <label for="{{ nid_form.hauteur_couvert.id_for_label }}">cm</label>
-                            {{ nid_form.hauteur_couvert }}
-                        </div>
-                    </td>
-                </tr>
+            <!-- Champ caché pour maintenir la compatibilité avec le formulaire -->
+            <input type="hidden" name="nid_prec_t_meme_couple" value="{% if nid_form.instance.fiche_precedente %}on{% endif %}">
+
+            <table class="table table-bordered" style="margin-bottom: 15px;">
+                <thead>
+                    <tr>
+                        <th style="width: 25%; text-align: center;">Nid précédent</th>
+                        <th style="width: 25%; text-align: center;">Nid suivant</th>
+                        <th style="width: 25%; text-align: center;">Hauteur du nid (cm)</th>
+                        <th style="width: 25%; text-align: center;">Hauteur du couvert (cm)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: center; background-color: #f8f9fa; vertical-align: middle;">
+                            <input type="hidden" name="fiche_precedente" id="id_fiche_precedente" value="{{ nid_form.instance.fiche_precedente.num_fiche|default:'' }}">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <button type="button" class="btn btn-xs btn-outline-primary" onclick="ouvrirModalRecherche()" style="font-size: 0.8em; padding: 3px 8px;">
+                                    <i class="fas fa-search"></i> Rechercher
+                                </button>
+                                <span id="affichageNidPrecedent" style="font-size: 1.1em;">
+                                    {% if nid_form.instance.fiche_precedente %}
+                                        <a href="{% url 'observations:fiche_observation' fiche_id=nid_form.instance.fiche_precedente.num_fiche %}" target="_blank" style="color: #0d6efd; text-decoration: none; font-weight: bold;" title="Voir la fiche {{ nid_form.instance.fiche_precedente.num_fiche }}">
+                                            #{{ nid_form.instance.fiche_precedente.num_fiche }}
+                                        </a>
+                                    {% else %}
+                                        <span style="color: #6c757d;">-</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </td>
+                        <td style="text-align: center; background-color: #f8f9fa; vertical-align: middle;">
+                            <span style="font-size: 1.1em;">
+                                {% if fiche_form.instance.pk and fiche_form.instance.nids_suivants.all %}
+                                    {% for nid_suivant in fiche_form.instance.nids_suivants.all %}
+                                        <a href="{% url 'observations:fiche_observation' fiche_id=nid_suivant.fiche.num_fiche %}" target="_blank" style="color: #198754; text-decoration: none; font-weight: bold;" title="Voir la fiche {{ nid_suivant.fiche.num_fiche }}">
+                                            #{{ nid_suivant.fiche.num_fiche }}
+                                        </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <span style="color: #6c757d;">-</span>
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td style="vertical-align: middle; text-align: center;">
+                            <div class="form-field">
+                                {{ nid_form.hauteur_nid }}
+                            </div>
+                        </td>
+                        <td style="vertical-align: middle; text-align: center;">
+                            <div class="form-field">
+                                {{ nid_form.hauteur_couvert }}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
 
             <div class="section-title">Détails du Nid</div>
@@ -658,5 +908,84 @@
     </form>
     {% endif %}
 {% endif %}
+
+<!-- Modale de recherche de fiche précédente -->
+<div class="modal" id="modalRechercheFiche" tabindex="-1" aria-labelledby="modalRechercheFicheLabel" aria-hidden="true" style="display: none; z-index: 1050;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalRechercheFicheLabel">Rechercher une fiche précédente</h5>
+                <button type="button" class="btn-close" onclick="fermerModalRecherche()" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Filtres de recherche -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="filtreObservateur" class="form-label">Observateur</label>
+                        <select id="filtreObservateur" class="form-select">
+                            <option value="">Tous</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtreAnnee" class="form-label">Année</label>
+                        <input type="number" id="filtreAnnee" class="form-control" placeholder="Ex: 2024">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtreNumPersonnel" class="form-label">N° Personnel</label>
+                        <input type="number" id="filtreNumPersonnel" class="form-control" placeholder="N°">
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="filtreEspece" class="form-label">Espèce</label>
+                        <select id="filtreEspece" class="form-select">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtreFicheMin" class="form-label">Fiche N° min</label>
+                        <input type="number" id="filtreFicheMin" class="form-control" placeholder="Min">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtreFicheMax" class="form-label">Fiche N° max</label>
+                        <input type="number" id="filtreFicheMax" class="form-control" placeholder="Max">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mb-3">
+                    <button type="button" class="btn btn-primary" id="btnRechercher">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                </div>
+
+                <!-- Tableau des résultats -->
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>N° Fiche</th>
+                                <th>Observateur</th>
+                                <th>N° Perso</th>
+                                <th>Espèce</th>
+                                <th>Année</th>
+                                <th>Commune</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultatsRecherche">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">
+                                    Utilisez les filtres ci-dessus pour rechercher des fiches
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="fermerModalRecherche()">Annuler</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

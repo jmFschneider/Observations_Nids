@@ -20,6 +20,13 @@ class FicheObservation(models.Model):
     )
     espece = models.ForeignKey(Espece, on_delete=models.PROTECT, related_name="observations")
     annee = models.IntegerField()
+    numero_personnel = models.IntegerField(
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name='Numéro personnel',
+        help_text='Numéro attribué par l\'observateur',
+    )
     chemin_image = models.CharField(max_length=255, blank=True)
     chemin_json = models.CharField(max_length=255, blank=True)
     transcription = models.BooleanField(default=False)
@@ -35,6 +42,7 @@ class FicheObservation(models.Model):
     @transaction.atomic
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+
         super().save(*args, **kwargs)
 
         # Si c'est une nouvelle fiche, créer automatiquement les objets liés
@@ -106,6 +114,14 @@ class FicheObservation(models.Model):
 class Nid(models.Model):
     fiche = models.OneToOneField(FicheObservation, on_delete=models.CASCADE, related_name="nid")
     nid_prec_t_meme_couple = models.BooleanField(default=False)
+    fiche_precedente = models.ForeignKey(
+        FicheObservation,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='nids_suivants',
+        verbose_name='Fiche précédente',
+    )
     hauteur_nid = models.IntegerField(null=True, blank=True, default=None)
     hauteur_couvert = models.IntegerField(null=True, blank=True, default=None)
     details_nid = models.TextField(blank=True, default='')
