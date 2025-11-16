@@ -94,7 +94,7 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Ajouter l'observation</button>
+                <button type="submit" class="btn btn-primary" onclick="return confirm('Voulez-vous vraiment ajouter cette observation ?');">Ajouter l'observation</button>
                 <a href="{% url 'observations:modifier_observation' fiche_id=fiche_id %}" class="btn btn-secondary">Annuler</a>
             </div>
         </form>

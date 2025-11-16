@@ -170,6 +170,13 @@ def saisie_observation(request, fiche_id=None):
             # Vérifier les permissions pour les fiches en cours de saisie
             if hasattr(fiche_instance, 'etat_correction'):
                 etat = fiche_instance.etat_correction
+                # Si la fiche est validée, elle ne peut plus être modifiée
+                if etat.statut == 'valide':
+                    messages.warning(
+                        request,
+                        "Cette fiche a été validée et ne peut plus être modifiée.",
+                    )
+                    return redirect('observations:fiche_observation', fiche_id=fiche_id)
                 # Si la fiche est en cours de saisie (nouveau ou en_edition),
                 # seul l'auteur ou un administrateur peut l'éditer
                 if (
@@ -619,7 +626,9 @@ def ajouter_observation(request, fiche_id):
 
             return redirect('observations:modifier_observation', fiche_id=fiche_id)
     else:
-        form = ObservationForm()
+        # Préremplir avec la date du jour à 00:00
+        initial_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        form = ObservationForm(initial={'date_observation': initial_date, 'heure_connue': False})
     return render(
         request,
         'saisie/ajouter_observation.html',
@@ -802,6 +811,57 @@ def soumettre_pour_correction(request, fiche_id):
             logger.warning(f"Fiche {fiche_id} déjà en statut: {etat_correction.statut}")
             messages.warning(
                 request, f"La fiche est déjà en statut '{etat_correction.get_statut_display()}'"
+            )
+
+        # Rediriger vers la vue de détail (lecture seule)
+        logger.info(f"Redirection vers fiche_observation pour fiche {fiche_id}")
+        return redirect('observations:fiche_observation', fiche_id=fiche_id)
+
+    logger.info(f"Méthode GET, redirection vers modifier_observation pour fiche {fiche_id}")
+    return redirect('observations:modifier_observation', fiche_id=fiche_id)
+
+
+@login_required
+def valider_correction(request, fiche_id):
+    """Valider la correction d'une fiche (passage du statut en_cours à valide)"""
+    fiche = get_object_or_404(FicheObservation, pk=fiche_id)
+    user = cast(Utilisateur, request.user)
+
+    logger.info(
+        f"valider_correction appelé pour fiche {fiche_id}, méthode: {request.method}"
+    )
+
+    # Vérifier que l'utilisateur est un reviewer ou administrateur
+    if user.role not in ["reviewer", "administrateur"]:
+        messages.error(request, "Vous n'êtes pas autorisé à valider cette correction")
+        return redirect('observations:modifier_observation', fiche_id=fiche_id)
+
+    if request.method == 'POST':
+        # Récupérer l'état de correction
+        etat_correction = fiche.etat_correction
+        logger.info(f"Statut actuel de la fiche {fiche_id}: {etat_correction.statut}")
+
+        # Passer en statut validé seulement si en cours de correction
+        if etat_correction.statut == 'en_cours':
+            # Calculer le pourcentage de complétion final
+            pourcentage = etat_correction.calculer_pourcentage_completion()
+
+            # Forcer le statut à "valide" et sauvegarder
+            etat_correction.statut = 'valide'
+            etat_correction.pourcentage_completion = pourcentage
+            etat_correction.save(skip_auto_calculation=True)
+
+            logger.info(
+                f"Fiche {fiche_id} passée en statut 'valide', pourcentage: {pourcentage}%"
+            )
+
+            messages.success(
+                request, f"Fiche #{fiche_id} validée avec succès. La correction est terminée."
+            )
+        else:
+            logger.warning(f"Fiche {fiche_id} n'est pas en cours de correction: {etat_correction.statut}")
+            messages.warning(
+                request, f"La fiche n'est pas en cours de correction (statut actuel: '{etat_correction.get_statut_display()}')"
             )
 
         # Rediriger vers la vue de détail (lecture seule)

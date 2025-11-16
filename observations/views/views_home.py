@@ -35,7 +35,7 @@ def home(request):
     # Compter les demandes de compte en attente (pour les administrateurs)
     demandes_en_attente = 0
     if user.role == 'administrateur':
-        demandes_en_attente = Utilisateur.objects.filter(est_valide=False).count()
+        demandes_en_attente = Utilisateur.objects.filter(est_valide=False, est_refuse=False).count()
 
     return render(
         request,

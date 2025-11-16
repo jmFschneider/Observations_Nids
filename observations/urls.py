@@ -10,6 +10,7 @@ from .views.saisie_observation_view import (
     historique_modifications,
     saisie_observation,
     soumettre_pour_correction,
+    valider_correction,
 )
 from .views.upload_views import mes_images_sources, upload_image_source, upload_success
 from .views.view_transcription import (
@@ -65,6 +66,12 @@ urlpatterns = [
         'observations/soumettre/<int:fiche_id>/',
         soumettre_pour_correction,
         name='soumettre_pour_correction',
+    ),
+    # Route pour valider la correction d'une fiche
+    path(
+        'observations/valider/<int:fiche_id>/',
+        valider_correction,
+        name='valider_correction',
     ),
 ]
 '''

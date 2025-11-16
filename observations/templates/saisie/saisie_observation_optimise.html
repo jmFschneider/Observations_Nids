@@ -629,7 +629,7 @@
 
     <!-- Boutons de formulaire -->
     <div class="form-buttons">
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <button type="submit" class="btn btn-primary" onclick="return confirm('Voulez-vous vraiment enregistrer les modifications ?');">Enregistrer</button>
         {% if fiche_form.instance.pk %}
             <a href="{% url 'observations:historique_modifications' fiche_id=fiche_form.instance.pk %}" class="btn btn-info" target="_blank">Historique</a>
             <a href="{% url 'observations:fiche_observation' fiche_id=fiche_form.instance.pk %}" class="btn btn-secondary">Voir détails</a>
@@ -647,6 +647,13 @@
         {% csrf_token %}
         <button type="submit" class="btn btn-success" onclick="return confirm('Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.');">
             Soumettre pour correction
+        </button>
+    </form>
+    {% elif fiche_form.instance.etat_correction.statut == 'en_cours' %}
+    <form method="post" action="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" style="margin-top: 10px;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success" onclick="return confirm('Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.');">
+            Valider la correction
         </button>
     </form>
     {% endif %}
