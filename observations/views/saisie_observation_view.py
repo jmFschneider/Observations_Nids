@@ -168,6 +168,7 @@ def saisie_observation(request, fiche_id=None):
             user = cast(Utilisateur, request.user)
 
             # Vérifier les permissions pour les fiches en cours de saisie
+            redirect_response = None
             if hasattr(fiche_instance, 'etat_correction'):
                 etat = fiche_instance.etat_correction
                 # Si la fiche est validée, elle ne peut plus être modifiée
@@ -176,10 +177,10 @@ def saisie_observation(request, fiche_id=None):
                         request,
                         "Cette fiche a été validée et ne peut plus être modifiée.",
                     )
-                    return redirect('observations:fiche_observation', fiche_id=fiche_id)
+                    redirect_response = redirect('observations:fiche_observation', fiche_id=fiche_id)
                 # Si la fiche est en cours de saisie (nouveau ou en_edition),
                 # seul l'auteur ou un administrateur peut l'éditer
-                if (
+                elif (
                     etat.statut in ['nouveau', 'en_edition']
                     and user != fiche_instance.observateur
                     and user.role != "administrateur"
@@ -189,7 +190,10 @@ def saisie_observation(request, fiche_id=None):
                         f"Vous n'êtes pas autorisé à modifier cette fiche. "
                         f"Seul l'auteur ({fiche_instance.observateur.username}) peut continuer la saisie.",
                     )
-                    return redirect('observations:fiche_observation', fiche_id=fiche_id)
+                    redirect_response = redirect('observations:fiche_observation', fiche_id=fiche_id)
+
+            if redirect_response:
+                return redirect_response
 
             localisation_instance = fiche_instance.localisation
             nid_instance = fiche_instance.nid
@@ -827,9 +831,7 @@ def valider_correction(request, fiche_id):
     fiche = get_object_or_404(FicheObservation, pk=fiche_id)
     user = cast(Utilisateur, request.user)
 
-    logger.info(
-        f"valider_correction appelé pour fiche {fiche_id}, méthode: {request.method}"
-    )
+    logger.info(f"valider_correction appelé pour fiche {fiche_id}, méthode: {request.method}")
 
     # Vérifier que l'utilisateur est un reviewer ou administrateur
     if user.role not in ["reviewer", "administrateur"]:
@@ -851,17 +853,18 @@ def valider_correction(request, fiche_id):
             etat_correction.pourcentage_completion = pourcentage
             etat_correction.save(skip_auto_calculation=True)
 
-            logger.info(
-                f"Fiche {fiche_id} passée en statut 'valide', pourcentage: {pourcentage}%"
-            )
+            logger.info(f"Fiche {fiche_id} passée en statut 'valide', pourcentage: {pourcentage}%")
 
             messages.success(
                 request, f"Fiche #{fiche_id} validée avec succès. La correction est terminée."
             )
         else:
-            logger.warning(f"Fiche {fiche_id} n'est pas en cours de correction: {etat_correction.statut}")
+            logger.warning(
+                f"Fiche {fiche_id} n'est pas en cours de correction: {etat_correction.statut}"
+            )
             messages.warning(
-                request, f"La fiche n'est pas en cours de correction (statut actuel: '{etat_correction.get_statut_display()}')"
+                request,
+                f"La fiche n'est pas en cours de correction (statut actuel: '{etat_correction.get_statut_display()}')",
             )
 
         # Rediriger vers la vue de détail (lecture seule)
