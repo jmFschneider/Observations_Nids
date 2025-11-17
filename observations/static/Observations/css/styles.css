@@ -80,6 +80,7 @@ textarea {
 }
 
 /* === Bouton de validation === */
+/*
 button {
     display: block; /* Affiche comme un bloc */
     margin: 20px auto; /* Centré horizontalement avec espacement vertical */
@@ -94,6 +95,7 @@ button {
 button:hover {
     background-color: #45a049; /* Fond vert plus foncé au survol */
 }
+*/
 
 /* === Responsive Design === */
 @media screen and (max-width: 768px) {

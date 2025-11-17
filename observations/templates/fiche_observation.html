@@ -28,16 +28,16 @@
     <tr>
         <th>N° Fiche</th>
         <th>Observateur</th>
+        <th>N° Personnel</th>
         <th>Espèce</th>
         <th>Année</th>
-        <th>N° Personnel</th>
     </tr>
     <tr>
         <td>{{ fiche.num_fiche }}</td>
         <td>{{ fiche.observateur.first_name }} {{ fiche.observateur.last_name }}</td>
+        <td>{% if fiche.numero_personnel %}{{ fiche.numero_personnel }}{% else %}-{% endif %}</td>
         <td>{{ fiche.espece.nom }}</td>
         <td>{{ fiche.annee }}</td>
-        <td>{% if fiche.numero_personnel %}{{ fiche.numero_personnel }}{% else %}-{% endif %}</td>
     </tr>
 </table>
 

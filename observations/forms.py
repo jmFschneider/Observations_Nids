@@ -294,10 +294,10 @@ class NidForm(forms.ModelForm):
                 }
             ),
             'hauteur_nid': forms.NumberInput(
-                attrs={'class': 'form-field', 'placeholder': 'hauteur_nid', 'min': 0}
+                attrs={'class': 'form-field', 'placeholder': 'Hauteur du nid (cm)', 'min': 0}
             ),
             'hauteur_couvert': forms.NumberInput(
-                attrs={'class': 'form-field', 'placeholder': 'hauteur_couvert', 'min': 0}
+                attrs={'class': 'form-field', 'placeholder': 'Hauteur du couvert (cm)', 'min': 0}
             ),
             'details_nid': forms.Textarea(
                 attrs={'class': 'section-content', 'rows': 2, 'placeholder': 'Détails du nid'}

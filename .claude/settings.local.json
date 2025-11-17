@@ -35,7 +35,14 @@
       "Bash(findstr:*)",
       "Bash(git tag:*)",
       "Bash(gh release edit:*)",
-      "Bash(gh release create:*)"
+      "Bash(gh release create:*)",
+      "WebFetch(domain:127.0.0.1)",
+      "Bash(gh pr merge:*)",
+      "WebFetch(domain:www.data.gouv.fr)",
+      "WebFetch(domain:www.insee.fr)",
+      "Bash(timeout 30 python manage.py importer_anciennes_communes:*)",
+      "Bash(timeout 10 python:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,6 +1,11 @@
 # Guide : Gestion des Anciennes Communes (Fusions)
 
 Ce guide explique comment gérer les anciennes communes qui ont fusionné avec d'autres communes françaises.
+Attention : l'import des anciennes commune est faite en deux temps (un import unique aurait pu être fait mais cela aurait un peu plus de travail), **voir paragraphe 5** :
+
+- ### Import depuis CSV (importer_anciennes_communes)
+
+- ### Import depuis API (verifier_communes_deleguees)
 
 ---
 
