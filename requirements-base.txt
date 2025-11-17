@@ -250,7 +250,7 @@ pydantic-core==2.41.4
     #   pydantic
 pydantic-settings==2.11.0
     # via -r requirements-base.in
-pyparsing==3.2.3
+pyparsing==3.2.5
     # via
     #   -r requirements-base.in
     #   httplib2
