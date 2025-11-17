@@ -517,22 +517,47 @@ main {
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
+    /* Normalisation pour uniformiser button et a */
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 1.5;
+    font-family: inherit;
+    vertical-align: middle;
+    text-align: center;
+    border: 1px solid transparent;
 }
 
 .btn-primary {
     background-color: #007bff;
     color: white;
-    border: none;
+    border-color: #007bff;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+    border-color: #28a745;
 }
 
 .btn-info {
     background-color: #17a2b8;
     color: white;
-    border: none;
+    border-color: #17a2b8;
 }
 
 .btn-secondary {
     background-color: #6c757d;
     color: white;
-    border: none;
+    border-color: #6c757d;
+}
+
+.btn-outline-secondary {
+    background-color: transparent;
+    color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
 }
