@@ -883,37 +883,28 @@ function fermerModalRecherche() {
         {% endfor %}
     </div>
 
+
+
     <!-- Boutons de formulaire -->
     <div class="form-buttons">
         <button type="submit" class="btn btn-primary" onclick="return confirm('Voulez-vous vraiment enregistrer les modifications ?');">Enregistrer</button>
         {% if fiche_form.instance.pk %}
+            {% if fiche_form.instance.etat_correction.statut == 'nouveau' or fiche_form.instance.etat_correction.statut == 'en_edition' %}
+                <button type="submit" class="btn btn-success" formaction="{% url 'observations:soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" onclick="return confirm('Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.');">
+                    Soumettre pour correction
+                </button>
+            {% elif fiche_form.instance.etat_correction.statut == 'en_cours' %}
+                <button type="submit" class="btn btn-success" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" onclick="return confirm('Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.');">
+                    Valider la correction
+                </button>
+            {% endif %}
             <a href="{% url 'observations:historique_modifications' fiche_id=fiche_form.instance.pk %}" class="btn btn-info" target="_blank">Historique</a>
-            <a href="{% url 'observations:fiche_observation' fiche_id=fiche_form.instance.pk %}" class="btn btn-secondary">Voir détails</a>
-            <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
+            <a href="{% url 'observations:fiche_observation' fiche_id=fiche_form.instance.pk %}" class="btn btn-secondary">Retour à la list</a>
         {% else %}
             <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary">Annuler</a>
         {% endif %}
     </div>
 </form>
-
-<!-- Formulaire de soumission pour correction (en dehors du formulaire principal) -->
-{% if fiche_form.instance.pk %}
-    {% if fiche_form.instance.etat_correction.statut == 'nouveau' or fiche_form.instance.etat_correction.statut == 'en_edition' %}
-    <form method="post" action="{% url 'observations:soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" style="margin-top: 10px;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success" onclick="return confirm('Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.');">
-            Soumettre pour correction
-        </button>
-    </form>
-    {% elif fiche_form.instance.etat_correction.statut == 'en_cours' %}
-    <form method="post" action="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" style="margin-top: 10px;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success" onclick="return confirm('Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.');">
-            Valider la correction
-        </button>
-    </form>
-    {% endif %}
-{% endif %}
 
 <!-- Modale de recherche de fiche précédente -->
 <div class="modal" id="modalRechercheFiche" tabindex="-1" aria-labelledby="modalRechercheFicheLabel" aria-hidden="true" style="display: none; z-index: 1050;">
