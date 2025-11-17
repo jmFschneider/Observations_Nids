@@ -93,7 +93,7 @@ django-crispy-forms==2.5
     # via
     #   -r requirements-base.in
     #   crispy-bootstrap5
-django-helpdesk==2.0.2
+django-helpdesk==2.1.0
     # via -r requirements-base.in
 django-model-utils==5.0.0
     # via django-helpdesk
