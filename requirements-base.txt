@@ -271,7 +271,7 @@ pytz==2025.2
     #   vobject
 radicale==3.5.8
     # via -r requirements-base.in
-redis==7.0.0
+redis==7.0.1
     # via -r requirements-base.in
 requests==2.32.5
     # via
