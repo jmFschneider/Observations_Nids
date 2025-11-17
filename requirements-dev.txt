@@ -109,7 +109,7 @@ django-debug-toolbar==6.1.0
     # via -r requirements-dev.in
 django-extensions==4.1
     # via -r requirements-dev.in
-django-helpdesk==2.0.2
+django-helpdesk==2.1.0
     # via -r requirements-base.in
 django-model-utils==5.0.0
     # via django-helpdesk
