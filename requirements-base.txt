@@ -68,7 +68,10 @@ click-repl==0.3.0
     #   -r requirements-base.in
     #   celery
 colorama==0.4.6
-    # via -r requirements-base.in
+    # via
+    #   -r requirements-base.in
+    #   click
+    #   tqdm
 crispy-bootstrap5==2025.6
     # via -r requirements-base.in
 defusedxml==0.7.1
@@ -80,6 +83,7 @@ django==5.2.8
     #   django-bootstrap4-form
     #   django-celery-results
     #   django-crispy-forms
+    #   django-filter
     #   django-helpdesk
     #   django-model-utils
     #   djangorestframework
@@ -93,6 +97,8 @@ django-crispy-forms==2.5
     # via
     #   -r requirements-base.in
     #   crispy-bootstrap5
+django-filter==25.2
+    # via -r requirements-base.in
 django-helpdesk==2.1.0
     # via -r requirements-base.in
 django-model-utils==5.0.0
@@ -327,6 +333,7 @@ typing-inspection==0.4.2
 tzdata==2025.2
     # via
     #   -r requirements-base.in
+    #   django
     #   kombu
 uritemplate==4.2.0
     # via

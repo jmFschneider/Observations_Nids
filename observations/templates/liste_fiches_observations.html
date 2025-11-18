@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
+{% load observation_filters %}
 
 {% block title %}Liste des fiches d'observation{% endblock %}
 
@@ -9,6 +11,32 @@
     transition: background-color 0.3s ease;
     border-radius: 6px;
     padding: 8px !important;
+}
+/* Style for filter inputs in table header */
+.table-filters th {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    vertical-align: top;
+}
+.table-filters .form-group {
+    margin-bottom: 0; /* Remove default margin from crispy forms */
+}
+.table-filters .form-control,
+.table-filters .form-select {
+    font-size: 0.875rem; /* Smaller font for compactness */
+    padding: 0.25rem 0.5rem; /* Smaller padding */
+    height: auto; /* Adjust height automatically */
+}
+.table-filters .form-control[type="date"] {
+    min-width: 120px; /* Ensure date inputs are wide enough */
+}
+.table-filters .input-group .form-control:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.table-filters .input-group .form-control:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 </style>
 
@@ -68,110 +96,132 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <div class="card">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Fiches d'observation ({{ fiches.paginator.count }})</h5>
+            <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-sm btn-outline-light">Réinitialiser les filtres</a>
         </div>
         <div class="card-body p-0">
-            <table class="table table-striped table-hover mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Date de création</th>
-                        <th>Observateur</th>
-                        <th>Espèce</th>
-                        <th>Commune</th>
-                        <th>État de correction</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for fiche in fiches %}
-                    <tr>
-                        <td>{{ fiche.num_fiche }}</td>
-                        <td>{{ fiche.date_creation|date:"d/m/Y H:i" }}</td>
-                        <td>
-                            {% if fiche.observateur %}
-                                {{ fiche.observateur.first_name }} {{ fiche.observateur.last_name }}
-                            {% else %}
-                                <span class="text-muted">Non renseigné</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if fiche.espece %}
-                                {{ fiche.espece.nom }}
-                            {% else %}
-                                <span class="text-muted">Non renseignée</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if fiche.localisation %}
-                                {% if fiche.localisation.commune_saisie and fiche.localisation.commune_saisie != fiche.localisation.commune %}
-                                    {{ fiche.localisation.commune_saisie }} → {{ fiche.localisation.commune }}
-                                {% elif fiche.localisation.commune_saisie %}
-                                    {{ fiche.localisation.commune_saisie }}
+            <form method="get" action="" id="filter-form">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Date de création</th>
+                            <th>Observateur</th>
+                            <th>Espèce</th>
+                            <th>Commune</th>
+                            <th>État de correction</th>
+                            <th>Actions</th>
+                        </tr>
+                        <tr class="table-filters">
+                            <th></th> {# ID #}
+                            <th>
+                                {{ filter.form.date_creation }}
+                            </th>
+                            <th>
+                                {{ filter.form.observateur }}
+                            </th>
+                            <th>
+                                {{ filter.form.espece }}
+                            </th>
+                            <th>
+                                {{ filter.form.commune }}
+                            </th>
+                            <th>
+                                {{ filter.form.statut_correction }}
+                            </th>
+                            <th></th> {# Actions #}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fiche in fiches %}
+                        <tr>
+                            <td>{{ fiche.num_fiche }}</td>
+                            <td>{{ fiche.date_creation|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if fiche.observateur %}
+                                    {{ fiche.observateur.first_name }} {{ fiche.observateur.last_name }}
                                 {% else %}
-                                    {{ fiche.localisation.commune }}
+                                    <span class="text-muted">Non renseigné</span>
                                 {% endif %}
-                            {% else %}
-                                <span class="text-muted">Non renseignée</span>
-                            {% endif %}
-                        </td>
-                        <td class="etat-correction-cell"
-                            data-percentage="{% if fiche.etat_correction %}{{ fiche.etat_correction.pourcentage_completion }}{% else %}0{% endif %}">
-                            {% if fiche.etat_correction %}
-                                <div class="d-flex align-items-center">
-                                    <span class="badge
-                                        {% if fiche.etat_correction.statut == 'nouveau' %}badge-info
-                                        {% elif fiche.etat_correction.statut == 'en_edition' %}badge-info
-                                        {% elif fiche.etat_correction.statut == 'en_cours' %}badge-warning
-                                        {% else %}badge-success{% endif %}">
-                                        {% if fiche.etat_correction.statut == 'en_edition' %}
-                                            En cours de saisie
-                                        {% else %}
-                                            {{ fiche.etat_correction.get_statut_display }}
-                                        {% endif %}
-                                    </span>
-                                    {% if fiche.etat_correction.statut == 'en_cours' %}
-                                        <div class="progress ml-2" style="width: 60px; height: 20px;">
-                                            <div class="progress-bar" style="width: {{ fiche.etat_correction.pourcentage_completion }}%">
-                                                <small>{{ fiche.etat_correction.pourcentage_completion }}%</small>
-                                            </div>
-                                        </div>
-                                    {% elif fiche.etat_correction.statut == 'valide' %}
-                                        <small class="text-success ml-2">
-                                            <i class="fas fa-check-circle"></i>
-                                            {% if fiche.etat_correction.validee_par %}
-                                                par {{ fiche.etat_correction.validee_par.first_name }} {{ fiche.etat_correction.validee_par.last_name }}
+                            </td>
+                            <td>
+                                {% if fiche.espece %}
+                                    {{ fiche.espece.nom }}
+                                {% else %}
+                                    <span class="text-muted">Non renseignée</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if fiche.localisation %}
+                                    {% if fiche.localisation.commune_saisie and fiche.localisation.commune_saisie != fiche.localisation.commune %}
+                                        {{ fiche.localisation.commune_saisie }} → {{ fiche.localisation.commune }}
+                                    {% elif fiche.localisation.commune_saisie %}
+                                        {{ fiche.localisation.commune_saisie }}
+                                    {% else %}
+                                        {{ fiche.localisation.commune }}
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">Non renseignée</span>
+                                {% endif %}
+                            </td>
+                            <td class="etat-correction-cell"
+                                data-percentage="{% if fiche.etat_correction %}{{ fiche.etat_correction.pourcentage_completion }}{% else %}0{% endif %}">
+                                {% if fiche.etat_correction %}
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge
+                                            {% if fiche.etat_correction.statut == 'nouveau' %}badge-info
+                                            {% elif fiche.etat_correction.statut == 'en_edition' %}badge-info
+                                            {% elif fiche.etat_correction.statut == 'en_cours' %}badge-warning
+                                            {% else %}badge-success{% endif %}">
+                                            {% if fiche.etat_correction.statut == 'en_edition' %}
+                                                En cours de saisie
+                                            {% else %}
+                                                {{ fiche.etat_correction.get_statut_display }}
                                             {% endif %}
-                                        </small>
+                                        </span>
+                                        {% if fiche.etat_correction.statut == 'en_cours' %}
+                                            <div class="progress ml-2" style="width: 60px; height: 20px;">
+                                                <div class="progress-bar" style="width: {{ fiche.etat_correction.pourcentage_completion }}%">
+                                                    <small>{{ fiche.etat_correction.pourcentage_completion }}%</small>
+                                                </div>
+                                            </div>
+                                        {% elif fiche.etat_correction.statut == 'valide' %}
+                                            <small class="text-success ml-2">
+                                                <i class="fas fa-check-circle"></i>
+                                                {% if fiche.etat_correction.validee_par %}
+                                                    par {{ fiche.etat_correction.validee_par.first_name }} {{ fiche.etat_correction.validee_par.last_name }}
+                                                {% endif %}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="badge badge-secondary">Nouveau</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a href="{% url 'observations:fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Visualiser</a>
+                                    {% if fiche.etat_correction.statut == 'en_edition' or fiche.etat_correction.statut == 'nouveau' %}
+                                        {% if user == fiche.observateur or user.role == 'administrateur' %}
+                                            <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-primary">Continuer</a>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-secondary" disabled title="Seul l'auteur peut continuer la saisie">Continuer</button>
+                                        {% endif %}
+                                    {% elif fiche.etat_correction.statut == 'en_cours' %}
+                                        <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-warning">Corriger</a>
                                     {% endif %}
                                 </div>
-                            {% else %}
-                                <span class="badge badge-secondary">Nouveau</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="d-flex gap-1">
-                                <a href="{% url 'observations:fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Visualiser</a>
-                                {% if fiche.etat_correction.statut == 'en_edition' or fiche.etat_correction.statut == 'nouveau' %}
-                                    {% if user == fiche.observateur or user.role == 'administrateur' %}
-                                        <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-primary">Continuer</a>
-                                    {% else %}
-                                        <button class="btn btn-sm btn-secondary" disabled title="Seul l'auteur peut continuer la saisie">Continuer</button>
-                                    {% endif %}
-                                {% elif fiche.etat_correction.statut == 'en_cours' %}
-                                    <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-warning">Corriger</a>
-                                {% endif %}
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center py-3">Aucune fiche d'observation trouvée.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-3">Aucune fiche d'observation trouvée.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
         </div>
         {% if fiches.paginator.num_pages > 1 %}
         <div class="card-footer">
@@ -179,12 +229,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 <ul class="pagination justify-content-center mb-0">
                     {% if fiches.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page=1">
+                            <a class="page-link" href="?{% urlencode_without_page %}&page=1">
                                 &laquo; Première
                             </a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ fiches.previous_page_number }}">
+                            <a class="page-link" href="?{% urlencode_without_page %}&page={{ fiches.previous_page_number }}">
                                 Précédente
                             </a>
                         </li>
@@ -205,12 +255,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     {% if fiches.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ fiches.next_page_number }}">
+                            <a class="page-link" href="?{% urlencode_without_page %}&page={{ fiches.next_page_number }}">
                                 Suivante
                             </a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ fiches.paginator.num_pages }}">
+                            <a class="page-link" href="?{% urlencode_without_page %}&page={{ fiches.paginator.num_pages }}">
                                 Dernière &raquo;
                             </a>
                         </li>
@@ -233,4 +283,33 @@ document.addEventListener('DOMContentLoaded', function() {
         <a href="{% url 'observations:observations_list' %}" class="btn btn-primary">Nouvelle observation</a>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filter-form');
+    const inputs = filterForm.querySelectorAll('input, select');
+    let debounceTimeout;
+
+    function submitForm() {
+        // Before submitting, remove the 'page' parameter to always go back to the first page on a new filter
+        const url = new URL(filterForm.action);
+        const params = new URLSearchParams(new FormData(filterForm));
+        params.delete('page');
+        window.location.search = params.toString();
+    }
+
+    const debouncedSubmit = function() {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(submitForm, 300);
+    };
+
+    inputs.forEach(input => {
+        if (input.type === 'text' || input.type === 'date') {
+            input.addEventListener('input', debouncedSubmit);
+        } else {
+            input.addEventListener('change', submitForm);
+        }
+    });
+});
+</script>
 {% endblock %}
