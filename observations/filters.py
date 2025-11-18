@@ -1,6 +1,6 @@
 import django_filters
-from django.db.models import Q
 from django import forms
+from django.db.models import Q
 from django_filters.widgets import RangeWidget
 
 from accounts.models import Utilisateur
@@ -34,9 +34,7 @@ class FicheObservationFilter(django_filters.FilterSet):
     commune = django_filters.CharFilter(
         method='filter_by_commune',
         label="Commune",
-        widget=forms.TextInput(
-            attrs={'class': 'form-control', 'placeholder': 'Commune'}
-        ),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Commune'}),
     )
     statut_correction = django_filters.ChoiceFilter(
         field_name='etat_correction__statut',
