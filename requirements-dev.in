@@ -5,6 +5,7 @@ ruff
 mypy
 django-stubs
 django-stubs-ext
+types-django-filter
 types-pytz
 types-PyYAML
 typing-inspection

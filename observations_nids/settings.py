@@ -9,11 +9,9 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-import sys
+
 import os
 from pathlib import Path
-
-
 from types import ModuleType
 from typing import Any
 
