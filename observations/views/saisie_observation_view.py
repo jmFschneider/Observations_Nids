@@ -620,7 +620,7 @@ def saisie_observation(request, fiche_id=None):
         'remarques': remarques,
     }
 
-    return render(request, 'saisie/saisie_observation_optimise.html', context)
+    return render(request, 'saisie/saisie_observation.html', context)
 
 
 @login_required
