@@ -286,9 +286,21 @@ function fermerModalRecherche() {
     <div class="header-section">
         <h2>
           {% if fiche_form.instance.pk %}
-            Edition d'une observation
+            {# Fiche existante : on distingue selon l'état de correction et la provenance #}
+            {% if fiche_form.instance.etat_correction.statut == 'en_cours' %}
+              {# En correction #}
+              {% if fiche_form.instance.transcription %}
+                Correction de la fiche {{ fiche_form.instance.num_fiche }} obtenue par transcription
+              {% else %}
+                Correction de la fiche saisie par {{ fiche_form.instance.observateur.first_name }} {{ fiche_form.instance.observateur.last_name }}
+              {% endif %}
+            {% else %}
+              {# En édition (nouveau ou en_edition) #}
+              Saisie d'une nouvelle observation
+            {% endif %}
           {% else %}
-            Saisie d'une nouvelle observation
+            {# Nouvelle fiche #}
+            Création d'une fiche
           {% endif %}
         </h2>
     </div>
