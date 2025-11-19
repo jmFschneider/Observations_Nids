@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
 
+from observations.filters import FicheObservationFilter  # Import the filter
 from observations.models import FicheObservation
 
 logger = logging.getLogger('observations')
@@ -37,7 +38,7 @@ def fiche_observation_view(request, fiche_id):
 
 @login_required
 def liste_fiches_observations(request):
-    fiches = (
+    fiches_queryset = (
         FicheObservation.objects.select_related(
             'observateur', 'espece', 'localisation', 'etat_correction'
         )
@@ -45,11 +46,15 @@ def liste_fiches_observations(request):
         .order_by('-date_creation')
     )
 
+    fiche_filter = FicheObservationFilter(request.GET, queryset=fiches_queryset)
+    fiches = fiche_filter.qs
+
     paginator = Paginator(fiches, 10)
     page = request.GET.get('page', 1)
     fiches_page = paginator.get_page(page)
 
     context = {
+        'filter': fiche_filter,  # Pass the filter object to the template
         'fiches': fiches_page,
     }
     return render(request, 'liste_fiches_observations.html', context)

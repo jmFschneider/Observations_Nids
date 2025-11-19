@@ -102,6 +102,7 @@ INSTALLED_APPS = [
     'rest_framework',  # required for the API
     'helpdesk',
     'helpdesk_custom.apps.HelpdeskCustomConfig',  # Personnalisation de Helpdesk
+    'django_filters',
 ]
 
 MIDDLEWARE = [

@@ -70,3 +70,5 @@ packaging
 uritemplate
 wcwidth
 radicale>=1.1.2
+django-filter
+
