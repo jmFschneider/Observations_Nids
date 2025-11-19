@@ -8,6 +8,8 @@ from django.urls import reverse
 
 from accounts.models import Utilisateur
 from geo.models import AncienneCommune, CommuneFrance
+from observations.models import FicheObservation
+from taxonomy.models import Espece
 
 
 @pytest.fixture
@@ -239,7 +241,7 @@ class TestCreerCommune:
             'longitude': '2,3522',
             'altitude': '35,5',
         }
-        response = client.post(reverse('geo:creer_commune'), data)
+        client.post(reverse('geo:creer_commune'), data)
         commune = CommuneFrance.objects.get(code_insee='99998')
         # Comparaison avec Decimal car latitude/longitude sont des DecimalField
         assert float(commune.latitude) == 48.8566
@@ -269,7 +271,7 @@ class TestCreerCommune:
             'latitude': '',
             'longitude': '',
         }
-        response = client.post(reverse('geo:creer_commune'), data)
+        client.post(reverse('geo:creer_commune'), data)
         assert not CommuneFrance.objects.filter(code_insee='99996').exists()
 
     def test_creation_code_insee_duplique_refuse(self, client, admin_user, commune_test):
@@ -393,26 +395,17 @@ class TestSupprimerCommune:
         messages = list(get_messages(response.wsgi_request))
         assert any('supprimée avec succès' in str(m) for m in messages)
 
-    def test_suppression_commune_avec_fiches_refusee(
-        self, client, admin_user, commune_test
-    ):
+    def test_suppression_commune_avec_fiches_refusee(self, client, admin_user, commune_test):
         """Une commune utilisée dans des fiches ne peut pas être supprimée."""
         # Créer une fiche et l'associer à la commune
-        from observations.models import FicheObservation
-        from taxonomy.models import Espece
 
         # Créer une espèce si elle n'existe pas
         espece, _ = Espece.objects.get_or_create(
-            nom='Espèce Test',
-            defaults={'nom_scientifique': 'Species testus'}
+            nom='Espèce Test', defaults={'nom_scientifique': 'Species testus'}
         )
 
         # Créer une fiche d'observation
-        fiche = FicheObservation.objects.create(
-            observateur=admin_user,
-            espece=espece,
-            annee=2024
-        )
+        fiche = FicheObservation.objects.create(observateur=admin_user, espece=espece, annee=2024)
 
         # Associer la commune à la fiche via la localisation
         fiche.localisation.commune = commune_test.nom
@@ -449,6 +442,7 @@ class TestRechercherNominatim:
 
     def test_recherche_nominatim_avec_mock(self, client, admin_user, monkeypatch):
         """La recherche Nominatim fonctionne avec un mock."""
+
         # Mock du géocodeur avec monkeypatch au lieu de mocker
         class MockGeocodeur:
             def geocoder_commune(self, nom, departement=None):
@@ -485,7 +479,7 @@ class TestRechercherNominatim:
             'altitude': '35',
             'adresse': 'NominatimVille, Paris, France',
         }
-        response = client.post(reverse('geo:rechercher_nominatim'), data)
+        client.post(reverse('geo:rechercher_nominatim'), data)
 
         assert CommuneFrance.objects.filter(nom='NominatimVille').exists()
         commune = CommuneFrance.objects.get(nom='NominatimVille')

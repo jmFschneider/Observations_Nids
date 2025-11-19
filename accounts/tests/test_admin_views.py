@@ -7,8 +7,6 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 
 from accounts.models import Utilisateur
-from observations.models import FicheObservation
-from taxonomy.models import Espece
 
 
 @pytest.fixture
@@ -124,9 +122,7 @@ class TestListeUtilisateurs:
     def test_recherche_par_nom(self, client, admin_user, observateur_user):
         """La recherche par nom/prénom fonctionne."""
         client.force_login(admin_user)
-        response = client.get(
-            reverse('accounts:liste_utilisateurs'), {'recherche': 'Observateur'}
-        )
+        response = client.get(reverse('accounts:liste_utilisateurs'), {'recherche': 'Observateur'})
         assert response.status_code == 200
         assert observateur_user.username in str(response.content)
 
@@ -199,7 +195,7 @@ class TestCreerUtilisateur:
             'password1': 'ComplexPass123!',
             'password2': 'ComplexPass123!',
         }
-        response = client.post(reverse('accounts:creer_utilisateur'), data)
+        client.post(reverse('accounts:creer_utilisateur'), data)
         assert not Utilisateur.objects.filter(email='test@test.com').exists()
 
     def test_creation_username_duplique_refuse(self, client, admin_user, observateur_user):
@@ -212,7 +208,7 @@ class TestCreerUtilisateur:
             'password2': 'ComplexPass123!',
             'role': 'observateur',
         }
-        response = client.post(reverse('accounts:creer_utilisateur'), data)
+        client.post(reverse('accounts:creer_utilisateur'), data)
         # Un seul utilisateur avec ce username
         assert Utilisateur.objects.filter(username=observateur_user.username).count() == 1
 
@@ -230,9 +226,7 @@ class TestModifierUtilisateur:
     def test_affichage_formulaire(self, client, admin_user, observateur_user):
         """Le formulaire de modification s'affiche."""
         client.force_login(admin_user)
-        response = client.get(
-            reverse('accounts:modifier_utilisateur', args=[observateur_user.id])
-        )
+        response = client.get(reverse('accounts:modifier_utilisateur', args=[observateur_user.id]))
         assert response.status_code == 200
         assert response.context['utilisateur'] == observateur_user
         assert 'form' in response.context
@@ -269,9 +263,7 @@ class TestModifierUtilisateur:
     def test_acces_non_admin_refuse(self, client, reviewer_user, observateur_user):
         """Un non-admin ne peut pas modifier d'utilisateur."""
         client.force_login(reviewer_user)
-        response = client.get(
-            reverse('accounts:modifier_utilisateur', args=[observateur_user.id])
-        )
+        response = client.get(reverse('accounts:modifier_utilisateur', args=[observateur_user.id]))
         assert response.status_code == 302
 
 
@@ -281,7 +273,7 @@ class TestActiverDesactiverUtilisateur:
 
     def test_desactiver_utilisateur(self, client, admin_user, observateur_user):
         """Un admin peut désactiver un utilisateur."""
-        assert observateur_user.is_active == True
+        assert observateur_user.is_active
 
         client.force_login(admin_user)
         response = client.post(
@@ -290,7 +282,7 @@ class TestActiverDesactiverUtilisateur:
         assert response.status_code == 302
 
         observateur_user.refresh_from_db()
-        assert observateur_user.is_active == False
+        assert not observateur_user.is_active
 
         messages = list(get_messages(response.wsgi_request))
         # Vérifier qu'un message a été créé
@@ -402,7 +394,7 @@ class TestInscriptionPublique:
         if Utilisateur.objects.filter(username='nouveau_user').exists():
             user = Utilisateur.objects.get(username='nouveau_user')
             # Vérifier les valeurs par défaut
-            assert user.est_valide == False  # Non validé par défaut (défini par save())
+            assert not user.est_valide  # Non validé par défaut (défini par save())
             assert user.role == 'observateur'  # Rôle par défaut
 
     def test_inscription_sans_username_refuse(self, client):
@@ -413,7 +405,7 @@ class TestInscriptionPublique:
             'password1': 'ComplexPass123!',
             'password2': 'ComplexPass123!',
         }
-        response = client.post(reverse('accounts:inscription_publique'), data)
+        client.post(reverse('accounts:inscription_publique'), data)
         assert not Utilisateur.objects.filter(email='test@test.com').exists()
 
     def test_inscription_mots_de_passe_differents_refuse(self, client):
@@ -424,7 +416,7 @@ class TestInscriptionPublique:
             'password1': 'ComplexPass123!',
             'password2': 'DifferentPass456!',
         }
-        response = client.post(reverse('accounts:inscription_publique'), data)
+        client.post(reverse('accounts:inscription_publique'), data)
         assert not Utilisateur.objects.filter(username='testuser').exists()
 
     def test_inscription_username_duplique_refuse(self, client, observateur_user):
@@ -435,7 +427,7 @@ class TestInscriptionPublique:
             'password1': 'ComplexPass123!',
             'password2': 'ComplexPass123!',
         }
-        response = client.post(reverse('accounts:inscription_publique'), data)
+        client.post(reverse('accounts:inscription_publique'), data)
         # Un seul utilisateur avec ce username
         assert Utilisateur.objects.filter(username=observateur_user.username).count() == 1
 
@@ -444,9 +436,7 @@ class TestInscriptionPublique:
 class TestPermissions:
     """Tests des permissions d'accès pour toutes les vues admin."""
 
-    def test_toutes_vues_admin_requierent_role_admin(
-        self, client, reviewer_user, observateur_user
-    ):
+    def test_toutes_vues_admin_requierent_role_admin(self, client, reviewer_user, observateur_user):
         """Toutes les vues admin requièrent le rôle administrateur."""
         client.force_login(reviewer_user)  # Reviewer, pas admin
 
