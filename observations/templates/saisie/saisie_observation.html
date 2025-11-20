@@ -59,19 +59,38 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'Observations/js/saisie_observation.js' %}?v=4.6"></script>
+<script src="{% static 'Observations/js/saisie_observation.js' %}?v=5.6"></script>
 <!-- Store fiche_id for JS access -->
 {% if fiche_form.instance.pk %}
 <div data-fiche-id="{{ fiche_form.instance.pk }}" style="display: none;"></div>
 {% endif %}
 
+<!-- Rouvrir la modale des remarques après sauvegarde si demandé -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Vérifier si on doit rouvrir la modale des remarques
+    const urlParams = new URLSearchParams(window.location.search);
+    const reopenRemarquesModal = urlParams.get('reopen_remarques_modal');
+
+    if (reopenRemarquesModal === '1') {
+        // Attendre que tout soit chargé (y compris le script principal qui expose ouvrirModalRemarques)
+        setTimeout(function() {
+            if (typeof window.ouvrirModalRemarques === 'function') {
+                window.ouvrirModalRemarques();
+
+                // Nettoyer l'URL pour retirer le paramètre
+                const newUrl = window.location.pathname + window.location.hash;
+                window.history.replaceState({}, document.title, newUrl);
+            }
+        }, 1000); // Attendre 1 seconde pour être sûr que tout est chargé
+    }
+});
+</script>
+
 <!-- JavaScript pour la modale de recherche de fiche précédente -->
 <script>
 // Attendre que la page soit complètement chargée (pas juste le DOM)
 window.addEventListener('load', function() {
-    console.log('Page complètement chargée, initialisation de la modale...');
-    console.log('Bootstrap disponible:', typeof bootstrap !== 'undefined');
-
     // Charger les observateurs et espèces disponibles
     chargerFiltresRecherche();
 
@@ -80,12 +99,8 @@ window.addEventListener('load', function() {
     if (btnRechercher) {
         btnRechercher.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('Bouton Rechercher cliqué');
             rechercherFiches();
         });
-        console.log('Event listener ajouté sur btnRechercher');
-    } else {
-        console.error('Bouton btnRechercher non trouvé');
     }
 
     // Permettre la recherche avec Entrée
@@ -100,8 +115,6 @@ window.addEventListener('load', function() {
             });
         }
     });
-
-    console.log('Initialisation modale terminée');
 });
 
 function chargerFiltresRecherche() {
@@ -126,7 +139,6 @@ function chargerFiltresRecherche() {
 }
 
 function rechercherFiches() {
-    console.log('Début de la recherche...');
     var params = new URLSearchParams();
 
     var observateur = document.getElementById('filtreObservateur').value;
@@ -143,13 +155,10 @@ function rechercherFiches() {
     if (ficheMin) params.append('fiche_id_min', ficheMin);
     if (ficheMax) params.append('fiche_id_max', ficheMax);
 
-    console.log('Paramètres:', params.toString());
-
     var tbody = document.getElementById('resultatsRecherche');
     tbody.innerHTML = '<tr><td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i> Recherche en cours...</td></tr>';
 
     var url = '{% url "observations:rechercher_fiches" %}?' + params.toString();
-    console.log('URL:', url);
 
     fetch(url, {
         headers: {
@@ -157,14 +166,12 @@ function rechercherFiches() {
         }
     })
     .then(function(response) {
-        console.log('Réponse reçue:', response.status);
         if (!response.ok) {
             throw new Error('Erreur HTTP: ' + response.status);
         }
         return response.json();
     })
     .then(function(data) {
-        console.log('Données reçues:', data);
         if (data.fiches && data.fiches.length > 0) {
             tbody.innerHTML = '';
             data.fiches.forEach(function(fiche) {
@@ -184,18 +191,14 @@ function rechercherFiches() {
         }
     })
     .catch(function(error) {
-        console.error('Erreur:', error);
         tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erreur lors de la recherche: ' + error.message + '</td></tr>';
     });
 }
 
 function selectionnerFiche(numFiche) {
-    console.log('Sélection de la fiche:', numFiche);
-
     var input = document.getElementById('id_fiche_precedente');
     if (input) {
         input.value = numFiche;
-        console.log('Champ mis à jour avec:', numFiche);
 
         // Mettre à jour l'affichage visuel avec un lien cliquable
         var affichage = document.getElementById('affichageNidPrecedent');
@@ -203,26 +206,19 @@ function selectionnerFiche(numFiche) {
             var lien = '<a href="/observations/' + numFiche + '/" target="_blank" style="color: #0d6efd; text-decoration: none;" title="Voir la fiche ' + numFiche + '">#' + numFiche + '</a>';
             affichage.innerHTML = lien;
         }
-    } else {
-        console.error('Champ id_fiche_precedente non trouvé');
     }
 
-    // Fermer la modale (utiliser notre fonction de fermeture)
+    // Fermer la modale
     fermerModalRecherche();
-    console.log('Modale fermée après sélection');
 }
 
 function ouvrirModalRecherche() {
-    console.log('Ouverture de la modale...');
     var modalElement = document.getElementById('modalRechercheFiche');
     if (modalElement) {
-        console.log('Élément modal trouvé');
         if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            console.log('Bootstrap Modal disponible');
             var modal = new bootstrap.Modal(modalElement);
             modal.show();
         } else {
-            console.error('Bootstrap Modal non disponible - utilisation du fallback');
             // Fallback: affichage manuel complet
             modalElement.classList.remove('fade'); // Retirer l'animation fade
             modalElement.classList.add('show');
@@ -252,12 +248,7 @@ function ouvrirModalRecherche() {
                 document.body.appendChild(backdrop);
             }
             backdrop.style.display = 'block';
-
-            console.log('Modale ouverte manuellement');
         }
-    } else {
-        console.error('Élément modalRechercheFiche non trouvé');
-        alert('Erreur: modale non trouvée');
     }
 }
 
@@ -569,7 +560,7 @@ function fermerModalRecherche() {
 
             {% if fiche_form.instance.pk %}
             <div class="mt-3">
-                <a href="{% url 'observations:ajouter_observation' fiche_id=fiche_form.instance.pk %}" class="btn btn-primary btn-sm">
+                <a href="{% url 'observations:ajouter_observation' fiche_id=fiche_form.instance.pk %}" id="ajouter-observation-link" class="btn btn-primary btn-sm" data-check-changes="true">
                     <i class="fas fa-plus"></i> Ajouter une observation
                 </a>
             </div>

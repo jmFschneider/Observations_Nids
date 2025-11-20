@@ -5,6 +5,187 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // ====================================
+    // Détection des modifications du formulaire
+    // ====================================
+
+    let formInitialState = {};
+    let hasUnsavedChanges = false;
+
+    // Fonction pour capturer l'état initial du formulaire PRINCIPAL
+    function captureFormInitialState() {
+        const mainForm = document.querySelector('form[method="post"]:not([action*="logout"])');
+        if (!mainForm) return;
+
+        formInitialState = {};
+
+        // Capturer tous les champs input, textarea et select du formulaire PRINCIPAL
+        const formElements = mainForm.querySelectorAll('input, textarea, select');
+        formElements.forEach(element => {
+            const name = element.name;
+            if (!name) return;
+
+            // Ignorer les champs de management form du formset (ils changent dynamiquement)
+            if (name.includes('TOTAL_FORMS') || name.includes('INITIAL_FORMS')) return;
+
+            if (element.type === 'checkbox') {
+                formInitialState[name] = element.checked;
+            } else if (element.type === 'radio') {
+                if (element.checked) {
+                    formInitialState[name] = element.value;
+                }
+            } else {
+                formInitialState[name] = element.value;
+            }
+        });
+    }
+
+    // Fonction pour vérifier si le formulaire a des modifications
+    function checkForUnsavedChanges() {
+        const mainForm = document.querySelector('form[method="post"]:not([action*="logout"])');
+        if (!mainForm) return false;
+
+        const formElements = mainForm.querySelectorAll('input, textarea, select');
+        let hasChanges = false;
+
+        formElements.forEach(element => {
+            const name = element.name;
+            if (!name) return;
+
+            // Ignorer les champs de management form
+            if (name.includes('TOTAL_FORMS') || name.includes('INITIAL_FORMS')) return;
+
+            let currentValue;
+            if (element.type === 'checkbox') {
+                currentValue = element.checked;
+            } else if (element.type === 'radio') {
+                if (element.checked) {
+                    currentValue = element.value;
+                }
+            } else {
+                currentValue = element.value;
+            }
+
+            // Comparer avec l'état initial
+            if (formInitialState[name] !== currentValue) {
+                hasChanges = true;
+            }
+        });
+
+        return hasChanges;
+    }
+
+    // Capturer l'état initial au chargement
+    captureFormInitialState();
+
+    // Surveiller les changements sur le formulaire PRINCIPAL
+    const mainForm = document.querySelector('form[method="post"]:not([action*="logout"])');
+    if (mainForm) {
+        mainForm.addEventListener('change', function() {
+            hasUnsavedChanges = checkForUnsavedChanges();
+        });
+
+        mainForm.addEventListener('input', function() {
+            hasUnsavedChanges = checkForUnsavedChanges();
+        });
+    }
+
+    // Note: Cette fonction n'est plus utilisée directement, remplacée par l'approche globale ci-dessous
+    // Conservée pour référence historique uniquement
+
+    // ========================================
+    // APPROCHE GLOBALE : Intercepter TOUS les clics sur les liens et boutons
+    // qui pourraient naviguer hors de la page
+    // ========================================
+
+    document.addEventListener('click', function(event) {
+        // Vérifier si le clic provient d'un lien <a> ou d'un bouton qui navigue
+        let target = event.target;
+
+        // Remonter jusqu'à trouver un lien <a>
+        while (target && target.tagName !== 'A' && target.tagName !== 'BUTTON') {
+            target = target.parentElement;
+        }
+
+        if (!target) return; // Pas de lien ou bouton trouvé
+
+        // Liste des liens/boutons à intercepter (qui causent une navigation)
+        const shouldCheckChanges = (
+            // Lien "Ajouter une observation"
+            (target.id === 'ajouter-observation-link') ||
+            (target.href && target.href.includes('ajouter_observation')) ||
+            // Bouton "Ajouter/Modifier remarques"
+            (target.id === 'open-remarques-modal-btn') ||
+            // Attribut data-check-changes explicite
+            (target.dataset && target.dataset.checkChanges === 'true')
+        );
+
+        if (!shouldCheckChanges) return; // Ce lien/bouton n'est pas concerné
+
+        // Vérifier s'il y a des modifications
+        const hasChanges = checkForUnsavedChanges();
+
+        if (!hasChanges) {
+            return; // Pas de modifications, laisser la navigation se faire
+        }
+
+        // Il y a des modifications - bloquer et demander confirmation
+        event.preventDefault();
+        event.stopPropagation();
+
+        const linkText = target.textContent.trim();
+        const userChoice = confirm(
+            `Vous avez des modifications non sauvegardées sur cette fiche.\n\n` +
+            `Voulez-vous sauvegarder avant de continuer vers "${linkText}" ?\n\n` +
+            `• Cliquez sur OK pour sauvegarder puis continuer\n` +
+            `• Cliquez sur Annuler pour continuer SANS sauvegarder (les modifications seront perdues)`
+        );
+
+        if (userChoice) {
+            // L'utilisateur veut sauvegarder
+            const form = document.querySelector('form[method="post"]:not([action*="logout"])');
+            if (form) {
+                // Si c'est un lien avec href, rediriger après sauvegarde
+                if (target.href) {
+                    const redirectInput = document.createElement('input');
+                    redirectInput.type = 'hidden';
+                    redirectInput.name = 'redirect_after_save';
+                    redirectInput.value = target.href;
+                    form.appendChild(redirectInput);
+                }
+                // Si c'est le bouton remarques, rouvrir la modal après sauvegarde
+                else if (target.id === 'open-remarques-modal-btn') {
+                    const reopenModalInput = document.createElement('input');
+                    reopenModalInput.type = 'hidden';
+                    reopenModalInput.name = 'reopen_remarques_modal';
+                    reopenModalInput.value = '1';
+                    form.appendChild(reopenModalInput);
+                }
+
+                form.submit();
+            }
+        } else {
+            // L'utilisateur ne veut PAS sauvegarder
+            if (target.href) {
+                window.location.href = target.href;
+            } else if (target.id === 'open-remarques-modal-btn') {
+                // Ouvrir la modal des remarques sans sauvegarder
+                const tempFlag = window._skipChangeCheck;
+                window._skipChangeCheck = true;
+                target.click();
+                window._skipChangeCheck = tempFlag;
+            }
+        }
+    }, true); // useCapture = true pour capturer l'événement en phase de capture
+
+    // Réinitialiser l'état après sauvegarde réussie
+    if (mainForm) {
+        mainForm.addEventListener('submit', function() {
+            // Après soumission, on considère qu'il n'y a plus de modifications non sauvegardées
+            hasUnsavedChanges = false;
+        });
+    }
+
+    // ====================================
     // Amélioration du champ Espèce avec recherche intelligente
     // ====================================
 
@@ -503,7 +684,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Add confirmation before submitting the form
-    const mainForm = document.querySelector('form[method="post"]:not([action*="logout"])');
+    // Note: mainForm est déjà déclaré au début du script
     if (mainForm) {
         mainForm.addEventListener('submit', function(e) {
             // Re-enable all disabled fields right before submission so their values are sent
@@ -597,6 +778,17 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Erreur lors du chargement des remarques');
         });
     }
+
+    // Exposer une fonction globale pour ouvrir la modale des remarques
+    // (utilisée pour la réouverture automatique après sauvegarde)
+    window.ouvrirModalRemarques = function() {
+        const ficheIdDiv = document.querySelector('[data-fiche-id]');
+        if (ficheIdDiv && remarquesModal) {
+            const ficheId = ficheIdDiv.dataset.ficheId;
+            chargerRemarques(ficheId);
+            remarquesModal.style.display = 'flex';
+        }
+    };
 
     // Fonction pour afficher les remarques dans le modal
     function afficherRemarquesDansModal() {
@@ -837,23 +1029,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function toggleTimeStyle(observationRow, isTimeKnown) {
         const dateTimeContainer = observationRow.querySelector('.date-time-container');
 
-        console.log('toggleTimeStyle appelé:', {
-            row: observationRow,
-            isTimeKnown: isTimeKnown,
-            dateTimeContainer: dateTimeContainer,
-            hasClass: dateTimeContainer ? dateTimeContainer.classList.contains('time-unknown') : 'N/A'
-        });
-
         if (dateTimeContainer) {
             if (isTimeKnown) {
                 dateTimeContainer.classList.remove('time-unknown');
-                console.log('Classe time-unknown RETIRÉE du container');
             } else {
                 dateTimeContainer.classList.add('time-unknown');
-                console.log('Classe time-unknown AJOUTÉE au container');
             }
-        } else {
-            console.error('Element .date-time-container NON TROUVÉ dans la ligne');
         }
     }
 
@@ -882,22 +1063,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const heureConnueData = observationRow.dataset.heureConnue;
         const isTimeKnown = heureConnueData === 'true' || heureCheckbox.checked;
 
-        console.log('=== Initialisation ligne:', prefix, '===');
-        console.log('heureConnueData:', heureConnueData);
-        console.log('heureCheckbox.checked:', heureCheckbox.checked);
-        console.log('isTimeKnown:', isTimeKnown);
-        console.log('dateInput:', dateInput);
-        console.log('timeInput:', timeInput);
-
         // Initialisation : appliquer le style selon la valeur de heure_connue
         if (!isTimeKnown) {
-            console.log('→ Heure NON CONNUE - application du style grisé');
             if (timeInput.value) {
                 setTimeToMidnight(timeInput);
             }
             toggleTimeStyle(observationRow, false);
         } else {
-            console.log('→ Heure CONNUE - style normal');
             toggleTimeStyle(observationRow, true);
         }
 
@@ -940,10 +1112,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialiser tous les gestionnaires pour les lignes d'observation existantes
     const observationRows = document.querySelectorAll('.observation-row');
-    console.log('=== Nombre de lignes d\'observation trouvées:', observationRows.length, '===');
 
-    observationRows.forEach((row, index) => {
-        console.log(`Initialisation ligne ${index + 1}:`, row);
+    observationRows.forEach((row) => {
         initHeureConnueHandlers(row);
     });
 

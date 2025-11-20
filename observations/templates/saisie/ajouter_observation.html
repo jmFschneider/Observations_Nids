@@ -193,6 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fields.forEach(field => {
         // Stocker la valeur par défaut
         const defaultValue = field.value;
+        const fieldName = field.name;
 
         // Vérifier si c'est une valeur par défaut à effacer
         const shouldClearOnFocus = (
@@ -211,10 +212,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Au blur, remettre la valeur par défaut si le champ est vide
+            // Au blur : pour nombre_oeufs et nombre_poussins, laisser vide si rien n'est saisi
+            // Pour les autres champs, remettre la valeur par défaut
             field.addEventListener('blur', function() {
                 if (this.value.trim() === '') {
-                    this.value = defaultValue;
+                    // Ne pas remettre de valeur par défaut pour les œufs et poussins
+                    if (fieldName !== 'nombre_oeufs' && fieldName !== 'nombre_poussins') {
+                        this.value = defaultValue;
+                    }
                 }
             });
         }

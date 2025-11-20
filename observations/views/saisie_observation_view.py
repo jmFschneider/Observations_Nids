@@ -9,6 +9,7 @@ from django.db import transaction
 from django.forms import inlineformset_factory
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from accounts.models import Utilisateur
 from audit.models import HistoriqueModification
@@ -147,7 +148,7 @@ def fiche_observation_view(request, fiche_id):
 
 
 @login_required
-def saisie_observation(request, fiche_id=None):
+def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
     """
     Vue optimisée pour la saisie d'une nouvelle observation ou la modification d'une existante.
     Combine la structure claire de 'saisie_observation_optimisee' avec la logique de sauvegarde robuste
@@ -585,6 +586,22 @@ def saisie_observation(request, fiche_id=None):
                         )
 
                     messages.success(request, "Fiche d'observation sauvegardée avec succès!")
+
+                    # Vérifier si une redirection après sauvegarde a été demandée (depuis JavaScript)
+                    redirect_url = post_data.get('redirect_after_save')
+                    if redirect_url:
+                        return redirect(redirect_url)
+
+                    # Vérifier si on doit rouvrir la modal des remarques après sauvegarde
+                    reopen_remarques = post_data.get('reopen_remarques_modal')
+                    if reopen_remarques:
+                        # Rediriger vers la même page avec un paramètre GET pour rouvrir la modal
+                        redirect_url = reverse(
+                            'observations:modifier_observation', kwargs={'fiche_id': fiche.pk}
+                        )
+                        redirect_url += '?reopen_remarques_modal=1'
+                        return redirect(redirect_url)
+
                     return redirect('observations:modifier_observation', fiche_id=fiche.pk)
 
             except Exception as e:
