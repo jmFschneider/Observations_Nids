@@ -138,8 +138,18 @@ class Observation(models.Model):
     heure_connue = models.BooleanField(
         default=True, help_text="Indique si l'heure d'observation est connue"
     )
-    nombre_oeufs = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    nombre_poussins = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    nombre_oeufs = models.IntegerField(
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0)],
+        help_text="Laisser vide si non observé",
+    )
+    nombre_poussins = models.IntegerField(
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0)],
+        help_text="Laisser vide si non observé",
+    )
     observations = models.TextField(blank=True, default='')
 
     class Meta:
