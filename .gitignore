@@ -62,3 +62,6 @@ docs/docs/todo/
 
 # Claude
 .claude/settings.local.json
+
+# Fichiers Windows réservés
+nul
