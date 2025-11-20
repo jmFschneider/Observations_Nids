@@ -585,6 +585,22 @@ def saisie_observation(request, fiche_id=None):
                         )
 
                     messages.success(request, "Fiche d'observation sauvegardée avec succès!")
+
+                    # Vérifier si une redirection après sauvegarde a été demandée (depuis JavaScript)
+                    redirect_url = post_data.get('redirect_after_save')
+                    if redirect_url:
+                        return redirect(redirect_url)
+
+                    # Vérifier si on doit rouvrir la modal des remarques après sauvegarde
+                    reopen_remarques = post_data.get('reopen_remarques_modal')
+                    if reopen_remarques:
+                        # Rediriger vers la même page avec un paramètre GET pour rouvrir la modal
+                        from django.urls import reverse
+                        redirect_url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche.pk})
+                        redirect_url += '?reopen_remarques_modal=1'
+                        from django.shortcuts import redirect as django_redirect
+                        return django_redirect(redirect_url)
+
                     return redirect('observations:modifier_observation', fiche_id=fiche.pk)
 
             except Exception as e:
