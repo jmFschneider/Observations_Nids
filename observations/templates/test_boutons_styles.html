@@ -1,0 +1,533 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .demo-container {
+        max-width: 1400px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .demo-section {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 40px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-section h2 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    .demo-section .description {
+        color: #666;
+        margin-bottom: 25px;
+        font-size: 14px;
+        font-style: italic;
+    }
+
+    .demo-buttons {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    /* ========================================
+       PROPOSITION 1 : Boutons Pills avec Dégradé
+       ======================================== */
+    .prop1 .action-buttons-container {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .prop1 .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .prop1 .btn-action i {
+        font-size: 16px;
+    }
+
+    .prop1 .btn-image {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+    }
+
+    .prop1 .btn-image:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .prop1 .btn-json {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border: none;
+    }
+
+    .prop1 .btn-json:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        color: white;
+    }
+
+    /* ========================================
+       PROPOSITION 2 : Style Card Compact
+       ======================================== */
+    .prop2 .action-buttons-container {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .prop2 .btn-action {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 13px;
+        transition: all 0.3s ease;
+        border: 2px solid;
+        background: white;
+        min-width: 110px;
+    }
+
+    .prop2 .btn-action i {
+        font-size: 24px;
+    }
+
+    .prop2 .btn-image {
+        border-color: #17a2b8;
+        color: #17a2b8;
+    }
+
+    .prop2 .btn-image:hover {
+        background: #17a2b8;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(23, 162, 184, 0.3);
+    }
+
+    .prop2 .btn-json {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+
+    .prop2 .btn-json:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(108, 117, 125, 0.3);
+    }
+
+    /* ========================================
+       PROPOSITION 3 : Badges avec Icônes
+       ======================================== */
+    .prop3 .action-buttons-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .prop3 .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+    .prop3 .btn-action i {
+        font-size: 14px;
+    }
+
+    .prop3 .btn-image {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .prop3 .btn-image:hover {
+        background: #1976d2;
+        color: white;
+        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+    }
+
+    .prop3 .btn-json {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .prop3 .btn-json:hover {
+        background: #7b1fa2;
+        color: white;
+        box-shadow: 0 2px 8px rgba(123, 31, 162, 0.3);
+    }
+
+    /* ========================================
+       PROPOSITION 4 : Boutons Outlined avec Animation
+       ======================================== */
+    .prop4 .action-buttons-container {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .prop4 .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .prop4 .btn-action::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        transition: left 0.3s ease;
+        z-index: -1;
+    }
+
+    .prop4 .btn-action i {
+        font-size: 18px;
+        transition: transform 0.3s ease;
+    }
+
+    .prop4 .btn-action:hover i {
+        transform: scale(1.1);
+    }
+
+    .prop4 .btn-image {
+        border-color: #17a2b8;
+        color: #17a2b8;
+        background: white;
+    }
+
+    .prop4 .btn-image::before {
+        background: #17a2b8;
+    }
+
+    .prop4 .btn-image:hover {
+        color: white;
+        border-color: #17a2b8;
+    }
+
+    .prop4 .btn-image:hover::before {
+        left: 0;
+    }
+
+    .prop4 .btn-json {
+        border-color: #6c757d;
+        color: #6c757d;
+        background: white;
+    }
+
+    .prop4 .btn-json::before {
+        background: #6c757d;
+    }
+
+    .prop4 .btn-json:hover {
+        color: white;
+        border-color: #6c757d;
+    }
+
+    .prop4 .btn-json:hover::before {
+        left: 0;
+    }
+
+    /* ========================================
+       PROPOSITION 4 HYBRIDE : Outlined + Fond Coloré
+       ======================================== */
+    .prop4-hybrid .action-buttons-container {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .prop4-hybrid .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .prop4-hybrid .btn-action::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        transition: left 0.3s ease;
+        z-index: -1;
+    }
+
+    .prop4-hybrid .btn-action i {
+        font-size: 18px;
+        transition: transform 0.3s ease;
+    }
+
+    .prop4-hybrid .btn-action:hover i {
+        transform: scale(1.1);
+    }
+
+    /* Bouton Image - Bleu clair avec animation vers bleu foncé */
+    .prop4-hybrid .btn-image {
+        border-color: #1976d2;
+        color: #1976d2;
+        background: #e3f2fd; /* Fond bleu clair */
+    }
+
+    .prop4-hybrid .btn-image::before {
+        background: #1976d2;
+    }
+
+    .prop4-hybrid .btn-image:hover {
+        color: white;
+        border-color: #1976d2;
+    }
+
+    .prop4-hybrid .btn-image:hover::before {
+        left: 0;
+    }
+
+    /* Bouton JSON - Violet clair avec animation vers violet foncé */
+    .prop4-hybrid .btn-json {
+        border-color: #7b1fa2;
+        color: #7b1fa2;
+        background: #f3e5f5; /* Fond violet clair */
+    }
+
+    .prop4-hybrid .btn-json::before {
+        background: #7b1fa2;
+    }
+
+    .prop4-hybrid .btn-json:hover {
+        color: white;
+        border-color: #7b1fa2;
+    }
+
+    .prop4-hybrid .btn-json:hover::before {
+        left: 0;
+    }
+
+    /* Style actuel pour comparaison */
+    .current .action-buttons-container {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .current .btn-link {
+        padding: 5px 10px;
+        border-radius: 4px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .current .btn-image {
+        border: 1px solid #17a2b8;
+        color: #17a2b8;
+    }
+
+    .current .btn-json {
+        border: 1px solid #6c757d;
+        color: #6c757d;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #667eea;
+    }
+
+    .page-title h1 {
+        color: #333;
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .page-title p {
+        color: #666;
+        font-size: 16px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="demo-container">
+    <div class="page-title">
+        <h1>Démonstration des Styles de Boutons</h1>
+        <p>Survolez les boutons pour voir les animations</p>
+    </div>
+
+    <!-- Style actuel -->
+    <div class="demo-section current">
+        <h2>Style Actuel</h2>
+        <p class="description">Le style actuellement utilisé dans l'application</p>
+        <div class="demo-buttons">
+            <div class="action-buttons-container">
+                <a href="javascript:void(0);" class="btn-link btn-image">
+                    <i class="fas fa-image"></i> Voir l'image
+                </a>
+                <a href="javascript:void(0);" class="btn-link btn-json">
+                    <i class="fas fa-file-code"></i> Voir JSON
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proposition 1 -->
+    <div class="demo-section prop1">
+        <h2>Proposition 1 : Boutons Pills avec Dégradé</h2>
+        <p class="description">Design contemporain avec dégradés subtils et effets de hover sophistiqués</p>
+        <div class="demo-buttons">
+            <div class="action-buttons-container">
+                <a href="javascript:void(0);" class="btn-action btn-image">
+                    <i class="fas fa-image"></i>
+                    <span>Voir l'image</span>
+                </a>
+                <a href="javascript:void(0);" class="btn-action btn-json">
+                    <i class="fas fa-file-code"></i>
+                    <span>Voir JSON</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proposition 2 -->
+    <div class="demo-section prop2">
+        <h2>Proposition 2 : Style Card Compact</h2>
+        <p class="description">Mini-cartes élégantes avec icônes et texte empilés verticalement</p>
+        <div class="demo-buttons">
+            <div class="action-buttons-container">
+                <a href="javascript:void(0);" class="btn-action btn-image">
+                    <i class="fas fa-image"></i>
+                    <span>Voir l'image</span>
+                </a>
+                <a href="javascript:void(0);" class="btn-action btn-json">
+                    <i class="fas fa-file-code"></i>
+                    <span>Voir JSON</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proposition 3 -->
+    <div class="demo-section prop3">
+        <h2>Proposition 3 : Badges avec Icônes</h2>
+        <p class="description">Style badge/tag compact et discret mais élégant</p>
+        <div class="demo-buttons">
+            <div class="action-buttons-container">
+                <a href="javascript:void(0);" class="btn-action btn-image">
+                    <i class="fas fa-image"></i>
+                    <span>Voir l'image</span>
+                </a>
+                <a href="javascript:void(0);" class="btn-action btn-json">
+                    <i class="fas fa-file-code"></i>
+                    <span>Voir JSON</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proposition 4 -->
+    <div class="demo-section prop4">
+        <h2>Proposition 4 : Boutons Outlined avec Animation</h2>
+        <p class="description">Style épuré avec bordures et animation de remplissage fluide (recommandé)</p>
+        <div class="demo-buttons">
+            <div class="action-buttons-container">
+                <a href="javascript:void(0);" class="btn-action btn-image">
+                    <i class="fas fa-image"></i>
+                    <span>Voir l'image</span>
+                </a>
+                <a href="javascript:void(0);" class="btn-action btn-json">
+                    <i class="fas fa-file-code"></i>
+                    <span>Voir JSON</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proposition 4 Hybride (NOUVEAU) -->
+    <div class="demo-section prop4-hybrid">
+        <h2>🌟 Proposition 4 Hybride : Outlined + Fond Coloré</h2>
+        <p class="description">Combine l'animation de l'option 4 avec les fonds colorés de l'option 3 (VOTRE CHOIX)</p>
+        <div class="demo-buttons">
+            <div class="action-buttons-container">
+                <a href="javascript:void(0);" class="btn-action btn-image">
+                    <i class="fas fa-image"></i>
+                    <span>Voir l'image</span>
+                </a>
+                <a href="javascript:void(0);" class="btn-action btn-json">
+                    <i class="fas fa-file-code"></i>
+                    <span>Voir JSON</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px; padding: 20px; background: #e8f5e9; border-radius: 8px; border: 2px solid #4caf50;">
+        <p style="color: #2e7d32; font-size: 14px; margin: 0;">
+            <strong>✓ Option 4 Hybride sélectionnée !</strong> Prête à être appliquée aux pages réelles.
+        </p>
+    </div>
+</div>
+{% endblock %}
