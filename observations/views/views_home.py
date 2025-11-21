@@ -52,3 +52,8 @@ def home(request):
 
 def default_view(request):
     return render(request, 'access_restricted.html')
+
+
+def test_boutons_styles(request):
+    """Vue de test pour visualiser les différents styles de boutons."""
+    return render(request, 'test_boutons_styles.html')

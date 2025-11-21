@@ -24,6 +24,7 @@ from .views.view_transcription import (
 from .views.views_home import (
     default_view,
     home,
+    test_boutons_styles,
 )
 from .views.views_observation import (
     liste_fiches_observations,
@@ -35,6 +36,8 @@ urlpatterns = [
     # Routes principales
     path('', home, name='home'),
     path('tableau-de-bord/', default_view, name='default'),
+    # Route de test pour les styles de boutons
+    path('test-boutons-styles/', test_boutons_styles, name='test_boutons_styles'),
     # Routes d'authentification
     path('auth/logout/', LogoutView.as_view(next_page='observations:home'), name='logout'),
     path('auth/login/', CustomLoginView.as_view(template_name='login.html'), name='login'),

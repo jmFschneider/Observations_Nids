@@ -20,9 +20,68 @@
     </style>
 {% endblock %}
 
+{% block extra_js %}
+<script>
+    function openResizableImageWindow(imageUrl) {
+        const width = 800;
+        const height = 600;
+        const left = (screen.width - width) / 2;
+        const top = (screen.height - height) / 2;
+
+        const windowFeatures = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`;
+        const newWindow = window.open('', '_blank', windowFeatures);
+
+        if (newWindow) {
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Image de la fiche</title>
+                    <style>
+                        body { margin: 0; padding: 10px; background: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+                        img { max-width: 100%; height: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: white; }
+                    </style>
+                </head>
+                <body>
+                    <img src="${imageUrl}" alt="Image de la fiche">
+                </body>
+                </html>
+            `);
+            newWindow.document.close();
+        }
+    }
+</script>
+{% endblock %}
+
 
 {% block content %}
-<h2>Fiche Observation n°{{ fiche.num_fiche }}</h2>
+<div class="header-container" style="margin-bottom: 20px;">
+    <div class="header-section">
+        <h2>Fiche Observation n°{{ fiche.num_fiche }}</h2>
+    </div>
+
+    <div class="header-section header-right">
+        <div class="action-buttons-container">
+            {% if fiche.chemin_image %}
+                <a href="javascript:void(0);"
+                   onclick="openResizableImageWindow('{{ MEDIA_URL|escapejs }}{{ fiche.chemin_image|escapejs }}')"
+                   class="btn-action btn-image">
+                    <i class="fas fa-image"></i>
+                    <span>Voir l'image</span>
+                </a>
+            {% endif %}
+
+            {% if fiche.chemin_json %}
+                <a href="{{ MEDIA_URL }}transcription_results/{{ fiche.chemin_json }}"
+                   target="_blank"
+                   class="btn-action btn-json">
+                    <i class="fas fa-file-code"></i>
+                    <span>Voir JSON</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
 <table class="fiche-table">
     <tr>
