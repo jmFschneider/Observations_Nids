@@ -550,6 +550,230 @@ main {
   left: 0 !important;
 }
 
+/* ========================================
+   Amélioration des boutons Bootstrap standard
+   Style cohérent avec les boutons d'action
+   ======================================== */
+
+/* Base commune pour tous les boutons améliorés */
+.btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 2px solid !important;
+  position: relative !important;
+  overflow: hidden !important;
+  z-index: 1 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+}
+
+.btn::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  transition: left 0.3s ease !important;
+  z-index: -1 !important;
+}
+
+.btn i {
+  font-size: 16px !important;
+  transition: transform 0.3s ease !important;
+}
+
+.btn:hover i {
+  transform: scale(1.1) !important;
+}
+
+/* Boutons taille small */
+.btn-sm {
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+}
+
+.btn-sm i {
+  font-size: 14px !important;
+}
+
+/* Boutons taille extra-small */
+.btn-xs {
+  padding: 5px 12px !important;
+  font-size: 12px !important;
+}
+
+.btn-xs i {
+  font-size: 12px !important;
+}
+
+/* Bouton Primary - Bleu */
+.btn-primary {
+  border-color: #0d6efd !important;
+  color: #0d6efd !important;
+  background: #e7f1ff !important;
+}
+
+.btn-primary::before {
+  background: #0d6efd !important;
+}
+
+.btn-primary:hover {
+  color: white !important;
+  border-color: #0d6efd !important;
+}
+
+.btn-primary:hover::before {
+  left: 0 !important;
+}
+
+/* Bouton Success - Vert */
+.btn-success {
+  border-color: #198754 !important;
+  color: #198754 !important;
+  background: #d1e7dd !important;
+}
+
+.btn-success::before {
+  background: #198754 !important;
+}
+
+.btn-success:hover {
+  color: white !important;
+  border-color: #198754 !important;
+}
+
+.btn-success:hover::before {
+  left: 0 !important;
+}
+
+/* Bouton Info - Cyan */
+.btn-info {
+  border-color: #0dcaf0 !important;
+  color: #055160 !important;
+  background: #cff4fc !important;
+}
+
+.btn-info::before {
+  background: #0dcaf0 !important;
+}
+
+.btn-info:hover {
+  color: white !important;
+  border-color: #0dcaf0 !important;
+}
+
+.btn-info:hover::before {
+  left: 0 !important;
+}
+
+/* Bouton Warning - Jaune/Orange */
+.btn-warning {
+  border-color: #ffc107 !important;
+  color: #664d03 !important;
+  background: #fff3cd !important;
+}
+
+.btn-warning::before {
+  background: #ffc107 !important;
+}
+
+.btn-warning:hover {
+  color: #000 !important;
+  border-color: #ffc107 !important;
+}
+
+.btn-warning:hover::before {
+  left: 0 !important;
+}
+
+/* Bouton Danger - Rouge */
+.btn-danger,
+.btn-outline-danger {
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+  background: #f8d7da !important;
+}
+
+.btn-danger::before,
+.btn-outline-danger::before {
+  background: #dc3545 !important;
+}
+
+.btn-danger:hover,
+.btn-outline-danger:hover {
+  color: white !important;
+  border-color: #dc3545 !important;
+}
+
+.btn-danger:hover::before,
+.btn-outline-danger:hover::before {
+  left: 0 !important;
+}
+
+/* Bouton Secondary - Gris */
+.btn-secondary,
+.btn-outline-secondary {
+  border-color: #6c757d !important;
+  color: #6c757d !important;
+  background: #e2e3e5 !important;
+}
+
+.btn-secondary::before,
+.btn-outline-secondary::before {
+  background: #6c757d !important;
+}
+
+.btn-secondary:hover,
+.btn-outline-secondary:hover {
+  color: white !important;
+  border-color: #6c757d !important;
+}
+
+.btn-secondary:hover::before,
+.btn-outline-secondary:hover::before {
+  left: 0 !important;
+}
+
+/* Bouton Outline Primary */
+.btn-outline-primary {
+  border-color: #0d6efd !important;
+  color: #0d6efd !important;
+  background: white !important;
+}
+
+.btn-outline-primary::before {
+  background: #0d6efd !important;
+}
+
+.btn-outline-primary:hover {
+  color: white !important;
+  border-color: #0d6efd !important;
+}
+
+.btn-outline-primary:hover::before {
+  left: 0 !important;
+}
+
+/* Conteneur de boutons */
+.form-buttons {
+  display: flex !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+  margin-top: 20px !important;
+  padding: 20px !important;
+  background: #f8f9fa !important;
+  border-radius: 8px !important;
+  justify-content: flex-start !important;
+}
+
 /* Styles pour l'historique des modifications */
 .historique-container {
     padding: 20px;
