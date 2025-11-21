@@ -14,23 +14,52 @@ La documentation utilisateur est construite avec **MkDocs** et le thème **Mater
 ### Prérequis
 
 ```bash
-pip install mkdocs mkdocs-material pymdown-extensions
+pip install -r requirements-dev.txt
 ```
 
-### Lancer le serveur de documentation
+### Mode 1 : Serveur MkDocs (développement de la doc)
+
+**Quand l'utiliser** : Vous modifiez la documentation et voulez voir les changements en temps réel.
 
 ```bash
+# Terminal 1 : Serveur MkDocs
 cd docs
 mkdocs serve --config-file=mkdocs.yml
+
+# Terminal 2 : Serveur Django
+python manage.py runserver
 ```
 
 La documentation sera accessible sur : `http://127.0.0.1:8001`
+Le lien "Aide" dans l'application redirigera automatiquement vers ce serveur.
 
-### Modifications
-
+**Modifications** :
 - Les fichiers Markdown sont dans `docs/utilisateurs/`
 - La configuration est dans `docs/mkdocs.yml`
 - Les modifications sont détectées automatiquement (hot reload)
+
+### Mode 2 : Fichiers statiques (test environnement pilote/prod)
+
+**Quand l'utiliser** : Vous voulez tester le comportement exact de la production.
+
+```bash
+# 1. Builder la documentation
+bash scripts/build_docs.sh
+
+# 2. Configurer l'environnement pour utiliser les fichiers statiques
+echo "MKDOCS_USE_STATIC=True" >> .env
+
+# 3. Lancer Django
+python manage.py runserver
+
+# 4. Tester : Le lien "Aide" redirigera vers /static/docs/
+```
+
+Pour revenir au mode serveur MkDocs :
+```bash
+# Retirer ou commenter la ligne dans .env
+# MKDOCS_USE_STATIC=True
+```
 
 ---
 
@@ -66,7 +95,7 @@ git commit -m "📚 Mise à jour de la documentation utilisateur"
 git push
 ```
 
-### Étape 4 : Sur le Raspberry Pi
+### Étape 4 : Sur le Raspberry Pi (Pilote/Production)
 
 ```bash
 # Se connecter au Raspberry Pi
@@ -78,12 +107,17 @@ cd /path/to/observations_nids
 # Récupérer les changements
 git pull
 
+# Activer l'environnement virtuel
+source venv/bin/activate
+
 # Collecter les fichiers statiques
 python manage.py collectstatic --noinput
 
-# Redémarrer Gunicorn (si nécessaire)
+# Redémarrer Gunicorn
 sudo systemctl restart gunicorn
 ```
+
+**Important** : Sur le Raspberry Pi, assurez-vous que `DEBUG=False` dans le fichier `.env` (ou configuration production). La variable `MKDOCS_USE_STATIC` n'est pas nécessaire car la documentation sera automatiquement servie depuis `/static/docs/` quand `DEBUG=False`.
 
 ---
 

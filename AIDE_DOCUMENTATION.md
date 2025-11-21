@@ -12,8 +12,10 @@
 ### 2. Vue Django pour la redirection
 
 ✅ **Créée dans `observations/views/views_home.py`**
-- Fonction `aide_view()` qui gère la redirection
-- Détecte automatiquement l'environnement (DEBUG vs Production)
+- Fonction `aide_view()` qui gère la redirection intelligente
+- **Mode développement** (`DEBUG=True`) : Redirige vers `http://127.0.0.1:8001/` (serveur MkDocs)
+- **Mode production/pilote** (`DEBUG=False`) : Redirige vers `/static/docs/index.html`
+- **Mode test production** : Variable `MKDOCS_USE_STATIC=True` dans `.env` pour forcer les fichiers statiques
 
 ✅ **Route ajoutée dans `observations/urls.py`**
 - URL : `/aide/`
@@ -56,6 +58,10 @@
 
 ### En développement (votre PC)
 
+#### Option A : Développement de la documentation (mode dynamique)
+
+**Quand** : Vous modifiez la documentation et voulez voir les changements en temps réel.
+
 1. **Démarrer le serveur MkDocs** :
    ```bash
    cd docs
@@ -71,7 +77,30 @@
 3. **Tester le lien "Aide"** :
    - Se connecter à l'application : `http://127.0.0.1:8000/`
    - Cliquer sur "Aide" dans le menu latéral
-   - Un nouvel onglet s'ouvre avec la documentation
+   - Un nouvel onglet s'ouvre avec la documentation MkDocs live
+
+#### Option B : Test environnement production (mode statique)
+
+**Quand** : Vous voulez tester le comportement exact du pilote/production.
+
+1. **Builder la documentation** :
+   ```bash
+   bash scripts/build_docs.sh
+   ```
+
+2. **Activer le mode statique** :
+   ```bash
+   echo "MKDOCS_USE_STATIC=True" >> .env
+   ```
+
+3. **Démarrer Django** :
+   ```bash
+   python manage.py runserver
+   ```
+
+4. **Tester** : Le lien "Aide" redirigera vers `/static/docs/index.html`
+
+**Pour revenir au mode MkDocs live** : Commentez ou supprimez `MKDOCS_USE_STATIC=True` dans `.env`
 
 ### En production (Raspberry Pi)
 
