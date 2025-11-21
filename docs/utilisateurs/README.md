@@ -1,123 +1,137 @@
-# Documentation du Projet : Observations Nids
+# 🦅 Bienvenue dans Observations Nids
 
-> **Page d'accueil de la documentation utilisateur**
-> Vue d'ensemble, objectifs et fonctionnalités de l'application.
-
----
-
-## 1. Objectifs du Projet
-
-**Observations Nids** est une application web Django conçue pour la gestion complète du cycle de vie des observations ornithologiques de nidification.
-
-Les objectifs principaux sont :
-
-- **Numérisation Automatisée** : Transcrire des fiches papier en données numériques via l'API Google Vision (OCR).
-- **Gestion Collaborative** : Permettre la saisie, la correction et la validation des données par une équipe avec différents rôles.
-- **Qualité des Données** : Assurer la cohérence et la précision des informations grâce à un workflow de validation structuré.
-- **Traçabilité Complète** : Historiser chaque modification apportée aux données pour garantir l'intégrité scientifique.
+> **Guide utilisateur de l'application**
+> Tout ce dont vous avez besoin pour utiliser efficacement l'application de gestion des observations ornithologiques.
 
 ---
 
-## 2. Fonctionnalités
+## 📖 Qu'est-ce que Observations Nids ?
 
-> **Inventaire complet des fonctionnalités**
-> Ce document liste les fonctionnalités implémentées dans l'application par module, leur état de développement et leurs dépendances.
+**Observations Nids** est une application web qui vous permet de :
 
-### Légende des statuts
-
-- ✅ **Stable :** Fonctionne correctement, testé et utilisé en production.
-- 🚧 **En développement :** Fonctionnel mais peut évoluer, non finalisé.
-- ⚠️ **Attention :** Problèmes connus ou limitations importantes.
-
-**Résumé global :**
-- ✅ Stable : **28 fonctionnalités**
-- 🚧 En développement : **2 fonctionnalités**
-- ⚠️ Attention : **0 fonctionnalité**
+- 📝 **Saisir vos observations** de nidification directement en ligne
+- 🔍 **Consulter et filtrer** toutes les observations enregistrées
+- ✏️ **Transcrire automatiquement** vos carnets papier grâce à l'intelligence artificielle
+- 📊 **Suivre l'évolution** des nids tout au long de la saison
+- 🤝 **Collaborer** avec d'autres observateurs et correcteurs
+- 📈 **Analyser** vos données grâce aux statistiques
 
 ---
 
-### 🔐 Module `accounts` (Authentification)
+## 🚀 Démarrage rapide
 
-| # | Fonctionnalité | État | Notes |
-|---|---|---|---|
-| 1 | Connexion / Déconnexion | ✅ | Basé sur le système d'authentification de Django. |
-| 2 | Modèle `Utilisateur` personnalisé | ✅ | Inclut des rôles (observateur, correcteur, etc.). |
-| 3 | Gestion des rôles & permissions | ✅ | Contrôle d'accès granulaire via des décorateurs. |
+### Pour commencer en 5 minutes
 
----
+**→ [⚡ Guide rapide de démarrage](./00_guide_rapide.md)** - L'essentiel en 5 minutes !
 
-### 📝 Module `observations`
+Ou suivez ces étapes :
 
-#### Fonctionnalités Principales
-
-| # | Fonctionnalité | État | Notes |
-|---|---|---|---|
-| 1 | Liste des fiches d'observation | ✅ | Paginée et filtrable. |
-| 2 | Vue détaillée d'une fiche | ✅ | Affichage complet de toutes les données liées. |
-| 3 | Création / Modification de fiche | ✅ | Formulaire unifié pour la création et la modification. |
-| 4 | Gestion d'observations multiples | ✅ | Utilisation de `Formsets` pour ajouter dynamiquement des observations. |
-| 5 | Système de remarques | ✅ | Ajout et modification de remarques via une popup modale (AJAX). |
-| 6 | Export de données | 🚧 | Fonctionnalité à implémenter (CSV, JSON). |
-| 7 | Recherche avancée | 🚧 | Fonctionnalité à implémenter. |
-
-#### Interface de Saisie (UI/UX)
-
-| # | Fonctionnalité | État | Notes |
-|---|---|---|---|
-| 8 | Auto-complétion des espèces | ✅ | Recherche asynchrone avec délai pour une meilleure expérience. |
-| 9 | Auto-complétion des communes | ✅ | Interroge l'API du module `geo`. |
-| 10| Auto-remplissage des données | ✅ | Remplit automatiquement le département, les coordonnées et l'altitude. |
-| 11| Navigation au clavier | ✅ | Support des flèches, `Entrée` et `Echap` pour l'auto-complétion. |
+1. **[Créez votre compte](./01_navigation_generale.md#1-inscription-et-connexion)** et connectez-vous
+2. **[Saisissez votre première observation](./02_saisie_nouvelle_observation.md)** en quelques clics
+3. **Consultez vos observations** depuis le tableau de bord
+4. **[Transcrivez vos carnets papier](./03_correction_transcription.md)** (optionnel)
+5. **[Obtenez de l'aide](./04_support_tickets.md)** si besoin
 
 ---
 
-### 🔍 Module `ingest` (Transcription & Import)
+## 📚 Guides utilisateur
 
-| # | Fonctionnalité | État | Notes |
-|---|---|---|---|
-| 1 | Sélection de répertoire | ✅ | Interface pour choisir le dossier d'images à transcrire. |
-| 2 | Traitement asynchrone (Celery) | ✅ | Les transcriptions sont des tâches longues exécutées en arrière-plan. |
-| 3 | Intégration OCR (Google Vision) | ✅ | Extraction du texte brut depuis les images. |
-| 4 | Parsing intelligent | ✅ | Analyse du texte pour en extraire des données structurées. |
-| 5 | Suivi de la progression | ✅ | Interface de suivi en temps réel. |
+### 🚀 Pour débuter
+
+- **[⚡ Guide rapide](./00_guide_rapide.md)**
+  - Démarrage en 5 minutes
+  - Actions essentielles
+  - Raccourcis utiles
+
+### 📖 Pour tous les utilisateurs
+
+- **[📍 Navigation générale](./01_navigation_generale.md)**
+  - Inscription et connexion
+  - Tour d'horizon de l'interface
+  - Comprendre les rôles et permissions
+  - Cycle de vie d'une observation
+
+- **[📝 Saisir une nouvelle observation](./02_saisie_nouvelle_observation.md)**
+  - Renseigner la localisation
+  - Enregistrer les informations du nid
+  - Ajouter des observations au fil du temps
+  - Soumettre pour validation
+
+- **[🎫 Support et tickets](./04_support_tickets.md)**
+  - Signaler un problème
+  - Poser une question
+  - Suivre vos demandes
+
+- **[📖 Glossaire](./05_glossaire.md)**
+  - Définitions des termes techniques
+  - Vocabulaire ornithologique
+  - Acronymes et abréviations
+
+### Pour les correcteurs
+
+- **[✏️ Corriger des fiches (Transcription)](./03_correction_transcription.md)**
+  - *(Préparer vos images de carnets ==> **pas encore opérationnel à titre individuel)***
+  - *(Lancer la transcription automatique ==> **pas encore opérationnel à titre individuel)***
+  - Corriger les données extraites
+  - Valider les fiches
 
 ---
 
-### 🦅 Module `taxonomy` (Gestion des Espèces)
+## 🎯 Principales fonctionnalités
 
-| # | Fonctionnalité | État | Notes |
-|---|---|---|---|
-| 1 | Modèles de données | ✅ | Structure hiérarchique : `Ordre` -> `Famille` -> `Espece`. |
-| 2 | Commande `charger_lof` | ✅ | **(Recommandé)** Import rapide depuis la Liste des Oiseaux de France. |
-| 3 | Commande `charger_taxref` | ✅ | (Alternative) Import depuis le référentiel national TaxRef. |
-| 4 | Commande `recuperer_liens_oiseaux_net` | ✅ | Enrichissement automatique des données avec des liens externes. |
+### 📝 Gestion des observations
+- ✅ **Saisie en ligne** : Formulaire intuitif avec auto-complétion
+- ✅ **Suivi temporel** : Ajoutez plusieurs observations pour un même nid
+- ✅ **Géolocalisation** : GPS automatique ou recherche par commune
+- ✅ **Validation collaborative** : Workflow de correction et validation
 
----
+### 🔍 Transcription automatique (IA)
+- ✅ **OCR intelligent** : Transcription automatique via Google Gemini
+- ✅ **Carnets manuscrits** : Reconnaissance d'écriture manuscrite et imprimée
+- ✅ **Correction facilitée** : Interface de révision avec aperçu de l'image source
+- ✅ **Traitement asynchrone** : Traitez plusieurs carnets en arrière-plan
 
-### 🗺️ Module `geo` (Géocodage)
+### 📊 Consultation et analyse
+- ✅ **Liste complète** : Toutes vos observations avec filtres
+- ✅ **Historique complet** : Traçabilité de toutes les modifications
+- ✅ **Statistiques** : Analyses par espèce, zone géographique et période
+- 🚧 **Export de données** : CSV et JSON (à venir)
 
-| # | Fonctionnalité | État | Notes |
-|---|---|---|---|
-| 1 | Base de données des communes | ✅ | Cache local de ~35 000 communes françaises pour un géocodage rapide. |
-| 2 | Commande `charger_communes_france` | ✅ | Peuple la base de données des communes via une API officielle. |
-| 3 | Géocodeur intelligent | ✅ | Stratégie à 2 niveaux : recherche locale d'abord, puis API externe (Nominatim). |
-| 4 | API de recherche | ✅ | Point d'accès (`/geo/rechercher-communes/`) pour l'auto-complétion. |
-
----
-
-### ✅ Module `review` (Validation)
-
-| # | Fonctionnalité | État | Notes |
-|---|---|---|---|
-| 1 | Workflow de correction | ✅ | Gestion des statuts : `nouveau`, `en_cours`, `corrige`, `valide`, `rejete`. |
-| 2 | Soumission pour validation | ✅ | Un observateur peut soumettre sa fiche, ce qui la verrouille pour lui. |
+### 🔐 Gestion collaborative
+- ✅ **Rôles et permissions** : Observateur, Correcteur, Administrateur
+- ✅ **Workflow de validation** : Soumission, correction, validation
+- ✅ **Système de tickets** : Support intégré avec suivi
+- ✅ **Remarques collaboratives** : Commentaires et notes partagées
 
 ---
 
-### 📜 Module `audit` (Traçabilité)
+## ❓ Besoin d'aide ?
 
-| # | Fonctionnalité | État | Notes |
-|---|---|---|---|
-| 1 | Historique des modifications | ✅ | Chaque changement sur une fiche est enregistré. |
-| 2 | Tracking automatique | ✅ | Utilise les signaux Django (`post_save`) pour une traçabilité transparente. |
-| 3 | Interface de consultation | ✅ | Page dédiée pour voir l'historique complet d'une fiche. |
+### 📖 Documentation
+- Consultez les [guides détaillés ci-dessus](#-guides-utilisateur)
+- Parcourez la section [Questions fréquentes](./01_navigation_generale.md#-problemes-courants)
+
+### 🎫 Support
+- [Créez un ticket](./04_support_tickets.md) pour signaler un problème
+- Contactez un administrateur via le système de support
+
+### 🐛 Signaler un bug
+- Utilisez le [système de tickets](./04_support_tickets.md) avec la catégorie "Bug"
+- Décrivez précisément le problème rencontré
+
+---
+
+## 📝 Notes de version
+
+**Version actuelle : 1.0** (Novembre 2025)
+
+Fonctionnalités principales :
+- Interface de saisie complète
+- Transcription automatique via IA (Google Gemini)
+- Système de validation collaborative
+- Historique et traçabilité
+- Support et tickets intégrés
+
+---
+
+*Bonne utilisation d'Observations Nids ! 🦅*

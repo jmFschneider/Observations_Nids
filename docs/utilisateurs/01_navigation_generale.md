@@ -265,4 +265,4 @@ Maintenant que vous connaissez la navigation générale, consultez les guides sp
 
 ---
 
-*Version 1.0 - Octobre 2025*
+*Version 1.0 - Novembre 2025*

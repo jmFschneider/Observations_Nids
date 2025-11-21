@@ -509,4 +509,4 @@ Pour consulter l'historique :
 
 ---
 
-*Version 1.0 - Octobre 2025*
+*Version 1.0 - Novembre 2025*

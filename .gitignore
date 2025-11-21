@@ -54,6 +54,7 @@ Thumbs.db
 
 # MkDocs
 site/
+site-user/
 docs/docs/todo/
 
 # Archives de fichiers orphelins

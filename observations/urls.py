@@ -22,6 +22,7 @@ from .views.view_transcription import (
     transcription_results,
 )
 from .views.views_home import (
+    aide_view,
     default_view,
     home,
     test_boutons_styles,
@@ -38,6 +39,8 @@ urlpatterns = [
     path('tableau-de-bord/', default_view, name='default'),
     # Route de test pour les styles de boutons
     path('test-boutons-styles/', test_boutons_styles, name='test_boutons_styles'),
+    # Route pour la documentation d'aide
+    path('aide/', aide_view, name='aide'),
     # Routes d'authentification
     path('auth/logout/', LogoutView.as_view(next_page='observations:home'), name='logout'),
     path('auth/login/', CustomLoginView.as_view(template_name='login.html'), name='login'),

@@ -57,3 +57,21 @@ def default_view(request):
 def test_boutons_styles(request):
     """Vue de test pour visualiser les différents styles de boutons."""
     return render(request, 'test_boutons_styles.html')
+
+
+def aide_view(request):
+    """
+    Vue pour rediriger vers la documentation d'aide utilisateur.
+    En développement : redirige vers le serveur MkDocs local (port 8001)
+    En production : sert les fichiers statiques buildés de MkDocs
+    """
+    from django.conf import settings
+    from django.http import HttpResponseRedirect
+
+    # En développement, rediriger vers le serveur MkDocs
+    if settings.DEBUG:
+        return HttpResponseRedirect('http://127.0.0.1:8001/')
+
+    # En production, servir les fichiers statiques buildés
+    # On redirige vers l'URL des fichiers statiques servis par Apache
+    return HttpResponseRedirect('/static/docs/index.html')
