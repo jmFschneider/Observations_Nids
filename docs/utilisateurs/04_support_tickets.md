@@ -149,17 +149,23 @@ Seul un administrateur peut fermer un ticket. Quand votre problème est résolu 
 
 ---
 
-## 📚 Documentation complète
+## 📚 Ressources complémentaires
 
-
+- **[Guide de navigation générale](./01_navigation_generale.md)** : Découvrir l'interface
+- **[Guide de saisie](./02_saisie_nouvelle_observation.md)** : Créer une observation
+- **[Guide de transcription](./03_correction_transcription.md)** : Transcrire des carnets
+- **[Page d'accueil de la documentation](./README.md)** : Vue d'ensemble
 
 ---
 
 ## 📞 Contact d'urgence
 
-En cas d'urgence critique (site totalement inaccessible), contactez directement :
-- **Email** : admin@observations-nids.fr
+En cas d'urgence critique (site totalement inaccessible), contactez directement un administrateur via le système de tickets (si le site est accessible) ou par les canaux de communication habituels de votre organisation.
 
 ---
 
 **Retour à** : [Sommaire de l'aide utilisateurs](README.md)
+
+---
+
+*Version 1.0 - Novembre 2025*

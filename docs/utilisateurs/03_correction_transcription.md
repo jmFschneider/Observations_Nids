@@ -660,4 +660,4 @@ Sur Raspberry Pi, comptez **2-3x plus long** que sur un PC puissant.
 
 ---
 
-*Version 1.0 - Octobre 2025*
+*Version 1.0 - Novembre 2025*

@@ -2,7 +2,7 @@ site_name: Observations Nids - Guide Utilisateur
 site_description: Guide utilisateur pour l'application Observations Nids
 dev_addr: '127.0.0.1:8001'
 
-docs_dir: .
+docs_dir: utilisateurs
 site_dir: ../site-user
 
 # Thème avec support de recherche
@@ -60,9 +60,11 @@ markdown_extensions:
 
 # Navigation Utilisateurs
 nav:
-  - '🏠 Accueil': 'utilisateurs/README.md'
+  - '🏠 Accueil': 'README.md'
+  - '⚡ Démarrage Rapide': '00_guide_rapide.md'
   - '📖 Guides Utilisateur':
-    - 'Navigation Générale': 'utilisateurs/01_navigation_generale.md'
-    - 'Saisir une Observation': 'utilisateurs/02_saisie_nouvelle_observation.md'
-    - 'Corriger des Fiches': 'utilisateurs/03_correction_transcription.md'
-    - 'Support et Tickets': 'utilisateurs/04_support_tickets.md'
+    - 'Navigation Générale': '01_navigation_generale.md'
+    - 'Saisir une Observation': '02_saisie_nouvelle_observation.md'
+    - 'Corriger des Fiches': '03_correction_transcription.md'
+    - 'Support et Tickets': '04_support_tickets.md'
+  - '📖 Glossaire': '05_glossaire.md'

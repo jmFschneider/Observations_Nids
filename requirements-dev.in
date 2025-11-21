@@ -12,6 +12,8 @@ typing-inspection
 django-debug-toolbar
 django-extensions
 mkdocs
+mkdocs-material
+pymdown-extensions
 pytest
 pytest-django
 pytest-cov

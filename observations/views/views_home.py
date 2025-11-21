@@ -1,6 +1,9 @@
 # views_home.py
 import logging
+import os
 
+from django.conf import settings
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from accounts.models import Utilisateur
@@ -57,3 +60,27 @@ def default_view(request):
 def test_boutons_styles(request):
     """Vue de test pour visualiser les différents styles de boutons."""
     return render(request, 'test_boutons_styles.html')
+
+
+def aide_view(request):
+    """
+    Vue pour rediriger vers la documentation d'aide utilisateur.
+
+    Comportement selon l'environnement :
+    - LOCAL (DEBUG=True + pas de MKDOCS_USE_STATIC) : Serveur MkDocs sur port 8001
+    - PILOTE/PROD (DEBUG=False ou MKDOCS_USE_STATIC=True) : Fichiers statiques
+
+    Pour forcer l'utilisation des fichiers statiques en dev, ajoutez dans .env :
+    MKDOCS_USE_STATIC=True
+    """
+
+    # Vérifier si on force l'utilisation des fichiers statiques
+    use_static = os.environ.get('MKDOCS_USE_STATIC', '').lower() in ('true', '1', 'yes')
+
+    # En développement LOCAL uniquement : rediriger vers le serveur MkDocs
+    # (sauf si MKDOCS_USE_STATIC est activé)
+    if settings.DEBUG and not use_static:
+        return HttpResponseRedirect('http://127.0.0.1:8001/')
+
+    # En production/pilote OU si MKDOCS_USE_STATIC : servir les fichiers statiques
+    return HttpResponseRedirect('/static/docs/index.html')
