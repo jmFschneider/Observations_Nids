@@ -5,6 +5,7 @@ from .views import (
     especes,
     home,
     importation,
+    preparation,
 )
 from .views.especes import valider_especes_multiples
 
@@ -14,6 +15,9 @@ app_name = 'ingest'
 urlpatterns = [
     # Accueil et importation initiale
     path('', home.accueil_importation, name='accueil_importation'),
+    # Préparation d'images
+    path('preparer-images/', preparation.preparer_images_view, name='preparer_images'),
+    path('liste-preparations/', preparation.liste_preparations_view, name='liste_preparations'),
     path('preparer/', importation.preparer_importations, name='preparer_importations'),
     path('importer-json/', importation.importer_json, name='importer_json'),
     path('extraire-candidats/', importation.extraire_candidats, name='extraire_candidats'),
