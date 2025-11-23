@@ -202,6 +202,12 @@ LOGIN_URL = 'observations:login'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.environ.get("DJANGO_STATIC_ROOT", os.path.join(BASE_DIR, "staticfiles"))
 
+# Dossiers additionnels contenant des fichiers statiques
+# La documentation MkDocs buildée sera collectée depuis site-user/ vers staticfiles/docs/
+STATICFILES_DIRS = [
+    ("docs", os.path.join(BASE_DIR, "site-user")),  # Build MkDocs → /static/docs/
+]
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.environ.get("DJANGO_MEDIA_ROOT", os.path.join(BASE_DIR, "media"))
 

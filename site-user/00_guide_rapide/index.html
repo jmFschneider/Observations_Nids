@@ -1,0 +1,1430 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Guide utilisateur pour l'application Observations Nids">
+      
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../01_navigation_generale/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>⚡ Démarrage Rapide - Observations Nids - Guide Utilisateur</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#guide-rapide-demarrage-en-5-minutes" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href=".." title="Observations Nids - Guide Utilisateur" class="md-header__button md-logo" aria-label="Observations Nids - Guide Utilisateur" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Observations Nids - Guide Utilisateur
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ⚡ Démarrage Rapide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Partager" aria-label="Partager" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  🏠 Accueil
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  ⚡ Démarrage Rapide
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../01_navigation_generale/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  📖 Guides Utilisateur
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../05_glossaire/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  📖 Glossaire
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Observations Nids - Guide Utilisateur" class="md-nav__button md-logo" aria-label="Observations Nids - Guide Utilisateur" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Observations Nids - Guide Utilisateur
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🏠 Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ⚡ Démarrage Rapide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ⚡ Démarrage Rapide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ce-que-vous-allez-faire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Ce que vous allez faire
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#etape-1-se-connecter-30-secondes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📋 Étape 1 : Se connecter (30 secondes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📋 Étape 1 : Se connecter (30 secondes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#premiere-visite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Première visite ?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deja-inscrit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Déjà inscrit ?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#etape-2-creer-votre-premiere-observation-3-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📝 Étape 2 : Créer votre première observation (3 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📝 Étape 2 : Créer votre première observation (3 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-localiser-le-nid-1-minute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. Localiser le nid (1 minute)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-renseigner-le-nid-1-minute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. Renseigner le nid (1 minute)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-enregistrer-30-secondes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C. Enregistrer (30 secondes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-ajouter-une-observation-30-secondes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D. Ajouter une observation (30 secondes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#etape-3-consulter-vos-observations-30-secondes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Étape 3 : Consulter vos observations (30 secondes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#felicitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎊 Félicitations !
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pour-aller-plus-loin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📚 Pour aller plus loin
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📚 Pour aller plus loin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#guides-detailles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guides détaillés
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actions-courantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions courantes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Actions courantes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ajouter-une-nouvelle-visite-a-un-nid-existant" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ➕ Ajouter une nouvelle visite à un nid existant
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#utiliser-la-geolocalisation-gps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🗺️ Utiliser la géolocalisation GPS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#voir-levolution-dun-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Voir l'évolution d'un nid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soumettre-une-fiche-complete-pour-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 Soumettre une fiche complète pour validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#points-importants-a-retenir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Points importants à retenir
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="⚠️ Points importants à retenir">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bonnes-pratiques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Bonnes pratiques
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreurs-courantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ Erreurs courantes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#besoin-daide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🆘 Besoin d'aide ?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raccourcis-utiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 Raccourcis utiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-typique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Workflow typique
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prochaines-etapes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎓 Prochaines étapes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../01_navigation_generale/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📖 Guides Utilisateur
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_glossaire/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📖 Glossaire
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ce-que-vous-allez-faire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Ce que vous allez faire
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#etape-1-se-connecter-30-secondes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📋 Étape 1 : Se connecter (30 secondes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📋 Étape 1 : Se connecter (30 secondes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#premiere-visite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Première visite ?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deja-inscrit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Déjà inscrit ?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#etape-2-creer-votre-premiere-observation-3-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📝 Étape 2 : Créer votre première observation (3 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📝 Étape 2 : Créer votre première observation (3 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-localiser-le-nid-1-minute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. Localiser le nid (1 minute)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-renseigner-le-nid-1-minute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. Renseigner le nid (1 minute)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-enregistrer-30-secondes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C. Enregistrer (30 secondes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-ajouter-une-observation-30-secondes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D. Ajouter une observation (30 secondes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#etape-3-consulter-vos-observations-30-secondes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Étape 3 : Consulter vos observations (30 secondes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#felicitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎊 Félicitations !
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pour-aller-plus-loin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📚 Pour aller plus loin
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📚 Pour aller plus loin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#guides-detailles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guides détaillés
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actions-courantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions courantes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Actions courantes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ajouter-une-nouvelle-visite-a-un-nid-existant" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ➕ Ajouter une nouvelle visite à un nid existant
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#utiliser-la-geolocalisation-gps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🗺️ Utiliser la géolocalisation GPS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#voir-levolution-dun-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Voir l'évolution d'un nid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soumettre-une-fiche-complete-pour-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 Soumettre une fiche complète pour validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#points-importants-a-retenir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Points importants à retenir
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="⚠️ Points importants à retenir">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bonnes-pratiques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Bonnes pratiques
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreurs-courantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ Erreurs courantes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#besoin-daide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🆘 Besoin d'aide ?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raccourcis-utiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 Raccourcis utiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-typique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Workflow typique
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prochaines-etapes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎓 Prochaines étapes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="guide-rapide-demarrage-en-5-minutes">⚡ Guide rapide - Démarrage en 5 minutes<a class="headerlink" href="#guide-rapide-demarrage-en-5-minutes" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Pour les utilisateurs pressés</strong>
+L'essentiel pour commencer rapidement à utiliser Observations Nids</p>
+</blockquote>
+<hr />
+<h2 id="ce-que-vous-allez-faire">🎯 Ce que vous allez faire<a class="headerlink" href="#ce-que-vous-allez-faire" title="Permanent link">&para;</a></h2>
+<ol>
+<li>✅ Vous connecter à l'application</li>
+<li>✅ Créer votre première observation</li>
+<li>✅ Comprendre les actions principales</li>
+</ol>
+<p><strong>Temps estimé : 5 minutes</strong></p>
+<hr />
+<h2 id="etape-1-se-connecter-30-secondes">📋 Étape 1 : Se connecter (30 secondes)<a class="headerlink" href="#etape-1-se-connecter-30-secondes" title="Permanent link">&para;</a></h2>
+<h3 id="premiere-visite">Première visite ?<a class="headerlink" href="#premiere-visite" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Cliquez sur <strong>"S'inscrire"</strong></li>
+<li>Remplissez le formulaire (nom d'utilisateur, email, mot de passe)</li>
+<li>Validez → Vous êtes connecté !</li>
+</ol>
+<h3 id="deja-inscrit">Déjà inscrit ?<a class="headerlink" href="#deja-inscrit" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Saisissez votre <strong>nom d'utilisateur</strong></li>
+<li>Saisissez votre <strong>mot de passe</strong></li>
+<li>Cliquez sur <strong>"Se connecter"</strong></li>
+</ol>
+<hr />
+<h2 id="etape-2-creer-votre-premiere-observation-3-minutes">📝 Étape 2 : Créer votre première observation (3 minutes)<a class="headerlink" href="#etape-2-creer-votre-premiere-observation-3-minutes" title="Permanent link">&para;</a></h2>
+<h3 id="a-localiser-le-nid-1-minute">A. Localiser le nid (1 minute)<a class="headerlink" href="#a-localiser-le-nid-1-minute" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Cliquez sur <strong>"📝 Nouvelle observation"</strong> depuis l'accueil</li>
+<li><strong>Renseignez la localisation</strong> :</li>
+<li><strong>Option 1 (rapide)</strong> : Cliquez sur "📍 Me géolocaliser" → Vérifiez la commune suggérée</li>
+<li><strong>Option 2 (manuelle)</strong> : Tapez le nom de la commune dans le champ "Commune"</li>
+</ol>
+<h3 id="b-renseigner-le-nid-1-minute">B. Renseigner le nid (1 minute)<a class="headerlink" href="#b-renseigner-le-nid-1-minute" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Sélectionnez l'espèce</strong> : Tapez les premières lettres → Sélectionnez dans la liste</li>
+<li><strong>Renseignez l'année</strong> : Ex: 2025</li>
+<li><strong>Ajoutez des infos</strong> (optionnel) : Hauteur du nid, support, etc.</li>
+</ol>
+<h3 id="c-enregistrer-30-secondes">C. Enregistrer (30 secondes)<a class="headerlink" href="#c-enregistrer-30-secondes" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Cliquez sur "💾 Enregistrer"</strong> en bas du formulaire</li>
+<li>✅ <strong>Votre fiche est créée !</strong></li>
+</ol>
+<h3 id="d-ajouter-une-observation-30-secondes">D. Ajouter une observation (30 secondes)<a class="headerlink" href="#d-ajouter-une-observation-30-secondes" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Cliquez sur <strong>"+ Ajouter une observation"</strong></li>
+<li>Renseignez :</li>
+<li><strong>Date</strong> : Date de votre visite</li>
+<li><strong>Nombre d'œufs</strong> : Ex: 3</li>
+<li><strong>Nombre de poussins</strong> : Ex: 0</li>
+<li><strong>Notes</strong> : Ex: "Ponte terminée"</li>
+<li>Cliquez sur <strong>"Enregistrer l'observation"</strong></li>
+</ol>
+<hr />
+<h2 id="etape-3-consulter-vos-observations-30-secondes">🔍 Étape 3 : Consulter vos observations (30 secondes)<a class="headerlink" href="#etape-3-consulter-vos-observations-30-secondes" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Cliquez sur <strong>"🔍 Consulter les observations"</strong> dans le menu</li>
+<li>Vous voyez la liste de vos observations</li>
+<li>Cliquez sur une fiche pour voir les détails</li>
+</ol>
+<hr />
+<h2 id="felicitations">🎊 Félicitations !<a class="headerlink" href="#felicitations" title="Permanent link">&para;</a></h2>
+<p>Vous savez maintenant :
+- ✅ Créer une observation
+- ✅ Renseigner la localisation
+- ✅ Ajouter des détails sur le nid
+- ✅ Suivre l'évolution avec plusieurs observations
+- ✅ Consulter vos fiches</p>
+<hr />
+<h2 id="pour-aller-plus-loin">📚 Pour aller plus loin<a class="headerlink" href="#pour-aller-plus-loin" title="Permanent link">&para;</a></h2>
+<h3 id="guides-detailles">Guides détaillés<a class="headerlink" href="#guides-detailles" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><a href="../01_navigation_generale/">Navigation complète</a></strong> : Comprendre toutes les fonctionnalités</li>
+<li><strong><a href="../02_saisie_nouvelle_observation/">Saisie détaillée</a></strong> : Toutes les options du formulaire</li>
+<li><strong><a href="../03_correction_transcription/">Transcription</a></strong> : Numériser vos carnets papier</li>
+<li><strong><a href="../04_support_tickets/">Support</a></strong> : Obtenir de l'aide</li>
+</ul>
+<h3 id="actions-courantes">Actions courantes<a class="headerlink" href="#actions-courantes" title="Permanent link">&para;</a></h3>
+<h4 id="ajouter-une-nouvelle-visite-a-un-nid-existant">➕ Ajouter une nouvelle visite à un nid existant<a class="headerlink" href="#ajouter-une-nouvelle-visite-a-un-nid-existant" title="Permanent link">&para;</a></h4>
+<ol>
+<li>Allez dans <strong>"Consulter les observations"</strong></li>
+<li>Cliquez sur la fiche du nid</li>
+<li>Cliquez sur <strong>"✏️ Modifier"</strong></li>
+<li>Cliquez sur <strong>"+ Ajouter une observation"</strong></li>
+<li>Renseignez la date et les détails de la nouvelle visite</li>
+<li>Enregistrez</li>
+</ol>
+<h4 id="utiliser-la-geolocalisation-gps">🗺️ Utiliser la géolocalisation GPS<a class="headerlink" href="#utiliser-la-geolocalisation-gps" title="Permanent link">&para;</a></h4>
+<ol>
+<li>Sur un appareil mobile ou avec GPS</li>
+<li>Dans le formulaire de localisation</li>
+<li>Cliquez sur <strong>"📍 Me géolocaliser"</strong></li>
+<li>Autorisez l'accès à votre position</li>
+<li>Vérifiez la commune détectée (corrigez si besoin)</li>
+</ol>
+<h4 id="voir-levolution-dun-nid">📊 Voir l'évolution d'un nid<a class="headerlink" href="#voir-levolution-dun-nid" title="Permanent link">&para;</a></h4>
+<ol>
+<li>Ouvrez la fiche du nid</li>
+<li>Consultez la section <strong>"Observations"</strong></li>
+<li>Toutes les visites sont listées chronologiquement</li>
+<li>Vous voyez l'évolution : ponte → éclosion → envol</li>
+</ol>
+<h4 id="soumettre-une-fiche-complete-pour-validation">🚀 Soumettre une fiche complète pour validation<a class="headerlink" href="#soumettre-une-fiche-complete-pour-validation" title="Permanent link">&para;</a></h4>
+<ol>
+<li>Assurez-vous que tous les champs importants sont remplis</li>
+<li>Cliquez sur <strong>"🚀 Soumettre pour correction"</strong></li>
+<li>Un correcteur pourra réviser votre fiche</li>
+<li>Vous ne pourrez plus la modifier seul (sauf retour du correcteur)</li>
+</ol>
+<hr />
+<h2 id="points-importants-a-retenir">⚠️ Points importants à retenir<a class="headerlink" href="#points-importants-a-retenir" title="Permanent link">&para;</a></h2>
+<h3 id="bonnes-pratiques">✅ Bonnes pratiques<a class="headerlink" href="#bonnes-pratiques" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Enregistrez régulièrement</strong> : Ne perdez pas vos données !</li>
+<li><strong>Commune obligatoire</strong> : Même si vous avez les coordonnées GPS</li>
+<li><strong>Première sauvegarde obligatoire</strong> : Enregistrez AVANT d'ajouter des observations</li>
+<li><strong>Vérifiez avant de soumettre</strong> : Une fois soumise, vous ne pouvez plus modifier seul</li>
+</ol>
+<h3 id="erreurs-courantes">❌ Erreurs courantes<a class="headerlink" href="#erreurs-courantes" title="Permanent link">&para;</a></h3>
+<ol>
+<li>
+<p><strong>"Je ne peux pas ajouter d'observations"</strong>
+   → Avez-vous enregistré la fiche au moins une fois ?</p>
+</li>
+<li>
+<p><strong>"Ma commune n'est pas trouvée"</strong>
+   → Essayez différentes orthographes ou un village voisin</p>
+</li>
+<li>
+<p><strong>"La géolocalisation ne marche pas"</strong>
+   → Vérifiez les autorisations GPS de votre navigateur</p>
+</li>
+<li>
+<p><strong>"J'ai perdu mes données"</strong>
+   → Cliquez toujours sur "Enregistrer" !</p>
+</li>
+</ol>
+<hr />
+<h2 id="besoin-daide">🆘 Besoin d'aide ?<a class="headerlink" href="#besoin-daide" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>❓ Question</strong> : Consultez les <a href="../">guides détaillés</a></li>
+<li><strong>🐛 Bug</strong> : <a href="../04_support_tickets/">Créez un ticket</a></li>
+<li><strong>💬 Support</strong> : Contactez un administrateur</li>
+</ul>
+<hr />
+<h2 id="raccourcis-utiles">📌 Raccourcis utiles<a class="headerlink" href="#raccourcis-utiles" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Chemin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Nouvelle observation</strong></td>
+<td>Accueil → "Nouvelle observation"</td>
+</tr>
+<tr>
+<td><strong>Consulter mes fiches</strong></td>
+<td>Menu → "Observations"</td>
+</tr>
+<tr>
+<td><strong>Modifier une fiche</strong></td>
+<td>Liste → Cliquer sur la fiche → "Modifier"</td>
+</tr>
+<tr>
+<td><strong>Transcrire des carnets</strong></td>
+<td>Menu → "Transcription"</td>
+</tr>
+<tr>
+<td><strong>Obtenir de l'aide</strong></td>
+<td>Menu → "Support"</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="workflow-typique">🔄 Workflow typique<a class="headerlink" href="#workflow-typique" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>1. 📍 Repérage du nid sur le terrain
+   ↓
+2. 📝 Création de la fiche (localisation + infos)
+   ↓
+3. 💾 Premier enregistrement
+   ↓
+4. 📊 Ajout d&#39;observations régulières (plusieurs visites)
+   ↓
+5. 🚀 Soumission pour validation
+   ↓
+6. ✅ Validation par un correcteur
+</code></pre></div>
+<hr />
+<h2 id="prochaines-etapes">🎓 Prochaines étapes<a class="headerlink" href="#prochaines-etapes" title="Permanent link">&para;</a></h2>
+<p>Maintenant que vous maîtrisez les bases :</p>
+<ol>
+<li><strong>Explorez les fonctionnalités avancées</strong> : Filtres, statistiques, exports</li>
+<li><strong>Consultez les guides détaillés</strong> : Pour comprendre toutes les options</li>
+<li><strong>Essayez la transcription</strong> : Si vous avez des carnets papier à numériser</li>
+<li><strong>Collaborez</strong> : Échangez avec les autres observateurs et correcteurs</li>
+</ol>
+<hr />
+<p><strong>Retour à</strong> : <a href="../">Documentation complète</a></p>
+<hr />
+<p><em>Version 1.0 - Novembre 2025</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.prune", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="../javascripts/navigation.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Script de build de la documentation utilisateur
-# Ce script construit la documentation MkDocs et la copie dans staticfiles pour Apache
+# Ce script construit la documentation MkDocs dans site-user/
+# Les fichiers seront collectés par 'python manage.py collectstatic'
 
 set -e  # Arrêter en cas d'erreur
 
@@ -14,18 +15,14 @@ cd "$(dirname "$0")/../docs"
 echo "📦 Build MkDocs..."
 mkdocs build --config-file=mkdocs.yml --clean
 
-# Créer le dossier de destination si nécessaire
-STATIC_DOCS_DIR="../staticfiles/docs"
-mkdir -p "$STATIC_DOCS_DIR"
-
-# Copier les fichiers buildés vers staticfiles
-echo "📂 Copie vers staticfiles/docs/..."
-cp -r ../site-user/* "$STATIC_DOCS_DIR/"
-
 echo "✅ Documentation buildée avec succès !"
-echo "📍 Emplacement : staticfiles/docs/"
+echo "📍 Emplacement : site-user/"
+echo ""
+echo "ℹ️  Prochaine étape :"
+echo "   python manage.py collectstatic"
 echo ""
 echo "ℹ️  Pour déployer en production :"
-echo "   1. Committez les changements dans staticfiles/docs/"
-echo "   2. Déployez sur le Raspberry Pi"
-echo "   3. Apache servira automatiquement /static/docs/"
+echo "   1. Committez les changements dans site-user/"
+echo "   2. Poussez : git push"
+echo "   3. Sur le serveur : git pull && python manage.py collectstatic"
+echo "   4. Redémarrez : sudo systemctl restart gunicorn"

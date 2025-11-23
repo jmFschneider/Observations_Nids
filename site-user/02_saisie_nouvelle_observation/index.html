@@ -1,0 +1,2552 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Guide utilisateur pour l'application Observations Nids">
+      
+      
+      
+      
+        <link rel="prev" href="../01_navigation_generale/">
+      
+      
+        <link rel="next" href="../03_correction_transcription/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Saisir une Observation - Observations Nids - Guide Utilisateur</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#guide-utilisateur-saisir-une-nouvelle-observation" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href=".." title="Observations Nids - Guide Utilisateur" class="md-header__button md-logo" aria-label="Observations Nids - Guide Utilisateur" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Observations Nids - Guide Utilisateur
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Saisir une Observation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Partager" aria-label="Partager" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  🏠 Accueil
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../00_guide_rapide/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  ⚡ Démarrage Rapide
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../01_navigation_generale/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  📖 Guides Utilisateur
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../05_glossaire/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  📖 Glossaire
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Observations Nids - Guide Utilisateur" class="md-nav__button md-logo" aria-label="Observations Nids - Guide Utilisateur" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Observations Nids - Guide Utilisateur
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🏠 Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00_guide_rapide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ⚡ Démarrage Rapide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📖 Guides Utilisateur
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    📖 Guides Utilisateur
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01_navigation_generale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Navigation Générale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Saisir une Observation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Saisir une Observation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vue-densemble" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vue d'ensemble
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-des-matieres" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table des matières
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-creer-une-nouvelle-fiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Créer une nouvelle fiche
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Créer une nouvelle fiche">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#acceder-au-formulaire-de-saisie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accéder au formulaire de saisie
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-etape-1-localisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Étape 1 : Localisation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Étape 1 : Localisation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methode-a-recherche-par-commune" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Méthode A : Recherche par commune
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methode-b-geolocalisation-gps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Méthode B : Géolocalisation GPS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#precision-importante-commune-obligatoire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Précision importante : Commune obligatoire
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#champs-de-localisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Champs de localisation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-etape-2-enregistrer-la-fiche-obligatoire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Étape 2 : Enregistrer la fiche (OBLIGATOIRE)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Étape 2 : Enregistrer la fiche (OBLIGATOIRE)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#important-enregistrer-avant-dajouter-des-observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ IMPORTANT : Enregistrer AVANT d'ajouter des observations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comment-enregistrer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comment enregistrer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-etape-3-informations-du-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Étape 3 : Informations du nid
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Étape 3 : Informations du nid">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informations-generales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Informations générales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#details-du-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Détails du nid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resume-de-lobservation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Résumé de l'observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causes-dechec-si-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Causes d'échec (si applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-etape-4-ajouter-des-observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Étape 4 : Ajouter des observations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Étape 4 : Ajouter des observations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Prérequis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ajouter-une-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ajouter une observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemple-de-suivi-chronologique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple de suivi chronologique
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modifier-ou-supprimer-une-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modifier ou supprimer une observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-etape-5-ajouter-des-remarques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Étape 5 : Ajouter des remarques
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Étape 5 : Ajouter des remarques">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequis_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Prérequis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-quoi-servent-les-remarques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        À quoi servent les remarques ?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ajouter-une-remarque" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ajouter une remarque
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemples-de-remarques-utiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples de remarques utiles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-etape-6-resume-et-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Étape 6 : Résumé et validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Étape 6 : Résumé et validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verifier-votre-fiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vérifier votre fiche
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soumettre-pour-correction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Soumettre pour correction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#que-se-passe-t-il-apres-la-soumission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Que se passe-t-il après la soumission ?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-le-bouton-enregistrer-a-quoi-sert-il" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Le bouton "Enregistrer" - À quoi sert-il ?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Le bouton &#34;Enregistrer&#34; - À quoi sert-il ?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enregistrements-multiples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Enregistrements multiples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bonnes-pratiques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bonnes pratiques
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-modifier-une-fiche-existante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Modifier une fiche existante
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Modifier une fiche existante">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#acceder-a-une-fiche-existante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accéder à une fiche existante
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#differences-entre-creation-et-modification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Différences entre création et modification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#historique-des-modifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Historique des modifications
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-questions-frequentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Questions fréquentes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. Questions fréquentes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#je-narrive-pas-a-ajouter-dobservations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Je n'arrive pas à ajouter d'observations"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-geolocalisation-ne-fonctionne-pas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "La géolocalisation ne fonctionne pas"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#je-ne-peux-plus-modifier-ma-fiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Je ne peux plus modifier ma fiche"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comment-annuler-une-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Comment annuler une observation ?"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#puis-je-sauvegarder-une-fiche-incomplete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Puis-je sauvegarder une fiche incomplète ?"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combien-dobservations-puis-je-ajouter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Combien d'observations puis-je ajouter ?"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recapitulatif-du-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Récapitulatif du workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aide-supplementaire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aide supplémentaire
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03_correction_transcription/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Corriger des Fiches
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04_support_tickets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Support et Tickets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_glossaire/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📖 Glossaire
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vue-densemble" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vue d'ensemble
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-des-matieres" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table des matières
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-creer-une-nouvelle-fiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Créer une nouvelle fiche
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Créer une nouvelle fiche">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#acceder-au-formulaire-de-saisie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accéder au formulaire de saisie
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-etape-1-localisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Étape 1 : Localisation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Étape 1 : Localisation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methode-a-recherche-par-commune" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Méthode A : Recherche par commune
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methode-b-geolocalisation-gps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Méthode B : Géolocalisation GPS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#precision-importante-commune-obligatoire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Précision importante : Commune obligatoire
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#champs-de-localisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Champs de localisation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-etape-2-enregistrer-la-fiche-obligatoire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Étape 2 : Enregistrer la fiche (OBLIGATOIRE)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Étape 2 : Enregistrer la fiche (OBLIGATOIRE)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#important-enregistrer-avant-dajouter-des-observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ IMPORTANT : Enregistrer AVANT d'ajouter des observations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comment-enregistrer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comment enregistrer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-etape-3-informations-du-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Étape 3 : Informations du nid
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Étape 3 : Informations du nid">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informations-generales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Informations générales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#details-du-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Détails du nid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resume-de-lobservation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Résumé de l'observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causes-dechec-si-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Causes d'échec (si applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-etape-4-ajouter-des-observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Étape 4 : Ajouter des observations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Étape 4 : Ajouter des observations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Prérequis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ajouter-une-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ajouter une observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemple-de-suivi-chronologique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple de suivi chronologique
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modifier-ou-supprimer-une-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modifier ou supprimer une observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-etape-5-ajouter-des-remarques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Étape 5 : Ajouter des remarques
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Étape 5 : Ajouter des remarques">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequis_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Prérequis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-quoi-servent-les-remarques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        À quoi servent les remarques ?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ajouter-une-remarque" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ajouter une remarque
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemples-de-remarques-utiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples de remarques utiles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-etape-6-resume-et-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Étape 6 : Résumé et validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Étape 6 : Résumé et validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verifier-votre-fiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vérifier votre fiche
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soumettre-pour-correction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Soumettre pour correction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#que-se-passe-t-il-apres-la-soumission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Que se passe-t-il après la soumission ?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-le-bouton-enregistrer-a-quoi-sert-il" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Le bouton "Enregistrer" - À quoi sert-il ?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Le bouton &#34;Enregistrer&#34; - À quoi sert-il ?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enregistrements-multiples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Enregistrements multiples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bonnes-pratiques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bonnes pratiques
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-modifier-une-fiche-existante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Modifier une fiche existante
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Modifier une fiche existante">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#acceder-a-une-fiche-existante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accéder à une fiche existante
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#differences-entre-creation-et-modification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Différences entre création et modification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#historique-des-modifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Historique des modifications
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-questions-frequentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Questions fréquentes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. Questions fréquentes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#je-narrive-pas-a-ajouter-dobservations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Je n'arrive pas à ajouter d'observations"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-geolocalisation-ne-fonctionne-pas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "La géolocalisation ne fonctionne pas"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#je-ne-peux-plus-modifier-ma-fiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Je ne peux plus modifier ma fiche"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comment-annuler-une-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Comment annuler une observation ?"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#puis-je-sauvegarder-une-fiche-incomplete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Puis-je sauvegarder une fiche incomplète ?"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combien-dobservations-puis-je-ajouter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Combien d'observations puis-je ajouter ?"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recapitulatif-du-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Récapitulatif du workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aide-supplementaire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aide supplémentaire
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="guide-utilisateur-saisir-une-nouvelle-observation">Guide utilisateur - Saisir une nouvelle observation<a class="headerlink" href="#guide-utilisateur-saisir-une-nouvelle-observation" title="Permanent link">&para;</a></h1>
+<h2 id="vue-densemble">Vue d'ensemble<a class="headerlink" href="#vue-densemble" title="Permanent link">&para;</a></h2>
+<p>Ce guide vous accompagne <strong>pas à pas</strong> dans la saisie d'une nouvelle fiche d'observation de nid.</p>
+<hr />
+<h2 id="table-des-matieres">Table des matières<a class="headerlink" href="#table-des-matieres" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#1-creer-une-nouvelle-fiche">Créer une nouvelle fiche</a></li>
+<li><a href="#2-etape-1-localisation">Étape 1 : Localisation</a></li>
+<li><a href="#3-etape-2-enregistrer-la-fiche-obligatoire">Étape 2 : Enregistrer la fiche (OBLIGATOIRE)</a></li>
+<li><a href="#4-etape-3-informations-du-nid">Étape 3 : Informations du nid</a></li>
+<li><a href="#5-etape-4-ajouter-des-observations">Étape 4 : Ajouter des observations</a></li>
+<li><a href="#6-etape-5-ajouter-des-remarques">Étape 5 : Ajouter des remarques</a></li>
+<li><a href="#7-etape-6-resume-et-validation">Étape 6 : Résumé et validation</a></li>
+<li><a href="#8-le-bouton-enregistrer-a-quoi-sert-il">Le bouton "Enregistrer" - À quoi sert-il ?</a></li>
+<li><a href="#9-modifier-une-fiche-existante">Modifier une fiche existante</a></li>
+<li><a href="#10-questions-frequentes">Questions fréquentes</a></li>
+</ol>
+<hr />
+<h2 id="1-creer-une-nouvelle-fiche">1. Créer une nouvelle fiche<a class="headerlink" href="#1-creer-une-nouvelle-fiche" title="Permanent link">&para;</a></h2>
+<h3 id="acceder-au-formulaire-de-saisie">Accéder au formulaire de saisie<a class="headerlink" href="#acceder-au-formulaire-de-saisie" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Depuis l'accueil</strong> : Cliquez sur "📝 Nouvelle observation"</li>
+<li><strong>Depuis le menu</strong> : "Observations" &gt; "Nouvelle saisie"</li>
+</ol>
+<p>Vous arrivez sur la page de saisie avec plusieurs sections.</p>
+<hr />
+<h2 id="2-etape-1-localisation">2. Étape 1 : Localisation<a class="headerlink" href="#2-etape-1-localisation" title="Permanent link">&para;</a></h2>
+<p>La localisation est la <strong>première étape obligatoire</strong>. Vous avez deux méthodes pour définir la localisation du nid.</p>
+<h3 id="methode-a-recherche-par-commune">Méthode A : Recherche par commune<a class="headerlink" href="#methode-a-recherche-par-commune" title="Permanent link">&para;</a></h3>
+<p><strong>Quand l'utiliser</strong> : Vous connaissez le nom de la commune</p>
+<ol>
+<li><strong>Champ "Commune"</strong></li>
+<li>Tapez les premières lettres du nom de la commune</li>
+<li>Un menu déroulant s'affiche avec les suggestions</li>
+<li>
+<p>Sélectionnez la commune dans la liste</p>
+</li>
+<li>
+<p><strong>Précision automatique</strong></p>
+</li>
+<li>Les coordonnées GPS de la commune sont automatiquement ajoutées</li>
+<li>
+<p>Le code postal et le département sont renseignés</p>
+</li>
+<li>
+<p><strong>Affiner la localisation (optionnel)</strong></p>
+</li>
+<li>Vous pouvez ajuster manuellement les coordonnées</li>
+<li>Utilisez les champs "Latitude" et "Longitude"</li>
+</ol>
+<p><strong>Exemple</strong> :
+<div class="highlight"><pre><span></span><code>Commune : Strasbourg
+Code postal : 67000 (automatique)
+Latitude : 48.5734 (automatique)
+Longitude : 7.7521 (automatique)
+</code></pre></div></p>
+<hr />
+<h3 id="methode-b-geolocalisation-gps">Méthode B : Géolocalisation GPS<a class="headerlink" href="#methode-b-geolocalisation-gps" title="Permanent link">&para;</a></h3>
+<p><strong>Quand l'utiliser</strong> : Vous êtes sur le terrain avec un smartphone/tablette</p>
+<ol>
+<li><strong>Bouton "📍 Me géolocaliser"</strong></li>
+<li>Cliquez sur le bouton de géolocalisation</li>
+<li>Autorisez l'accès à votre position GPS (si demandé)</li>
+<li>
+<p>Les coordonnées sont automatiquement renseignées</p>
+</li>
+<li>
+<p><strong>Reverse geocoding (recherche de commune)</strong></p>
+</li>
+<li>L'application cherche automatiquement la commune correspondante</li>
+<li><strong>⚠️ IMPORTANT</strong> : Vérifiez et <strong>précisez manuellement la commune</strong></li>
+<li>
+<p>Le reverse geocoding n'est pas toujours précis !</p>
+</li>
+<li>
+<p><strong>Corriger la commune si nécessaire</strong></p>
+</li>
+<li>Vérifiez le champ "Commune"</li>
+<li>Si la commune détectée est incorrecte, sélectionnez la bonne dans la liste</li>
+<li>Gardez les coordonnées GPS précises</li>
+</ol>
+<p><strong>Exemple</strong> :
+<div class="highlight"><pre><span></span><code>[Clic sur 📍 Me géolocaliser]
+→ Coordonnées détectées : 48.8566, 2.3522
+→ Commune suggérée : Paris
+→ Vous vérifiez : C&#39;est correct ✓
+→ Ou vous corrigez : Paris 5e arrondissement
+</code></pre></div></p>
+<hr />
+<h3 id="precision-importante-commune-obligatoire">⚠️ Précision importante : Commune obligatoire<a class="headerlink" href="#precision-importante-commune-obligatoire" title="Permanent link">&para;</a></h3>
+<p><strong>Pourquoi la commune est obligatoire ?</strong>
+- Les coordonnées GPS seules ne suffisent pas pour les analyses
+- La commune permet le tri et les statistiques par zone
+- C'est une donnée administrative stable</p>
+<p><strong>Workflow recommandé</strong> :
+<div class="highlight"><pre><span></span><code>1. Cliquer sur &quot;Me géolocaliser&quot; (coordonnées précises)
+   ↓
+2. Vérifier la commune suggérée
+   ↓
+3. Corriger/préciser la commune si nécessaire
+   ↓
+4. Enregistrer
+</code></pre></div></p>
+<hr />
+<h3 id="champs-de-localisation">Champs de localisation<a class="headerlink" href="#champs-de-localisation" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Obligatoire</th>
+<th>Description</th>
+<th>Exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Commune</strong></td>
+<td>✅ Oui</td>
+<td>Nom de la commune</td>
+<td>Strasbourg</td>
+</tr>
+<tr>
+<td><strong>Code postal</strong></td>
+<td>Non</td>
+<td>Auto-rempli avec la commune</td>
+<td>67000</td>
+</tr>
+<tr>
+<td><strong>Département</strong></td>
+<td>Non</td>
+<td>Auto-rempli avec la commune</td>
+<td>Bas-Rhin (67)</td>
+</tr>
+<tr>
+<td><strong>Coordonnées</strong></td>
+<td>✅ Oui</td>
+<td>Format Latitude, Longitude</td>
+<td>48.5734, 7.7521</td>
+</tr>
+<tr>
+<td><strong>Lieu-dit</strong></td>
+<td>Non</td>
+<td>Précision supplémentaire</td>
+<td>La Robertsau</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-etape-2-enregistrer-la-fiche-obligatoire">3. Étape 2 : Enregistrer la fiche (OBLIGATOIRE)<a class="headerlink" href="#3-etape-2-enregistrer-la-fiche-obligatoire" title="Permanent link">&para;</a></h2>
+<h3 id="important-enregistrer-avant-dajouter-des-observations">⚠️ IMPORTANT : Enregistrer AVANT d'ajouter des observations<a class="headerlink" href="#important-enregistrer-avant-dajouter-des-observations" title="Permanent link">&para;</a></h3>
+<p><strong>Pourquoi cette étape est obligatoire ?</strong></p>
+<p>Une fois la localisation renseignée, vous <strong>DEVEZ enregistrer la fiche</strong> avant de pouvoir ajouter :
+- ✅ Des observations (dates, œufs, poussins)
+- ✅ Des remarques</p>
+<p><strong>Raison technique</strong> :
+- La fiche doit avoir un ID en base de données
+- Les observations et remarques sont liées à cet ID
+- Sans ID, impossible d'enregistrer des observations</p>
+<hr />
+<h3 id="comment-enregistrer">Comment enregistrer<a class="headerlink" href="#comment-enregistrer" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Remplissez les informations de base</strong></li>
+<li>Localisation (commune + coordonnées)</li>
+<li>Informations du nid (voir section suivante)</li>
+<li>
+<p>Causes d'échec éventuelles</p>
+</li>
+<li>
+<p><strong>Cliquez sur le bouton "💾 Enregistrer"</strong></p>
+</li>
+<li>Le bouton se trouve en bas du formulaire</li>
+<li>Un message de confirmation s'affiche</li>
+<li>
+<p>La page se recharge avec votre fiche sauvegardée</p>
+</li>
+<li>
+<p><strong>Vous êtes maintenant en mode "Modification"</strong></p>
+</li>
+<li>La fiche a un numéro d'identification</li>
+<li>Les sections "Observations" et "Remarques" sont maintenant actives</li>
+<li>Vous pouvez ajouter autant d'observations que nécessaire</li>
+</ol>
+<hr />
+<h2 id="4-etape-3-informations-du-nid">4. Étape 3 : Informations du nid<a class="headerlink" href="#4-etape-3-informations-du-nid" title="Permanent link">&para;</a></h2>
+<h3 id="informations-generales">Informations générales<a class="headerlink" href="#informations-generales" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Obligatoire</th>
+<th>Description</th>
+<th>Valeurs possibles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Espèce</strong></td>
+<td>✅ Oui</td>
+<td>Espèce observée</td>
+<td>Liste déroulante d'espèces</td>
+</tr>
+<tr>
+<td><strong>Année</strong></td>
+<td>✅ Oui</td>
+<td>Année d'observation</td>
+<td>2024, 2025, etc.</td>
+</tr>
+<tr>
+<td><strong>Observateur</strong></td>
+<td>Auto</td>
+<td>Rempli automatiquement</td>
+<td>Votre nom d'utilisateur</td>
+</tr>
+<tr>
+<td><strong>Photo du nid</strong></td>
+<td>Non</td>
+<td>Image du nid</td>
+<td>Fichier JPG/PNG</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="details-du-nid">Détails du nid<a class="headerlink" href="#details-du-nid" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Description</th>
+<th>Exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hauteur du nid</strong></td>
+<td>Hauteur en mètres</td>
+<td>5.5</td>
+</tr>
+<tr>
+<td><strong>Support du nid</strong></td>
+<td>Type de support</td>
+<td>Arbre, bâtiment, pylône</td>
+</tr>
+<tr>
+<td><strong>Exposition</strong></td>
+<td>Orientation cardinale</td>
+<td>Nord, Sud, Est, Ouest</td>
+</tr>
+<tr>
+<td><strong>Type d'habitat</strong></td>
+<td>Environnement</td>
+<td>Urbain, Rural, Forestier</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="resume-de-lobservation">Résumé de l'observation<a class="headerlink" href="#resume-de-lobservation" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Date de première observation</strong></td>
+<td>Première fois que le nid a été repéré</td>
+</tr>
+<tr>
+<td><strong>Date de dernière observation</strong></td>
+<td>Dernière visite du nid</td>
+</tr>
+<tr>
+<td><strong>Succès de reproduction</strong></td>
+<td>Oui / Non / Inconnu</td>
+</tr>
+<tr>
+<td><strong>Nombre d'envols réussis</strong></td>
+<td>Nombre de jeunes ayant quitté le nid</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="causes-dechec-si-applicable">Causes d'échec (si applicable)<a class="headerlink" href="#causes-dechec-si-applicable" title="Permanent link">&para;</a></h3>
+<p>Si la reproduction a échoué, précisez les causes :
+- Prédation
+- Conditions météorologiques
+- Dérangement humain
+- Destruction du nid
+- Autre (à préciser)</p>
+<hr />
+<h2 id="5-etape-4-ajouter-des-observations">5. Étape 4 : Ajouter des observations<a class="headerlink" href="#5-etape-4-ajouter-des-observations" title="Permanent link">&para;</a></h2>
+<h3 id="prerequis">⚠️ Prérequis<a class="headerlink" href="#prerequis" title="Permanent link">&para;</a></h3>
+<p><strong>Vous devez avoir enregistré la fiche au moins une fois</strong> (voir Étape 2)</p>
+<hr />
+<h3 id="ajouter-une-observation">Ajouter une observation<a class="headerlink" href="#ajouter-une-observation" title="Permanent link">&para;</a></h3>
+<p>Les observations permettent de suivre l'évolution du nid au fil du temps.</p>
+<ol>
+<li><strong>Cliquez sur "+ Ajouter une observation"</strong></li>
+<li>Le bouton apparaît après l'enregistrement initial</li>
+<li>
+<p>Un nouveau formulaire d'observation s'affiche</p>
+</li>
+<li>
+<p><strong>Remplissez les champs</strong></p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Obligatoire</th>
+<th>Description</th>
+<th>Exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Date d'observation</strong></td>
+<td>✅ Oui</td>
+<td>Date de la visite</td>
+<td>15/04/2025</td>
+</tr>
+<tr>
+<td><strong>Nombre d'œufs</strong></td>
+<td>Non</td>
+<td>Œufs comptés</td>
+<td>3</td>
+</tr>
+<tr>
+<td><strong>Nombre de poussins</strong></td>
+<td>Non</td>
+<td>Poussins visibles</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>Observations</strong></td>
+<td>Non</td>
+<td>Notes textuelles</td>
+<td>"2 poussins bien nourris, parents actifs"</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>Cliquez sur "Enregistrer l'observation"</strong></li>
+<li>L'observation est ajoutée à la fiche</li>
+<li>Vous pouvez en ajouter d'autres</li>
+</ol>
+<hr />
+<h3 id="exemple-de-suivi-chronologique">Exemple de suivi chronologique<a class="headerlink" href="#exemple-de-suivi-chronologique" title="Permanent link">&para;</a></h3>
+<p>Voici un exemple de suivi d'un nid avec plusieurs observations :</p>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Œufs</th>
+<th>Poussins</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01/04/2025</td>
+<td>3</td>
+<td>0</td>
+<td>Ponte terminée</td>
+</tr>
+<tr>
+<td>15/04/2025</td>
+<td>0</td>
+<td>3</td>
+<td>Éclosion réussie</td>
+</tr>
+<tr>
+<td>01/05/2025</td>
+<td>0</td>
+<td>3</td>
+<td>Poussins bien développés</td>
+</tr>
+<tr>
+<td>20/05/2025</td>
+<td>0</td>
+<td>2</td>
+<td>Un poussin mort (cause inconnue)</td>
+</tr>
+<tr>
+<td>05/06/2025</td>
+<td>0</td>
+<td>0</td>
+<td>Envol réussi des 2 jeunes</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="modifier-ou-supprimer-une-observation">Modifier ou supprimer une observation<a class="headerlink" href="#modifier-ou-supprimer-une-observation" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Modifier</strong> : Cliquez sur l'icône ✏️ à côté de l'observation</li>
+<li><strong>Supprimer</strong> : Cliquez sur l'icône 🗑️ (confirmation demandée)</li>
+</ul>
+<hr />
+<h2 id="6-etape-5-ajouter-des-remarques">6. Étape 5 : Ajouter des remarques<a class="headerlink" href="#6-etape-5-ajouter-des-remarques" title="Permanent link">&para;</a></h2>
+<h3 id="prerequis_1">⚠️ Prérequis<a class="headerlink" href="#prerequis_1" title="Permanent link">&para;</a></h3>
+<p><strong>Vous devez avoir enregistré la fiche au moins une fois</strong> (voir Étape 2)</p>
+<hr />
+<h3 id="a-quoi-servent-les-remarques">À quoi servent les remarques ?<a class="headerlink" href="#a-quoi-servent-les-remarques" title="Permanent link">&para;</a></h3>
+<p>Les remarques permettent d'ajouter :
+- Des notes contextuelles
+- Des informations complémentaires
+- Des observations non structurées
+- Des commentaires pour les correcteurs</p>
+<hr />
+<h3 id="ajouter-une-remarque">Ajouter une remarque<a class="headerlink" href="#ajouter-une-remarque" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Cliquez sur "+ Ajouter une remarque"</strong></li>
+<li>Le bouton apparaît après l'enregistrement initial</li>
+<li>
+<p>Une zone de texte s'affiche</p>
+</li>
+<li>
+<p><strong>Saisissez votre remarque</strong>
+   <div class="highlight"><pre><span></span><code>Exemple : &quot;Nid situé dans un jardin privé, accès difficile.
+Les propriétaires ont accepté les observations depuis la rue.&quot;
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Cliquez sur "Enregistrer la remarque"</strong></p>
+</li>
+<li>La remarque est sauvegardée avec la date et l'auteur</li>
+<li>Vous pouvez en ajouter d'autres</li>
+</ol>
+<hr />
+<h3 id="exemples-de-remarques-utiles">Exemples de remarques utiles<a class="headerlink" href="#exemples-de-remarques-utiles" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Contexte d'accès : "Nid visible depuis la route départementale"</li>
+<li>Conditions météo : "Fortes pluies pendant la période d'observation"</li>
+<li>Interactions : "Dérangement fréquent par des corbeaux"</li>
+<li>Incertitudes : "Nombre d'œufs estimé, visibilité limitée"</li>
+</ul>
+<hr />
+<h2 id="7-etape-6-resume-et-validation">7. Étape 6 : Résumé et validation<a class="headerlink" href="#7-etape-6-resume-et-validation" title="Permanent link">&para;</a></h2>
+<h3 id="verifier-votre-fiche">Vérifier votre fiche<a class="headerlink" href="#verifier-votre-fiche" title="Permanent link">&para;</a></h3>
+<p>Avant de soumettre votre fiche pour correction, vérifiez :</p>
+<ul>
+<li>✅ Localisation complète et précise</li>
+<li>✅ Espèce correctement sélectionnée</li>
+<li>✅ Au moins une observation enregistrée</li>
+<li>✅ Dates cohérentes</li>
+<li>✅ Informations du nid renseignées</li>
+<li>✅ Résumé de la reproduction complété</li>
+</ul>
+<hr />
+<h3 id="soumettre-pour-correction">Soumettre pour correction<a class="headerlink" href="#soumettre-pour-correction" title="Permanent link">&para;</a></h3>
+<p>Une fois votre fiche complète :</p>
+<ol>
+<li><strong>Cliquez sur "🚀 Soumettre pour correction"</strong></li>
+<li>Le bouton se trouve en bas du formulaire</li>
+<li>
+<p>Une confirmation vous est demandée</p>
+</li>
+<li>
+<p><strong>Changement de statut</strong></p>
+</li>
+<li>La fiche passe de <strong>EN_EDITION</strong> à <strong>EN_COURS</strong></li>
+<li>Vous ne pouvez plus la modifier seul</li>
+<li>
+<p>Un correcteur pourra la réviser</p>
+</li>
+<li>
+<p><strong>Pourcentage de complétion</strong></p>
+</li>
+<li>Un pourcentage de complétion est calculé</li>
+<li>Il indique si toutes les informations importantes sont renseignées</li>
+<li>Visez au moins 80% pour une fiche de qualité</li>
+</ol>
+<hr />
+<h3 id="que-se-passe-t-il-apres-la-soumission">Que se passe-t-il après la soumission ?<a class="headerlink" href="#que-se-passe-t-il-apres-la-soumission" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Révision par un correcteur</strong></li>
+<li>Un correcteur ou administrateur révise votre fiche</li>
+<li>Des remarques peuvent être ajoutées</li>
+<li>
+<p>Des corrections peuvent être apportées</p>
+</li>
+<li>
+<p><strong>Validation finale</strong></p>
+</li>
+<li>Une fois validée, la fiche passe au statut <strong>VALIDEE</strong></li>
+<li>Elle est intégrée dans les statistiques</li>
+<li>Elle ne peut plus être modifiée (sauf par un administrateur)</li>
+</ol>
+<hr />
+<h2 id="8-le-bouton-enregistrer-a-quoi-sert-il">8. Le bouton "Enregistrer" - À quoi sert-il ?<a class="headerlink" href="#8-le-bouton-enregistrer-a-quoi-sert-il" title="Permanent link">&para;</a></h2>
+<h3 id="enregistrements-multiples">🔄 Enregistrements multiples<a class="headerlink" href="#enregistrements-multiples" title="Permanent link">&para;</a></h3>
+<p>Le bouton "Enregistrer" peut être utilisé <strong>plusieurs fois</strong> pendant la saisie :</p>
+<table>
+<thead>
+<tr>
+<th>Moment</th>
+<th>Action</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1er enregistrement</strong></td>
+<td>Sauvegarder la fiche avec localisation + infos nid</td>
+<td>Création de la fiche en base, génération d'un ID</td>
+</tr>
+<tr>
+<td><strong>2e enregistrement</strong></td>
+<td>Après ajout d'une observation</td>
+<td>Sauvegarde de l'observation</td>
+</tr>
+<tr>
+<td><strong>3e enregistrement</strong></td>
+<td>Après ajout d'une remarque</td>
+<td>Sauvegarde de la remarque</td>
+</tr>
+<tr>
+<td><strong>Nième enregistrement</strong></td>
+<td>Modification de n'importe quel champ</td>
+<td>Mise à jour de la fiche</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="bonnes-pratiques">Bonnes pratiques<a class="headerlink" href="#bonnes-pratiques" title="Permanent link">&para;</a></h3>
+<p>✅ <strong>Enregistrez régulièrement</strong> pour ne pas perdre vos données
+✅ <strong>Enregistrez AVANT d'ajouter des observations</strong>
+✅ <strong>Enregistrez après chaque modification importante</strong></p>
+<p>❌ <strong>Ne fermez pas votre navigateur sans enregistrer</strong>
+❌ <strong>N'utilisez pas le bouton "Retour" du navigateur</strong> (utilisez les liens de navigation)</p>
+<hr />
+<h2 id="9-modifier-une-fiche-existante">9. Modifier une fiche existante<a class="headerlink" href="#9-modifier-une-fiche-existante" title="Permanent link">&para;</a></h2>
+<h3 id="acceder-a-une-fiche-existante">Accéder à une fiche existante<a class="headerlink" href="#acceder-a-une-fiche-existante" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Depuis la liste des observations</strong></li>
+<li>Menu "Observations" &gt; "Mes observations"</li>
+<li>
+<p>Cliquez sur la fiche à modifier</p>
+</li>
+<li>
+<p><strong>Cliquez sur "✏️ Modifier"</strong></p>
+</li>
+<li>Le bouton apparaît si vous avez les droits</li>
+<li>Vous accédez au formulaire de modification</li>
+</ol>
+<hr />
+<h3 id="differences-entre-creation-et-modification">Différences entre création et modification<a class="headerlink" href="#differences-entre-creation-et-modification" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Création</th>
+<th>Modification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Changer la localisation</td>
+<td>✅ Oui</td>
+<td>✅ Oui</td>
+</tr>
+<tr>
+<td>Ajouter des observations</td>
+<td>✅ Oui (après 1er enregistrement)</td>
+<td>✅ Oui</td>
+</tr>
+<tr>
+<td>Supprimer des observations</td>
+<td>❌ Non (pas encore créées)</td>
+<td>✅ Oui</td>
+</tr>
+<tr>
+<td>Modifier le statut</td>
+<td>❌ Non (toujours NOUVEAU)</td>
+<td>✅ Oui (si droits suffisants)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="historique-des-modifications">Historique des modifications<a class="headerlink" href="#historique-des-modifications" title="Permanent link">&para;</a></h3>
+<p>Toutes les modifications sont tracées :</p>
+<ul>
+<li><strong>Qui</strong> a modifié</li>
+<li><strong>Quand</strong> la modification a eu lieu</li>
+<li><strong>Quel champ</strong> a été modifié</li>
+<li><strong>Ancienne valeur</strong> → <strong>Nouvelle valeur</strong></li>
+</ul>
+<p>Pour consulter l'historique :
+- Cliquez sur "📜 Historique" dans la fiche</p>
+<hr />
+<h2 id="10-questions-frequentes">10. Questions fréquentes<a class="headerlink" href="#10-questions-frequentes" title="Permanent link">&para;</a></h2>
+<h3 id="je-narrive-pas-a-ajouter-dobservations">"Je n'arrive pas à ajouter d'observations"<a class="headerlink" href="#je-narrive-pas-a-ajouter-dobservations" title="Permanent link">&para;</a></h3>
+<p><strong>Réponse</strong> : Avez-vous enregistré la fiche au moins une fois ?
+- Les observations ne peuvent être ajoutées qu'après le premier enregistrement
+- Cliquez sur "Enregistrer" en bas du formulaire
+- Puis cliquez sur "+ Ajouter une observation"</p>
+<hr />
+<h3 id="la-geolocalisation-ne-fonctionne-pas">"La géolocalisation ne fonctionne pas"<a class="headerlink" href="#la-geolocalisation-ne-fonctionne-pas" title="Permanent link">&para;</a></h3>
+<p><strong>Solutions possibles</strong> :
+1. Vérifiez que vous avez autorisé l'accès GPS sur votre navigateur
+2. Assurez-vous d'avoir une connexion internet
+3. Sur mobile, vérifiez les paramètres de localisation
+4. En cas d'échec, saisissez les coordonnées manuellement</p>
+<hr />
+<h3 id="je-ne-peux-plus-modifier-ma-fiche">"Je ne peux plus modifier ma fiche"<a class="headerlink" href="#je-ne-peux-plus-modifier-ma-fiche" title="Permanent link">&para;</a></h3>
+<p><strong>Raison</strong> : Vous avez probablement soumis la fiche pour correction
+- Les fiches au statut EN_COURS ou VALIDEE ne peuvent plus être modifiées par l'auteur
+- Contactez un correcteur ou administrateur pour des modifications</p>
+<hr />
+<h3 id="comment-annuler-une-observation">"Comment annuler une observation ?"<a class="headerlink" href="#comment-annuler-une-observation" title="Permanent link">&para;</a></h3>
+<p><strong>Procédure</strong> :
+1. Allez dans votre fiche en mode modification
+2. Trouvez l'observation à supprimer
+3. Cliquez sur l'icône 🗑️
+4. Confirmez la suppression
+5. Enregistrez la fiche</p>
+<hr />
+<h3 id="puis-je-sauvegarder-une-fiche-incomplete">"Puis-je sauvegarder une fiche incomplète ?"<a class="headerlink" href="#puis-je-sauvegarder-une-fiche-incomplete" title="Permanent link">&para;</a></h3>
+<p><strong>Réponse</strong> : Oui !
+- Vous pouvez enregistrer une fiche même si elle n'est pas complète
+- Elle restera au statut EN_EDITION
+- Vous pourrez la compléter plus tard
+- Ne la soumettez pas tant qu'elle n'est pas prête</p>
+<hr />
+<h3 id="combien-dobservations-puis-je-ajouter">"Combien d'observations puis-je ajouter ?"<a class="headerlink" href="#combien-dobservations-puis-je-ajouter" title="Permanent link">&para;</a></h3>
+<p><strong>Réponse</strong> : Illimité
+- Vous pouvez ajouter autant d'observations que nécessaire
+- Une observation = une visite du nid
+- Suivez l'évolution du nid tout au long de la saison</p>
+<hr />
+<h2 id="recapitulatif-du-workflow">Récapitulatif du workflow<a class="headerlink" href="#recapitulatif-du-workflow" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>1. Créer une nouvelle fiche
+   ↓
+2. Renseigner la localisation (commune + coordonnées)
+   ↓
+3. Remplir les informations du nid
+   ↓
+4. 💾 ENREGISTRER LA FICHE (obligatoire)
+   ↓
+5. Ajouter des observations (dates, œufs, poussins)
+   ↓
+6. Ajouter des remarques (optionnel)
+   ↓
+7. 💾 Enregistrer après chaque ajout
+   ↓
+8. Vérifier que tout est complet
+   ↓
+9. 🚀 Soumettre pour correction
+</code></pre></div>
+<hr />
+<h2 id="aide-supplementaire">Aide supplémentaire<a class="headerlink" href="#aide-supplementaire" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../01_navigation_generale/">Guide de navigation</a></strong></li>
+<li><strong><a href="../03_correction_transcription/">Guide de correction (Transcription)</a></strong></li>
+<li><strong>Support</strong> : Contactez un administrateur</li>
+</ul>
+<hr />
+<p><em>Version 1.0 - Novembre 2025</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.prune", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="../javascripts/navigation.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

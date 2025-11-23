@@ -54,7 +54,7 @@ Thumbs.db
 
 # MkDocs
 site/
-site-user/
+# site-user/ est maintenant committé (documentation buildée pour collectstatic)
 docs/docs/todo/
 
 # Archives de fichiers orphelins
