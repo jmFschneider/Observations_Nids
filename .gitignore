@@ -54,6 +54,7 @@ Thumbs.db
 
 # Fichiers temporaires et tests
 tmp/
+test_scans/
 
 # MkDocs
 site/
