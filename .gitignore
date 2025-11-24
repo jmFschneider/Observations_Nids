@@ -50,7 +50,10 @@ htmlcov/
 
 # OS
 Thumbs.db
-.DS_Storetmp/
+.DS_Store
+
+# Fichiers temporaires et tests
+tmp/
 
 # MkDocs
 site/
