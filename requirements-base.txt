@@ -68,10 +68,7 @@ click-repl==0.3.0
     #   -r requirements-base.in
     #   celery
 colorama==0.4.6
-    # via
-    #   -r requirements-base.in
-    #   click
-    #   tqdm
+    # via -r requirements-base.in
 crispy-bootstrap5==2025.6
     # via -r requirements-base.in
 defusedxml==0.7.1
@@ -245,12 +242,12 @@ pyasn1-modules==0.4.2
     # via
     #   -r requirements-base.in
     #   google-auth
-pydantic==2.12.3
+pydantic==2.12.4
     # via
     #   -r requirements-base.in
     #   google-generativeai
     #   pydantic-settings
-pydantic-core==2.41.4
+pydantic-core==2.41.5
     # via
     #   -r requirements-base.in
     #   pydantic
@@ -333,7 +330,6 @@ typing-inspection==0.4.2
 tzdata==2025.2
     # via
     #   -r requirements-base.in
-    #   django
     #   kombu
 uritemplate==4.2.0
     # via
