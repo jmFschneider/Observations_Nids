@@ -19,7 +19,35 @@ Le workflow de traitement des images se fait en **3 étapes** :
 
 ---
 
-## 🚀 Script principal : `prepare_images_local.py`
+## 🖥️ Interface graphique : `prepare_images_gui.py` (Recommandé)
+
+Pour une utilisation quotidienne simplifiée avec sauvegarde automatique des préférences :
+
+```bash
+python scripts/prepare_images_gui.py
+```
+
+### Fonctionnalités
+
+- **Interface intuitive** : Sélection des dossiers via boutons "Parcourir..."
+- **Sauvegarde des préférences** : Tous les paramètres sont mémorisés entre les sessions
+- **Logs en temps réel** : Affichage du traitement dans la fenêtre
+- **Exécution en arrière-plan** : L'interface reste réactive pendant le traitement
+- **Bouton Arrêter** : Possibilité d'interrompre le traitement en cours
+
+### Préférences automatiques
+
+Les paramètres sont sauvegardés dans `~/.observations_nids_preferences.json` :
+- Dossiers d'entrée/sortie
+- Nom de l'opérateur
+- Options de recadrage et de traitement
+- Modes preview et verbose
+
+---
+
+## 🚀 Script en ligne de commande : `prepare_images_local.py`
+
+Pour les utilisateurs avancés ou l'automatisation via scripts.
 
 ### Installation des dépendances
 
