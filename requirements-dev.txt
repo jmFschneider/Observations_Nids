@@ -36,7 +36,7 @@ build==1.3.0
     # via
     #   -r requirements-dev.in
     #   pip-tools
-cachetools==5.5.2
+cachetools==6.2.2
     # via
     #   -r requirements-base.in
     #   google-auth
