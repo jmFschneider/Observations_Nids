@@ -68,10 +68,7 @@ click-repl==0.3.0
     #   -r requirements-base.in
     #   celery
 colorama==0.4.6
-    # via
-    #   -r requirements-base.in
-    #   click
-    #   tqdm
+    # via -r requirements-base.in
 crispy-bootstrap5==2025.6
     # via -r requirements-base.in
 defusedxml==0.7.1
@@ -152,7 +149,7 @@ googleapis-common-protos==1.72.0
     #   -r requirements-base.in
     #   google-api-core
     #   grpcio-status
-greenlet==3.2.1
+greenlet==3.2.4
     # via
     #   -r requirements-base.in
     #   eventlet
@@ -333,7 +330,6 @@ typing-inspection==0.4.2
 tzdata==2025.2
     # via
     #   -r requirements-base.in
-    #   django
     #   kombu
 uritemplate==4.2.0
     # via
