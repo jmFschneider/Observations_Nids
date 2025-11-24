@@ -80,12 +80,7 @@ click-repl==0.3.0
 colorama==0.4.6
     # via
     #   -r requirements-base.in
-    #   build
-    #   click
-    #   mkdocs
     #   mkdocs-material
-    #   pytest
-    #   tqdm
 coverage[toml]==7.10.7
     # via pytest-cov
 crispy-bootstrap5==2025.6
@@ -227,7 +222,7 @@ jinja2==3.1.6
     #   -r requirements-base.in
     #   mkdocs
     #   mkdocs-material
-kombu==5.5.3
+kombu==5.5.4
     # via
     #   -r requirements-base.in
     #   celery
@@ -272,6 +267,7 @@ packaging==25.0
     # via
     #   -r requirements-base.in
     #   build
+    #   kombu
     #   mkdocs
     #   pytest
 paginate==0.5.7
@@ -461,7 +457,6 @@ typing-inspection==0.4.2
 tzdata==2025.2
     # via
     #   -r requirements-base.in
-    #   django
     #   kombu
 uritemplate==4.2.0
     # via
