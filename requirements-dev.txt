@@ -429,7 +429,7 @@ tqdm==4.67.1
     #   google-generativeai
 types-django-filter==25.2.0.20251010
     # via -r requirements-dev.in
-types-pytz==2025.2.0.20250809
+types-pytz==2025.2.0.20251108
     # via -r requirements-dev.in
 types-pyyaml==6.0.12.20250915
     # via
