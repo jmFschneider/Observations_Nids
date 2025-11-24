@@ -80,12 +80,7 @@ click-repl==0.3.0
 colorama==0.4.6
     # via
     #   -r requirements-base.in
-    #   build
-    #   click
-    #   mkdocs
     #   mkdocs-material
-    #   pytest
-    #   tqdm
 coverage[toml]==7.10.7
     # via pytest-cov
 crispy-bootstrap5==2025.6
@@ -389,7 +384,7 @@ pyyaml-env-tag==1.1
     # via mkdocs
 radicale==3.5.8
     # via -r requirements-base.in
-redis==7.0.1
+redis==7.1.0
     # via -r requirements-base.in
 requests==2.32.5
     # via
@@ -461,7 +456,6 @@ typing-inspection==0.4.2
 tzdata==2025.2
     # via
     #   -r requirements-base.in
-    #   django
     #   kombu
 uritemplate==4.2.0
     # via

@@ -68,10 +68,7 @@ click-repl==0.3.0
     #   -r requirements-base.in
     #   celery
 colorama==0.4.6
-    # via
-    #   -r requirements-base.in
-    #   click
-    #   tqdm
+    # via -r requirements-base.in
 crispy-bootstrap5==2025.6
     # via -r requirements-base.in
 defusedxml==0.7.1
@@ -277,7 +274,7 @@ pytz==2025.2
     #   vobject
 radicale==3.5.8
     # via -r requirements-base.in
-redis==7.0.1
+redis==7.1.0
     # via -r requirements-base.in
 requests==2.32.5
     # via
@@ -333,7 +330,6 @@ typing-inspection==0.4.2
 tzdata==2025.2
     # via
     #   -r requirements-base.in
-    #   django
     #   kombu
 uritemplate==4.2.0
     # via
