@@ -322,12 +322,12 @@ pyasn1-modules==0.4.2
     # via
     #   -r requirements-base.in
     #   google-auth
-pydantic==2.12.3
+pydantic==2.12.4
     # via
     #   -r requirements-base.in
     #   google-generativeai
     #   pydantic-settings
-pydantic-core==2.41.4
+pydantic-core==2.41.5
     # via
     #   -r requirements-base.in
     #   pydantic
