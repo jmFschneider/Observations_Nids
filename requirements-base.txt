@@ -32,7 +32,7 @@ cachetools==6.2.2
     # via
     #   -r requirements-base.in
     #   google-auth
-celery==5.5.3
+celery==5.6.0
     # via
     #   -r requirements-base.in
     #   django-celery-results
@@ -110,6 +110,8 @@ email-reply-parser==0.5.12
     # via django-helpdesk
 eventlet==0.40.3
     # via -r requirements-base.in
+exceptiongroup==1.3.1
+    # via celery
 flower==2.0.1
     # via -r requirements-base.in
 geographiclib==2.1
@@ -185,7 +187,7 @@ idna==3.11
     #   requests
 jinja2==3.1.6
     # via -r requirements-base.in
-kombu==5.5.4
+kombu==5.6.1
     # via
     #   -r requirements-base.in
     #   celery
@@ -320,6 +322,7 @@ typing-extensions==4.15.0
     #   akismet
     #   anyio
     #   beautifulsoup4
+    #   exceptiongroup
     #   google-generativeai
     #   grpcio
     #   pydantic
@@ -333,6 +336,8 @@ tzdata==2025.2
     # via
     #   -r requirements-base.in
     #   kombu
+tzlocal==5.3.1
+    # via celery
 uritemplate==4.2.0
     # via
     #   -r requirements-base.in
