@@ -294,7 +294,9 @@ platformdirs==4.5.1
     #   -r requirements-dev.in
     #   mkdocs-get-deps
 pluggy==1.6.0
-    # via pytest
+    # via
+    #   pytest
+    #   pytest-cov
 prometheus-client==0.23.1
     # via
     #   -r requirements-base.in
@@ -359,7 +361,7 @@ pytest==9.0.2
     #   -r requirements-dev.in
     #   pytest-cov
     #   pytest-django
-pytest-cov==6.0.0
+pytest-cov==7.0.0
     # via -r requirements-dev.in
 pytest-django==4.11.1
     # via -r requirements-dev.in
