@@ -308,7 +308,7 @@ sqlparse==0.5.4
     # via
     #   -r requirements-base.in
     #   django
-tornado==6.5.2
+tornado==6.5.3
     # via
     #   -r requirements-base.in
     #   flower
