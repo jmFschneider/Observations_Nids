@@ -73,7 +73,7 @@ crispy-bootstrap5==2025.6
     # via -r requirements-base.in
 defusedxml==0.7.1
     # via radicale
-django==5.2.8
+django==6.0
     # via
     #   -r requirements-base.in
     #   crispy-bootstrap5
