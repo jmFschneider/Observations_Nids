@@ -24,7 +24,7 @@ beautifulsoup4==4.14.3
     # via
     #   -r requirements-base.in
     #   django-helpdesk
-billiard==4.2.3
+billiard==4.2.4
     # via
     #   -r requirements-base.in
     #   celery
