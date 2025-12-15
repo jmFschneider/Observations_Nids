@@ -28,7 +28,7 @@ billiard==4.2.3
     # via
     #   -r requirements-base.in
     #   celery
-cachetools==6.2.2
+cachetools==6.2.3
     # via
     #   -r requirements-base.in
     #   google-auth
