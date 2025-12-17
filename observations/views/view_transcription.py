@@ -26,6 +26,19 @@ def select_directory(request):
     # Définir un répertoire racine pour les images
     base_dir = os.path.join(settings.MEDIA_ROOT, '')
 
+    # Récupérer le chemin actuel depuis les paramètres GET (ou racine par défaut)
+    current_path = request.GET.get('path', '')
+
+    # Sécurité : empêcher de sortir du répertoire racine
+    # Normaliser le chemin pour éviter les attaques de type "../../../"
+    safe_path = os.path.normpath(current_path).replace('..', '')
+    full_current_path = os.path.join(base_dir, safe_path)
+
+    # Vérifier que le chemin est bien dans le répertoire racine
+    if not full_current_path.startswith(base_dir):
+        safe_path = ''
+        full_current_path = base_dir
+
     if request.method == 'POST':
         selected_dir = request.POST.get('selected_directory')
         if selected_dir and os.path.isdir(os.path.join(base_dir, selected_dir)):
@@ -49,10 +62,91 @@ def select_directory(request):
 
         return JsonResponse({'success': False, 'error': 'Répertoire invalide'})
 
-    # Récupérer la liste des répertoires disponibles
-    directories = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
+    # Récupérer la liste des sous-répertoires du chemin actuel avec statistiques
+    directories = []
+    try:
+        dir_list = [
+            d for d in os.listdir(full_current_path)
+            if os.path.isdir(os.path.join(full_current_path, d))
+        ]
 
-    return render(request, 'transcription/upload_files.html', {'directories': directories})
+        # Pour chaque répertoire, collecter des statistiques
+        for dir_name in dir_list:
+            dir_path = os.path.join(full_current_path, dir_name)
+
+            try:
+                # Compter les sous-répertoires
+                subdirs_count = len([
+                    d for d in os.listdir(dir_path)
+                    if os.path.isdir(os.path.join(dir_path, d))
+                ])
+
+                # Compter les fichiers images
+                images_count = len([
+                    f for f in os.listdir(dir_path)
+                    if os.path.isfile(os.path.join(dir_path, f))
+                    and f.lower().endswith(('.jpg', '.jpeg', '.png'))
+                ])
+
+                # Récupérer la date de modification
+                mod_time = os.path.getmtime(dir_path)
+                mod_date = timezone.datetime.fromtimestamp(mod_time)
+
+                directories.append({
+                    'name': dir_name,
+                    'subdirs_count': subdirs_count,
+                    'images_count': images_count,
+                    'modified_date': mod_date,
+                })
+            except (OSError, PermissionError):
+                # Si on ne peut pas accéder aux stats, on ajoute quand même le dossier
+                directories.append({
+                    'name': dir_name,
+                    'subdirs_count': 0,
+                    'images_count': 0,
+                    'modified_date': None,
+                })
+
+        # Trier par ordre alphabétique
+        directories.sort(key=lambda x: x['name'].lower())
+    except (OSError, PermissionError):
+        directories = []
+        messages.error(request, "Impossible d'accéder à ce répertoire")
+        safe_path = ''
+        full_current_path = base_dir
+
+    # Créer le fil d'Ariane (breadcrumb)
+    breadcrumb = []
+    if safe_path:
+        parts = safe_path.split(os.sep)
+        current = ''
+        for part in parts:
+            if part:
+                current = os.path.join(current, part) if current else part
+                breadcrumb.append({'name': part, 'path': current})
+
+    # Compter les fichiers images dans le répertoire actuel
+    try:
+        image_count = len(
+            [
+                f
+                for f in os.listdir(full_current_path)
+                if os.path.isfile(os.path.join(full_current_path, f))
+                and f.lower().endswith(('.jpg', '.jpeg', '.png'))
+            ]
+        )
+    except (OSError, PermissionError):
+        image_count = 0
+
+    context = {
+        'directories': directories,
+        'current_path': safe_path,
+        'breadcrumb': breadcrumb,
+        'image_count': image_count,
+        'parent_path': os.path.dirname(safe_path) if safe_path else None,
+    }
+
+    return render(request, 'transcription/upload_files.html', context)
 
 
 def is_celery_operational():
