@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-microscope"></i> Optimisation OCR - Configuration du traitement batch</h2>
+    <p class="text-muted">Configurez le traitement OCR pour les répertoires sélectionnés</p>
+
+    <!-- Répertoires sélectionnés -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-folder-open"></i> Répertoires sélectionnés</h5>
+        </div>
+        <div class="card-body">
+            <div id="selected-dirs-list">
+                <p class="text-muted">Chargement...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration du traitement -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-cogs"></i> Configuration</h5>
+        </div>
+        <div class="card-body">
+            <form id="batch-config-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-robot"></i> Modèles OCR <span class="text-danger">*</span>
+                        </label>
+                        <div class="form-text mb-2">Sélectionnez un ou plusieurs modèles à tester (exécution séquentielle)</div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input model-checkbox" type="checkbox" value="gemini_flash" id="model_gemini_flash">
+                                    <label class="form-check-label" for="model_gemini_flash">
+                                        <strong>Gemini Flash</strong>
+                                        <small class="text-muted d-block">Rapide et économique</small>
+                                    </label>
+                                </div>
+                                <hr class="my-2">
+                                <div class="form-check">
+                                    <input class="form-check-input model-checkbox" type="checkbox" value="gemini_1.5_pro" id="model_gemini_1.5_pro">
+                                    <label class="form-check-label" for="model_gemini_1.5_pro">
+                                        <strong>Gemini 1.5 Pro</strong>
+                                        <small class="text-muted d-block">Équilibre qualité/coût</small>
+                                    </label>
+                                </div>
+                                <hr class="my-2">
+                                <div class="form-check">
+                                    <input class="form-check-input model-checkbox" type="checkbox" value="gemini_2_pro" id="model_gemini_2_pro">
+                                    <label class="form-check-label" for="model_gemini_2_pro">
+                                        <strong>Gemini 2.0 Pro</strong>
+                                        <small class="text-muted d-block">Haute qualité</small>
+                                    </label>
+                                </div>
+                                <hr class="my-2">
+                                <div class="form-check">
+                                    <input class="form-check-input model-checkbox" type="checkbox" value="gemini_2_flash" id="model_gemini_2_flash" checked>
+                                    <label class="form-check-label" for="model_gemini_2_flash">
+                                        <strong>Gemini 2.0 Flash</strong>
+                                        <small class="text-muted d-block">Dernier modèle (recommandé)</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectAllModels()">
+                                <i class="fas fa-check-square"></i> Tout sélectionner
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAllModels()">
+                                <i class="fas fa-square"></i> Tout désélectionner
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-info-circle"></i> Options
+                        </label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="importer_en_base" checked>
+                            <label class="form-check-label" for="importer_en_base">
+                                <strong>Importer les fiches en base de données</strong>
+                            </label>
+                            <div class="form-text">
+                                Cocher pour créer les FicheObservation en base (première fois sur FUSION_FULL).
+                                Décocher si les fiches existent déjà (réexécution ou tests sur autres répertoires).
+                            </div>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="analyse_avant">
+                            <label class="form-check-label" for="analyse_avant">
+                                Analyser les correspondances avant de lancer
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{% url 'pilot:selection_repertoire_ocr' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour à la sélection
+                    </a>
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-play-circle"></i> Lancer la transcription batch
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Résultats de l'analyse (masqué par défaut) -->
+    <div id="analyse-results" class="card" style="display: none;">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Résultats de l'analyse</h5>
+        </div>
+        <div class="card-body" id="analyse-content">
+            <!-- Rempli dynamiquement -->
+        </div>
+    </div>
+</div>
+
+<script>
+// Charger les répertoires sélectionnés depuis sessionStorage
+document.addEventListener('DOMContentLoaded', function() {
+    const selectedDirsJSON = sessionStorage.getItem('selectedDirectories');
+    const currentPath = sessionStorage.getItem('currentPath');
+
+    if (!selectedDirsJSON) {
+        document.getElementById('selected-dirs-list').innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                Aucun répertoire sélectionné. <a href="{% url 'pilot:selection_repertoire_ocr' %}">Retourner à la sélection</a>
+            </div>
+        `;
+        document.getElementById('batch-config-form').style.display = 'none';
+        return;
+    }
+
+    const selectedDirs = JSON.parse(selectedDirsJSON);
+
+    // Afficher les répertoires sélectionnés
+    let html = '<ul class="list-group">';
+    selectedDirs.forEach(dir => {
+        html += `
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="fas fa-folder text-warning"></i>
+                    <strong>${dir.path}</strong>
+                </span>
+                <span class="badge bg-primary rounded-pill">${dir.name}</span>
+            </li>
+        `;
+    });
+    html += '</ul>';
+    html += `<p class="mt-3 mb-0 text-muted"><strong>Total:</strong> ${selectedDirs.length} répertoire(s)</p>`;
+
+    document.getElementById('selected-dirs-list').innerHTML = html;
+});
+
+// Fonctions pour sélection des modèles
+function selectAllModels() {
+    document.querySelectorAll('.model-checkbox').forEach(cb => cb.checked = true);
+}
+
+function deselectAllModels() {
+    document.querySelectorAll('.model-checkbox').forEach(cb => cb.checked = false);
+}
+
+// Gestionnaire de soumission du formulaire
+document.getElementById('batch-config-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Récupérer les modèles sélectionnés
+    const selectedModels = [];
+    document.querySelectorAll('.model-checkbox:checked').forEach(cb => {
+        selectedModels.push(cb.value);
+    });
+
+    const importerEnBase = document.getElementById('importer_en_base').checked;
+    const analyseAvant = document.getElementById('analyse_avant').checked;
+
+    // Validation
+    if (selectedModels.length === 0) {
+        alert('Veuillez sélectionner au moins un modèle OCR');
+        return;
+    }
+
+    const selectedDirs = JSON.parse(sessionStorage.getItem('selectedDirectories'));
+
+    if (analyseAvant) {
+        // Analyser les correspondances avant de lancer
+        analyserCorrespondancesBatch(selectedDirs, selectedModels, importerEnBase);
+    } else {
+        // Lancer directement
+        lancerTranscriptionBatch(selectedDirs, selectedModels, importerEnBase);
+    }
+});
+
+function analyserCorrespondancesBatch(directories, modeles, importerEnBase) {
+    const analyseResults = document.getElementById('analyse-results');
+    const analyseContent = document.getElementById('analyse-content');
+
+    analyseResults.style.display = 'block';
+    analyseContent.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Analyse en cours...</p></div>';
+
+    // Afficher un récapitulatif
+    let html = '<h6>Analyse des répertoires:</h6><ul>';
+
+    directories.forEach(dir => {
+        html += `<li><strong>${dir.name}</strong> - Analyse en cours...</li>`;
+    });
+
+    html += '</ul>';
+    html += `<p><strong>Modèles:</strong> ${modeles.join(', ')}</p>`;
+    html += `
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle"></i>
+            Cette fonctionnalité sera implémentée prochainement.
+            Pour l'instant, utilisez le flux normal de transcription.
+        </div>
+    `;
+
+    analyseContent.innerHTML = html;
+}
+
+function lancerTranscriptionBatch(directories, modeles, importerEnBase) {
+    // Désactiver le bouton pendant le traitement
+    const submitBtn = document.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Lancement en cours...';
+
+    // Préparer les données
+    const formData = new FormData();
+    formData.append('directories', JSON.stringify(directories));
+    formData.append('modeles_ocr', JSON.stringify(modeles));
+    formData.append('importer_en_base', importerEnBase ? 'true' : 'false');
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+    // Envoyer la requête
+    fetch('{% url "pilot:lancer_transcription_batch" %}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Rediriger vers la page de suivi
+            window.location.href = '{% url "pilot:batch_results" %}?task_id=' + data.task_id + '&tracking=true';
+        } else {
+            alert('Erreur: ' + (data.error || 'Erreur inconnue'));
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-play-circle"></i> Lancer la transcription batch';
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Erreur lors du lancement du traitement batch');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-play-circle"></i> Lancer la transcription batch';
+    });
+}
+</script>
+{% endblock %}

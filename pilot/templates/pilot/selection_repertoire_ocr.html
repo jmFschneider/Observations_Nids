@@ -1,0 +1,435 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-microscope"></i> Optimisation OCR - Sélection du répertoire</h2>
+    <p class="text-muted">Sélectionnez un répertoire d'images optimisées pour lancer la transcription batch</p>
+
+    <!-- Fil d'Ariane -->
+    <nav aria-label="breadcrumb" class="mt-4 mb-4">
+        <ol class="breadcrumb py-3">
+            <li class="breadcrumb-item">
+                <a href="{% url 'pilot:selection_repertoire_ocr' %}">
+                    <i class="fas fa-home"></i> images_optimisees
+                </a>
+            </li>
+            {% for crumb in breadcrumb %}
+                {% if forloop.last %}
+                    <li class="breadcrumb-item active" aria-current="page">{{ crumb.name }}</li>
+                {% else %}
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'pilot:selection_repertoire_ocr' %}?path={{ crumb.path }}">{{ crumb.name }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+    </nav>
+
+    <!-- Informations sur le répertoire actuel -->
+    <div class="card mb-4">
+        <div class="card-body py-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <h6 class="text-muted mb-2"><i class="fas fa-folder-open"></i> RÉPERTOIRE</h6>
+                    <p class="h5 mb-0">
+                        {% if current_path %}{{ current_path }}{% else %}<em>Racine</em>{% endif %}
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="text-muted mb-2"><i class="fas fa-images"></i> IMAGES</h6>
+                    <p class="h5 mb-0">
+                        {% if image_count > 0 %}
+                            <span class="badge bg-success" style="font-size: 1.1rem;">{{ image_count }}</span>
+                        {% else %}
+                            <span class="text-muted">Aucune</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="text-muted mb-2"><i class="fas fa-file-alt"></i> TYPE FICHE</h6>
+                    <p class="h5 mb-0">
+                        {% if type_fiche %}
+                            <span class="badge bg-info" style="font-size: 1.1rem;">{{ type_fiche }}</span>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="text-muted mb-2"><i class="fas fa-magic"></i> TRAITEMENT</h6>
+                    <p class="h5 mb-0">
+                        {% if type_traitement %}
+                            <span class="badge bg-warning text-dark" style="font-size: 1.1rem;">{{ type_traitement }}</span>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bouton d'action si le répertoire contient des images -->
+    {% if image_count > 0 %}
+    <div class="card mb-5 border-primary">
+        <div class="card-body py-4">
+            <h5 class="card-title mb-3">
+                <i class="fas fa-check-circle text-primary"></i> Répertoire prêt pour la transcription
+            </h5>
+            <p class="card-text mb-4">
+                Ce répertoire contient <strong>{{ image_count }} image{{ image_count|pluralize }}</strong>
+                {% if type_traitement %}avec le traitement <strong>{{ type_traitement }}</strong>{% endif %}.
+            </p>
+
+            <form id="analyse-form" method="post" action="{% url 'pilot:analyser_correspondances' %}">
+                {% csrf_token %}
+                <input type="hidden" name="repertoire" value="{{ current_path }}">
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="modele_ocr" class="form-label">
+                            <i class="fas fa-robot"></i> Modèle OCR
+                        </label>
+                        <select class="form-select" id="modele_ocr" name="modele_ocr" required>
+                            <option value="">-- Sélectionner un modèle --</option>
+                            <option value="gemini_flash">Gemini Flash</option>
+                            <option value="gemini_1.5_pro">Gemini 1.5 Pro</option>
+                            <option value="gemini_2_pro">Gemini 2.0 Pro</option>
+                            <option value="gemini_2_flash">Gemini 2.0 Flash</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-search"></i> Analyser les correspondances
+                </button>
+            </form>
+
+            <!-- Zone d'affichage des résultats d'analyse -->
+            <div id="resultats-analyse" class="mt-4" style="display: none;">
+                <hr>
+                <h5><i class="fas fa-chart-bar"></i> Résultats de l'analyse</h5>
+                <div id="resultats-content"></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Liste des sous-répertoires -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-folder"></i> Sous-répertoires disponibles</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if parent_path is not None %}
+            <div class="p-3 border-bottom bg-light">
+                <a href="{% url 'pilot:selection_repertoire_ocr' %}?path={{ parent_path }}"
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-level-up-alt"></i> Remonter au dossier parent
+                </a>
+            </div>
+            {% endif %}
+
+            {% if directories %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="directories-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;">
+                                <input type="checkbox" id="select-all" title="Tout sélectionner">
+                            </th>
+                            <th style="width: 50px;"></th>
+                            <th>Nom du répertoire</th>
+                            <th class="text-center" style="width: 150px;">
+                                <i class="fas fa-folder"></i> Sous-dossiers
+                            </th>
+                            <th class="text-center" style="width: 150px;">
+                                <i class="fas fa-images"></i> Images
+                            </th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dir in directories %}
+                        <tr class="directory-row" data-dir-name="{{ dir.name }}" data-has-subdirs="{{ dir.subdirs_count }}" data-has-images="{{ dir.images_count }}">
+                            <td class="text-center" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="dir-checkbox"
+                                       value="{{ dir.name }}"
+                                       data-path="{{ current_path }}{% if current_path %}/{% endif %}{{ dir.name }}">
+                            </td>
+                            <td class="text-center clickable-cell"
+                                onclick="navigateToDir('{{ current_path }}{% if current_path %}/{% endif %}{{ dir.name }}')">
+                                <i class="fas fa-folder text-warning fa-lg"></i>
+                            </td>
+                            <td class="clickable-cell"
+                                onclick="navigateToDir('{{ current_path }}{% if current_path %}/{% endif %}{{ dir.name }}')">
+                                <strong>{{ dir.name }}</strong>
+                            </td>
+                            <td class="text-center clickable-cell"
+                                onclick="navigateToDir('{{ current_path }}{% if current_path %}/{% endif %}{{ dir.name }}')">
+                                {% if dir.subdirs_count > 0 %}
+                                    <span class="badge bg-info">{{ dir.subdirs_count }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center clickable-cell"
+                                onclick="navigateToDir('{{ current_path }}{% if current_path %}/{% endif %}{{ dir.name }}')">
+                                {% if dir.images_count > 0 %}
+                                    <span class="badge bg-success">{{ dir.images_count }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center clickable-cell"
+                                onclick="navigateToDir('{{ current_path }}{% if current_path %}/{% endif %}{{ dir.name }}')">
+                                <i class="fas fa-chevron-right text-muted"></i>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bouton de sélection batch -->
+            <div id="batch-selection-panel" class="p-3 border-top bg-light" style="display: none;">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <strong id="selected-count">0</strong> répertoire(s) sélectionné(s)
+                        <span id="selected-list" class="ms-2 text-muted"></span>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-primary" onclick="proceedToBatchConfig()">
+                            <i class="fas fa-arrow-right"></i> Continuer
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="p-3">
+                <div class="alert alert-warning mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Aucun sous-répertoire trouvé.
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.breadcrumb {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.directory-row {
+    transition: background-color 0.2s ease;
+}
+
+.clickable-cell {
+    cursor: pointer;
+}
+
+.clickable-cell:hover {
+    background-color: #f8f9fa !important;
+}
+
+.directory-row td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+}
+
+.table thead th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.dir-checkbox {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+</style>
+
+<script>
+// Gestion de la sélection multiple de répertoires
+const checkboxes = document.querySelectorAll('.dir-checkbox');
+const selectAllCheckbox = document.getElementById('select-all');
+const batchPanel = document.getElementById('batch-selection-panel');
+const selectedCountEl = document.getElementById('selected-count');
+const selectedListEl = document.getElementById('selected-list');
+
+// Fonction pour naviguer vers un répertoire
+function navigateToDir(path) {
+    window.location = '{% url "pilot:selection_repertoire_ocr" %}?path=' + path;
+}
+
+// Mettre à jour l'affichage de la sélection
+function updateSelection() {
+    const checked = Array.from(checkboxes).filter(cb => cb.checked);
+    const count = checked.length;
+
+    selectedCountEl.textContent = count;
+
+    if (count > 0) {
+        const names = checked.map(cb => cb.value).join(', ');
+        selectedListEl.textContent = `(${names})`;
+        batchPanel.style.display = 'block';
+    } else {
+        batchPanel.style.display = 'none';
+    }
+}
+
+// Gestionnaire pour chaque checkbox
+checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', updateSelection);
+});
+
+// Gestionnaire pour "Tout sélectionner"
+if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener('change', function() {
+        checkboxes.forEach(cb => {
+            cb.checked = this.checked;
+        });
+        updateSelection();
+    });
+}
+
+// Continuer vers la configuration du batch
+function proceedToBatchConfig() {
+    const checked = Array.from(checkboxes).filter(cb => cb.checked);
+    if (checked.length === 0) {
+        alert('Veuillez sélectionner au moins un répertoire');
+        return;
+    }
+
+    // Stocker les répertoires sélectionnés dans sessionStorage
+    const selectedDirs = checked.map(cb => ({
+        name: cb.value,
+        path: cb.dataset.path
+    }));
+
+    sessionStorage.setItem('selectedDirectories', JSON.stringify(selectedDirs));
+    sessionStorage.setItem('currentPath', '{{ current_path }}');
+
+    // Rediriger vers la page de configuration
+    window.location = '{% url "pilot:optimisation_ocr_home" %}';
+}
+
+// Ancien code pour la sélection unique (gardé pour compatibilité)
+if (document.getElementById('analyse-form')) {
+    document.getElementById('analyse-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const form = this;
+        const formData = new FormData(form);
+        const modele = document.getElementById('modele_ocr').value;
+
+        if (!modele) {
+            alert('Veuillez sélectionner un modèle OCR');
+            return;
+        }
+
+        // Afficher un indicateur de chargement
+        const resultatsDiv = document.getElementById('resultats-analyse');
+        const resultatsContent = document.getElementById('resultats-content');
+        resultatsDiv.style.display = 'block';
+        resultatsContent.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Analyse en cours...</p></div>';
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                afficherResultats(data, modele);
+            } else {
+                resultatsContent.innerHTML = `<div class="alert alert-danger">Erreur: ${data.error}</div>`;
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            resultatsContent.innerHTML = '<div class="alert alert-danger">Une erreur s\'est produite lors de l\'analyse.</div>';
+        });
+    });
+}
+
+function afficherResultats(data, modele) {
+    const content = document.getElementById('resultats-content');
+
+    let html = `
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3>${data.nb_trouvees}</h3>
+                        <p class="mb-0">Trouvées</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning">
+                    <div class="card-body text-center">
+                        <h3>${data.nb_multiples}</h3>
+                        <p class="mb-0">Multiples</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h3>${data.nb_non_trouvees}</h3>
+                        <p class="mb-0">Non trouvées</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h3>${data.total_images}</h3>
+                        <p class="mb-0">Total</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    if (data.nb_trouvees > 0) {
+        html += `
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i> ${data.nb_trouvees} correspondance${data.nb_trouvees > 1 ? 's' : ''} trouvée${data.nb_trouvees > 1 ? 's' : ''} automatiquement!
+            </div>
+            <button class="btn btn-success btn-lg" onclick="lancerTranscription('${modele}')">
+                <i class="fas fa-play-circle"></i> Lancer la transcription (${data.nb_trouvees} images)
+            </button>
+        `;
+    }
+
+    if (data.nb_multiples > 0 || data.nb_non_trouvees > 0) {
+        html += `
+            <div class="alert alert-warning mt-3">
+                <i class="fas fa-exclamation-triangle"></i>
+                ${data.nb_multiples + data.nb_non_trouvees} image${(data.nb_multiples + data.nb_non_trouvees) > 1 ? 's' : ''}
+                nécessite${(data.nb_multiples + data.nb_non_trouvees) > 1 ? 'nt' : ''} une vérification manuelle.
+            </div>
+        `;
+    }
+
+    content.innerHTML = html;
+    window.correspondancesData = data;
+}
+
+function lancerTranscription(modele) {
+    alert('Fonctionnalité de transcription batch en cours de développement. Modèle sélectionné: ' + modele);
+}
+</script>
+{% endblock %}

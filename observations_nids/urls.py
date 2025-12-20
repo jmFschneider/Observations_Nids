@@ -34,6 +34,9 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # type: ignore
 
+# App pilot - Expérimentation OCR (branche temporaire)
+urlpatterns += [path('pilot/', include('pilot.urls'))]
+
 if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
 

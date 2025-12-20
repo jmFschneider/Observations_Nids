@@ -1,8 +1,9 @@
 # 🧪 App Pilot - Expérimentation OCR
 
-⚠️ **ATTENTION: Cette app est destinée UNIQUEMENT au pilote/développement**
+⚠️ **App temporaire dans la branche `feature/optimisation-ocr-batch`**
 
-Cette app ne doit **JAMAIS être déployée en production**.
+Cette app permet d'évaluer différents modèles OCR sur les images de fiches.
+Elle sera supprimée une fois les tests terminés.
 
 ## 📋 Objectif
 
@@ -85,46 +86,13 @@ Accès: `/admin/pilot/transcriptionocr/`
 - Actions groupées (marquer comme évaluée/non évaluée)
 - Vue détaillée avec tous les champs
 
-## 🚀 Déploiement en production
+## 🗑️ Suppression après tests
 
-### ⚠️ ÉTAPES CRITIQUES
+Une fois les tests d'évaluation OCR terminés:
 
-Avant de déployer en production, **RETIRER** cette app:
-
-### 1. Modifier `settings.py`
-
-```python
-INSTALLED_APPS = [
-    # ... autres apps ...
-    # 'pilot.apps.PilotConfig',  # ⚠️ COMMENTÉ pour la production
-]
-```
-
-### 2. Vérifier l'exclusion
-
-```bash
-python manage.py check
-# Ne doit PAS afficher d'erreur liée à pilot
-```
-
-### 3. Ne PAS migrer en production
-
-Les migrations de `pilot/` ne doivent **JAMAIS** être exécutées en production.
-
-```bash
-# En production, ne jamais faire:
-python manage.py migrate pilot  # ❌ À NE PAS FAIRE
-```
-
-### 4. Vérifier les imports
-
-Assurez-vous qu'aucun code de production n'importe depuis `pilot`:
-
-```bash
-# Rechercher les imports
-grep -r "from pilot" observations/ core/ accounts/
-# Ne doit retourner aucun résultat
-```
+1. **Supprimer la branche** `feature/optimisation-ocr-batch`
+2. L'app `pilot` et toutes ses données seront supprimées automatiquement
+3. Conserver uniquement les conclusions de l'évaluation (quel modèle est le meilleur)
 
 ## 📈 Analyses et statistiques
 

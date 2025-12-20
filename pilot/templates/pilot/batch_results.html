@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Résultats du traitement batch - Optimisation OCR{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Styles pour la zone de log */
+.log-content {
+    height: 400px;
+    overflow-y: auto;
+    padding: 12px;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    border-radius: 0 0 4px 4px;
+}
+
+.log-entry {
+    padding: 4px 0 4px 8px;
+    border-left: 3px solid transparent;
+    margin-bottom: 2px;
+    transition: background-color 0.2s;
+}
+
+.log-entry:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.log-entry.log-info {
+    border-left-color: #007bff;
+    color: #d4d4d4;
+}
+
+.log-entry.log-success {
+    border-left-color: #28a745;
+    color: #90ee90;
+}
+
+.log-entry.log-warning {
+    border-left-color: #ffc107;
+    color: #ffd700;
+}
+
+.log-entry.log-error {
+    border-left-color: #dc3545;
+    color: #ff6b6b;
+    font-weight: 500;
+}
+
+.log-time {
+    color: #888;
+    margin-right: 8px;
+    font-size: 11px;
+}
+
+.log-icon {
+    margin-right: 6px;
+    font-size: 14px;
+}
+
+.log-message {
+    word-wrap: break-word;
+}
+
+/* Scrollbar personnalisée pour la zone de log */
+.log-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.log-content::-webkit-scrollbar-track {
+    background: #2d2d2d;
+}
+
+.log-content::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+.log-content::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-microscope"></i> Optimisation OCR - Résultats du traitement batch</h2>
+
+    {% if no_results %}
+    <!-- Aucun résultat disponible -->
+    <div class="alert alert-warning mt-4">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Aucun résultat disponible.</strong>
+        <p class="mb-0">Veuillez lancer un traitement batch d'abord.</p>
+        <a href="{% url 'pilot:selection_repertoire_ocr' %}" class="btn btn-primary mt-2">
+            <i class="fas fa-arrow-left"></i> Retour à la sélection
+        </a>
+    </div>
+
+    {% else %}
+
+    <!-- Page de suivi de progression -->
+    <div id="tracking-section" style="display: none;">
+        <div class="card mt-4">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-spinner fa-spin fa-3x text-primary"></i>
+                </div>
+                <h4 id="progress-message">Traitement en cours...</h4>
+
+                <div class="progress mt-3" style="height: 30px;">
+                    <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated"
+                         role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        0%
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <p class="mb-1"><strong>Modèle:</strong> <span id="current-model" class="badge bg-dark">-</span></p>
+                    <p class="mb-1"><strong>Fichier en cours:</strong> <span id="current-file">-</span></p>
+                    <p class="mb-1"><strong>Répertoire:</strong> <span id="current-directory">-</span></p>
+                    <p class="mb-0"><strong>Progression:</strong> <span id="progress-info">0/0</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zone de log en temps réel -->
+        <div class="card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-file-alt"></i> Log du traitement</h5>
+                <div>
+                    <label class="mb-0 me-3">
+                        <input type="checkbox" id="auto-scroll" checked>
+                        Auto-scroll
+                    </label>
+                    <button id="clear-log" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-eraser"></i> Effacer
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div id="log-content" class="log-content">
+                    <!-- Les logs seront ajoutés ici dynamiquement -->
+                    <div class="log-entry log-info">
+                        <span class="log-time">[00:00:00]</span>
+                        <span class="log-icon">ℹ️</span>
+                        <span class="log-message">En attente du démarrage...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Résultats finaux -->
+    <div id="results-section" style="display: none;">
+        <!-- Statistiques globales -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0">{{ total_images }}</h3>
+                        <p class="mb-0">Images traitées</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0">{{ total_success }}</h3>
+                        <p class="mb-0">Succès</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0">{{ total_errors }}</h3>
+                        <p class="mb-0">Erreurs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0">{{ success_rate|floatformat:1 }}%</h3>
+                        <p class="mb-0">Taux de succès</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations de configuration -->
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Informations</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Modèles OCR:</strong> {{ modeles_ocr_display }}</p>
+                        <p><strong>Nombre de modèles:</strong> {{ total_models }}</p>
+                        <p><strong>Répertoires traités:</strong> {{ total_directories }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Durée totale:</strong> {{ duration|floatformat:2 }} secondes</p>
+                        <p><strong>Durée moyenne par image:</strong>
+                            {% if total_images > 0 %}
+                                {{ duration_per_image|floatformat:2 }} s
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Résultats par répertoire -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-folder-open"></i> Résultats par répertoire</h5>
+            </div>
+            <div class="card-body">
+                {% for dir_result in directory_results %}
+                <div class="mb-4">
+                    <h6>
+                        <i class="fas fa-folder text-warning"></i>
+                        <strong>{{ dir_result.directory }}</strong>
+                        <span class="badge bg-dark">{{ dir_result.modele_ocr }}</span>
+                        <span class="badge bg-secondary">{{ dir_result.type_fiche }}</span>
+                        <span class="badge bg-info">{{ dir_result.type_traitement }}</span>
+                        <span class="badge {% if dir_result.type_image == 'brute' %}bg-primary{% else %}bg-success{% endif %}">
+                            {{ dir_result.type_image }}
+                        </span>
+                    </h6>
+
+                    {% if dir_result.images %}
+                    <table class="table table-sm table-striped mt-2">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Statut</th>
+                                <th>Durée</th>
+                                <th>Fiche liée</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for img in dir_result.images %}
+                            <tr>
+                                <td>{{ img.filename }}</td>
+                                <td>
+                                    {% if img.status == 'success' %}
+                                        <span class="badge bg-success">Succès</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Erreur</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ img.duration|floatformat:2 }}s</td>
+                                <td>
+                                    {% if img.fiche_linked %}
+                                        <span class="badge bg-primary">Fiche #{{ img.fiche_linked }}</span>
+                                    {% else %}
+                                        <span class="text-muted">Non liée</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if img.status == 'success' %}
+                                        <a href="/media/{{ img.json_path }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-code"></i> JSON
+                                        </a>
+                                        {% if img.transcription_id %}
+                                        <a href="/admin/pilot/transcriptionocr/{{ img.transcription_id }}/change/"
+                                           target="_blank" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-eye"></i> Admin
+                                        </a>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-danger small">{{ img.error }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted mb-0">Aucune image traitée dans ce répertoire.</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-4 d-flex justify-content-between">
+            <a href="{% url 'pilot:selection_repertoire_ocr' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la sélection
+            </a>
+            <a href="/admin/pilot/transcriptionocr/" target="_blank" class="btn btn-primary">
+                <i class="fas fa-chart-bar"></i> Voir toutes les transcriptions
+            </a>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+
+{% if not no_results %}
+<script>
+// Vérifier si on est en mode "tracking"
+const urlParams = new URLSearchParams(window.location.search);
+const isTracking = urlParams.get('tracking') === 'true';
+
+if (isTracking) {
+    // Afficher la section de suivi
+    document.getElementById('tracking-section').style.display = 'block';
+
+    // Démarrer le polling de progression
+    let progressCheckInterval = setInterval(checkProgress, 2000);  // Vérifier toutes les 2 secondes
+    let displayedLogsCount = 0;  // Compteur de logs déjà affichés
+
+    // Fonction pour obtenir l'icône selon le niveau
+    function getIconForLevel(level) {
+        const icons = {
+            'info': 'ℹ️',
+            'success': '✓',
+            'warning': '⚠️',
+            'error': '❌',
+        };
+        return icons[level] || 'ℹ️';
+    }
+
+    // Fonction pour mettre à jour les logs
+    function updateLogs(logs) {
+        const logContent = document.getElementById('log-content');
+        const autoScroll = document.getElementById('auto-scroll').checked;
+
+        // Effacer le message d'attente initial si c'est le premier log
+        if (displayedLogsCount === 0 && logContent.children.length === 1) {
+            logContent.innerHTML = '';
+        }
+
+        // Ajouter uniquement les nouveaux logs (ceux qu'on n'a pas encore affichés)
+        const newLogs = logs.slice(displayedLogsCount);
+        newLogs.forEach(log => {
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${log.level}`;
+
+            const icon = getIconForLevel(log.level);
+            logEntry.innerHTML = `
+                <span class="log-time">[${log.timestamp}]</span>
+                <span class="log-icon">${icon}</span>
+                <span class="log-message">${escapeHtml(log.message)}</span>
+            `;
+
+            logContent.appendChild(logEntry);
+        });
+
+        // Mettre à jour le compteur
+        displayedLogsCount = logs.length;
+
+        // Auto-scroll vers le bas
+        if (autoScroll) {
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+    }
+
+    // Fonction pour échapper le HTML (sécurité)
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Gestionnaire pour le bouton "Effacer"
+    document.getElementById('clear-log').addEventListener('click', function() {
+        const logContent = document.getElementById('log-content');
+        logContent.innerHTML = '<div class="log-entry log-info"><span class="log-time">[00:00:00]</span><span class="log-icon">ℹ️</span><span class="log-message">Log effacé</span></div>';
+        displayedLogsCount = 0;
+    });
+
+    function checkProgress() {
+        fetch('{% url "pilot:check_batch_progress" %}')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Progress data:', data);
+
+                // Mettre à jour la barre de progression
+                const percent = data.percent || 0;
+                const progressBar = document.getElementById('progress-bar');
+                progressBar.style.width = percent + '%';
+                progressBar.textContent = percent + '%';
+                progressBar.setAttribute('aria-valuenow', percent);
+
+                // Mettre à jour le message
+                document.getElementById('progress-message').textContent = data.message || 'Traitement en cours...';
+
+                // Mettre à jour les infos de progression
+                if (data.current_model) {
+                    document.getElementById('current-model').textContent = data.current_model;
+                }
+                if (data.current_file) {
+                    document.getElementById('current-file').textContent = data.current_file;
+                }
+                if (data.current_directory) {
+                    document.getElementById('current-directory').textContent = data.current_directory;
+                }
+                if (data.processed !== undefined && data.total !== undefined) {
+                    document.getElementById('progress-info').textContent = data.processed + '/' + data.total;
+                }
+
+                // Mettre à jour les logs en temps réel
+                if (data.logs && data.logs.length > 0) {
+                    updateLogs(data.logs);
+                }
+
+                // Vérifier si terminé
+                if (data.status === 'SUCCESS' || data.force_redirect) {
+                    clearInterval(progressCheckInterval);
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        window.location.href = '{% url "pilot:batch_results" %}';
+                    }
+                } else if (data.status === 'FAILURE') {
+                    clearInterval(progressCheckInterval);
+                    document.getElementById('progress-message').innerHTML =
+                        '<span class="text-danger">Erreur: ' + (data.error || 'Erreur inconnue') + '</span>';
+                    progressBar.classList.remove('progress-bar-animated');
+                    progressBar.classList.add('bg-danger');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la vérification de la progression:', error);
+            });
+    }
+
+    // Première vérification immédiate
+    checkProgress();
+} else {
+    // Afficher les résultats
+    document.getElementById('results-section').style.display = 'block';
+}
+</script>
+{% endif %}
+
+{% endblock %}

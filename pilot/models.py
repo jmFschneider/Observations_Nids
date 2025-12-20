@@ -29,6 +29,8 @@ class TranscriptionOCR(models.Model):
         related_name="transcriptions_ocr_pilot",
         verbose_name="Fiche de référence",
         help_text="Fiche d'observation corrigée manuellement (vérité terrain)",
+        null=True,
+        blank=True,
     )
 
     # ========================================
