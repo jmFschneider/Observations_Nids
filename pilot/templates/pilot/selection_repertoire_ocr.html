@@ -429,7 +429,68 @@ function afficherResultats(data, modele) {
 }
 
 function lancerTranscription(modele) {
-    alert('Fonctionnalité de transcription batch en cours de développement. Modèle sélectionné: ' + modele);
+    if (!window.correspondancesData) {
+        alert('Erreur: aucune donnée d\'analyse disponible');
+        return;
+    }
+
+    const data = window.correspondancesData;
+
+    // Construire la liste des répertoires depuis les données d'analyse
+    const directories = [];
+    if (data.directories_data) {
+        for (const [path, dirData] of Object.entries(data.directories_data)) {
+            if (dirData.images && dirData.images.length > 0) {
+                directories.push({
+                    path: path,
+                    name: dirData.name || path.split('/').pop()
+                });
+            }
+        }
+    }
+
+    if (directories.length === 0) {
+        alert('Aucun répertoire avec des images à traiter');
+        return;
+    }
+
+    // Préparer les données pour le POST
+    const formData = new FormData();
+    formData.append('directories', JSON.stringify(directories));
+    formData.append('modeles_ocr', JSON.stringify([modele]));
+    formData.append('importer_en_base', 'false');  // Pour l'instant, on n'importe pas en base
+
+    // Désactiver le bouton et afficher un loader
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Lancement en cours...';
+
+    // Lancer la tâche batch
+    fetch('{% url "pilot:lancer_transcription_batch" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Rediriger vers la page de résultats avec tracking
+            window.location.href = '{% url "pilot:batch_results" %}?tracking=true&task_id=' + data.task_id;
+        } else {
+            alert('Erreur: ' + (data.error || 'Erreur inconnue'));
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-play-circle"></i> Lancer la transcription';
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Erreur lors du lancement du traitement batch');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-play-circle"></i> Lancer la transcription';
+    });
 }
 </script>
 {% endblock %}
