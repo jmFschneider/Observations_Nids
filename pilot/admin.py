@@ -104,6 +104,7 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
         ),
     ]
 
+    @admin.display(description='Fiche')
     def fiche_numero(self, obj):
         """Affiche le numéro de fiche avec lien"""
         return format_html(
@@ -112,8 +113,7 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
             obj.fiche.num_fiche,
         )
 
-    fiche_numero.short_description = 'Fiche'
-
+    @admin.display(description='Modèle')
     def modele_ocr_badge(self, obj):
         """Affiche le modèle OCR avec un badge coloré"""
         colors = {
@@ -130,8 +130,7 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
             obj.get_modele_ocr_display(),
         )
 
-    modele_ocr_badge.short_description = 'Modèle'
-
+    @admin.display(description='Image')
     def type_image_badge(self, obj):
         """Affiche le type d'image avec un badge"""
         colors = {'brute': '#ffc107', 'optimisee': '#28a745'}
@@ -143,8 +142,7 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
             obj.get_type_image_display(),
         )
 
-    type_image_badge.short_description = 'Image'
-
+    @admin.display(description='Statut')
     def statut_evaluation_badge(self, obj):
         """Affiche le statut d'évaluation avec un badge"""
         colors = {
@@ -161,8 +159,7 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
             obj.get_statut_evaluation_display(),
         )
 
-    statut_evaluation_badge.short_description = 'Statut'
-
+    @admin.display(description='Score', ordering='score_global')
     def score_global_colored(self, obj):
         """Affiche le score global avec une couleur selon la qualité"""
         if obj.score_global is None:
@@ -181,9 +178,7 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
             '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, obj.score_global
         )
 
-    score_global_colored.short_description = 'Score'
-    score_global_colored.admin_order_field = 'score_global'
-
+    @admin.display(description='Taux de précision')
     def taux_precision_display(self, obj):
         """Affiche le taux de précision calculé"""
         taux = obj.taux_precision
@@ -191,8 +186,7 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
             return '-'
         return f'{taux:.1f}%'
 
-    taux_precision_display.short_description = 'Taux de précision'
-
+    @admin.display(description='Erreurs totales')
     def nombre_erreurs_total_display(self, obj):
         """Affiche le nombre total d'erreurs"""
         total = obj.nombre_erreurs_total
@@ -200,21 +194,17 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
             return format_html('<span style="color: #28a745;">✓ Aucune</span>')
         return format_html('<span style="color: #dc3545;">✗ {}</span>', total)
 
-    nombre_erreurs_total_display.short_description = 'Erreurs totales'
-
     # Actions personnalisées
     actions = ['marquer_comme_evaluee', 'marquer_comme_non_evaluee']
 
+    @admin.action(description='Marquer comme évaluée')
     def marquer_comme_evaluee(self, request, queryset):
         """Marque les transcriptions sélectionnées comme évaluées"""
         updated = queryset.update(statut_evaluation='evaluee')
         self.message_user(request, f'{updated} transcription(s) marquée(s) comme évaluée(s).')
 
-    marquer_comme_evaluee.short_description = 'Marquer comme évaluée'
-
+    @admin.action(description='Marquer comme non évaluée')
     def marquer_comme_non_evaluee(self, request, queryset):
         """Marque les transcriptions sélectionnées comme non évaluées"""
         updated = queryset.update(statut_evaluation='non_evaluee')
         self.message_user(request, f'{updated} transcription(s) marquée(s) comme non évaluée(s).')
-
-    marquer_comme_non_evaluee.short_description = 'Marquer comme non évaluée'

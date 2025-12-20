@@ -938,11 +938,11 @@ def process_batch_transcription_task(
 
                         logger.info(
                             f"TranscriptionOCR créée (ID: {transcription_ocr.id}) pour {img_file}"
-                            + (f" - Liée à fiche {fiche.id}" if fiche else " - Aucune fiche liée")
+                            + (f" - Liée à fiche {fiche.pk}" if fiche else " - Aucune fiche liée")
                         )
 
                         # Log de création de TranscriptionOCR
-                        fiche_info = f" (liée à fiche {fiche.id})" if fiche else " (sans fiche)"
+                        fiche_info = f" (liée à fiche {fiche.pk})" if fiche else " (sans fiche)"
                         _log_progress(
                             self,
                             f"✓ TranscriptionOCR créée (ID: {transcription_ocr.id}){fiche_info}",
@@ -955,7 +955,7 @@ def process_batch_transcription_task(
                             'json_path': json_path_relatif,
                             'duration': duration,
                             'transcription_id': transcription_ocr.id,
-                            'fiche_linked': fiche.id if fiche else None,
+                            'fiche_linked': fiche.pk if fiche else None,
                         }
                         total_success += 1
                     else:
