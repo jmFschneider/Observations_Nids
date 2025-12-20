@@ -5,7 +5,6 @@ Ces tâches seront supprimées avec l'app une fois les tests terminés.
 """
 
 import copy
-import datetime
 import json
 import logging
 import os
@@ -17,25 +16,12 @@ import google.generativeai as genai
 from celery import shared_task
 from celery.result import AsyncResult
 from django.conf import settings
-from django.db import transaction
 from django.utils import timezone
-from django.utils.crypto import get_random_string
 from PIL import Image
 
-from accounts.models import Utilisateur
-from geo.utils.geocoding import get_geocodeur
 from observations.json_rep.json_sanitizer import corriger_json, validate_json_structure
-from observations.models import (
-    CausesEchec,
-    FicheObservation,
-    Localisation,
-    Nid,
-    Observation,
-    Remarque,
-    ResumeObservation,
-)
+from observations.models import FicheObservation
 from pilot.models import TranscriptionOCR
-from taxonomy.models import Espece
 
 logger = logging.getLogger('pilot')
 
@@ -320,249 +306,6 @@ def _charger_prompt_selon_type_fiche(chemin_relatif: str) -> str:
         raise ValueError(f"Prompt {prompt_filename} non trouvé dans observations/json_rep/") from e
 
 
-def _importer_fiche_depuis_json(
-    json_data: dict, chemin_json_relatif: str, chemin_image_relatif: str, annee: int
-) -> FicheObservation | None:
-    """
-    Importe une fiche d'observation depuis un JSON (version simplifiée pour pilot).
-
-    Cette fonction est une version allégée de ImportationService.finaliser_importation,
-    adaptée pour l'app pilot.
-
-    Args:
-        json_data: Données JSON de la transcription
-        chemin_json_relatif: Chemin relatif du fichier JSON
-        chemin_image_relatif: Chemin relatif de l'image source
-        annee: Année de l'observation
-
-    Returns:
-        FicheObservation créée ou None en cas d'erreur
-    """
-    try:
-        with transaction.atomic():
-            # Extraire l'espèce
-            nom_espece = json_data.get('informations_generales', {}).get('espece')
-            if not nom_espece:
-                logger.error("Espèce manquante dans le JSON")
-                return None
-
-            espece = Espece.objects.filter(nom__iexact=nom_espece, valide_par_admin=True).first()
-            if not espece:
-                logger.warning(f"Espèce '{nom_espece}' non trouvée en base, création ignorée")
-                return None
-
-            # Extraire l'observateur
-            nom_observateur = json_data.get('informations_generales', {}).get(
-                'observateur', 'Inconnu'
-            )
-
-            # Créer ou récupérer l'utilisateur (logique simplifiée)
-            parts = nom_observateur.strip().split()
-            if len(parts) >= 2:
-                prenom, nom = parts[0], ' '.join(parts[1:])
-            else:
-                prenom = nom = parts[0] if parts else 'Inconnu'
-
-            utilisateur = Utilisateur.objects.filter(
-                first_name__iexact=prenom, last_name__iexact=nom, est_transcription=True
-            ).first()
-
-            if not utilisateur:
-                # Créer un nouvel utilisateur transcription
-                base_username = f"{prenom.lower()}.{nom.lower()}"
-                username = base_username
-                counter = 1
-                while Utilisateur.objects.filter(username=username).exists():
-                    username = f"{base_username}{counter}"
-                    counter += 1
-
-                utilisateur = Utilisateur.objects.create(
-                    username=username,
-                    email=f"{username}@transcription.trans",
-                    first_name=prenom,
-                    last_name=nom,
-                    est_transcription=True,
-                    est_valide=True,
-                    role='observateur',
-                )
-                utilisateur.set_password(get_random_string(12))
-                utilisateur.save()
-                logger.info(f"Utilisateur créé: {utilisateur}")
-
-            # Créer la fiche d'observation
-            fiche = FicheObservation.objects.create(
-                observateur=utilisateur,
-                espece=espece,
-                annee=annee,
-                chemin_image=chemin_image_relatif,
-                chemin_json=chemin_json_relatif,
-                transcription=True,
-            )
-
-            logger.info(f"Fiche d'observation #{fiche.num_fiche} créée")
-
-            # Géocodeur pour la localisation
-            geocodeur = get_geocodeur()
-
-            # Mettre à jour la localisation
-            if 'localisation' in json_data:
-                loc_data = json_data['localisation']
-                localisation = Localisation.objects.get(fiche=fiche)
-
-                nom_commune = (
-                    loc_data.get('commune') or loc_data.get('IGN_50000') or 'Non spécifiée'
-                )
-                departement = loc_data.get('dep_t') or '00'
-
-                # Géocoder si possible
-                if nom_commune != 'Non spécifiée':
-                    try:
-                        resultat_geo = geocodeur.geocoder_commune(nom_commune, departement)
-                        if resultat_geo:
-                            localisation.commune = resultat_geo.get(
-                                'adresse_complete', nom_commune
-                            ).split(',')[0]
-                            localisation.latitude = str(resultat_geo['lat'])
-                            localisation.longitude = str(resultat_geo['lon'])
-                            localisation.coordonnees = resultat_geo['coordonnees_gps']
-                            localisation.source_coordonnees = resultat_geo['source']
-                            localisation.precision_gps = resultat_geo.get('precision_metres', 5000)
-                            if 'code_insee' in resultat_geo:
-                                localisation.code_insee = resultat_geo['code_insee']
-                            if 'altitude' in resultat_geo and resultat_geo['altitude']:
-                                localisation.altitude = resultat_geo['altitude']
-                    except Exception as e:
-                        localisation.commune = nom_commune
-                        logger.warning(f"Erreur géocodage pour '{nom_commune}': {e}")
-                else:
-                    localisation.commune = nom_commune
-
-                localisation.lieu_dit = (
-                    loc_data.get('coordonnees_et_ou_lieu_dit') or 'Non spécifiée'
-                )
-                localisation.departement = departement
-                localisation.paysage = loc_data.get('paysage') or 'Non spécifié'
-                localisation.alentours = loc_data.get('alentours') or 'Non spécifié'
-
-                if not hasattr(localisation, 'altitude') or localisation.altitude == 0:
-                    alt = loc_data.get('altitude')
-                    if alt:
-                        try:
-                            localisation.altitude = int(alt)
-                        except (ValueError, TypeError):
-                            localisation.altitude = 0
-
-                localisation.save()
-
-            # Mettre à jour le nid
-            if 'nid' in json_data:
-                nid_data = json_data['nid']
-                nid = Nid.objects.get(fiche=fiche)
-
-                def safe_float_to_int(val):
-                    try:
-                        return int(float(str(val).replace(',', '.')))
-                    except Exception:
-                        return 0
-
-                nid.nid_prec_t_meme_couple = bool(nid_data.get('nid_prec_t_meme_c_ple'))
-                nid.hauteur_nid = safe_float_to_int(nid_data.get('haut_nid'))
-                nid.hauteur_couvert = safe_float_to_int(nid_data.get('h_c_vert'))
-                nid.details_nid = nid_data.get('nid') or 'Aucun détail'
-                nid.save()
-
-            # Créer les observations
-            if 'tableau_donnees' in json_data and isinstance(json_data['tableau_donnees'], list):
-                for obs in json_data['tableau_donnees']:
-                    try:
-                        jour = int(obs.get('Jour') or 1)
-                        mois = int(obs.get('Mois') or 1)
-                        heure = int(str(obs.get('Heure') or 12).replace('e', ''))
-                        date_obs = timezone.make_aware(
-                            datetime.datetime(annee, mois, jour, heure, 0)
-                        )
-
-                        Observation.objects.create(
-                            fiche=fiche,
-                            date_observation=date_obs,
-                            nombre_oeufs=int(obs.get('Nombre_oeuf') or 0),
-                            nombre_poussins=int(obs.get('Nombre_pou') or 0),
-                            observations=obs.get('observations') or '',
-                        )
-                    except Exception as e:
-                        logger.warning(f"Observation ignorée (fiche {fiche.num_fiche}): {e}")
-
-            # Mettre à jour le résumé
-            if 'tableau_donnees_2' in json_data:
-                resume_data = json_data['tableau_donnees_2']
-                resume = ResumeObservation.objects.get(fiche=fiche)
-
-                def safe_int(value):
-                    try:
-                        return int(value)
-                    except Exception:
-                        return 0
-
-                nombre_oeufs_pondus = (
-                    safe_int(resume_data.get('nombre_oeufs', {}).get('pondus')) or 0
-                )
-                nombre_oeufs_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('eclos')) or 0
-                nombre_oeufs_non_eclos = (
-                    safe_int(resume_data.get('nombre_oeufs', {}).get('n_ecl')) or 0
-                )
-                nombre_poussins = safe_int(resume_data.get('nombre_poussins', {}).get('vol_t')) or 0
-
-                # Corrections automatiques pour cohérence
-                nombre_oeufs_eclos = max(nombre_oeufs_eclos, nombre_poussins)
-                if nombre_oeufs_eclos > nombre_oeufs_pondus:
-                    nombre_oeufs_pondus = nombre_oeufs_eclos + nombre_oeufs_non_eclos
-
-                resume.premier_oeuf_pondu_jour = safe_int(
-                    resume_data.get('1er_o_pondu', {}).get('jour')
-                )
-                resume.premier_oeuf_pondu_mois = safe_int(
-                    resume_data.get('1er_o_pondu', {}).get('Mois')
-                )
-                resume.premier_poussin_eclos_jour = safe_int(
-                    resume_data.get('1er_p_eclos', {}).get('jour')
-                )
-                resume.premier_poussin_eclos_mois = safe_int(
-                    resume_data.get('1er_p_eclos', {}).get('Mois')
-                )
-                resume.premier_poussin_volant_jour = safe_int(
-                    resume_data.get('1er_p_volant', {}).get('jour')
-                )
-                resume.premier_poussin_volant_mois = safe_int(
-                    resume_data.get('1er_p_volant', {}).get('Mois')
-                )
-                resume.nombre_oeufs_pondus = nombre_oeufs_pondus
-                resume.nombre_oeufs_eclos = nombre_oeufs_eclos
-                resume.nombre_oeufs_non_eclos = nombre_oeufs_non_eclos
-                resume.nombre_poussins = nombre_poussins
-                resume.save()
-
-            # Mettre à jour les causes d'échec
-            if 'causes_echec' in json_data:
-                causes_echec = CausesEchec.objects.get(fiche=fiche)
-                causes_echec.description = json_data['causes_echec'].get('causes_d_echec') or ''
-                causes_echec.save()
-
-            # Ajouter une remarque si elle existe
-            if 'remarque' in json_data and json_data['remarque']:
-                Remarque.objects.create(fiche=fiche, remarque=json_data['remarque'])
-
-            # Mettre l'état de correction à "En cours de correction"
-            etat_correction = fiche.etat_correction
-            etat_correction.statut = 'en_cours'
-            etat_correction.save()
-
-            return fiche
-
-    except Exception as e:
-        logger.error(f"Erreur lors de l'importation de la fiche: {e}", exc_info=True)
-        return None
-
-
 def _log_progress(task_self, message, level='info', details=None):
     """
     Ajoute un message au log de progression visible en temps réel.
@@ -612,22 +355,22 @@ def _log_progress(task_self, message, level='info', details=None):
 
 @shared_task(bind=True, name='pilot.process_batch_transcription')
 def process_batch_transcription_task(
-    self, directories: list[dict], modeles_ocr: list[str], importer_en_base: bool = False
+    self, directories: list[dict], modeles_ocr: list[str]
 ):
     """
     Tâche Celery pour traiter plusieurs répertoires en batch avec plusieurs modèles OCR.
 
-    Cette tâche est spécifique à l'app pilot pour l'optimisation OCR.
+    Cette tâche est spécifique à l'app pilot pour l'évaluation OCR.
     Elle traite chaque répertoire avec chaque modèle sélectionné (exécution séquentielle),
     génère les transcriptions JSON, et crée automatiquement les entrées TranscriptionOCR
     pour comparaison avec la vérité terrain.
 
+    **Mode pilote uniquement** : Cette tâche génère les fichiers JSON pour évaluation.
+    L'importation en base de données se fait depuis l'app observations.
+
     Args:
         directories: Liste de dictionnaires avec 'path' (chemin relatif) et 'name' (nom du répertoire)
-        modeles_ocr: Liste des noms de modèles OCR à utiliser (ex: ["gemini_2_flash", "gemini_1.5_pro"])
-        importer_en_base: Si True, importe les fiches en base de données (FicheObservation).
-                          Si False, crée uniquement les JSON et TranscriptionOCR (défaut: False).
-                          Cocher uniquement pour la première importation de FUSION_FULL (référence).
+        modeles_ocr: Liste des noms de modèles OCR à utiliser (ex: ["gemini_3_flash", "gemini_3_pro"])
 
     Returns:
         dict: Résultats globaux du traitement batch
@@ -900,32 +643,11 @@ def process_batch_transcription_task(
                         duration = round(time.time() - file_start, 2)
                         logger.info(f"Transcription réussie pour {img_file}, durée: {duration}s")
 
-                        # Importer en base si demandé
-                        fiche_importee = None
-                        if importer_en_base:
-                            # Extraire l'année du JSON
-                            annee = timezone.now().year
-                            if 'informations_generales' in json_data:
-                                annee_str = json_data['informations_generales'].get('annee')
-                                if annee_str and str(annee_str).isdigit():
-                                    annee = int(annee_str)
-
-                            fiche_importee = _importer_fiche_depuis_json(
-                                json_data, json_path_relatif, img_path_relatif, annee
-                            )
-
-                            if fiche_importee:
-                                logger.info(
-                                    f"Fiche #{fiche_importee.num_fiche} importée en base depuis {img_file}"
-                                )
-                            else:
-                                logger.warning(f"Échec de l'importation en base pour {img_file}")
-
-                        # Créer l'entrée TranscriptionOCR
+                        # Créer l'entrée TranscriptionOCR (mode pilote: JSON uniquement)
                         nom_base = _extraire_nom_base_fichier(img_path_relatif)
 
-                        # Utiliser la fiche importée si disponible, sinon chercher une correspondance
-                        fiche = fiche_importee or _trouver_fiche_correspondante(nom_base)
+                        # Chercher une fiche correspondante pour la lier (utile pour l'évaluation)
+                        fiche = _trouver_fiche_correspondante(nom_base)
 
                         transcription_ocr = TranscriptionOCR.objects.create(
                             fiche=fiche,  # Peut être None si pas de correspondance

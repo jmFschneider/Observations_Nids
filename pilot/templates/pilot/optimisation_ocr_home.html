@@ -80,24 +80,13 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                            <i class="fas fa-info-circle"></i> Options
-                        </label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="importer_en_base" checked>
-                            <label class="form-check-label" for="importer_en_base">
-                                <strong>Importer les fiches en base de données</strong>
-                            </label>
-                            <div class="form-text">
-                                Cocher pour créer les FicheObservation en base (première fois sur FUSION_FULL).
-                                Décocher si les fiches existent déjà (réexécution ou tests sur autres répertoires).
-                            </div>
-                        </div>
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" id="analyse_avant">
-                            <label class="form-check-label" for="analyse_avant">
-                                Analyser les correspondances avant de lancer
-                            </label>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> <strong>Mode pilote</strong>
+                            <p class="mb-0 mt-2">
+                                Cette interface génère uniquement les fichiers JSON pour l'évaluation OCR.
+                                L'importation des fiches en base se fait depuis le menu
+                                <strong>Transcription</strong> de l'application principale.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -184,9 +173,6 @@ document.getElementById('batch-config-form').addEventListener('submit', function
         selectedModels.push(cb.value);
     });
 
-    const importerEnBase = document.getElementById('importer_en_base').checked;
-    const analyseAvant = document.getElementById('analyse_avant').checked;
-
     // Validation
     if (selectedModels.length === 0) {
         alert('Veuillez sélectionner au moins un modèle OCR');
@@ -195,43 +181,11 @@ document.getElementById('batch-config-form').addEventListener('submit', function
 
     const selectedDirs = JSON.parse(sessionStorage.getItem('selectedDirectories'));
 
-    if (analyseAvant) {
-        // Analyser les correspondances avant de lancer
-        analyserCorrespondancesBatch(selectedDirs, selectedModels, importerEnBase);
-    } else {
-        // Lancer directement
-        lancerTranscriptionBatch(selectedDirs, selectedModels, importerEnBase);
-    }
+    // Lancer la transcription (génération JSON uniquement)
+    lancerTranscriptionBatch(selectedDirs, selectedModels);
 });
 
-function analyserCorrespondancesBatch(directories, modeles, importerEnBase) {
-    const analyseResults = document.getElementById('analyse-results');
-    const analyseContent = document.getElementById('analyse-content');
-
-    analyseResults.style.display = 'block';
-    analyseContent.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Analyse en cours...</p></div>';
-
-    // Afficher un récapitulatif
-    let html = '<h6>Analyse des répertoires:</h6><ul>';
-
-    directories.forEach(dir => {
-        html += `<li><strong>${dir.name}</strong> - Analyse en cours...</li>`;
-    });
-
-    html += '</ul>';
-    html += `<p><strong>Modèles:</strong> ${modeles.join(', ')}</p>`;
-    html += `
-        <div class="alert alert-info mt-3">
-            <i class="fas fa-info-circle"></i>
-            Cette fonctionnalité sera implémentée prochainement.
-            Pour l'instant, utilisez le flux normal de transcription.
-        </div>
-    `;
-
-    analyseContent.innerHTML = html;
-}
-
-function lancerTranscriptionBatch(directories, modeles, importerEnBase) {
+function lancerTranscriptionBatch(directories, modeles) {
     // Désactiver le bouton pendant le traitement
     const submitBtn = document.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
@@ -241,7 +195,6 @@ function lancerTranscriptionBatch(directories, modeles, importerEnBase) {
     const formData = new FormData();
     formData.append('directories', JSON.stringify(directories));
     formData.append('modeles_ocr', JSON.stringify(modeles));
-    formData.append('importer_en_base', importerEnBase ? 'true' : 'false');
     formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
 
     // Envoyer la requête

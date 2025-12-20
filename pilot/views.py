@@ -266,7 +266,6 @@ def lancer_transcription_batch(request):  # noqa: PLR0911
         # Récupérer les paramètres
         directories_json = request.POST.get('directories')
         modeles_ocr_json = request.POST.get('modeles_ocr')
-        importer_en_base = request.POST.get('importer_en_base', 'false').lower() == 'true'
 
         if not directories_json or not modeles_ocr_json:
             return JsonResponse(
@@ -296,12 +295,12 @@ def lancer_transcription_batch(request):  # noqa: PLR0911
             )
 
         logger.info(
-            f"Lancement transcription batch: {len(directories)} répertoire(s), "
-            f"{len(modeles_ocr)} modèle(s) ({', '.join(modeles_ocr)}), importer en base: {importer_en_base}"
+            f"[PILOT] Lancement transcription batch: {len(directories)} répertoire(s), "
+            f"{len(modeles_ocr)} modèle(s) ({', '.join(modeles_ocr)}) - Mode évaluation (JSON uniquement)"
         )
 
-        # Lancer la tâche Celery
-        task = process_batch_transcription_task.delay(directories, modeles_ocr, importer_en_base)
+        # Lancer la tâche Celery (mode pilote : génération JSON uniquement)
+        task = process_batch_transcription_task.delay(directories, modeles_ocr)
         task_id = task.id
 
         # Stocker l'ID de tâche en session pour le suivi
@@ -309,7 +308,6 @@ def lancer_transcription_batch(request):  # noqa: PLR0911
         request.session['pilot_batch_config'] = {
             'directories': directories,
             'modeles_ocr': modeles_ocr,
-            'importer_en_base': importer_en_base,
             'start_time': timezone.now().isoformat(),
         }
 

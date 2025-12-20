@@ -458,7 +458,6 @@ function lancerTranscription(modele) {
     const formData = new FormData();
     formData.append('directories', JSON.stringify(directories));
     formData.append('modeles_ocr', JSON.stringify([modele]));
-    formData.append('importer_en_base', 'false');  // Pour l'instant, on n'importe pas en base
 
     // Désactiver le bouton et afficher un loader
     const btn = event.target;
