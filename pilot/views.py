@@ -400,15 +400,24 @@ def batch_results(request):
     """
     Affiche les résultats du traitement batch
     """
+    # Vérifier si on est en mode tracking (suivi en temps réel)
+    is_tracking = request.GET.get('tracking') == 'true'
+
     # Récupérer les résultats stockés en session
     results = request.session.get('pilot_batch_results', {})
     config = request.session.get('pilot_batch_config', {})
 
-    if not results:
+    # Si pas de résultats ET qu'on n'est pas en mode tracking, afficher un message d'erreur
+    if not results and not is_tracking:
         messages.warning(
             request, "Aucun résultat disponible. Veuillez lancer un traitement batch d'abord."
         )
         return render(request, 'pilot/batch_results.html', {'no_results': True})
+
+    # Si on est en mode tracking mais pas encore de résultats, afficher le template sans no_results
+    # Le JavaScript va gérer le polling
+    if is_tracking and not results:
+        return render(request, 'pilot/batch_results.html', {'no_results': False})
 
     # Enrichir le contexte
     modeles_ocr = results.get('modeles_ocr', config.get('modeles_ocr', []))
