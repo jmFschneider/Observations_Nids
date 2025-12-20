@@ -300,12 +300,13 @@ def _charger_prompt_selon_type_fiche(chemin_relatif: str) -> str:
     type_fiche, _ = _determiner_type_fiche_et_traitement(chemin_relatif)
 
     # Déterminer quel prompt utiliser (insensible à la casse)
-    if 'ancien' in type_fiche.lower():
+    # Recherche "ancien" n'importe où dans le chemin complet
+    if 'ancien' in chemin_relatif.lower():
         prompt_filename = 'prompt_gemini_transcription_Ancienne_Fiche.txt'
-        logger.info(f"📄 Prompt ANCIENNES FICHES sélectionné pour: {type_fiche}")
+        logger.info(f"📄 Prompt ANCIENNES FICHES sélectionné pour: {chemin_relatif}")
     else:
         prompt_filename = 'prompt_gemini_transcription.txt'
-        logger.info(f"📄 Prompt STANDARD sélectionné pour: {type_fiche}")
+        logger.info(f"📄 Prompt STANDARD sélectionné pour: {chemin_relatif}")
 
     prompt_path = os.path.join(settings.BASE_DIR, 'observations', 'json_rep', prompt_filename)
 
@@ -635,10 +636,10 @@ def process_batch_transcription_task(
 
     # Mapper les noms de modèles vers les identifiants Gemini API
     modeles_mapping = {
-        'gemini_flash': 'gemini-1.5-flash',
-        'gemini_1.5_pro': 'gemini-1.5-pro',
-        'gemini_2_pro': 'gemini-2.0-pro',
-        'gemini_2_flash': 'gemini-2.0-flash',
+        'gemini_3_flash': 'gemini-3-flash-preview',
+        'gemini_3_pro': 'gemini-3-pro-preview',
+        'gemini_2.5_pro': 'gemini-2.5-pro',
+        'gemini_2.5_flash_lite': 'gemini-2.5-flash-lite',
     }
 
     logger.info(
@@ -700,7 +701,7 @@ def process_batch_transcription_task(
 
     # Traiter avec chaque modèle OCR
     for modele_index, modele_ocr in enumerate(modeles_ocr):
-        modele_api = modeles_mapping.get(modele_ocr, 'gemini-2.0-flash')
+        modele_api = modeles_mapping.get(modele_ocr, 'gemini-3-flash-preview')
 
         logger.info(
             f"═══ Traitement avec modèle {modele_index + 1}/{len(modeles_ocr)}: "

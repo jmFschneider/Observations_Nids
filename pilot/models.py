@@ -62,10 +62,10 @@ class TranscriptionOCR(models.Model):
     modele_ocr = models.CharField(
         max_length=50,
         choices=[
-            ('gemini_flash', 'Gemini Flash'),
-            ('gemini_1.5_pro', 'Gemini 1.5 Pro'),
-            ('gemini_2_pro', 'Gemini 2.0 Pro'),
-            ('gemini_2_flash', 'Gemini 2.0 Flash'),
+            ('gemini_3_flash', 'Gemini 3 Flash'),
+            ('gemini_3_pro', 'Gemini 3 Pro'),
+            ('gemini_2.5_pro', 'Gemini 2.5 Pro'),
+            ('gemini_2.5_flash_lite', 'Gemini 2.5 Flash-Lite'),
         ],
         verbose_name="Modèle OCR",
         help_text="Modèle d'IA utilisé pour la transcription",
