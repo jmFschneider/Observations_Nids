@@ -97,7 +97,7 @@ def selection_repertoire_ocr(request):
                     }
                 )
 
-        directories.sort(key=lambda x: x['name'].lower())
+        directories.sort(key=lambda x: str(x['name']).lower())
     except (OSError, PermissionError):
         directories = []
         messages.error(request, "Impossible d'accéder à ce répertoire")
@@ -195,20 +195,21 @@ def analyser_correspondances(request):
 
         if fiches.count() == 1:
             fiche = fiches.first()
-            correspondances.append(
-                {
-                    'image': image_filename,
-                    'statut': 'trouvee',
-                    'fiche_id': fiche.num_fiche,
-                    'fiche_info': {
-                        'numero': fiche.num_fiche,
-                        'espece': fiche.espece.nom if fiche.espece else 'Non spécifié',
-                        'annee': fiche.annee,
-                        'observateur': fiche.observateur.username,
-                        'chemin_image': fiche.chemin_image,
-                    },
-                }
-            )
+            if fiche:  # Type narrowing pour mypy
+                correspondances.append(
+                    {
+                        'image': image_filename,
+                        'statut': 'trouvee',
+                        'fiche_id': fiche.num_fiche,
+                        'fiche_info': {
+                            'numero': fiche.num_fiche,
+                            'espece': fiche.espece.nom if fiche.espece else 'Non spécifié',
+                            'annee': fiche.annee,
+                            'observateur': fiche.observateur.username,
+                            'chemin_image': fiche.chemin_image,
+                        },
+                    }
+                )
         elif fiches.count() > 1:
             correspondances.append(
                 {

@@ -34,7 +34,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
 django.setup()
 
-from django.conf import settings
+from django.conf import settings  # noqa: E402
 
 
 def tester_modeles_gemini():
@@ -79,7 +79,7 @@ def charger_prompt(type_prompt='standard'):
     prompt_path = Path(settings.BASE_DIR) / 'observations' / 'json_rep' / prompt_filename
 
     try:
-        with open(prompt_path, 'r', encoding='utf-8') as f:
+        with open(prompt_path, encoding='utf-8') as f:
             prompt_content = f.read()
         print(f"✓ Prompt chargé: {prompt_filename}")
         print(f"  Longueur: {len(prompt_content)} caractères")
@@ -93,7 +93,7 @@ def charger_prompt(type_prompt='standard'):
 def tester_transcription(image_path, model_name, prompt):
     """Teste la transcription d'une image avec un modèle spécifique."""
     print("\n" + "=" * 80)
-    print(f"🧪 TEST DE TRANSCRIPTION")
+    print("🧪 TEST DE TRANSCRIPTION")
     print("=" * 80)
     print(f"Image: {image_path}")
     print(f"Modèle: {model_name}")
@@ -155,7 +155,7 @@ def tester_transcription(image_path, model_name, prompt):
 
             if 'informations_generales' in json_data:
                 info_gen = json_data['informations_generales']
-                print(f"\n   Informations générales:")
+                print("\n   Informations générales:")
                 print(f"     - Espèce: {info_gen.get('espece', 'N/A')}")
                 print(f"     - Observateur: {info_gen.get('observateur', 'N/A')}")
                 print(f"     - Année: {info_gen.get('annee', 'N/A')}")
@@ -173,7 +173,7 @@ def tester_transcription(image_path, model_name, prompt):
 
     except Exception as e:
         print(f"\n❌ ERREUR: {e}")
-        import traceback
+        import traceback  # noqa: PLC0415
         traceback.print_exc()
         return None
 

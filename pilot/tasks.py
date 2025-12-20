@@ -55,7 +55,7 @@ def retry_with_backoff(max_retries=3, initial_delay=2, max_delay=16):
         @wraps(func)
         def wrapper(*args, **kwargs):
             delay = initial_delay
-            last_error = None
+            last_error: Exception | None = None
 
             for attempt in range(max_retries):
                 try:
@@ -74,6 +74,9 @@ def retry_with_backoff(max_retries=3, initial_delay=2, max_delay=16):
                             f"❌ Toutes les tentatives échouées pour {func.__name__} après {max_retries} essais"
                         )
 
+            # last_error ne peut pas être None ici car on sort de la boucle seulement après une exception
+            if last_error is None:
+                raise RuntimeError(f"{func.__name__} a échoué sans exception")
             raise last_error
 
         return wrapper
@@ -99,8 +102,8 @@ def call_gemini_api_with_timeout(model, prompt, image_path, timeout=120):
         TimeoutError: Si l'appel dépasse le timeout
         Exception: Autres erreurs API
     """
-    result = [None]
-    exception = [None]
+    result: list[str | None] = [None]
+    exception: list[Exception | None] = [None]
 
     def api_call():
         """Fonction interne pour l'appel API threadé"""
@@ -148,7 +151,7 @@ class RateLimiter:
         """
         self.requests_per_minute = requests_per_minute
         self.min_delay = 60.0 / requests_per_minute  # Délai minimum entre requêtes
-        self.last_request_time = 0
+        self.last_request_time = 0.0
 
     def wait_if_needed(self):
         """
