@@ -208,17 +208,13 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
     def marquer_comme_evaluee(self, request, queryset):
         """Marque les transcriptions sélectionnées comme évaluées"""
         updated = queryset.update(statut_evaluation='evaluee')
-        self.message_user(
-            request, f'{updated} transcription(s) marquée(s) comme évaluée(s).'
-        )
+        self.message_user(request, f'{updated} transcription(s) marquée(s) comme évaluée(s).')
 
     marquer_comme_evaluee.short_description = 'Marquer comme évaluée'
 
     def marquer_comme_non_evaluee(self, request, queryset):
         """Marque les transcriptions sélectionnées comme non évaluées"""
         updated = queryset.update(statut_evaluation='non_evaluee')
-        self.message_user(
-            request, f'{updated} transcription(s) marquée(s) comme non évaluée(s).'
-        )
+        self.message_user(request, f'{updated} transcription(s) marquée(s) comme non évaluée(s).')
 
     marquer_comme_non_evaluee.short_description = 'Marquer comme non évaluée'

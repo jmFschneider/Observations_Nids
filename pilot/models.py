@@ -183,10 +183,7 @@ class TranscriptionOCR(models.Model):
         ]
 
     def __str__(self):
-        return (
-            f"[PILOTE] OCR {self.modele_ocr} - {self.type_image} "
-            f"(Fiche #{self.fiche.num_fiche})"
-        )
+        return f"[PILOTE] OCR {self.modele_ocr} - {self.type_image} (Fiche #{self.fiche.num_fiche})"
 
     @property
     def taux_precision(self):

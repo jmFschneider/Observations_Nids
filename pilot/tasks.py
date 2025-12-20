@@ -3,7 +3,9 @@
 Tâches Celery spécifiques pour l'app pilot (optimisation OCR).
 Ces tâches seront supprimées avec l'app une fois les tests terminés.
 """
+
 import copy
+import datetime
 import json
 import logging
 import os
@@ -13,13 +15,27 @@ from functools import wraps
 
 import google.generativeai as genai
 from celery import shared_task
+from celery.result import AsyncResult
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from PIL import Image
 
+from accounts.models import Utilisateur
+from geo.utils.geocoding import get_geocodeur
 from observations.json_rep.json_sanitizer import corriger_json, validate_json_structure
-from observations.models import FicheObservation
+from observations.models import (
+    CausesEchec,
+    FicheObservation,
+    Localisation,
+    Nid,
+    Observation,
+    Remarque,
+    ResumeObservation,
+)
 from pilot.models import TranscriptionOCR
+from taxonomy.models import Espece
 
 logger = logging.getLogger('pilot')
 
@@ -27,6 +43,7 @@ logger = logging.getLogger('pilot')
 # ========================================
 # UTILITAIRES DE ROBUSTESSE API
 # ========================================
+
 
 def retry_with_backoff(max_retries=3, initial_delay=2, max_delay=16):
     """
@@ -47,6 +64,7 @@ def retry_with_backoff(max_retries=3, initial_delay=2, max_delay=16):
         def call_api():
             # Code qui peut échouer
     """
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -71,7 +89,9 @@ def retry_with_backoff(max_retries=3, initial_delay=2, max_delay=16):
                         )
 
             raise last_error
+
         return wrapper
+
     return decorator
 
 
@@ -181,7 +201,7 @@ def _extraire_nom_base_fichier(chemin_image: str) -> str:
     suffixes_a_retirer = ['_optimisee', '_brute', '_result', '_raw', '_traitement']
     for suffixe in suffixes_a_retirer:
         if nom_fichier.endswith(suffixe):
-            nom_fichier = nom_fichier[:-len(suffixe)]
+            nom_fichier = nom_fichier[: -len(suffixe)]
 
     return nom_fichier
 
@@ -287,9 +307,7 @@ def _charger_prompt_selon_type_fiche(chemin_relatif: str) -> str:
         prompt_filename = 'prompt_gemini_transcription.txt'
         logger.info(f"📄 Prompt STANDARD sélectionné pour: {type_fiche}")
 
-    prompt_path = os.path.join(
-        settings.BASE_DIR, 'observations', 'json_rep', prompt_filename
-    )
+    prompt_path = os.path.join(settings.BASE_DIR, 'observations', 'json_rep', prompt_filename)
 
     try:
         with open(prompt_path, encoding='utf-8') as f:
@@ -301,7 +319,9 @@ def _charger_prompt_selon_type_fiche(chemin_relatif: str) -> str:
         raise ValueError(f"Prompt {prompt_filename} non trouvé dans observations/json_rep/") from e
 
 
-def _importer_fiche_depuis_json(json_data: dict, chemin_json_relatif: str, chemin_image_relatif: str, annee: int) -> FicheObservation | None:
+def _importer_fiche_depuis_json(
+    json_data: dict, chemin_json_relatif: str, chemin_image_relatif: str, annee: int
+) -> FicheObservation | None:
     """
     Importe une fiche d'observation depuis un JSON (version simplifiée pour pilot).
 
@@ -317,13 +337,6 @@ def _importer_fiche_depuis_json(json_data: dict, chemin_json_relatif: str, chemi
     Returns:
         FicheObservation créée ou None en cas d'erreur
     """
-    from accounts.models import Utilisateur
-    from observations.models import FicheObservation, Localisation, Nid, CausesEchec, ResumeObservation, Observation, Remarque
-    from taxonomy.models import Espece
-    from geo.utils.geocoding import get_geocodeur
-    from django.db import transaction
-    import datetime
-
     try:
         with transaction.atomic():
             # Extraire l'espèce
@@ -338,7 +351,9 @@ def _importer_fiche_depuis_json(json_data: dict, chemin_json_relatif: str, chemi
                 return None
 
             # Extraire l'observateur
-            nom_observateur = json_data.get('informations_generales', {}).get('observateur', 'Inconnu')
+            nom_observateur = json_data.get('informations_generales', {}).get(
+                'observateur', 'Inconnu'
+            )
 
             # Créer ou récupérer l'utilisateur (logique simplifiée)
             parts = nom_observateur.strip().split()
@@ -348,14 +363,11 @@ def _importer_fiche_depuis_json(json_data: dict, chemin_json_relatif: str, chemi
                 prenom = nom = parts[0] if parts else 'Inconnu'
 
             utilisateur = Utilisateur.objects.filter(
-                first_name__iexact=prenom,
-                last_name__iexact=nom,
-                est_transcription=True
+                first_name__iexact=prenom, last_name__iexact=nom, est_transcription=True
             ).first()
 
             if not utilisateur:
                 # Créer un nouvel utilisateur transcription
-                from django.utils.crypto import get_random_string
                 base_username = f"{prenom.lower()}.{nom.lower()}"
                 username = base_username
                 counter = 1
@@ -396,7 +408,9 @@ def _importer_fiche_depuis_json(json_data: dict, chemin_json_relatif: str, chemi
                 loc_data = json_data['localisation']
                 localisation = Localisation.objects.get(fiche=fiche)
 
-                nom_commune = loc_data.get('commune') or loc_data.get('IGN_50000') or 'Non spécifiée'
+                nom_commune = (
+                    loc_data.get('commune') or loc_data.get('IGN_50000') or 'Non spécifiée'
+                )
                 departement = loc_data.get('dep_t') or '00'
 
                 # Géocoder si possible
@@ -404,7 +418,9 @@ def _importer_fiche_depuis_json(json_data: dict, chemin_json_relatif: str, chemi
                     try:
                         resultat_geo = geocodeur.geocoder_commune(nom_commune, departement)
                         if resultat_geo:
-                            localisation.commune = resultat_geo.get('adresse_complete', nom_commune).split(',')[0]
+                            localisation.commune = resultat_geo.get(
+                                'adresse_complete', nom_commune
+                            ).split(',')[0]
                             localisation.latitude = str(resultat_geo['lat'])
                             localisation.longitude = str(resultat_geo['lon'])
                             localisation.coordonnees = resultat_geo['coordonnees_gps']
@@ -420,7 +436,9 @@ def _importer_fiche_depuis_json(json_data: dict, chemin_json_relatif: str, chemi
                 else:
                     localisation.commune = nom_commune
 
-                localisation.lieu_dit = loc_data.get('coordonnees_et_ou_lieu_dit') or 'Non spécifiée'
+                localisation.lieu_dit = (
+                    loc_data.get('coordonnees_et_ou_lieu_dit') or 'Non spécifiée'
+                )
                 localisation.departement = departement
                 localisation.paysage = loc_data.get('paysage') or 'Non spécifié'
                 localisation.alentours = loc_data.get('alentours') or 'Non spécifié'
@@ -459,7 +477,9 @@ def _importer_fiche_depuis_json(json_data: dict, chemin_json_relatif: str, chemi
                         jour = int(obs.get('Jour') or 1)
                         mois = int(obs.get('Mois') or 1)
                         heure = int(str(obs.get('Heure') or 12).replace('e', ''))
-                        date_obs = timezone.make_aware(datetime.datetime(annee, mois, jour, heure, 0))
+                        date_obs = timezone.make_aware(
+                            datetime.datetime(annee, mois, jour, heure, 0)
+                        )
 
                         Observation.objects.create(
                             fiche=fiche,
@@ -482,23 +502,38 @@ def _importer_fiche_depuis_json(json_data: dict, chemin_json_relatif: str, chemi
                     except Exception:
                         return 0
 
-                nombre_oeufs_pondus = safe_int(resume_data.get('nombre_oeufs', {}).get('pondus')) or 0
+                nombre_oeufs_pondus = (
+                    safe_int(resume_data.get('nombre_oeufs', {}).get('pondus')) or 0
+                )
                 nombre_oeufs_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('eclos')) or 0
-                nombre_oeufs_non_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('n_ecl')) or 0
+                nombre_oeufs_non_eclos = (
+                    safe_int(resume_data.get('nombre_oeufs', {}).get('n_ecl')) or 0
+                )
                 nombre_poussins = safe_int(resume_data.get('nombre_poussins', {}).get('vol_t')) or 0
 
                 # Corrections automatiques pour cohérence
-                if nombre_poussins > nombre_oeufs_eclos:
-                    nombre_oeufs_eclos = nombre_poussins
+                nombre_oeufs_eclos = max(nombre_oeufs_eclos, nombre_poussins)
                 if nombre_oeufs_eclos > nombre_oeufs_pondus:
                     nombre_oeufs_pondus = nombre_oeufs_eclos + nombre_oeufs_non_eclos
 
-                resume.premier_oeuf_pondu_jour = safe_int(resume_data.get('1er_o_pondu', {}).get('jour'))
-                resume.premier_oeuf_pondu_mois = safe_int(resume_data.get('1er_o_pondu', {}).get('Mois'))
-                resume.premier_poussin_eclos_jour = safe_int(resume_data.get('1er_p_eclos', {}).get('jour'))
-                resume.premier_poussin_eclos_mois = safe_int(resume_data.get('1er_p_eclos', {}).get('Mois'))
-                resume.premier_poussin_volant_jour = safe_int(resume_data.get('1er_p_volant', {}).get('jour'))
-                resume.premier_poussin_volant_mois = safe_int(resume_data.get('1er_p_volant', {}).get('Mois'))
+                resume.premier_oeuf_pondu_jour = safe_int(
+                    resume_data.get('1er_o_pondu', {}).get('jour')
+                )
+                resume.premier_oeuf_pondu_mois = safe_int(
+                    resume_data.get('1er_o_pondu', {}).get('Mois')
+                )
+                resume.premier_poussin_eclos_jour = safe_int(
+                    resume_data.get('1er_p_eclos', {}).get('jour')
+                )
+                resume.premier_poussin_eclos_mois = safe_int(
+                    resume_data.get('1er_p_eclos', {}).get('Mois')
+                )
+                resume.premier_poussin_volant_jour = safe_int(
+                    resume_data.get('1er_p_volant', {}).get('jour')
+                )
+                resume.premier_poussin_volant_mois = safe_int(
+                    resume_data.get('1er_p_volant', {}).get('Mois')
+                )
                 resume.nombre_oeufs_pondus = nombre_oeufs_pondus
                 resume.nombre_oeufs_eclos = nombre_oeufs_eclos
                 resume.nombre_oeufs_non_eclos = nombre_oeufs_non_eclos
@@ -550,10 +585,9 @@ def _log_progress(task_self, message, level='info', details=None):
 
     # Récupérer la meta actuelle de la tâche via AsyncResult
     try:
-        from celery.result import AsyncResult
         result = AsyncResult(task_self.request.id)
         current_meta = result.info if result.info and isinstance(result.info, dict) else {}
-    except:
+    except Exception:
         current_meta = {}
 
     # Ajouter le nouveau log
@@ -568,10 +602,7 @@ def _log_progress(task_self, message, level='info', details=None):
     current_meta['logs'] = logs
 
     # Utiliser update_state pour mettre à jour Redis
-    task_self.update_state(
-        state='PROGRESS',
-        meta=current_meta
-    )
+    task_self.update_state(state='PROGRESS', meta=current_meta)
 
     # Logger aussi dans les logs serveur pour historique
     log_method = getattr(logger, level if level in ['info', 'warning', 'error'] else 'info')
@@ -579,7 +610,9 @@ def _log_progress(task_self, message, level='info', details=None):
 
 
 @shared_task(bind=True, name='pilot.process_batch_transcription')
-def process_batch_transcription_task(self, directories: list[dict], modeles_ocr: list[str], importer_en_base: bool = False):
+def process_batch_transcription_task(
+    self, directories: list[dict], modeles_ocr: list[str], importer_en_base: bool = False
+):
     """
     Tâche Celery pour traiter plusieurs répertoires en batch avec plusieurs modèles OCR.
 
@@ -625,7 +658,7 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
     _log_progress(
         self,
         f"🚀 Démarrage du traitement batch: {len(directories)} répertoire(s), {len(modeles_ocr)} modèle(s)",
-        'info'
+        'info',
     )
 
     # Résultats globaux
@@ -640,8 +673,10 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
         dir_path = os.path.join(media_root, dir_info['path'])
         if os.path.exists(dir_path):
             images = [
-                f for f in os.listdir(dir_path)
-                if os.path.isfile(os.path.join(dir_path, f)) and f.lower().endswith(('.jpg', '.jpeg'))
+                f
+                for f in os.listdir(dir_path)
+                if os.path.isfile(os.path.join(dir_path, f))
+                and f.lower().endswith(('.jpg', '.jpeg'))
             ]
             images_par_repertoire += len(images)
 
@@ -676,7 +711,7 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
         _log_progress(
             self,
             f"═══ Modèle {modele_index + 1}/{len(modeles_ocr)}: {modele_ocr} ({modele_api}) ═══",
-            'info'
+            'info',
         )
 
         # Initialiser le modèle Gemini
@@ -697,23 +732,25 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
 
             # Log du démarrage du répertoire
             _log_progress(
-                self,
-                f"→ Répertoire {dir_index + 1}/{len(directories)}: {dir_path_relatif}",
-                'info'
+                self, f"→ Répertoire {dir_index + 1}/{len(directories)}: {dir_path_relatif}", 'info'
             )
 
             if not os.path.exists(dir_path_complet):
                 logger.error(f"Le répertoire {dir_path_complet} n'existe pas")
-                all_results.append({
-                    'directory': dir_path_relatif,
-                    'modele_ocr': modele_ocr,
-                    'status': 'error',
-                    'error': "Répertoire inexistant",
-                })
+                all_results.append(
+                    {
+                        'directory': dir_path_relatif,
+                        'modele_ocr': modele_ocr,
+                        'status': 'error',
+                        'error': "Répertoire inexistant",
+                    }
+                )
                 continue
 
             # Créer le répertoire de résultats (inclure le modèle dans le chemin)
-            results_dir = os.path.join(media_root, 'transcription_results', dir_path_relatif, modele_ocr)
+            results_dir = os.path.join(
+                media_root, 'transcription_results', dir_path_relatif, modele_ocr
+            )
             os.makedirs(results_dir, exist_ok=True)
 
             # Récupérer les métadonnées du répertoire
@@ -726,40 +763,40 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                 # Log de sélection du prompt
                 prompt_type = "ANCIENNES FICHES" if 'ancien' in type_fiche.lower() else "STANDARD"
                 _log_progress(
-                    self,
-                    f"📄 Prompt {prompt_type} sélectionné pour {type_fiche}",
-                    'success'
+                    self, f"📄 Prompt {prompt_type} sélectionné pour {type_fiche}", 'success'
                 )
             except ValueError as e:
                 logger.error(f"❌ Erreur chargement prompt pour {dir_path_relatif}: {e}")
-                _log_progress(
-                    self,
-                    f"❌ Erreur chargement prompt: {str(e)}",
-                    'error'
+                _log_progress(self, f"❌ Erreur chargement prompt: {str(e)}", 'error')
+                all_results.append(
+                    {
+                        'directory': dir_path_relatif,
+                        'modele_ocr': modele_ocr,
+                        'status': 'error',
+                        'error': f"Prompt introuvable: {str(e)}",
+                        'files': [],
+                    }
                 )
-                all_results.append({
-                    'directory': dir_path_relatif,
-                    'modele_ocr': modele_ocr,
-                    'status': 'error',
-                    'error': f"Prompt introuvable: {str(e)}",
-                    'files': [],
-                })
                 continue  # Passer au répertoire suivant
 
             # Récupérer les fichiers images
             image_files = [
-                f for f in os.listdir(dir_path_complet)
-                if os.path.isfile(os.path.join(dir_path_complet, f)) and f.lower().endswith(('.jpg', '.jpeg'))
+                f
+                for f in os.listdir(dir_path_complet)
+                if os.path.isfile(os.path.join(dir_path_complet, f))
+                and f.lower().endswith(('.jpg', '.jpeg'))
             ]
 
             if not image_files:
                 logger.warning(f"Aucune image dans {dir_path_relatif}")
-                all_results.append({
-                    'directory': dir_path_relatif,
-                    'modele_ocr': modele_ocr,
-                    'status': 'success',
-                    'images': [],
-                })
+                all_results.append(
+                    {
+                        'directory': dir_path_relatif,
+                        'modele_ocr': modele_ocr,
+                        'status': 'success',
+                        'images': [],
+                    }
+                )
                 continue
 
             dir_results = []
@@ -770,13 +807,13 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                 img_path_complet = os.path.join(dir_path_complet, img_file)
                 img_path_relatif = os.path.join(dir_path_relatif, img_file)
 
-                logger.info(f"Traitement de {img_path_relatif} ({processed_count + 1}/{total_images})")
+                logger.info(
+                    f"Traitement de {img_path_relatif} ({processed_count + 1}/{total_images})"
+                )
 
                 # Log du début du traitement
                 _log_progress(
-                    self,
-                    f"🖼️ Traitement {img_file} ({processed_count + 1}/{total_images})",
-                    'info'
+                    self, f"🖼️ Traitement {img_file} ({processed_count + 1}/{total_images})", 'info'
                 )
 
                 # Mise à jour de la progression
@@ -802,16 +839,12 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                         model=model,
                         prompt=prompt,
                         image_path=img_path_complet,
-                        timeout=120  # 2 minutes max par image
+                        timeout=120,  # 2 minutes max par image
                     )
                     api_duration = time.time() - api_start
 
                     # Log de succès de l'API
-                    _log_progress(
-                        self,
-                        f"✓ API réussie ({api_duration:.1f}s)",
-                        'success'
-                    )
+                    _log_progress(self, f"✓ API réussie ({api_duration:.1f}s)", 'success')
 
                     # Nettoyage des marqueurs markdown
                     if text_response.startswith("```json"):
@@ -834,44 +867,34 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                             logger.warning(
                                 f"Structure JSON invalide pour {img_file}, correction en cours. Erreurs: {erreurs}"
                             )
-                            _log_progress(
-                                self,
-                                f"⚠️ JSON invalide, correction en cours",
-                                'warning'
-                            )
+                            _log_progress(self, "⚠️ JSON invalide, correction en cours", 'warning')
                             json_data_raw = copy.deepcopy(json_data)
                             json_data = corriger_json(json_data_raw)
 
                             # Enregistrement du JSON brut
-                            raw_path = os.path.join(results_dir, f"{os.path.splitext(img_file)[0]}_raw.json")
+                            raw_path = os.path.join(
+                                results_dir, f"{os.path.splitext(img_file)[0]}_raw.json"
+                            )
                             with open(raw_path, 'w', encoding='utf-8') as f:
                                 json.dump(json_data_raw, f, indent=2, ensure_ascii=False)
 
                             _log_progress(
-                                self,
-                                f"✓ JSON corrigé et sauvegardé (raw + corrigé)",
-                                'success'
+                                self, "✓ JSON corrigé et sauvegardé (raw + corrigé)", 'success'
                             )
                         else:
-                            _log_progress(
-                                self,
-                                f"✓ JSON valide",
-                                'success'
-                            )
+                            _log_progress(self, "✓ JSON valide", 'success')
 
                         # Enregistrement du JSON final
                         json_filename = f"{os.path.splitext(img_file)[0]}_result.json"
                         json_path_complet = os.path.join(results_dir, json_filename)
-                        json_path_relatif = os.path.join('transcription_results', dir_path_relatif, modele_ocr, json_filename)
+                        json_path_relatif = os.path.join(
+                            'transcription_results', dir_path_relatif, modele_ocr, json_filename
+                        )
 
                         with open(json_path_complet, 'w', encoding='utf-8') as f:
                             json.dump(json_data, f, indent=2, ensure_ascii=False)
 
-                        _log_progress(
-                            self,
-                            f"💾 JSON sauvegardé: {json_filename}",
-                            'success'
-                        )
+                        _log_progress(self, f"💾 JSON sauvegardé: {json_filename}", 'success')
 
                         duration = round(time.time() - file_start, 2)
                         logger.info(f"Transcription réussie pour {img_file}, durée: {duration}s")
@@ -887,14 +910,13 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                                     annee = int(annee_str)
 
                             fiche_importee = _importer_fiche_depuis_json(
-                                json_data,
-                                json_path_relatif,
-                                img_path_relatif,
-                                annee
+                                json_data, json_path_relatif, img_path_relatif, annee
                             )
 
                             if fiche_importee:
-                                logger.info(f"Fiche #{fiche_importee.num_fiche} importée en base depuis {img_file}")
+                                logger.info(
+                                    f"Fiche #{fiche_importee.num_fiche} importée en base depuis {img_file}"
+                                )
                             else:
                                 logger.warning(f"Échec de l'importation en base pour {img_file}")
 
@@ -902,10 +924,7 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                         nom_base = _extraire_nom_base_fichier(img_path_relatif)
 
                         # Utiliser la fiche importée si disponible, sinon chercher une correspondance
-                        if fiche_importee:
-                            fiche = fiche_importee
-                        else:
-                            fiche = _trouver_fiche_correspondante(nom_base)
+                        fiche = fiche_importee or _trouver_fiche_correspondante(nom_base)
 
                         transcription_ocr = TranscriptionOCR.objects.create(
                             fiche=fiche,  # Peut être None si pas de correspondance
@@ -927,7 +946,7 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                         _log_progress(
                             self,
                             f"✓ TranscriptionOCR créée (ID: {transcription_ocr.id}){fiche_info}",
-                            'success'
+                            'success',
                         )
 
                         file_result = {
@@ -945,25 +964,19 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                 except TimeoutError as e:
                     logger.error(f"⏱️ Timeout pour {img_file} après 120s (et {3} retries): {str(e)}")
                     _log_progress(
-                        self,
-                        f"❌ Timeout après 120s (3 retries) pour {img_file}",
-                        'error'
+                        self, f"❌ Timeout après 120s (3 retries) pour {img_file}", 'error'
                     )
                     file_result = {
                         'filename': img_file,
                         'status': 'timeout',
-                        'error': f"Timeout après 120s (3 retries)",
+                        'error': "Timeout après 120s (3 retries)",
                         'duration': round(time.time() - file_start, 2),
                     }
                     total_errors += 1
 
                 except Exception as e:
                     logger.error(f"❌ Erreur lors du traitement de {img_file}: {str(e)}")
-                    _log_progress(
-                        self,
-                        f"❌ Erreur: {str(e)[:100]}",
-                        'error'
-                    )
+                    _log_progress(self, f"❌ Erreur: {str(e)[:100]}", 'error')
                     file_result = {
                         'filename': img_file,
                         'status': 'error',
@@ -975,15 +988,17 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                 dir_results.append(file_result)
                 processed_count += 1
 
-            all_results.append({
-                'directory': dir_path_relatif,
-                'modele_ocr': modele_ocr,
-                'status': 'success',
-                'images': dir_results,
-                'type_fiche': type_fiche,
-                'type_traitement': type_traitement,
-                'type_image': type_image,
-            })
+            all_results.append(
+                {
+                    'directory': dir_path_relatif,
+                    'modele_ocr': modele_ocr,
+                    'status': 'success',
+                    'images': dir_results,
+                    'type_fiche': type_fiche,
+                    'type_traitement': type_traitement,
+                    'type_image': type_image,
+                }
+            )
 
     # Résultats finaux
     duration_total = round(time.time() - start_time_global, 2)
@@ -1001,17 +1016,13 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
         'duration': duration_total,
     }
 
-    logger.info(
-        f"═══ Traitement batch terminé ═══"
-    )
+    logger.info("═══ Traitement batch terminé ═══")
     logger.info(
         f"  {len(modeles_ocr)} modèle(s) × {len(directories)} répertoire(s) = {total_images} images"
     )
     logger.info(
         f"  {total_success} succès / {total_errors} erreurs ({final_result['success_rate']}%)"
     )
-    logger.info(
-        f"  Durée totale: {duration_total}s"
-    )
+    logger.info(f"  Durée totale: {duration_total}s")
 
     return final_result

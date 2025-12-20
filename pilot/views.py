@@ -57,7 +57,9 @@ def selection_repertoire_ocr(request):
     directories = []
     try:
         dir_list = [
-            d for d in os.listdir(full_current_path) if os.path.isdir(os.path.join(full_current_path, d))
+            d
+            for d in os.listdir(full_current_path)
+            if os.path.isdir(os.path.join(full_current_path, d))
         ]
 
         for dir_name in dir_list:
@@ -65,29 +67,35 @@ def selection_repertoire_ocr(request):
 
             try:
                 # Compter les sous-répertoires
-                subdirs_count = len([
-                    d for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))
-                ])
+                subdirs_count = len(
+                    [d for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))]
+                )
 
                 # Compter les fichiers images
-                images_count = len([
-                    f
-                    for f in os.listdir(dir_path)
-                    if os.path.isfile(os.path.join(dir_path, f))
-                    and f.lower().endswith(('.jpg', '.jpeg', '.png'))
-                ])
+                images_count = len(
+                    [
+                        f
+                        for f in os.listdir(dir_path)
+                        if os.path.isfile(os.path.join(dir_path, f))
+                        and f.lower().endswith(('.jpg', '.jpeg', '.png'))
+                    ]
+                )
 
-                directories.append({
-                    'name': dir_name,
-                    'subdirs_count': subdirs_count,
-                    'images_count': images_count,
-                })
+                directories.append(
+                    {
+                        'name': dir_name,
+                        'subdirs_count': subdirs_count,
+                        'images_count': images_count,
+                    }
+                )
             except (OSError, PermissionError):
-                directories.append({
-                    'name': dir_name,
-                    'subdirs_count': 0,
-                    'images_count': 0,
-                })
+                directories.append(
+                    {
+                        'name': dir_name,
+                        'subdirs_count': 0,
+                        'images_count': 0,
+                    }
+                )
 
         directories.sort(key=lambda x: x['name'].lower())
     except (OSError, PermissionError):
@@ -108,12 +116,14 @@ def selection_repertoire_ocr(request):
 
     # Compter les images dans le répertoire actuel
     try:
-        image_count = len([
-            f
-            for f in os.listdir(full_current_path)
-            if os.path.isfile(os.path.join(full_current_path, f))
-            and f.lower().endswith(('.jpg', '.jpeg', '.png'))
-        ])
+        image_count = len(
+            [
+                f
+                for f in os.listdir(full_current_path)
+                if os.path.isfile(os.path.join(full_current_path, f))
+                and f.lower().endswith(('.jpg', '.jpeg', '.png'))
+            ]
+        )
     except (OSError, PermissionError):
         image_count = 0
 
@@ -185,55 +195,63 @@ def analyser_correspondances(request):
 
         if fiches.count() == 1:
             fiche = fiches.first()
-            correspondances.append({
-                'image': image_filename,
-                'statut': 'trouvee',
-                'fiche_id': fiche.num_fiche,
-                'fiche_info': {
-                    'numero': fiche.num_fiche,
-                    'espece': fiche.espece.nom if fiche.espece else 'Non spécifié',
-                    'annee': fiche.annee,
-                    'observateur': fiche.observateur.username,
-                    'chemin_image': fiche.chemin_image,
-                },
-            })
+            correspondances.append(
+                {
+                    'image': image_filename,
+                    'statut': 'trouvee',
+                    'fiche_id': fiche.num_fiche,
+                    'fiche_info': {
+                        'numero': fiche.num_fiche,
+                        'espece': fiche.espece.nom if fiche.espece else 'Non spécifié',
+                        'annee': fiche.annee,
+                        'observateur': fiche.observateur.username,
+                        'chemin_image': fiche.chemin_image,
+                    },
+                }
+            )
         elif fiches.count() > 1:
-            correspondances.append({
-                'image': image_filename,
-                'statut': 'multiple',
-                'fiches_possibles': [
-                    {
-                        'numero': f.num_fiche,
-                        'espece': f.espece.nom if f.espece else 'Non spécifié',
-                        'annee': f.annee,
-                        'chemin_image': f.chemin_image,
-                    }
-                    for f in fiches
-                ],
-            })
+            correspondances.append(
+                {
+                    'image': image_filename,
+                    'statut': 'multiple',
+                    'fiches_possibles': [
+                        {
+                            'numero': f.num_fiche,
+                            'espece': f.espece.nom if f.espece else 'Non spécifié',
+                            'annee': f.annee,
+                            'chemin_image': f.chemin_image,
+                        }
+                        for f in fiches
+                    ],
+                }
+            )
         else:
-            correspondances.append({
-                'image': image_filename,
-                'statut': 'non_trouvee',
-            })
+            correspondances.append(
+                {
+                    'image': image_filename,
+                    'statut': 'non_trouvee',
+                }
+            )
 
     # Compter les résultats
     nb_trouvees = len([c for c in correspondances if c['statut'] == 'trouvee'])
     nb_multiples = len([c for c in correspondances if c['statut'] == 'multiple'])
     nb_non_trouvees = len([c for c in correspondances if c['statut'] == 'non_trouvee'])
 
-    return JsonResponse({
-        'success': True,
-        'total_images': len(images),
-        'nb_trouvees': nb_trouvees,
-        'nb_multiples': nb_multiples,
-        'nb_non_trouvees': nb_non_trouvees,
-        'correspondances': correspondances,
-    })
+    return JsonResponse(
+        {
+            'success': True,
+            'total_images': len(images),
+            'nb_trouvees': nb_trouvees,
+            'nb_multiples': nb_multiples,
+            'nb_non_trouvees': nb_non_trouvees,
+            'correspondances': correspondances,
+        }
+    )
 
 
 @transcription_required
-def lancer_transcription_batch(request):
+def lancer_transcription_batch(request):  # noqa: PLR0911
     """
     Lance la transcription batch pour les images sélectionnées avec le modèle OCR choisi.
 
@@ -262,7 +280,9 @@ def lancer_transcription_batch(request):
             return JsonResponse({'error': 'Format JSON invalide pour directories'}, status=400)
 
         if not directories or not isinstance(directories, list):
-            return JsonResponse({'error': 'La liste des répertoires est vide ou invalide'}, status=400)
+            return JsonResponse(
+                {'error': 'La liste des répertoires est vide ou invalide'}, status=400
+            )
 
         # Parser la liste des modèles OCR
         try:
@@ -271,7 +291,9 @@ def lancer_transcription_batch(request):
             return JsonResponse({'error': 'Format JSON invalide pour modeles_ocr'}, status=400)
 
         if not modeles_ocr or not isinstance(modeles_ocr, list):
-            return JsonResponse({'error': 'La liste des modèles OCR est vide ou invalide'}, status=400)
+            return JsonResponse(
+                {'error': 'La liste des modèles OCR est vide ou invalide'}, status=400
+            )
 
         logger.info(
             f"Lancement transcription batch: {len(directories)} répertoire(s), "
@@ -293,12 +315,14 @@ def lancer_transcription_batch(request):
 
         logger.info(f"Tâche batch créée avec ID: {task_id}")
 
-        return JsonResponse({
-            'success': True,
-            'task_id': task_id,
-            'message': 'Traitement batch démarré',
-            'progress_url': '/pilot/optimisation-ocr/verifier-progression/',
-        })
+        return JsonResponse(
+            {
+                'success': True,
+                'task_id': task_id,
+                'message': 'Traitement batch démarré',
+                'progress_url': '/pilot/optimisation-ocr/verifier-progression/',
+            }
+        )
 
     except Exception as e:
         logger.error(f"Erreur lors du lancement de la transcription batch: {str(e)}")
@@ -381,7 +405,9 @@ def batch_results(request):
     config = request.session.get('pilot_batch_config', {})
 
     if not results:
-        messages.warning(request, "Aucun résultat disponible. Veuillez lancer un traitement batch d'abord.")
+        messages.warning(
+            request, "Aucun résultat disponible. Veuillez lancer un traitement batch d'abord."
+        )
         return render(request, 'pilot/batch_results.html', {'no_results': True})
 
     # Enrichir le contexte
@@ -394,7 +420,9 @@ def batch_results(request):
         'results': results,
         'config': config,
         'modeles_ocr': modeles_ocr,
-        'modeles_ocr_display': ', '.join(modeles_ocr) if isinstance(modeles_ocr, list) else modeles_ocr,
+        'modeles_ocr_display': ', '.join(modeles_ocr)
+        if isinstance(modeles_ocr, list)
+        else modeles_ocr,
         'total_directories': results.get('total_directories', 0),
         'total_models': results.get('total_models', 0),
         'total_images': total_images,
