@@ -5,6 +5,7 @@ Guide complet pour déployer l'application Observations Nids avec Docker.
 ## Table des matières
 
 - [Prérequis](#prérequis)
+- [Comment fonctionne Docker](#comment-fonctionne-docker)
 - [Installation rapide](#installation-rapide)
 - [Configuration](#configuration)
 - [Démarrage](#démarrage)
@@ -45,44 +46,183 @@ docker compose version
 
 **Important** : Déconnectez-vous et reconnectez-vous pour que le groupe docker soit pris en compte.
 
+## Comment fonctionne Docker
+
+Comprendre le processus d'installation et d'isolation Docker.
+
+### 📦 Le processus : Clone → Build → Run
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  1️⃣ CLONE sur l'hôte Ubuntu                                 │
+│     git clone → /opt/observations_nids_pilote/              │
+│     Le code source est maintenant sur VOTRE système         │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│  2️⃣ BUILD de l'image Docker                                 │
+│     docker compose build                                    │
+│     • Docker LIT le Dockerfile                              │
+│     • COPIE le code dans l'image (COPY . .)                 │
+│     • Installe Python 3.12 + dépendances                    │
+│     • Crée une IMAGE isolée et autonome                     │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│  3️⃣ RUN du conteneur                                        │
+│     docker compose up                                       │
+│     • Lance le conteneur depuis l'image                     │
+│     • Le code est maintenant dans /app du conteneur         │
+│     • Totalement ISOLÉ du système Ubuntu                    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 🔒 L'isolation complète
+
+```
+Système Ubuntu (Hôte)
+├── /opt/observations_nids_pilote/     ← Code source original
+│   ├── observations/
+│   ├── docker/
+│   └── ...
+│
+├── Conteneur "web" (Django)           ← Copie isolée
+│   └── /app/
+│       ├── observations/              ← Copie du code
+│       ├── manage.py
+│       └── Python 3.12 + Django 6.0   ← Isolé du système
+│
+├── Conteneur "db" (MariaDB)           ← Base de données isolée
+│   └── MariaDB 10.11
+│
+├── Conteneur "redis"                  ← Cache isolé
+│   └── Redis 7
+│
+└── Conteneur "nginx"                  ← Reverse proxy isolé
+    └── Nginx
+```
+
+**Chaque conteneur** :
+- ✅ A son propre système de fichiers
+- ✅ A ses propres processus
+- ✅ A son propre réseau
+- ✅ Ne voit PAS le système Ubuntu
+- ✅ Ne voit PAS les autres conteneurs (sauf via le réseau Docker)
+
+### 🔗 Les volumes : ponts entre hôte et conteneurs
+
+Certains dossiers sont **partagés** pour persister les données :
+
+```yaml
+volumes:
+  - db_data:/var/lib/mysql        # Base de données persistante
+  - static_volume:/app/staticfiles # Fichiers statiques
+  - media_volume:/app/mediafiles   # Uploads utilisateurs
+  - ../logs:/app/logs             # Logs accessibles depuis l'hôte
+```
+
+**Avantage** : Si vous supprimez les conteneurs, les données persistent !
+
+### 🔄 Modifier le code après le build
+
+**Question** : Si je modifie le code sur l'hôte, est-ce que c'est automatiquement dans le conteneur ?
+
+**Réponse** : **NON** ! Le conteneur contient une **copie** faite lors du build.
+
+**Solution** :
+```bash
+# Reconstruire l'image avec les modifications
+docker compose down
+docker compose build
+docker compose up -d
+```
+
+**OU** en mode développement (hot-reload) :
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+
 ## Installation rapide
 
-### Installation version pilote sur Ubuntu
+### Choix de l'emplacement
+
+Deux options recommandées pour installer la version pilote sur Ubuntu :
+
+#### Option A : Installation dans /opt (recommandée)
+
+Standard Linux pour les applications tierces. Nécessite sudo pour le clone initial.
 
 ```bash
-# 1. Créer un utilisateur dédié (recommandé pour production)
+# 1. Créer un utilisateur dédié
+sudo useradd -m -s /bin/bash observations
+sudo usermod -aG docker observations
+
+# 2. Cloner dans /opt avec sudo
+cd /opt
+sudo git clone https://github.com/jmFschneider/Observations_Nids.git observations_nids_pilote
+
+# 3. Changer le propriétaire pour l'utilisateur observations
+sudo chown -R observations:observations observations_nids_pilote
+
+# 4. Se connecter comme utilisateur observations
+sudo su - observations
+
+# 5. Aller dans le répertoire docker
+cd /opt/observations_nids_pilote/docker
+
+# 6. Configurer
+cp .env.example .env
+nano .env
+
+# 7. Construire et démarrer
+docker compose up -d --build
+
+# 8. Vérifier
+docker compose ps
+```
+
+**Emplacement final** : `/opt/observations_nids_pilote/`
+
+#### Option B : Installation dans le home de l'utilisateur
+
+Plus simple, pas besoin de sudo pour le clone.
+
+```bash
+# 1. Créer un utilisateur dédié
 sudo useradd -m -s /bin/bash observations
 sudo usermod -aG docker observations
 
 # 2. Se connecter comme cet utilisateur
 sudo su - observations
 
-# 3. Cloner le dépôt dans le home (version pilote)
+# 3. Cloner dans le home (version pilote)
 git clone https://github.com/jmFschneider/Observations_Nids.git observations_nids_pilote
-cd observations_nids_pilote
+cd observations_nids_pilote/docker
 
-# 4. Aller dans le répertoire docker
-cd docker
-
-# 5. Créer le fichier .env depuis le template
+# 4. Configurer
 cp .env.example .env
-
-# 6. Éditer le fichier .env avec vos valeurs
 nano .env
 
-# 7. Construire et démarrer tous les services
+# 5. Construire et démarrer
 docker compose up -d --build
 
-# 8. Vérifier que tout fonctionne
+# 6. Vérifier
 docker compose ps
 ```
 
+**Emplacement final** : `/home/observations/observations_nids_pilote/`
+
+### Accès à l'application
+
 L'application sera accessible sur http://votre-serveur
 
-**Note** :
-- Tous les fichiers de configuration Docker sont dans le répertoire `docker/`
-- Cette installation est nommée `observations_nids_pilote` pour la version pilote
-- Vous devez toujours exécuter les commandes depuis le répertoire `docker/`
+**Notes importantes** :
+- ✅ Le dépôt GitHub est **public**, pas d'authentification nécessaire pour cloner
+- ✅ Tous les fichiers de configuration Docker sont dans `docker/`
+- ✅ Installation nommée `observations_nids_pilote` (version pilote)
+- ✅ Toujours exécuter les commandes depuis le répertoire `docker/`
+- ✅ Le code sur l'hôte est **copié** dans les conteneurs lors du build
+- ✅ Les conteneurs sont **totalement isolés** du système Ubuntu
 
 ## Configuration
 

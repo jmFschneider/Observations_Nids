@@ -64,6 +64,25 @@ services:
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      # Email configuration
+      - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
+      - EMAIL_HOST=${EMAIL_HOST:-}
+      - EMAIL_PORT=${EMAIL_PORT:-587}
+      - EMAIL_USE_TLS=${EMAIL_USE_TLS:-True}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER:-}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-}
+      # Environment & version
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - VERSION=${VERSION:-dev}
+      # Documentation
+      - MKDOCS_USE_STATIC=${MKDOCS_USE_STATIC:-False}
+      # SSL/Security
+      - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT:-False}
+      - SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE:-False}
+      - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-False}
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/mediafiles
@@ -103,6 +122,20 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      # Email configuration
+      - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
+      - EMAIL_HOST=${EMAIL_HOST:-}
+      - EMAIL_PORT=${EMAIL_PORT:-587}
+      - EMAIL_USE_TLS=${EMAIL_USE_TLS:-True}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER:-}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-}
+      # Environment & version
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - VERSION=${VERSION:-dev}
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     volumes:
       - media_volume:/app/mediafiles
       - ../logs:/app/logs
@@ -133,6 +166,20 @@ services:
       - REDIS_PORT=6379
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      # Email configuration
+      - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
+      - EMAIL_HOST=${EMAIL_HOST:-}
+      - EMAIL_PORT=${EMAIL_PORT:-587}
+      - EMAIL_USE_TLS=${EMAIL_USE_TLS:-True}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER:-}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-}
+      # Environment & version
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - VERSION=${VERSION:-dev}
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     volumes:
       - ../logs:/app/logs
     depends_on:
