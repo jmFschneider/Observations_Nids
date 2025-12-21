@@ -8,10 +8,32 @@
 
 | Script | Description | Usage |
 |--------|-------------|-------|
-| `maintenance_on.sh` | Active le mode maintenance | `sudo ./scripts/maintenance_on.sh` |
+| `maintenance_on.sh` | Active le mode maintenance avec durée personnalisée | `sudo ./scripts/maintenance_on.sh` |
 | `maintenance_off.sh` | Désactive le mode maintenance | `sudo ./scripts/maintenance_off.sh` |
 
-**Fonctionnement** : Ces scripts créent/suppriment un fichier `.maintenance` qui déclenche un middleware Django affichant une page de maintenance.
+**Fonctionnement** :
+- `maintenance_on.sh` propose un **menu interactif** pour choisir :
+  - La durée estimée (quelques minutes, 1 heure, quelques heures, demi-journée, date précise, indéterminée)
+  - La raison de la maintenance (optionnel)
+- Génère dynamiquement le fichier `maintenance.html` avec les informations saisies
+- Crée le fichier `.maintenance` qui déclenche le middleware Django
+
+**Options de durée** :
+1. Quelques minutes (< 30 min)
+2. Environ 1 heure
+3. Quelques heures (2-4h)
+4. Une demi-journée
+5. Jusqu'à une date/heure précise (ex: "15/01/2025 à 14h30")
+6. Durée indéterminée
+
+**Exemple d'utilisation** :
+```bash
+sudo ./scripts/maintenance_on.sh
+# Menu interactif s'affiche
+# Choisir l'option 5
+# Saisir: 25/11/2025 à 18h00
+# Saisir raison: Migration base de données
+```
 
 **Documentation** : Voir [Page de maintenance](../docs/docs/deployment/production.md#mode-maintenance)
 
