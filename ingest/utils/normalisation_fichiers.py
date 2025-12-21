@@ -138,21 +138,17 @@ def normaliser_paire_fichiers(
     # Vérifier que les deux fichiers ont le même numéro
     if num1 != num2:
         raise ValueError(
-            f"Les fichiers ne semblent pas former une paire : "
-            f"numéros différents ({num1} vs {num2})"
+            f"Les fichiers ne semblent pas former une paire : numéros différents ({num1} vs {num2})"
         )
 
     # Vérifier qu'on a bien un recto et un verso
     if type1 == type2:
         raise ValueError(
-            f"Les fichiers ne semblent pas former une paire : "
-            f"même type détecté ({type1})"
+            f"Les fichiers ne semblent pas former une paire : même type détecté ({type1})"
         )
 
     if type1 is None or type2 is None:
-        raise ValueError(
-            f"Impossible de détecter le type (recto/verso) pour les fichiers"
-        )
+        raise ValueError("Impossible de détecter le type (recto/verso) pour les fichiers")
 
     # Créer les dictionnaires normalisés
     fichiers_normalises = []
@@ -201,7 +197,7 @@ def detecter_paires_dans_dossier(fichiers: list[str]) -> list[tuple[str, str]]:
 
     # Créer les paires
     paires = []
-    for numero, fichiers_dict in sorted(fichiers_par_numero.items()):
+    for _numero, fichiers_dict in sorted(fichiers_par_numero.items()):
         if "recto" in fichiers_dict and "verso" in fichiers_dict:
             paires.append((fichiers_dict["recto"], fichiers_dict["verso"]))
 

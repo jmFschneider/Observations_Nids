@@ -10,7 +10,6 @@ la qualité de reconnaissance du texte par Tesseract :
 """
 
 import logging
-from typing import Optional, Tuple
 
 import cv2
 import numpy as np
@@ -24,7 +23,7 @@ def optimize_for_ocr(
     apply_denoise: bool = True,
     apply_sharpen: bool = True,
     apply_binarize: bool = False,
-) -> Tuple[np.ndarray, list[str]]:
+) -> tuple[np.ndarray, list[str]]:
     """
     Applique une série d'optimisations pour améliorer la reconnaissance OCR.
 
@@ -56,7 +55,7 @@ def optimize_for_ocr(
 
     # 2. Débruitage
     if apply_denoise:
-        result = apply_fastNlMeans_denoising(result)
+        result = apply_fast_nl_means_denoising(result)
         operations.append("denoise")
         logger.debug("Débruitage appliqué")
 
@@ -76,7 +75,7 @@ def optimize_for_ocr(
 
 
 def apply_clahe_enhancement(
-    image: np.ndarray, clip_limit: float = 2.0, tile_grid_size: Tuple[int, int] = (8, 8)
+    image: np.ndarray, clip_limit: float = 2.0, tile_grid_size: tuple[int, int] = (8, 8)
 ) -> np.ndarray:
     """
     Applique CLAHE pour améliorer le contraste de manière adaptative.
@@ -96,21 +95,25 @@ def apply_clahe_enhancement(
     lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
 
     # Séparer les canaux
-    l, a, b = cv2.split(lab)
+    luminance, a, b = cv2.split(lab)
 
     # Appliquer CLAHE sur le canal L (luminosité)
     clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
-    l_clahe = clahe.apply(l)
+    luminance_clahe = clahe.apply(luminance)
 
     # Recombiner et reconvertir en BGR
-    lab_clahe = cv2.merge([l_clahe, a, b])
+    lab_clahe = cv2.merge([luminance_clahe, a, b])
     result = cv2.cvtColor(lab_clahe, cv2.COLOR_LAB2BGR)
 
     return result
 
 
-def apply_fastNlMeans_denoising(
-    image: np.ndarray, h: int = 10, h_color: int = 10, template_window_size: int = 7, search_window_size: int = 21
+def apply_fast_nl_means_denoising(
+    image: np.ndarray,
+    h: int = 10,
+    h_color: int = 10,
+    template_window_size: int = 7,
+    search_window_size: int = 21,
 ) -> np.ndarray:
     """
     Applique un débruitage non local pour réduire le bruit tout en préservant les détails.
@@ -182,9 +185,7 @@ def apply_unsharp_mask(
     return sharpened
 
 
-def apply_adaptive_threshold(
-    image: np.ndarray, block_size: int = 11, C: int = 2
-) -> np.ndarray:
+def apply_adaptive_threshold(image: np.ndarray, block_size: int = 11, constant: int = 2) -> np.ndarray:
     """
     Applique une binarisation adaptative pour convertir en noir et blanc.
 
@@ -193,16 +194,13 @@ def apply_adaptive_threshold(
     Args:
         image: Image BGR ou grayscale
         block_size: Taille de la zone de voisinage (impair, ex: 11, 15, 21)
-        C: Constante soustraite de la moyenne (ajuste le seuil)
+        constant: Constante soustraite de la moyenne (ajuste le seuil)
 
     Returns:
         Image binarisée (noir et blanc)
     """
     # Convertir en niveaux de gris si nécessaire
-    if len(image.shape) == 3:
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = image.copy()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if len(image.shape) == 3 else image.copy()
 
     # Binarisation adaptative (Gaussian)
     binary = cv2.adaptiveThreshold(
@@ -211,7 +209,7 @@ def apply_adaptive_threshold(
         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
         cv2.THRESH_BINARY,
         block_size,
-        C,
+        constant,
     )
 
     # Reconvertir en BGR pour uniformité
@@ -221,7 +219,7 @@ def apply_adaptive_threshold(
 
 
 def resize_for_ocr(
-    image: np.ndarray, target_dpi: int = 300, current_dpi: Optional[int] = None
+    image: np.ndarray, target_dpi: int = 300, current_dpi: int | None = None
 ) -> np.ndarray:
     """
     Redimensionne l'image pour atteindre une résolution optimale pour l'OCR.
@@ -254,14 +252,14 @@ def resize_for_ocr(
 
     resized = cv2.resize(image, (new_width, new_height), interpolation=interpolation)
 
-    logger.debug(f"Redimensionnement: {current_dpi} DPI → {target_dpi} DPI (facteur: {scale_factor:.2f}x)")
+    logger.debug(
+        f"Redimensionnement: {current_dpi} DPI → {target_dpi} DPI (facteur: {scale_factor:.2f}x)"
+    )
 
     return resized
 
 
-def remove_borders(
-    image: np.ndarray, threshold: int = 240, border_size: int = 10
-) -> np.ndarray:
+def remove_borders(image: np.ndarray, threshold: int = 240, border_size: int = 10) -> np.ndarray:
     """
     Supprime les bordures blanches/claires autour d'un document scanné.
 
@@ -274,10 +272,7 @@ def remove_borders(
         Image sans bordures
     """
     # Convertir en niveaux de gris
-    if len(image.shape) == 3:
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = image.copy()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if len(image.shape) == 3 else image.copy()
 
     # Binarisation inverse (texte en blanc)
     _, binary = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY_INV)
@@ -317,10 +312,7 @@ def assess_image_quality(image: np.ndarray) -> dict:
         }
     """
     # Convertir en niveaux de gris
-    if len(image.shape) == 3:
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = image.copy()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if len(image.shape) == 3 else image.copy()
 
     warnings = []
 
@@ -370,7 +362,7 @@ if __name__ == "__main__":
 
     # Évaluer la qualité
     quality = assess_image_quality(image)
-    print(f"Qualité de l'image:")
+    print("Qualité de l'image:")
     print(f"  - Netteté: {quality['sharpness']}")
     print(f"  - Contraste: {quality['contrast']}")
     print(f"  - Luminosité: {quality['brightness']}")

@@ -11,7 +11,6 @@ L'algorithme le plus fiable est sélectionné automatiquement.
 
 import logging
 from pathlib import Path
-from typing import Optional, Tuple
 
 import cv2
 import numpy as np
@@ -30,9 +29,7 @@ except ImportError:
     )
 
 
-def auto_deskew_image(
-    image: np.ndarray, max_angle: float = 45.0
-) -> Tuple[np.ndarray, float, str]:
+def auto_deskew_image(image: np.ndarray, max_angle: float = 45.0) -> tuple[np.ndarray, float, str]:
     """
     Détecte et corrige automatiquement l'inclinaison d'une image.
 
@@ -53,10 +50,7 @@ def auto_deskew_image(
         raise ValueError("Image invalide ou vide")
 
     # Convertir en niveaux de gris si nécessaire
-    if len(image.shape) == 3:
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = image.copy()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if len(image.shape) == 3 else image.copy()
 
     # Méthode 1 : Bibliothèque deskew (la plus fiable)
     if HAS_DESKEW:
@@ -94,7 +88,7 @@ def auto_deskew_image(
     return image, 0.0, "none"
 
 
-def detect_skew_contours(gray: np.ndarray) -> Optional[float]:
+def detect_skew_contours(gray: np.ndarray) -> float | None:
     """
     Détecte l'inclinaison via les contours et minAreaRect.
 
@@ -139,8 +133,8 @@ def detect_skew_contours(gray: np.ndarray) -> Optional[float]:
 
 
 def detect_skew_projection(
-    gray: np.ndarray, angle_range: Tuple[float, float] = (-10, 10), step: float = 0.5
-) -> Optional[float]:
+    gray: np.ndarray, angle_range: tuple[float, float] = (-10, 10), step: float = 0.5
+) -> float | None:
     """
     Détecte l'inclinaison par projection horizontale et maximisation de variance.
 
@@ -184,7 +178,7 @@ def detect_skew_projection(
 
 
 def rotate_image(
-    image: np.ndarray, angle: float, border_value: Tuple[int, int, int] = (255, 255, 255)
+    image: np.ndarray, angle: float, border_value: tuple[int, int, int] = (255, 255, 255)
 ) -> np.ndarray:
     """
     Effectue une rotation d'image avec ajustement automatique de taille.
@@ -201,23 +195,23 @@ def rotate_image(
     center = (w // 2, h // 2)
 
     # Matrice de rotation
-    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
 
     # Calculer les nouvelles dimensions pour éviter de couper l'image
-    cos = np.abs(M[0, 0])
-    sin = np.abs(M[0, 1])
+    cos = np.abs(rotation_matrix[0, 0])
+    sin = np.abs(rotation_matrix[0, 1])
 
     new_w = int((h * sin) + (w * cos))
     new_h = int((h * cos) + (w * sin))
 
     # Ajuster la matrice de translation pour centrer l'image
-    M[0, 2] += (new_w / 2) - center[0]
-    M[1, 2] += (new_h / 2) - center[1]
+    rotation_matrix[0, 2] += (new_w / 2) - center[0]
+    rotation_matrix[1, 2] += (new_h / 2) - center[1]
 
     # Rotation avec fond blanc (ou couleur spécifiée)
     rotated = cv2.warpAffine(
         image,
-        M,
+        rotation_matrix,
         (new_w, new_h),
         flags=cv2.INTER_CUBIC,
         borderMode=cv2.BORDER_CONSTANT,
@@ -228,7 +222,7 @@ def rotate_image(
 
 
 def batch_deskew_images(
-    input_paths: list[Path], output_dir: Optional[Path] = None, overwrite: bool = False
+    input_paths: list[Path], output_dir: Path | None = None, overwrite: bool = False
 ) -> list[dict]:
     """
     Traite plusieurs images en batch pour le deskewing.
@@ -276,10 +270,7 @@ def batch_deskew_images(
             deskewed, angle, method = auto_deskew_image(image)
 
             # Déterminer le chemin de sortie
-            if output_dir:
-                output_path = output_dir / input_path.name
-            else:
-                output_path = input_path
+            output_path = output_dir / input_path.name if output_dir else input_path
 
             # Vérifier si le fichier existe déjà
             if output_path.exists() and not overwrite:
