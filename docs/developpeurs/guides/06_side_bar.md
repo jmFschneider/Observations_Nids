@@ -8,15 +8,7 @@
 
 ## 📋 Table des matières
 
-1. [Introduction](#introduction)
-2. [Architecture](#architecture)
-3. [Fonctionnalités](#fonctionnalités)
-4. [Structure des fichiers](#structure-des-fichiers)
-5. [Utilisation](#utilisation)
-6. [Personnalisation](#personnalisation)
-7. [Responsive Design](#responsive-design)
-8. [Maintenance](#maintenance)
-9. [Troubleshooting](#troubleshooting)
+[TOC]
 
 ---
 

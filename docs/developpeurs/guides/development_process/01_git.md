@@ -150,3 +150,67 @@ Une fois la PR fusionnée dans `develop`, il faut tester sur le serveur de pré-
 ### Étape 3 : Mettre en production
 
 Si tout fonctionne correctement, une autre PR sera créée de `develop` vers `production` pour le déploiement final.
+
+---
+
+## 6. Gestion des Modifications Urgentes en Production (Hotfix)
+
+Dans des cas exceptionnels, il peut être nécessaire d'intervenir directement sur le serveur de production (Raspberry Pi) pour corriger un bug critique. Voici la procédure pour sécuriser ces modifications et les réintégrer proprement dans le cycle de développement.
+
+### Étape 1 : Sécuriser les modifications sur le serveur
+
+Connectez-vous au serveur et naviguez vers le dossier du projet :
+```bash
+ssh user@serveur-prod
+cd /chemin/vers/observations_nids
+```
+
+Avant toute chose, vérifiez l'état du dépôt :
+```bash
+git status
+git diff
+```
+
+### Étape 2 : Créer une branche de sauvegarde
+
+Ne committez jamais directement sur `production` ou `main` depuis le serveur. Créez une branche dédiée à ce correctif :
+
+```bash
+# Créer et basculer sur une branche de hotfix
+git checkout -b hotfix/prod-urgent-fix-description
+
+# Ajouter toutes les modifications
+git add -A
+
+# Committer avec un message explicite
+git commit -m "fix: Modifications urgentes sur serveur production
+
+- Détails des corrections...
+- Sauvegarde avant intégration"
+```
+
+### Étape 3 : Pousser vers le dépôt central
+
+```bash
+# Pousser la branche vers GitHub/GitLab
+git push -u origin hotfix/prod-urgent-fix-description
+```
+
+**En cas de problème d'identité ou d'authentification :**
+```bash
+# Configurer l'identité si demandé
+git config user.name "Nom Prénom"
+git config user.email "email@exemple.com"
+
+# Vérifier l'URL du remote si le push est rejeté
+git remote -v
+```
+
+### Étape 4 : Réintégration en local
+
+Une fois la branche poussée, retournez sur votre machine de développement pour l'intégrer proprement :
+
+1.  `git fetch origin`
+2.  `git checkout develop`
+3.  `git merge origin/hotfix/prod-urgent-fix-description`
+4.  Gérer les conflits éventuels et lancer les tests.

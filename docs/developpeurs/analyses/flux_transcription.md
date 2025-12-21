@@ -10,15 +10,7 @@
 
 ## TABLE DES MATIÈRES
 
-1. [Synthèse exécutive](#synthèse-exécutive)
-2. [Détection du type de fiche et sélection du prompt](#1-détection-du-type-de-fiche-et-sélection-du-prompt)
-3. [Organisation des fichiers JSON résultats](#2-organisation-des-fichiers-json-résultats)
-4. [Boucles de traitement et optimisation](#3-boucles-de-traitement-et-optimisation)
-5. [Gestion des erreurs de transcription](#4-gestion-des-erreurs-de-transcription)
-6. [Création des entrées TranscriptionOCR](#5-création-des-entrées-transcriptionocr)
-7. [Passage des paramètres entre les vues](#6-passage-des-paramètres-entre-les-vues)
-8. [Récapitulatif global - Priorités](#récapitulatif-global---priorités)
-9. [Checklist des fichiers à modifier](#fichiers-à-modifier---checklist)
+[TOC]
 
 ---
 

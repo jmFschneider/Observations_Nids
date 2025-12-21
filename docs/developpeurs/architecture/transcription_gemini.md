@@ -8,17 +8,7 @@
 
 ## Table des matières
 
-1. [Vue d'ensemble](#vue-densemble)
-2. [Processus de préparation des images](#1-processus-de-préparation-des-images)
-3. [Chargement et utilisation du prompt](#2-chargement-et-utilisation-du-prompt)
-4. [Appel à l'API Gemini](#3-appel-à-lapi-gemini)
-5. [Architecture Redis et Celery](#4-architecture-redis-et-celery)
-6. [Flux complet de bout en bout](#5-flux-complet-de-bout-en-bout)
-7. [Interactions entre les composants](#6-interactions-entre-les-composants)
-8. [Models de données clés](#7-models-de-données-clés)
-9. [Sécurité et gestion des erreurs](#8-sécurité-et-gestion-des-erreurs)
-10. [Limitations et points d'amélioration](#9-limitations-et-points-damélioration)
-11. [Fichiers clés récapitulatifs](#10-fichiers-clés-récapitulatifs)
+[TOC]
 
 ---
 

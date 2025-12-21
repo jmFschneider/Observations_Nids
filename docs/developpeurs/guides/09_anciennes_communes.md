@@ -3,21 +3,15 @@
 Ce guide explique comment gérer les anciennes communes qui ont fusionné avec d'autres communes françaises.
 Attention : l'import des anciennes commune est faite en deux temps (un import unique aurait pu être fait mais cela aurait un peu plus de travail), **voir paragraphe 5** :
 
-- ### Import depuis CSV (importer_anciennes_communes)
+- ### [Import depuis CSV (importer_anciennes_communes)](#51-import-depuis-csv-importer_anciennes_communes)
 
-- ### Import depuis API (verifier_communes_deleguees)
+- ### [Import depuis API (verifier_communes_deleguees)](#52-import-depuis-api-verifier_communes_deleguees)
 
 ---
 
 ## Table des matières
 
-1. [Vue d'ensemble](#1-vue-densemble)
-2. [Architecture](#2-architecture)
-3. [Installation et Configuration](#3-installation-et-configuration)
-4. [Utilisation](#4-utilisation)
-5. [Script d'import](#5-script-dimport)
-6. [Intégration au géocodeur](#6-intégration-au-geocodeur)
-7. [Référence API](#7-référence-api)
+[TOC]
 
 ---
 

@@ -10,14 +10,7 @@
 
 ## Table des matières
 
-1. [Vue d'ensemble](#vue-densemble)
-2. [Architecture](#architecture)
-3. [Prérequis](#prérequis)
-4. [Installation étape par étape](#installation-étape-par-étape)
-5. [Configuration des services](#configuration-des-services)
-6. [Workflow de déploiement](#workflow-de-déploiement)
-7. [Maintenance](#maintenance)
-8. [Dépannage](#dépannage)
+[TOC]
 
 ---
 
@@ -1367,9 +1360,9 @@ Vous disposez maintenant d'un **environnement pilote/test totalement isolé** de
 - ✅ Tester Nginx/Gunicorn comme alternative à Apache
 - ✅ Garantir la stabilité de la production
 
-**Prochain déploiement** : Utilisez le workflow recommandé (dev → pilote → validation → production).
+**Prochain déplement** : Utilisez le workflow recommandé (dev → pilote → validation → production).
 
-**Support** : En cas de problème, consulter la section [Dépannage](#dépannage) ou les logs détaillés.
+**Support** : En cas de problème, consulter la section [Dépannage](#depannage) ou les logs détaillés.
 
 ---
 

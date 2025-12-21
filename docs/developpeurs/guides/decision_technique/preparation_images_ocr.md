@@ -8,14 +8,7 @@
 
 ## Table des matières
 
-1. [Contexte et objectifs](#1-contexte-et-objectifs)
-2. [Architecture technique proposée](#2-architecture-technique-proposée)
-3. [Stratégie Git et gestion des branches](#3-stratégie-git-et-gestion-des-branches)
-4. [Gestion de la base de données](#4-gestion-de-la-base-de-données)
-5. [Plan d'implémentation par phases](#5-plan-dimplémentation-par-phases)
-6. [Workflow de traitement des images](#6-workflow-de-traitement-des-images)
-7. [Portage du code Python existant](#7-portage-du-code-python-existant)
-8. [Décisions à prendre](#8-décisions-à-prendre)
+[TOC]
 
 ---
 

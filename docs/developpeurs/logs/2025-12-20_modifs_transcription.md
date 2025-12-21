@@ -8,14 +8,7 @@
 
 ## TABLE DES MATIÈRES
 
-1. [Vue d'ensemble des modifications](#vue-densemble-des-modifications)
-2. [Phase 1 : Corrections critiques](#phase-1--corrections-critiques)
-3. [Phase 2 : Optimisations de robustesse](#phase-2--optimisations-de-robustesse)
-4. [Phase 3 : Logging en temps réel](#phase-3--logging-en-temps-réel)
-5. [Fichiers modifiés](#fichiers-modifiés)
-6. [Migration base de données](#migration-base-de-données)
-7. [Guide de test](#guide-de-test)
-8. [Avant/Après](#avantaprès)
+[TOC]
 
 ---
 
