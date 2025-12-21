@@ -150,6 +150,9 @@ def normaliser_paire_fichiers(
     if type1 is None or type2 is None:
         raise ValueError("Impossible de détecter le type (recto/verso) pour les fichiers")
 
+    if num1 is None or num2 is None:
+        raise ValueError("Impossible de détecter le numéro pour les fichiers")
+
     # Créer les dictionnaires normalisés
     fichiers_normalises = []
     for path, num, type_fiche in [(path1, num1, type1), (path2, num2, type2)]:

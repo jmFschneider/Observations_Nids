@@ -55,7 +55,7 @@ def auto_deskew_image(image: np.ndarray, max_angle: float = 45.0) -> tuple[np.nd
     # Méthode 1 : Bibliothèque deskew (la plus fiable)
     if HAS_DESKEW:
         try:
-            angle = determine_skew(gray)
+            angle: float | None = determine_skew(gray)
             if angle is not None and abs(angle) < max_angle:
                 rotated = rotate_image(image, angle)
                 logger.info(f"Deskew réussi (bibliothèque): {angle:.2f}°")
@@ -129,7 +129,7 @@ def detect_skew_contours(gray: np.ndarray) -> float | None:
     elif angle > 45:
         angle = angle - 90
 
-    return -angle  # Inverser pour correction
+    return float(-angle)  # Inverser pour correction et convertir en float Python
 
 
 def detect_skew_projection(
@@ -154,11 +154,11 @@ def detect_skew_projection(
 
     angles = np.arange(angle_range[0], angle_range[1], step)
     max_variance = 0
-    best_angle = 0
+    best_angle = 0.0
 
     for angle in angles:
         # Rotation temporaire
-        rotated = rotate_image(binary, angle)
+        rotated = rotate_image(binary, float(angle))
 
         # Projection horizontale (somme par ligne)
         projection = np.sum(rotated, axis=1)
@@ -168,13 +168,13 @@ def detect_skew_projection(
 
         if variance > max_variance:
             max_variance = variance
-            best_angle = angle
+            best_angle = float(angle)
 
     # Vérifier que la variance trouvée est significative
     if max_variance == 0:
         return None
 
-    return best_angle
+    return float(best_angle)
 
 
 def rotate_image(
