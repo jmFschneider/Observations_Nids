@@ -174,6 +174,7 @@ def tester_transcription(image_path, model_name, prompt):
     except Exception as e:
         print(f"\n❌ ERREUR: {e}")
         import traceback  # noqa: PLC0415
+
         traceback.print_exc()
         return None
 
@@ -187,7 +188,9 @@ def main():
     if len(sys.argv) < 2:
         print("\n❌ Usage: python pilot/test_gemini_simple.py <chemin_image>")
         print("\nExemple:")
-        print('  python pilot/test_gemini_simple.py "media/jpeg_pdf/TRI_ANCIEN/FUSION_FULL/fiche 25_FINAL.jpg"')
+        print(
+            '  python pilot/test_gemini_simple.py "media/jpeg_pdf/TRI_ANCIEN/FUSION_FULL/fiche 25_FINAL.jpg"'
+        )
         sys.exit(1)
 
     image_path = sys.argv[1]

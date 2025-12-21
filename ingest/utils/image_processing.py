@@ -185,7 +185,9 @@ def apply_unsharp_mask(
     return sharpened
 
 
-def apply_adaptive_threshold(image: np.ndarray, block_size: int = 11, constant: int = 2) -> np.ndarray:
+def apply_adaptive_threshold(
+    image: np.ndarray, block_size: int = 11, constant: int = 2
+) -> np.ndarray:
     """
     Applique une binarisation adaptative pour convertir en noir et blanc.
 

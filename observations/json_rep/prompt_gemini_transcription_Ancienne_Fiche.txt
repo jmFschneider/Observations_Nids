@@ -81,6 +81,13 @@ Produit un SEUL et UNIQUE objet JSON **strictement structuré** selon le modèle
 7. **remarque** (string ou null) :
    Contient le texte libre visible dans la zone *"Remarques"* en bas de la page **verso**.
 
+et ajouter ces informations :
+"evaluation_ocr": {
+   "indice_confiance": "Elevé | Moyen | Faible",
+   "zones_douteuses": "Texte brut des passages difficiles à lire",
+   "commentaire_qualite_scan": "Note sur la lisibilité, l'éclairage ou l'écriture"
+}
+
 ⚠️ Contraintes :
 - Le JSON doit être UTF-8 valide.
 - Il ne doit contenir **aucun code Markdown** (` ```json ` etc.).

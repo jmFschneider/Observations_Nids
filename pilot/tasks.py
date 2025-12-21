@@ -357,9 +357,7 @@ def _log_progress(task_self, message, level='info', details=None):
 
 
 @shared_task(bind=True, name='pilot.process_batch_transcription')
-def process_batch_transcription_task(
-    self, directories: list[dict], modeles_ocr: list[str]
-):
+def process_batch_transcription_task(self, directories: list[dict], modeles_ocr: list[str]):
     """
     Tâche Celery pour traiter plusieurs répertoires en batch avec plusieurs modèles OCR.
 

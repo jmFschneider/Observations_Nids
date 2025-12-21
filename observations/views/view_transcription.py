@@ -66,7 +66,8 @@ def select_directory(request):
     directories = []
     try:
         dir_list = [
-            d for d in os.listdir(full_current_path)
+            d
+            for d in os.listdir(full_current_path)
             if os.path.isdir(os.path.join(full_current_path, d))
         ]
 
@@ -76,36 +77,42 @@ def select_directory(request):
 
             try:
                 # Compter les sous-répertoires
-                subdirs_count = len([
-                    d for d in os.listdir(dir_path)
-                    if os.path.isdir(os.path.join(dir_path, d))
-                ])
+                subdirs_count = len(
+                    [d for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))]
+                )
 
                 # Compter les fichiers images
-                images_count = len([
-                    f for f in os.listdir(dir_path)
-                    if os.path.isfile(os.path.join(dir_path, f))
-                    and f.lower().endswith(('.jpg', '.jpeg', '.png'))
-                ])
+                images_count = len(
+                    [
+                        f
+                        for f in os.listdir(dir_path)
+                        if os.path.isfile(os.path.join(dir_path, f))
+                        and f.lower().endswith(('.jpg', '.jpeg', '.png'))
+                    ]
+                )
 
                 # Récupérer la date de modification
                 mod_time = os.path.getmtime(dir_path)
                 mod_date = timezone.datetime.fromtimestamp(mod_time)
 
-                directories.append({
-                    'name': dir_name,
-                    'subdirs_count': subdirs_count,
-                    'images_count': images_count,
-                    'modified_date': mod_date,
-                })
+                directories.append(
+                    {
+                        'name': dir_name,
+                        'subdirs_count': subdirs_count,
+                        'images_count': images_count,
+                        'modified_date': mod_date,
+                    }
+                )
             except (OSError, PermissionError):
                 # Si on ne peut pas accéder aux stats, on ajoute quand même le dossier
-                directories.append({
-                    'name': dir_name,
-                    'subdirs_count': 0,
-                    'images_count': 0,
-                    'modified_date': None,
-                })
+                directories.append(
+                    {
+                        'name': dir_name,
+                        'subdirs_count': 0,
+                        'images_count': 0,
+                        'modified_date': None,
+                    }
+                )
 
         # Trier par ordre alphabétique
         directories.sort(key=lambda x: x['name'].lower())

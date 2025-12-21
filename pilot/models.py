@@ -189,7 +189,11 @@ class TranscriptionOCR(models.Model):
     @property
     def taux_precision(self):
         """Calcule le taux de précision (champs corrects / total)"""
-        if self.nombre_champs_total and self.nombre_champs_total > 0 and self.nombre_champs_corrects is not None:
+        if (
+            self.nombre_champs_total
+            and self.nombre_champs_total > 0
+            and self.nombre_champs_corrects is not None
+        ):
             return (self.nombre_champs_corrects / self.nombre_champs_total) * 100
         return None
 
