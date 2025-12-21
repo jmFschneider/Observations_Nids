@@ -8,13 +8,7 @@
 
 ## Table des matières
 
-1. [Contexte](#contexte)
-2. [Analyse d'impact](#analyse-dimpact)
-3. [Risques identifiés](#risques-identifiés)
-4. [Estimation de l'effort](#estimation-de-leffort)
-5. [Alternative sans risque](#alternative-sans-risque)
-6. [Checklist complète](#checklist-complète-si-renommage-nécessaire)
-7. [Recommandation](#recommandation)
+[TOC]
 
 ---
 

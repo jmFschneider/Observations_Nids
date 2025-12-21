@@ -1,14 +1,18 @@
-site_name: Observations Nids - Guide Utilisateur
-site_description: Guide utilisateur pour l'application Observations Nids
+site_name: Observations Nids - Documentation
+site_description: Documentation complète (Utilisateurs & Développeurs) pour l'application Observations Nids
 dev_addr: '127.0.0.1:8001'
 
-docs_dir: utilisateurs
+# Racine de la documentation = dossier courant (docs/)
+docs_dir: .
 site_dir: ../site-user
 
-# Thème avec support de recherche
+# Thème
 theme:
   name: material
   language: fr
+  logo: assets/images/logo.png # (Si existe, sinon à ajouter plus tard)
+  icon:
+    repo: fontawesome/brands/github
   palette:
     - scheme: default
       primary: green
@@ -17,23 +21,21 @@ theme:
     - navigation.instant
     - navigation.tracking
     - navigation.tabs
-    # - navigation.sections  # Désactivé pour permettre le repli
-    # - navigation.expand  # Désactivé : menu replié par défaut
-    - navigation.prune  # Élague automatiquement les sections non pertinentes
+    - navigation.prune
     - navigation.top
-    - navigation.indexes  # Permet des pages index pour les sections
+    - navigation.indexes
     - search.suggest
     - search.highlight
     - search.share
     - content.code.copy
     - toc.follow
-    # - toc.integrate  # Désactivé : TOC séparée à droite au lieu d'intégrée au menu
 
+# Assets centralisés
 extra_css:
-  - stylesheets/extra.css
+  - assets/stylesheets/extra.css
 
 extra_javascript:
-  - javascripts/navigation.js
+  - assets/javascripts/navigation.js
   - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js
 
 # Plugins
@@ -42,7 +44,7 @@ plugins:
       lang: fr
       separator: '[\s\-\.]'
 
-# Extension Markdown
+# Extensions Markdown
 markdown_extensions:
   - admonition
   - codehilite
@@ -58,13 +60,166 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.details
 
-# Navigation Utilisateurs
+# Navigation Structurée
+
 nav:
-  - '🏠 Accueil': 'README.md'
-  - '⚡ Démarrage Rapide': '00_guide_rapide.md'
-  - '📖 Guides Utilisateur':
-    - 'Navigation Générale': '01_navigation_generale.md'
-    - 'Saisir une Observation': '02_saisie_nouvelle_observation.md'
-    - 'Corriger des Fiches': '03_correction_transcription.md'
-    - 'Support et Tickets': '04_support_tickets.md'
-  - '📖 Glossaire': '05_glossaire.md'
+
+  - '🏠 Accueil': 'utilisateurs/README.md'
+
+  
+
+  - '👤 Espace Utilisateurs':
+
+    - '⚡ Démarrage Rapide': 'utilisateurs/00_guide_rapide.md'
+
+    - '📖 Guides':
+
+      - 'Navigation Générale': 'utilisateurs/01_navigation_generale.md'
+
+      - 'Saisir une Observation': 'utilisateurs/02_saisie_nouvelle_observation.md'
+
+      - 'Corriger des Fiches': 'utilisateurs/03_correction_transcription.md'
+
+      - 'Support et Tickets': 'utilisateurs/04_support_tickets.md'
+
+    - '📖 Glossaire': 'utilisateurs/05_glossaire.md'
+
+
+
+  - '💻 Espace Développeurs':
+
+    - '🏠 Accueil Développeur': 'developpeurs/index.md'
+
+    
+
+    - '🎯 Projet':
+
+      - 'Fonctionnalités': 'developpeurs/01_features.md'
+
+      - 'Roadmap': 'developpeurs/roadmap.md'
+
+      - 'Changelog': 'developpeurs/CHANGELOG.md'
+
+
+
+    - '🚀 Installation':
+
+      - 'Développement': 'developpeurs/installation/01_development_setup.md'
+
+      - 'Production': 'developpeurs/installation/02_production_deployment.md'
+
+      - 'Environnement Pilote': 'developpeurs/installation/03_environnement_pilote.md'
+
+
+
+    - '🏗️ Architecture':
+
+      - 'Vue d''ensemble': 'developpeurs/architecture/index.md'
+
+      - 'Diagramme ERD': 'developpeurs/architecture/diagrammes/erd.md'
+
+      - 'Domaines':
+
+        - 'Utilisateurs & Auth': 'developpeurs/architecture/domaines/01_users_and_auth.md'
+
+        - 'Observations Core': 'developpeurs/architecture/domaines/02_observations_core.md'
+
+        - 'OCR & Ingestion': 'developpeurs/architecture/domaines/03_ocr_ingestion.md'
+
+        - 'Audit': 'developpeurs/architecture/domaines/04_audit.md'
+
+        - 'Localisation': 'developpeurs/architecture/domaines/05_localisation.md'
+
+        - 'Nidification': 'developpeurs/architecture/domaines/06_nidification.md'
+
+        - 'Taxonomie': 'developpeurs/architecture/domaines/07_taxonomie.md'
+
+        - 'Validation': 'developpeurs/architecture/domaines/08_validation.md'
+
+        - 'Workflow Correction': 'developpeurs/architecture/domaines/09_workflow-correction.md'
+
+      - 'Transcription Gemini': 'developpeurs/architecture/transcription_gemini.md'
+
+
+
+    - '🔬 Analyses & Décisions':
+
+      - 'Flux Transcription': 'developpeurs/analyses/flux_transcription.md'
+
+      - 'Préparation Images OCR': 'developpeurs/guides/decision_technique/preparation_images_ocr.md'
+
+      - 'Renommage Modèles': 'developpeurs/guides/decision_technique/renommage_modeles.md'
+
+      - 'Téléversement': 'developpeurs/guides/decision_technique/televersement.md'
+
+      - 'Résumé Session (Nov 23)': 'developpeurs/guides/decision_technique/RESUME_SESSION_2025-11-23.md'
+
+
+
+    - '🔧 Guides & Processus':
+
+      - 'Processus Dev':
+
+        - 'Git Workflow': 'developpeurs/guides/development_process/01_git.md'
+
+        - 'CI/CD': 'developpeurs/guides/development_process/02_ci-cd.md'
+
+      - 'Documentation':
+
+        - 'Setup MkDocs': 'developpeurs/guides/documentation/mkdocs_setup.md'
+
+        - 'Implémentation Aide': 'developpeurs/guides/documentation/aide_utilisateur_impl.md'
+
+      - 'Guides Fonctionnels':
+
+        - 'Taxonomie': 'developpeurs/guides/01_taxonomie.md'
+
+        - 'Géolocalisation': 'developpeurs/guides/02_geolocalisation.md'
+
+        - 'Helpdesk': 'developpeurs/guides/03_django-helpdesk.md'
+
+        - 'Comptes Utilisateurs': 'developpeurs/guides/07_account.md'
+
+        - 'Gestion Communes': 'developpeurs/guides/08_gestion_communes.md'
+
+        - 'Anciennes Communes': 'developpeurs/guides/09_anciennes_communes.md'
+
+        - 'Menu Latéral': 'developpeurs/guides/06_side_bar.md'
+
+      - 'Maintenance':
+
+        - 'Monitoring': 'developpeurs/guides/05_monitoring_with_goaccess.md'
+
+        - 'Dépannage': 'developpeurs/guides/troubleshooting/01_troubleshooting.md'
+
+
+
+    - '🧪 Qualité & Tests':
+
+      - 'Stratégie de Tests': 'developpeurs/quality_and_testing/01_STRATEGIE_TESTS.md'
+
+      - 'Tests Reset MDP': 'developpeurs/quality_and_testing/02_TESTS_REINITIALISATION_MDP.md'
+
+
+
+    - '⚙️ Configuration & API':
+
+      - 'Config Générale': 'developpeurs/configuration/01_configuration.md'
+
+      - 'Reset Base de Données': 'developpeurs/configuration/02_reset_database.md'
+
+      - 'Référence API': 'developpeurs/api_reference/01_API_DOCUMENTATION.md'
+
+
+
+    - '📜 Logs & Historique':
+
+      - 'Modifs Transcription (Dec 2025)': 'developpeurs/logs/2025-12-20_modifs_transcription.md'
+
+      - 'Correctifs OCR (Dec 2025)': 'developpeurs/logs/2025-12-20_correctifs_ocr.md'
+
+      - 'Pilot Session (Dec 2024)': 'developpeurs/logs/2024-12-19_pilot_ocr_batch.md'
+
+      - 'Amélioration Tests (Nov 2025)': 'developpeurs/logs/2025-11-18_amelioration_tests.md'
+
+      - 'Archives Branches': 'developpeurs/logs/archived_branches.md'

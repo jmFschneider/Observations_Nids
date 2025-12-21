@@ -108,8 +108,8 @@ Ou suivez ces étapes :
 ## ❓ Besoin d'aide ?
 
 ### 📖 Documentation
-- Consultez les [guides détaillés ci-dessus](#-guides-utilisateur)
-- Parcourez la section [Questions fréquentes](./01_navigation_generale.md#-problemes-courants)
+- Consultez les [guides détaillés ci-dessus](#guides-utilisateur)
+- Parcourez la section [Questions fréquentes](./01_navigation_generale.md#problemes-courants)
 
 ### 🎫 Support
 - [Créez un ticket](./04_support_tickets.md) pour signaler un problème
