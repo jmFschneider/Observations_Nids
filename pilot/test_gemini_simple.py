@@ -20,8 +20,8 @@ import sys
 from pathlib import Path
 
 import django
-import google.generativeai as genai
 from dotenv import load_dotenv
+from google import genai
 from PIL import Image
 
 # Charger le fichier .env
@@ -49,15 +49,15 @@ def tester_modeles_gemini():
             print("❌ GEMINI_API_KEY non trouvée dans le fichier .env")
             return False
 
-        genai.configure(api_key=api_key)
+        client = genai.Client(api_key=api_key)
 
-        print("\nModèles supportant generateContent:")
-        for model in genai.list_models():
-            if 'generateContent' in model.supported_generation_methods:
-                print(f"  ✓ {model.name}")
+        print("\nModèles disponibles:")
+        models_list = client.models.list()
+        for model in models_list:
+            print(f"  ✓ {model.name}")
+            if hasattr(model, 'display_name'):
                 print(f"    Display name: {model.display_name}")
-                print(f"    Description: {model.description[:100]}...")
-                print()
+            print()
 
         return True
     except Exception as e:
@@ -112,14 +112,13 @@ def tester_transcription(image_path, model_name, prompt):
             print("   ❌ GEMINI_API_KEY non trouvée dans le fichier .env")
             return None
 
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(model_name)
-        print(f"   ✓ Modèle configuré: {model_name}")
+        client = genai.Client(api_key=api_key)
+        print(f"   ✓ Client configuré pour modèle: {model_name}")
 
         # Appeler l'API
         print("\n3️⃣ Appel de l'API Gemini...")
         print("   ⏳ En attente de la réponse...")
-        response = model.generate_content([prompt, img])
+        response = client.models.generate_content(model=model_name, contents=[prompt, img])
         print("   ✓ Réponse reçue!")
 
         # Extraire le texte

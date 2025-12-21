@@ -20,8 +20,7 @@ flower
 prometheus_client
 tornado
 humanize
-google-generativeai
-google-ai-generativelanguage
+google-genai
 google-api-core
 google-api-python-client
 google-auth

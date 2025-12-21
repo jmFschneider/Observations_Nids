@@ -5,9 +5,9 @@ import logging
 import os
 import time
 
-import google.generativeai as genai
 from celery import shared_task
 from django.conf import settings
+from google import genai
 from PIL import Image
 
 from observations.json_rep.json_sanitizer import corriger_json, validate_json_structure
@@ -55,8 +55,7 @@ def process_images_task(self, directory):
         logger.error("Clé API Gemini non configurée")
         return {'status': 'ERROR', 'error': "Clé API Gemini non configurée"}
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-2.0-flash")
+    client = genai.Client(api_key=api_key)
 
     # Charger le prompt
     prompt_path = os.path.join(
@@ -97,7 +96,9 @@ def process_images_task(self, directory):
         try:
             # Traitement de l'image
             image = Image.open(img_path)
-            response = model.generate_content([prompt, image])
+            response = client.models.generate_content(
+                model='gemini-2.0-flash', contents=[prompt, image]
+            )
             text_response = response.text.encode('utf-8').decode('utf-8')
 
             # Nettoyage des marqueurs markdown

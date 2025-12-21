@@ -17,7 +17,7 @@ jobs:
     services:
       # Label du conteneur de base de données
       mariadb:
-        image: mariadb:10.5
+        image: mariadb:10.11
         # Variables d'environnement pour initialiser la DB
         env:
           MYSQL_ROOT_PASSWORD: rootpassword

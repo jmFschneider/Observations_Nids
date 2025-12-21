@@ -12,11 +12,11 @@ import threading
 import time
 from functools import wraps
 
-import google.generativeai as genai
 from celery import shared_task
 from celery.result import AsyncResult
 from django.conf import settings
 from django.utils import timezone
+from google import genai
 from PIL import Image
 
 from observations.json_rep.json_sanitizer import corriger_json, validate_json_structure
@@ -85,12 +85,13 @@ def retry_with_backoff(max_retries=3, initial_delay=2, max_delay=16):
 
 
 @retry_with_backoff(max_retries=3, initial_delay=2)
-def call_gemini_api_with_timeout(model, prompt, image_path, timeout=120):
+def call_gemini_api_with_timeout(client, model_name, prompt, image_path, timeout=120):
     """
     Appel API Gemini avec timeout et retry automatique.
 
     Args:
-        model: Modèle Gemini initialisé
+        client: Client Google GenAI initialisé
+        model_name: Nom du modèle Gemini (ex: 'gemini-2.0-flash')
         prompt: Texte du prompt
         image_path: Chemin vers l'image
         timeout: Timeout en secondes (défaut: 120s = 2 minutes)
@@ -110,7 +111,9 @@ def call_gemini_api_with_timeout(model, prompt, image_path, timeout=120):
         try:
             image = Image.open(image_path)
             try:
-                response = model.generate_content([prompt, image])
+                response = client.models.generate_content(
+                    model=model_name, contents=[prompt, image]
+                )
                 result[0] = response.text.encode('utf-8').decode('utf-8')
             finally:
                 image.close()  # Libérer la mémoire
@@ -397,7 +400,7 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
         logger.error("Clé API Gemini non configurée")
         return {'status': 'ERROR', 'error': "Clé API Gemini non configurée"}
 
-    genai.configure(api_key=api_key)
+    client = genai.Client(api_key=api_key)
 
     # Log de démarrage
     _log_progress(
@@ -458,9 +461,6 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
             f"═══ Modèle {modele_index + 1}/{len(modeles_ocr)}: {modele_ocr} ({modele_api}) ═══",
             'info',
         )
-
-        # Initialiser le modèle Gemini
-        model = genai.GenerativeModel(modele_api)
 
         # Créer le rate limiter pour ce modèle (60 req/min = limite Google Gemini)
         rate_limiter = RateLimiter(requests_per_minute=60)
@@ -581,7 +581,8 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                     # Traitement de l'image avec le modèle OCR (avec retry, timeout)
                     api_start = time.time()
                     text_response = call_gemini_api_with_timeout(
-                        model=model,
+                        client=client,
+                        model_name=modele_api,
                         prompt=prompt,
                         image_path=img_path_complet,
                         timeout=120,  # 2 minutes max par image
