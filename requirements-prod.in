@@ -1,0 +1,7 @@
+# requirements-prod.in
+# Production-specific dependencies
+
+-r requirements-base.in
+
+# WSGI server for production
+gunicorn

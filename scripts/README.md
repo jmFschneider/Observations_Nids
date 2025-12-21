@@ -85,6 +85,51 @@ sudo ./scripts/maintenance_on.sh
 
 ---
 
+### 🖼️ Préparation d'images pour OCR
+
+| Script | Description | Usage |
+|--------|-------------|-------|
+| `prepare_images_gui.py` | Interface graphique pour la préparation locale d'images OCR (recommandé) | `python scripts/prepare_images_gui.py` |
+| `prepare_images_local.py` | Script CLI pour traiter les scans recto/verso en local | `python scripts/prepare_images_local.py --input DIR --output DIR` |
+
+**Fonctionnement** :
+- Traitement local sur PC puissant (vs serveur Raspberry Pi limité)
+- Détection automatique des paires recto/verso (patterns : xxx-R/xxx-V, xxx_recto/xxx_verso, etc.)
+- Redressement automatique (deskewing) avec 3 algorithmes
+- Optimisations OCR (CLAHE, débruitage, sharpening)
+- Recadrage verso configurable (100% ou 55%)
+- Génération de metadata.json pour import Django ultérieur
+
+**Workflow** :
+1. Traitement local : `python scripts/prepare_images_gui.py`
+2. Transfert vers serveur : copier `prepared/` manuellement ou via script
+3. Import Django : via interface web "Importer un lot préparé"
+
+**Interface graphique (GUI)** :
+- Sauvegarde automatique des préférences dans `~/.observations_nids_preferences.json`
+- Sélection de dossiers via boutons "Parcourir..."
+- Logs en temps réel
+- Bouton Arrêter pour interrompre le traitement
+
+**Options CLI** :
+- `--input DIR` : Dossier contenant les scans bruts
+- `--output DIR` : Dossier de sortie
+- `--crop 55|100` : Recadrage du verso en % (défaut: 100)
+- `--operateur NAME` : Nom de l'opérateur
+- `--skip-deskew` : Désactiver le redressement automatique
+- `--skip-optimize` : Désactiver les optimisations OCR
+- `--preview` : Mode aperçu (n'enregistre pas)
+- `--verbose` : Logs détaillés
+
+**Dépendances** :
+```bash
+pip install opencv-python numpy deskew tqdm
+```
+
+**Documentation complète** : [PREPARATION_IMAGES.md](./PREPARATION_IMAGES.md)
+
+---
+
 ## 📦 Déploiement des scripts sur le serveur
 
 ### Méthode 1 : Via SCP (recommandée)

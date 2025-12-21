@@ -1,0 +1,97 @@
+Tu vas analyser une fiche d’observation manuscrite (recto + verso combinés dans une seule image).
+
+[CONTEXTE : VERSION "ANCIENNE FICHE"]
+Tu analyses une fiche d'observation ornithologique d'archive (modèle années 70/80).
+Cette fiche diffère du standard moderne. Tu dois adapter ta lecture visuelle tout en conservant STRICTEMENT le schéma JSON de sortie demandé.
+
+[GUIDE DE LECTURE SPÉCIFIQUE - FICHE ANCIENNE]
+
+1. LOCALISATION DES CHAMPS D'EN-TÊTE (Recto) :
+   - L'Année est souvent écrite VERTICALEMENT dans la marge de droite (sous l'Altitude). Cherche bien une écriture orientée à 90°.
+   - "IGN" : Cherche le champ "Feuille IGN 1/25000" en haut à droite.
+   - "Hauteur / sol" : Se trouve tout en bas au centre (ex: "1,50 m").
+
+2. GESTION DE LA COLONNE DE GAUCHE (RÉSULTATS) :
+   Cette fiche utilise des cases à cocher pour le bilan (Succès/Échec) au lieu de dates.
+   - Si une case est cochée dans la section "Échec" (ex: "Nid vide", "Oeufs abandonnés"), transcris le libellé de la case dans le champ JSON "causes_echec".
+   - Si des annotations manuscrites sont ajoutées dans cette colonne, ajoute-les dans le champ "remarque".
+
+3. TABLEAU DE DONNÉES :
+   - Le tableau des visites (Jour/Mois/Oeufs...) ne figure PAS sur le recto de ce modèle.
+   - Cherche-le impérativement sur la partie VERSO de l'image.
+   - Si le verso est absent ou vide, renvoie un tableau vide `[]`.
+
+4. NORMALISATION :
+   - Années : Si l'année est notée "77", convertis-la en "1977".
+   - Coordonnées : Le champ "Lieu-dit ou coordonnées" peut contenir des descriptions textuelles.
+
+[INSTRUCTION FINALE]
+Malgré ces différences visuelles, tu DOIS mapper les informations trouvées dans le format JSON standard ci-dessous. Si un champ précis (ex: "h_c_vert") n'existe pas sur ce vieux papier, mets `null`.
+
+
+Produit un SEUL et UNIQUE objet JSON **strictement structuré** selon le modèle suivant :
+
+1. **informations_generales** (object) :
+   - n_fiche (string ou null)
+   - observateur (string ou null)
+   - n_espece (null ou code numérique si lisible)
+   - espece (string)
+   - annee (année complète, format "YYYY")
+
+2. **nid** (object) :
+   - nid_prec_t_meme_c_ple (booléen ou null)
+   - haut_nid (string ou null, valeur numérique sans unité)
+   - h_c_vert (string ou null)
+   - nid (texte libre, tel que décrit)
+
+3. **localisation** (object) :
+   - IGN_50000 (string ou null)
+   - commune (string ou null)
+   - dep_t (string ou null)
+   - coordonnees_et_ou_lieu_dit (string ou null)
+   - altitude (string ou null)
+   - paysage (string ou null)
+   - alentours (string ou null)
+
+4. **tableau_donnees** (array of objects) :
+   Représente l’ensemble des lignes du tableau d’observation, y compris celles visibles au verso.
+   Chaque ligne contient :
+   - Jour (entier entre 1 et 31, ou null)
+   - Mois (entier entre 1 et 12, ou null)
+   - Heure (entier entre 1 et 24, ou null)
+   - Nombre_oeuf (entier entre 0 et 12, ou null)
+   - Nombre_pou (entier entre 0 et 12, ou null)
+   - age (texte ou null)
+   - observations (texte libre ou null)
+
+⚠️ Ne conserve pas les lignes si **tous les champs sont vides ou null**.
+
+⚠️ Si le jour et le mois sont confondus (ex: `"30,5"`), les **séparer** :
+- "30,5" doit être interprété comme **Jour = 30**, **Mois = 5**.
+
+
+5. **tableau_donnees_2** (object) :
+   - 1er_o_pondu, 1er_p_eclos, 1er_p_volant : objets avec : jour, Mois, Precision
+   - nombre_oeufs : pondus, eclos, n_ecl
+   - nombre_poussins : 1/2, 3/4, vol_t
+
+6. **causes_echec** (object) :
+   - causes_d_echec (texte libre ou null)
+
+7. **remarque** (string ou null) :
+   Contient le texte libre visible dans la zone *"Remarques"* en bas de la page **verso**.
+
+et ajouter ces informations :
+"evaluation_ocr": {
+   "indice_confiance": "Elevé | Moyen | Faible",
+   "zones_douteuses": "Texte brut des passages difficiles à lire",
+   "commentaire_qualite_scan": "Note sur la lisibilité, l'éclairage ou l'écriture"
+}
+
+⚠️ Contraintes :
+- Le JSON doit être UTF-8 valide.
+- Il ne doit contenir **aucun code Markdown** (` ```json ` etc.).
+- Tous les noms de champ doivent être **strictement respectés**.
+- Utilise **null** si une donnée est absente.
+
+Ta sortie doit être **un seul dictionnaire JSON propre et complet**.

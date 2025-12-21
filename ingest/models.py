@@ -5,6 +5,60 @@ from core.constants import STATUT_IMPORTATION_CHOICES
 from taxonomy.models import Espece
 
 
+class PreparationImage(models.Model):
+    """
+    Stocke l'historique de préparation des images avant OCR.
+    Permet de tracer les opérations effectuées sur les scans bruts
+    (fusion recto/verso, rotation, prétraitements, etc.).
+    """
+
+    # Fichiers sources (scans bruts)
+    fichier_brut_recto = models.CharField(max_length=255, help_text="Chemin du scan brut recto")
+    fichier_brut_verso = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Chemin du scan brut verso (optionnel si fiche recto seulement)",
+    )
+
+    # Fichier résultat (fusionné et prétraité)
+    fichier_fusionne = models.ImageField(
+        upload_to='prepared_images/%Y/',
+        unique=True,
+        help_text="Image fusionnée recto+verso optimisée pour OCR",
+    )
+
+    # Métadonnées de traitement
+    operations_effectuees = models.JSONField(
+        default=dict,
+        help_text="Liste des opérations de traitement (rotation, crop, contraste, etc.)",
+    )
+
+    # Traçabilité
+    operateur = models.ForeignKey(
+        Utilisateur,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='preparations_images',
+        help_text="Utilisateur ayant effectué la préparation",
+    )
+    date_preparation = models.DateTimeField(
+        auto_now_add=True, help_text="Date et heure de la préparation"
+    )
+    notes = models.TextField(blank=True, help_text="Notes ou remarques sur cette préparation")
+
+    class Meta:
+        verbose_name = "Préparation d'image"
+        verbose_name_plural = "Préparations d'images"
+        ordering = ['-date_preparation']
+        indexes = [
+            models.Index(fields=['date_preparation']),
+            models.Index(fields=['operateur']),
+        ]
+
+    def __str__(self):
+        return f"Préparation #{self.id} - {self.date_preparation.strftime('%Y-%m-%d %H:%M')}"
+
+
 class TranscriptionBrute(models.Model):
     fichier_source = models.CharField(max_length=255, unique=True)
     json_brut = models.JSONField()

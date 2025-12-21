@@ -205,7 +205,7 @@ class ResumeObservation(models.Model):
             # Paires jour/mois : soit les deux NULL, soit les deux renseignés
             models.CheckConstraint(
                 name="resume_premier_oeuf_pondu_jour_mois_both_or_none",
-                check=(
+                condition=(
                     (
                         Q(premier_oeuf_pondu_jour__isnull=True)
                         & Q(premier_oeuf_pondu_mois__isnull=True)
@@ -218,7 +218,7 @@ class ResumeObservation(models.Model):
             ),
             models.CheckConstraint(
                 name="resume_premier_poussin_eclos_jour_mois_both_or_none",
-                check=(
+                condition=(
                     (
                         Q(premier_poussin_eclos_jour__isnull=True)
                         & Q(premier_poussin_eclos_mois__isnull=True)
@@ -231,7 +231,7 @@ class ResumeObservation(models.Model):
             ),
             models.CheckConstraint(
                 name="resume_premier_poussin_volant_jour_mois_both_or_none",
-                check=(
+                condition=(
                     (
                         Q(premier_poussin_volant_jour__isnull=True)
                         & Q(premier_poussin_volant_mois__isnull=True)
@@ -245,7 +245,7 @@ class ResumeObservation(models.Model):
             # Compteurs cohérents (uniquement si valeurs renseignées)
             models.CheckConstraint(
                 name="resume_eclos_le_pondus",
-                check=(
+                condition=(
                     Q(nombre_oeufs_eclos__isnull=True)
                     | Q(nombre_oeufs_pondus__isnull=True)
                     | Q(nombre_oeufs_eclos__lte=models.F("nombre_oeufs_pondus"))
@@ -253,7 +253,7 @@ class ResumeObservation(models.Model):
             ),
             models.CheckConstraint(
                 name="resume_non_eclos_le_pondus",
-                check=(
+                condition=(
                     Q(nombre_oeufs_non_eclos__isnull=True)
                     | Q(nombre_oeufs_pondus__isnull=True)
                     | Q(nombre_oeufs_non_eclos__lte=models.F("nombre_oeufs_pondus"))
@@ -261,7 +261,7 @@ class ResumeObservation(models.Model):
             ),
             models.CheckConstraint(
                 name="resume_poussins_le_eclos",
-                check=(
+                condition=(
                     Q(nombre_poussins__isnull=True)
                     | Q(nombre_oeufs_eclos__isnull=True)
                     | Q(nombre_poussins__lte=models.F("nombre_oeufs_eclos"))
@@ -321,7 +321,7 @@ class EtatCorrection(models.Model):
         constraints = [
             models.CheckConstraint(
                 name="etat_correction_pourcentage_valide",
-                check=Q(pourcentage_completion__gte=0) & Q(pourcentage_completion__lte=100),
+                condition=Q(pourcentage_completion__gte=0) & Q(pourcentage_completion__lte=100),
             ),
         ]
 

@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     'review.apps.ReviewConfig',
     'ingest.apps.IngestConfig',
     'audit.apps.AuditConfig',
+    'pilot.apps.PilotConfig',  # ⚠️ PILOTE UNIQUEMENT - Retirer en production
     'bootstrap4form',  # Required for nicer formatting of forms with the default templates
     'crispy_forms',  # Add crispy_forms
     'crispy_bootstrap5',  # Add crispy_bootstrap5 for Bootstrap 5 integration

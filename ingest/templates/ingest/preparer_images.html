@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Préparation des images pour OCR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .preview-container {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        margin: 10px 0;
+        min-height: 200px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    .preview-image {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+    .file-input-label {
+        cursor: pointer;
+        padding: 10px 20px;
+        background: #007bff;
+        color: white;
+        border-radius: 4px;
+        display: inline-block;
+    }
+    .file-input-label:hover {
+        background: #0056b3;
+    }
+    .progress-section {
+        display: none;
+        margin-top: 20px;
+    }
+    #fusionCanvas {
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        max-width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'ingest:accueil_importation' %}">Importation</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Préparer des images</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4"><i class="fas fa-crop-alt"></i> Préparation des images pour OCR</h1>
+
+    <div class="alert alert-info">
+        <h5><i class="fas fa-info-circle"></i> Comment ça fonctionne ?</h5>
+        <ol class="mb-0">
+            <li>Sélectionnez un dossier contenant vos scans (recto et verso)</li>
+            <li>Les paires recto/verso sont détectées automatiquement</li>
+            <li>Les images sont fusionnées et optimisées pour l'OCR</li>
+            <li>Validation visuelle puis sauvegarde</li>
+        </ol>
+    </div>
+
+    <!-- Sélection du dossier -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-folder-open"></i> Étape 1 : Sélection des fichiers</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="folderInput" class="form-label">
+                    Sélectionnez un dossier contenant les scans recto/verso :
+                </label>
+                <input
+                    type="file"
+                    id="folderInput"
+                    class="form-control"
+                    webkitdirectory
+                    directory
+                    multiple
+                    accept="image/*"
+                >
+                <small class="form-text text-muted">
+                    Les fichiers doivent contenir "recto" et "verso" dans leur nom pour être appariés automatiquement.
+                </small>
+            </div>
+
+            <div id="fileStats" class="alert alert-secondary" style="display: none;">
+                <strong>Fichiers détectés :</strong>
+                <ul id="fileStatsList" class="mb-0 mt-2"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aperçu et traitement -->
+    <div class="card mb-4" id="processingCard" style="display: none;">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-images"></i> Étape 2 : Préparation de la fiche</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Aperçu Recto -->
+                <div class="col-md-6">
+                    <h6>Recto</h6>
+                    <div class="preview-container">
+                        <canvas id="rectoCanvas" style="max-width: 100%;"></canvas>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">Rotation :</label>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="rotateImage('recto', -90)">
+                                <i class="fas fa-undo"></i> -90°
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="rotateImage('recto', 90)">
+                                <i class="fas fa-redo"></i> +90°
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="rotateImage('recto', 180)">
+                                <i class="fas fa-sync"></i> 180°
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aperçu Verso -->
+                <div class="col-md-6">
+                    <h6>Verso</h6>
+                    <div class="preview-container">
+                        <canvas id="versoCanvas" style="max-width: 100%;"></canvas>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">Rotation :</label>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="rotateImage('verso', -90)">
+                                <i class="fas fa-undo"></i> -90°
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="rotateImage('verso', 90)">
+                                <i class="fas fa-redo"></i> +90°
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="rotateImage('verso', 180)">
+                                <i class="fas fa-sync"></i> 180°
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Aperçu fusion -->
+            <div class="mt-4">
+                <h6>Aperçu de l'image fusionnée</h6>
+                <div class="preview-container text-center">
+                    <canvas id="fusionCanvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="mt-4">
+                <label for="notesInput" class="form-label">Notes (optionnel) :</label>
+                <textarea id="notesInput" class="form-control" rows="2" placeholder="Remarques sur cette fiche..."></textarea>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-4 d-flex justify-content-between">
+                <div>
+                    <span id="currentFicheInfo" class="text-muted"></span>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-secondary" onclick="ignorerFiche()">
+                        <i class="fas fa-forward"></i> Ignorer
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="validerFiche()">
+                        <i class="fas fa-check"></i> Valider et suivante
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progression globale -->
+    <div class="progress-section" id="progressSection">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-tasks"></i> Progression</h5>
+            </div>
+            <div class="card-body">
+                <div class="progress mb-2" style="height: 25px;">
+                    <div id="progressBar" class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%;">
+                        0%
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col">
+                        <strong id="countTraitees">0</strong>
+                        <div class="text-muted small">Traitées</div>
+                    </div>
+                    <div class="col">
+                        <strong id="countErreurs">0</strong>
+                        <div class="text-muted small">Erreurs</div>
+                    </div>
+                    <div class="col">
+                        <strong id="countRestantes">0</strong>
+                        <div class="text-muted small">Restantes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'ingest/js/preparation_images.js' %}"></script>
+{% endblock %}

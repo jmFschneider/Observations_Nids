@@ -6,26 +6,223 @@
 <div class="container mt-4">
     <h2>Sélection du répertoire d'images à transcrire</h2>
 
-    <form method="post" id="directory-form">
-        {% csrf_token %}
+    <!-- Fil d'Ariane (Breadcrumb) -->
+    <nav aria-label="breadcrumb" class="mt-4 mb-4">
+        <ol class="breadcrumb py-3">
+            <li class="breadcrumb-item">
+                <a href="{% url 'observations:select_directory' %}">
+                    <i class="fas fa-home"></i> Racine
+                </a>
+            </li>
+            {% for crumb in breadcrumb %}
+                {% if forloop.last %}
+                    <li class="breadcrumb-item active" aria-current="page">{{ crumb.name }}</li>
+                {% else %}
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'observations:select_directory' %}?path={{ crumb.path }}">{{ crumb.name }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+    </nav>
 
-        <div class="form-group">
-            <label for="selected_directory">Sélectionnez un répertoire d'images:</label>
-            <select name="selected_directory" id="selected_directory" class="form-control">
-                <option value="">-- Choisir un répertoire --</option>
-                {% for dir in directories %}
-                    <option value="{{ dir }}">{{ dir }}</option>
-                {% endfor %}
-            </select>
+    <!-- Informations sur le répertoire actuel -->
+    <div class="card mb-4">
+        <div class="card-body py-4">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h6 class="text-muted mb-2">
+                        <i class="fas fa-folder-open"></i> RÉPERTOIRE ACTUEL
+                    </h6>
+                    <p class="h5 mb-0">
+                        {% if current_path %}{{ current_path }}{% else %}<em>Racine</em>{% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-2">
+                        <i class="fas fa-images"></i> IMAGES TROUVÉES
+                    </h6>
+                    <p class="h5 mb-0">
+                        {% if image_count > 0 %}
+                            <span class="badge bg-success" style="font-size: 1.1rem;">{{ image_count }} fichier{{ image_count|pluralize }}</span>
+                        {% else %}
+                            <span class="text-muted">Aucune image</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <div id="directory-info" class="alert alert-info mt-3" style="display: none;">
-            <p>Nombre d'images trouvées: <span id="file-count">0</span></p>
+    <!-- Actions sur le répertoire actuel -->
+    <div class="card mb-5 {% if image_count > 0 %}border-success{% else %}border-warning{% endif %}">
+        <div class="card-body py-4">
+            {% if image_count > 0 %}
+                <h5 class="card-title mb-3">
+                    <i class="fas fa-check-circle text-success"></i> Ce répertoire contient des images
+                </h5>
+                <p class="card-text mb-4">
+                    Vous pouvez sélectionner ce répertoire pour lancer la transcription des <strong>{{ image_count }} image{{ image_count|pluralize }}</strong>.
+                </p>
+            {% else %}
+                <h5 class="card-title mb-3">
+                    <i class="fas fa-exclamation-triangle text-warning"></i> Ce répertoire ne contient pas d'images
+                </h5>
+                <p class="card-text mb-4">
+                    Ce répertoire ne contient aucune image à transcrire. Vous pouvez naviguer dans les sous-répertoires ci-dessous ou sélectionner ce répertoire si vous souhaitez tout de même l'utiliser.
+                </p>
+            {% endif %}
+
+            <form method="post" id="directory-form">
+                {% csrf_token %}
+                <input type="hidden" name="selected_directory" value="{{ current_path }}">
+                <button type="submit" class="btn {% if image_count > 0 %}btn-success{% else %}btn-warning{% endif %} btn-lg">
+                    <i class="fas fa-check-circle"></i> Sélectionner ce répertoire
+                </button>
+            </form>
+
+            <div id="directory-info" class="mt-4" style="display: none;">
+                <div class="alert alert-success">
+                    <p class="mb-2"><i class="fas fa-check"></i> Répertoire sélectionné avec succès!</p>
+                    <p class="mb-0">Nombre d'images à traiter: <strong><span id="file-count">0</span></strong></p>
+                </div>
+                <a href="{% url 'observations:process_images' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-magic"></i> Commencer la transcription
+                </a>
+            </div>
         </div>
+    </div>
 
-        <button type="submit" class="btn btn-primary mt-3">Sélectionner ce répertoire</button>
-    </form>
+    <!-- Liste des sous-répertoires -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-folder"></i> Sous-répertoires disponibles</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if parent_path is not None %}
+            <div class="p-3 border-bottom bg-light">
+                <a href="{% url 'observations:select_directory' %}?path={{ parent_path }}"
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-level-up-alt"></i> Remonter au dossier parent
+                </a>
+            </div>
+            {% endif %}
+
+            {% if directories %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;"></th>
+                            <th>Nom du répertoire</th>
+                            <th class="text-center" style="width: 150px;">
+                                <i class="fas fa-folder" title="Sous-dossiers"></i> Sous-dossiers
+                            </th>
+                            <th class="text-center" style="width: 150px;">
+                                <i class="fas fa-images" title="Images"></i> Images
+                            </th>
+                            <th class="text-center" style="width: 200px;">
+                                <i class="fas fa-clock" title="Dernière modification"></i> Modifié le
+                            </th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dir in directories %}
+                        <tr class="directory-row" style="cursor: pointer;"
+                            onclick="window.location='{% url 'observations:select_directory' %}?path={{ current_path }}{% if current_path %}/{% endif %}{{ dir.name }}'">
+                            <td class="text-center">
+                                <i class="fas fa-folder text-warning fa-lg"></i>
+                            </td>
+                            <td>
+                                <strong>{{ dir.name }}</strong>
+                            </td>
+                            <td class="text-center">
+                                {% if dir.subdirs_count > 0 %}
+                                    <span class="badge bg-info">{{ dir.subdirs_count }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if dir.images_count > 0 %}
+                                    <span class="badge bg-success">{{ dir.images_count }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center text-muted">
+                                {% if dir.modified_date %}
+                                    {{ dir.modified_date|date:"d/m/Y H:i" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <i class="fas fa-chevron-right text-muted"></i>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-3">
+                <div class="alert alert-warning mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Aucun sous-répertoire trouvé dans ce dossier.
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
+<style>
+.breadcrumb {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.card-header h5 {
+    margin: 0;
+}
+
+/* Style pour les lignes du tableau */
+.directory-row {
+    transition: background-color 0.2s ease;
+}
+
+.directory-row:hover {
+    background-color: #f8f9fa !important;
+}
+
+.directory-row td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+}
+
+/* Style pour les badges */
+.badge {
+    font-size: 0.875rem;
+    padding: 0.35em 0.65em;
+}
+
+/* Améliorer l'apparence de l'en-tête du tableau */
+.table thead th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Style pour le bouton de remontée */
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+}
+</style>
 
 <script>
 document.getElementById('directory-form').addEventListener('submit', function(e) {
@@ -46,25 +243,13 @@ document.getElementById('directory-form').addEventListener('submit', function(e)
         if (data.success) {
             document.getElementById('directory-info').style.display = 'block';
             document.getElementById('file-count').textContent = data.file_count;
-
-            // Ajouter un bouton pour commencer le traitement
-            const startButtonsContainer = document.createElement('div');
-            startButtonsContainer.className = "mt-3";
-
-            // Option 1: Commencer immédiatement (redirection vers process_images)
-            const startButton = document.createElement('a');
-            startButton.href = "{% url 'observations:process_images' %}";
-            startButton.className = "btn btn-success";
-            startButton.textContent = "Commencer la transcription";
-            startButtonsContainer.appendChild(startButton);
-
-            form.appendChild(startButtonsContainer);
         } else {
             alert("Erreur: " + data.error);
         }
     })
     .catch(error => {
         console.error('Erreur:', error);
+        alert("Une erreur s'est produite lors de la sélection du répertoire.");
     });
 });
 </script>
