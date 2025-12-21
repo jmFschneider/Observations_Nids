@@ -1,0 +1,94 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Tests
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# Documentation
+docs/_build/
+site/
+site-user/
+
+# Database
+*.sqlite3
+*.db
+
+# Logs
+*.log
+logs/
+
+# Media files (seront dans des volumes)
+mediafiles/
+staticfiles/
+
+# Docker
+docker-compose*.yml
+Dockerfile
+.dockerignore
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# CI/CD
+.github/
+
+# Development
+requirements-dev.txt
+requirements-dev.in
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Claude Code
+.claude/
+
+# Syncthing
+.stfolder/
+.stignore
+
+# Markdown temporaires
+*.md
+!README.md
+!README-DOCKER.md
+
+# Scripts de développement
+scripts/
+
+# Répertoires de test
+test_scans/

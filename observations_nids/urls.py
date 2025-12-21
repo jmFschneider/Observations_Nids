@@ -20,8 +20,10 @@ from django.contrib import admin
 from django.urls import include, path
 
 from observations_nids import settings
+from observations_nids.health import health_check
 
 urlpatterns = [
+    path('health/', health_check, name='health_check'),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('', include('observations.urls')),

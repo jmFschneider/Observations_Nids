@@ -1,0 +1,56 @@
+# Configuration Docker Compose pour le développement
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.8'
+
+services:
+  # Application Django en mode développement
+  web:
+    environment:
+      - DEBUG=True
+      - ALLOWED_HOSTS=*
+    volumes:
+      # Monter le code source pour le hot-reload
+      - ..:/app
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"  # Exposer directement pour le développement
+
+  # Celery Worker en mode développement
+  celery_worker:
+    environment:
+      - DEBUG=True
+    volumes:
+      - ..:/app
+    # Loglevel debug pour plus de détails
+    command: celery -A observations_nids worker --loglevel=debug --concurrency=1
+
+  # Celery Beat en mode développement
+  celery_beat:
+    environment:
+      - DEBUG=True
+    volumes:
+      - ..:/app
+    command: celery -A observations_nids beat --loglevel=debug
+
+  # Flower accessible directement
+  flower:
+    environment:
+      - DEBUG=True
+    volumes:
+      - ..:/app
+
+  # MariaDB avec port exposé pour outils externes
+  db:
+    ports:
+      - "3306:3306"
+
+  # Redis avec port exposé
+  redis:
+    ports:
+      - "6379:6379"
+
+  # Radicale avec port exposé
+  radicale:
+    ports:
+      - "5232:5232"
