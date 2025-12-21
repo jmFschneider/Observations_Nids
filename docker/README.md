@@ -47,30 +47,42 @@ docker compose version
 
 ## Installation rapide
 
-```bash
-# 1. Cloner le dépôt (si pas déjà fait)
-git clone https://github.com/votre-repo/observations_nids.git
-cd observations_nids
+### Installation version pilote sur Ubuntu
 
-# 2. Aller dans le répertoire docker
+```bash
+# 1. Créer un utilisateur dédié (recommandé pour production)
+sudo useradd -m -s /bin/bash observations
+sudo usermod -aG docker observations
+
+# 2. Se connecter comme cet utilisateur
+sudo su - observations
+
+# 3. Cloner le dépôt dans le home (version pilote)
+git clone https://github.com/jmFschneider/Observations_Nids.git observations_nids_pilote
+cd observations_nids_pilote
+
+# 4. Aller dans le répertoire docker
 cd docker
 
-# 3. Créer le fichier .env depuis le template
+# 5. Créer le fichier .env depuis le template
 cp .env.example .env
 
-# 4. Éditer le fichier .env avec vos valeurs
+# 6. Éditer le fichier .env avec vos valeurs
 nano .env
 
-# 5. Construire et démarrer tous les services
+# 7. Construire et démarrer tous les services
 docker compose up -d --build
 
-# 6. Vérifier que tout fonctionne
+# 8. Vérifier que tout fonctionne
 docker compose ps
 ```
 
-L'application sera accessible sur http://localhost
+L'application sera accessible sur http://votre-serveur
 
-**Note** : Tous les fichiers de configuration Docker sont dans le répertoire `docker/`. Vous devez toujours exécuter les commandes depuis ce répertoire.
+**Note** :
+- Tous les fichiers de configuration Docker sont dans le répertoire `docker/`
+- Cette installation est nommée `observations_nids_pilote` pour la version pilote
+- Vous devez toujours exécuter les commandes depuis le répertoire `docker/`
 
 ## Configuration
 

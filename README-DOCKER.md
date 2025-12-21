@@ -6,16 +6,23 @@ Tous les fichiers de configuration Docker ont été organisés dans le répertoi
 
 ## 🚀 Démarrage rapide
 
-```bash
-# 1. Aller dans le répertoire docker
-cd docker
+### Sur Ubuntu (version pilote)
 
-# 2. Copier et configurer les variables d'environnement
+```bash
+# 1. Créer un utilisateur dédié
+sudo useradd -m -s /bin/bash observations
+sudo usermod -aG docker observations
+sudo su - observations
+
+# 2. Cloner le dépôt (version pilote)
+git clone https://github.com/jmFschneider/Observations_Nids.git observations_nids_pilote
+cd observations_nids_pilote/docker
+
+# 3. Copier et configurer les variables d'environnement
 cp .env.example .env
 nano .env
 
-# 3. Démarrer avec le Makefile (recommandé)
-make init
+# 4. Démarrer avec le Makefile (recommandé)
 make build
 make up
 
