@@ -45,8 +45,8 @@ RUN pip install --upgrade pip && \
 # Copier le code de l'application
 COPY --chown=django:django . .
 
-# Copier le script d'entrée
-COPY docker-entrypoint.sh /usr/local/bin/
+# Copier le script d'entrée (depuis le contexte de build à la racine)
+COPY docker/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Collecter les fichiers statiques (sera refait au démarrage si nécessaire)
