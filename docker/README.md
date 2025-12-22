@@ -174,11 +174,15 @@ cd /opt/observations_nids_pilote/docker
 cp .env.example .env
 nano .env
 
-# 7. Construire et démarrer
-docker compose up -d --build
+# 7. Construire les images (première installation)
+docker compose build
 
-# 8. Vérifier
+# 8. Démarrer tous les services
+docker compose up -d
+
+# 9. Vérifier que tout fonctionne
 docker compose ps
+docker compose logs -f
 ```
 
 **Emplacement final** : `/opt/observations_nids_pilote/`
@@ -203,11 +207,15 @@ cd observations_nids_pilote/docker
 cp .env.example .env
 nano .env
 
-# 5. Construire et démarrer
-docker compose up -d --build
+# 5. Construire les images (première installation)
+docker compose build
 
-# 6. Vérifier
+# 6. Démarrer tous les services
+docker compose up -d
+
+# 7. Vérifier que tout fonctionne
 docker compose ps
+docker compose logs -f
 ```
 
 **Emplacement final** : `/home/observations/observations_nids_pilote/`
@@ -240,7 +248,8 @@ cp .env.example .env
 # Django
 SECRET_KEY=votre-secret-key-tres-longue-et-aleatoire
 DEBUG=False
-ALLOWED_HOSTS=votre-domaine.com,www.votre-domaine.com,localhost
+# IMPORTANT: Utiliser le format JSON pour ALLOWED_HOSTS avec Docker
+ALLOWED_HOSTS='["votre-domaine.com","www.votre-domaine.com","localhost","127.0.0.1"]'
 
 # Base de données
 DB_ROOT_PASSWORD=mot-de-passe-root-tres-fort
@@ -280,19 +289,49 @@ Pour activer HTTPS :
 
 ## Démarrage
 
-### Premier démarrage
+### Premier démarrage (recommandé en deux étapes)
+
+**Méthode recommandée** pour la première installation ou après modifications du Dockerfile :
 
 ```bash
-# Construire les images et démarrer tous les services
+# 1. Construire les images Docker
+docker compose build
+
+# 2. Démarrer tous les services
+docker compose up -d
+
+# 3. Suivre les logs pour vérifier
+docker compose logs -f
+
+# Attendre que tous les services soient prêts (environ 1-2 minutes)
+# Ctrl+C pour quitter les logs
+```
+
+**Avantages** :
+- ✅ Erreurs de build plus claires et isolées
+- ✅ Meilleur pour le débogage
+- ✅ Plus de contrôle sur le processus
+
+### Méthode alternative (tout en une commande)
+
+**Pour les mises à jour futures** ou si vous êtes pressé :
+
+```bash
+# Construire ET démarrer en une seule commande
 docker compose up -d --build
 
 # Suivre les logs
 docker compose logs -f
-
-# Attendre que tous les services soient prêts (environ 1-2 minutes)
 ```
 
-### Démarrages suivants
+**Avantages** :
+- ✅ Plus rapide (une seule commande)
+- ✅ Pratique pour les mises à jour
+
+**Inconvénient** :
+- ⚠️ Si le build échoue, les erreurs sont moins visibles
+
+### Démarrages suivants (services déjà construits)
 
 ```bash
 # Démarrer tous les services
@@ -303,6 +342,9 @@ docker compose down
 
 # Redémarrer un service spécifique
 docker compose restart web
+
+# Voir les logs d'un service
+docker compose logs -f web
 ```
 
 ## Gestion des conteneurs
@@ -448,6 +490,28 @@ docker compose restart db
 # Attendre 30 secondes et redémarrer l'app
 sleep 30
 docker compose restart web
+```
+
+### Erreur JSON parsing pour ALLOWED_HOSTS
+
+Si vous obtenez une erreur `json.decoder.JSONDecodeError` au démarrage :
+
+**Cause** : Le format CSV de ALLOWED_HOSTS peut être mal interprété par Docker Compose lors du passage des variables d'environnement (les virgules causent des problèmes).
+
+**Solution** : Utiliser le format JSON dans le fichier `.env` :
+
+```env
+# ❌ Format CSV (peut causer des problèmes avec Docker)
+ALLOWED_HOSTS=localhost,127.0.0.1,domaine.com
+
+# ✅ Format JSON (recommandé pour Docker)
+ALLOWED_HOSTS='["localhost","127.0.0.1","domaine.com"]'
+```
+
+Après modification, redémarrer les conteneurs :
+```bash
+docker compose down
+docker compose up -d
 ```
 
 ### Problèmes de permissions
