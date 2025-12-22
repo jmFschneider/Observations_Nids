@@ -248,8 +248,16 @@ cp .env.example .env
 # Django
 SECRET_KEY=votre-secret-key-tres-longue-et-aleatoire
 DEBUG=False
-# IMPORTANT: Utiliser le format JSON pour ALLOWED_HOSTS avec Docker
+
+# IMPORTANT: Utiliser le format JSON avec Docker (les virgules du CSV posent problème)
 ALLOWED_HOSTS='["votre-domaine.com","www.votre-domaine.com","localhost","127.0.0.1"]'
+
+# CSRF Protection (obligatoire depuis Django 4.0+ derrière reverse proxy)
+# Inclure le protocole (http:// ou https://) et le port si différent de 80/443
+# Si accès direct sans reverse proxy externe:
+CSRF_TRUSTED_ORIGINS='["http://localhost:8010"]'
+# Si reverse proxy HTTPS externe (Apache/Nginx):
+# CSRF_TRUSTED_ORIGINS='["https://votre-domaine.com","https://www.votre-domaine.com"]'
 
 # Base de données
 DB_ROOT_PASSWORD=mot-de-passe-root-tres-fort
@@ -286,6 +294,58 @@ Pour activer HTTPS :
    ```bash
    docker compose restart nginx
    ```
+
+### 3. Architecture avec reverse proxy externe (Apache/Nginx)
+
+Si vous utilisez un reverse proxy HTTPS externe devant Docker (par exemple Apache sur un autre serveur), suivez ces étapes :
+
+**Architecture typique :**
+```
+Utilisateur (Internet)
+    ↓ HTTPS (port 443)
+Apache/Nginx externe
+    ↓ HTTP (port 8010)
+nginx Docker
+    ↓ HTTP (port 8000)
+Django Gunicorn
+```
+
+**Configuration Apache externe :**
+
+Votre Apache doit transmettre les headers de proxy :
+
+```apache
+<VirtualHost *:443>
+  ServerName votre-domaine.com
+
+  ProxyPreserveHost On
+  ProxyRequests Off
+
+  # IMPORTANT: Indiquer HTTPS au backend
+  RequestHeader set X-Forwarded-Proto "https"
+  RequestHeader add X-Forwarded-For "%{REMOTE_ADDR}s"
+
+  ProxyPass        / http://serveur-docker:8010/
+  ProxyPassReverse / http://serveur-docker:8010/
+
+  # SSL Configuration
+  SSLEngine on
+  SSLCertificateFile /path/to/cert.pem
+  SSLCertificateKeyFile /path/to/key.pem
+</VirtualHost>
+```
+
+**Configuration Django (.env) :**
+
+```env
+# Hosts autorisés (sans protocole)
+ALLOWED_HOSTS='["votre-domaine.com","www.votre-domaine.com"]'
+
+# CSRF avec protocole HTTPS (ce que voit l'utilisateur)
+CSRF_TRUSTED_ORIGINS='["https://votre-domaine.com","https://www.votre-domaine.com"]'
+```
+
+**Note importante :** Django est configuré avec `SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')` pour faire confiance au header `X-Forwarded-Proto` envoyé par le reverse proxy externe. Cela permet à Django de reconnaître les requêtes HTTPS même si elles arrivent en HTTP depuis le proxy.
 
 ## Démarrage
 
@@ -407,8 +467,35 @@ Une fois les conteneurs démarrés :
 |---------|-----|-------------|
 | **Application principale** | http://localhost | Interface web Django |
 | **Admin Django** | http://localhost/admin | Interface d'administration |
+| **phpMyAdmin** | http://localhost:8080 | Gestion de la base de données MariaDB |
 | **Flower** | http://localhost:5555 | Monitoring Celery |
-| **Radicale (CalDAV)** | http://localhost/radicale | Serveur CalDAV/CardDAV |
+
+**Note :** Depuis un autre PC du réseau local, remplacez `localhost` par l'IP du serveur (exemple: `http://192.168.1.112:8080` pour phpMyAdmin).
+
+### phpMyAdmin - Gestion de la base de données
+
+phpMyAdmin vous permet de gérer la base de données MariaDB via une interface web conviviale.
+
+**Accès :**
+- Depuis le serveur : http://localhost:8080
+- Depuis votre réseau local : http://192.168.1.112:8080 (remplacez par l'IP de votre serveur)
+
+**Connexion :**
+- **Utilisateur** : `root`
+- **Mot de passe** : La valeur de `DB_ROOT_PASSWORD` dans votre fichier `.env`
+
+**Sécurité :**
+- ⚠️ phpMyAdmin est accessible **uniquement sur votre réseau local** (port 8080 non exposé sur Internet)
+- ⚠️ N'exposez JAMAIS phpMyAdmin sur Internet sans protection (authentification, HTTPS, firewall)
+- ✅ Pour un accès temporaire, vous pouvez arrêter le service : `docker compose stop phpmyadmin`
+- ✅ Pour désactiver complètement, commentez le service dans `docker-compose.yml`
+
+**Fonctionnalités utiles :**
+- Consulter et modifier les tables
+- Importer/Exporter des données (SQL, CSV, etc.)
+- Exécuter des requêtes SQL personnalisées
+- Gérer les utilisateurs et permissions
+- Optimiser les tables
 
 ## Maintenance
 
@@ -512,6 +599,51 @@ Après modification, redémarrer les conteneurs :
 ```bash
 docker compose down
 docker compose up -d
+```
+
+### Erreur CSRF 403 (Forbidden) - "La vérification CSRF a échoué"
+
+Si vous obtenez une erreur **403 Forbidden** lors de la connexion ou de la soumission de formulaires :
+
+**Cause** : Django n'arrive pas à vérifier l'origine de la requête, généralement dû à :
+1. `CSRF_TRUSTED_ORIGINS` non configuré (obligatoire depuis Django 4.0+)
+2. Mauvais protocole dans `CSRF_TRUSTED_ORIGINS` (HTTP vs HTTPS)
+3. Reverse proxy ne transmet pas le header `X-Forwarded-Proto`
+
+**Solution 1 - Vérifier CSRF_TRUSTED_ORIGINS dans `.env` :**
+
+```env
+# ✅ Si accès direct (sans reverse proxy externe)
+CSRF_TRUSTED_ORIGINS='["http://localhost:8010"]'
+
+# ✅ Si reverse proxy HTTPS externe (Apache/Nginx)
+CSRF_TRUSTED_ORIGINS='["https://votre-domaine.com","https://www.votre-domaine.com"]'
+
+# ❌ INCORRECT - oublier le protocole
+CSRF_TRUSTED_ORIGINS='["votre-domaine.com"]'
+
+# ❌ INCORRECT - mauvais protocole (si vous accédez en HTTPS)
+CSRF_TRUSTED_ORIGINS='["http://votre-domaine.com"]'
+```
+
+**Solution 2 - Vérifier la configuration Apache (reverse proxy externe) :**
+
+Votre Apache doit transmettre le header `X-Forwarded-Proto` :
+
+```apache
+RequestHeader set X-Forwarded-Proto "https"
+```
+
+Django est configuré avec `SECURE_PROXY_SSL_HEADER` pour faire confiance à ce header.
+
+**Tester :**
+```bash
+# Redémarrer après modification
+docker compose down
+docker compose up -d
+
+# Vérifier les logs
+docker compose logs web --tail=50
 ```
 
 ### Problèmes de permissions
