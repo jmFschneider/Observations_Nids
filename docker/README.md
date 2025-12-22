@@ -467,25 +467,25 @@ Une fois les conteneurs démarrés :
 |---------|-----|-------------|
 | **Application principale** | http://localhost | Interface web Django |
 | **Admin Django** | http://localhost/admin | Interface d'administration |
-| **phpMyAdmin** | http://localhost:8080 | Gestion de la base de données MariaDB |
+| **phpMyAdmin** | http://localhost:8081 | Gestion de la base de données MariaDB |
 | **Flower** | http://localhost:5555 | Monitoring Celery |
 
-**Note :** Depuis un autre PC du réseau local, remplacez `localhost` par l'IP du serveur (exemple: `http://192.168.1.112:8080` pour phpMyAdmin).
+**Note :** Depuis un autre PC du réseau local, remplacez `localhost` par l'IP du serveur (exemple: `http://192.168.1.112:8081` pour phpMyAdmin).
 
 ### phpMyAdmin - Gestion de la base de données
 
 phpMyAdmin vous permet de gérer la base de données MariaDB via une interface web conviviale.
 
 **Accès :**
-- Depuis le serveur : http://localhost:8080
-- Depuis votre réseau local : http://192.168.1.112:8080 (remplacez par l'IP de votre serveur)
+- Depuis le serveur : http://localhost:8081
+- Depuis votre réseau local : http://192.168.1.112:8081 (remplacez par l'IP de votre serveur)
 
 **Connexion :**
 - **Utilisateur** : `root`
 - **Mot de passe** : La valeur de `DB_ROOT_PASSWORD` dans votre fichier `.env`
 
 **Sécurité :**
-- ⚠️ phpMyAdmin est accessible **uniquement sur votre réseau local** (port 8080 non exposé sur Internet)
+- ⚠️ phpMyAdmin est accessible **uniquement sur votre réseau local** (port 8081 non exposé sur Internet)
 - ⚠️ N'exposez JAMAIS phpMyAdmin sur Internet sans protection (authentification, HTTPS, firewall)
 - ✅ Pour un accès temporaire, vous pouvez arrêter le service : `docker compose stop phpmyadmin`
 - ✅ Pour désactiver complètement, commentez le service dans `docker-compose.yml`

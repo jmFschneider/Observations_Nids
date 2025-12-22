@@ -32,7 +32,7 @@ services:
       PMA_PASSWORD: ${DB_ROOT_PASSWORD}
       UPLOAD_LIMIT: 100M
     ports:
-      - "8080:80"
+      - "8081:80"
     depends_on:
       db:
         condition: service_healthy
