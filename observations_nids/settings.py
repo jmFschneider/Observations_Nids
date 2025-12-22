@@ -34,6 +34,9 @@ settings = get_settings()
 # Use ALLOWED_HOSTS from settings object which is loaded from config.py
 ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
+# CSRF_TRUSTED_ORIGINS (required for Django 4.0+ behind reverse proxy)
+CSRF_TRUSTED_ORIGINS = settings.CSRF_TRUSTED_ORIGINS
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = settings.SECRET_KEY
 

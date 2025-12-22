@@ -55,6 +55,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     DEBUG: bool = False
     ALLOWED_HOSTS: list[str] = Field(default_factory=lambda: ["localhost", "127.0.0.1"])
+    CSRF_TRUSTED_ORIGINS: list[str] = Field(default_factory=list)
     ENVIRONMENT: str = "production"  # Valeurs possibles : production, pilote, development
 
     gemini_api_key: str | None = None
@@ -104,6 +105,19 @@ class Settings(BaseSettings):
         elif isinstance(v, list):
             return [str(host).strip() for host in v]
         return ["localhost", "127.0.0.1"]
+
+    @validator("CSRF_TRUSTED_ORIGINS", pre=True)
+    def validate_csrf_trusted_origins(cls, v):  # noqa: N805
+        if isinstance(v, str):
+            if not v.strip():  # Empty string
+                return []
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return [origin.strip() for origin in v.split(",") if origin.strip()]
+        elif isinstance(v, list):
+            return [str(origin).strip() for origin in v]
+        return []
 
 
 def get_settings() -> Settings:
