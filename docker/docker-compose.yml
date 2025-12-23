@@ -103,7 +103,7 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     volumes:
       - static_volume:/app/staticfiles
-      - media_volume:/app/mediafiles
+      - /opt/observations_nids_pilote/media:/app/mediafiles
       - ../logs:/app/logs
     depends_on:
       db:
@@ -155,7 +155,7 @@ services:
       # Logging
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     volumes:
-      - media_volume:/app/mediafiles
+      - /opt/observations_nids_pilote/media:/app/mediafiles
       - ../logs:/app/logs
     depends_on:
       - db
@@ -245,7 +245,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - static_volume:/app/staticfiles:ro
-      - media_volume:/app/mediafiles:ro
+      - /opt/observations_nids_pilote/media:/app/mediafiles:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - web
@@ -267,6 +267,4 @@ volumes:
   redis_data:
     driver: local
   static_volume:
-    driver: local
-  media_volume:
     driver: local
