@@ -71,17 +71,16 @@ LOGIN_REDIRECT_URL = '/'
 SESSION_COOKIE_AGE = settings.SESSION_COOKIE_AGE
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Déconnexion si l'utilisateur ferme son navigateur
 
-# Celery Configuration - utilise les paramètres de pydantic
-# Celery Configuration - utilise les paramètres de pydantic
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'  # settings.celery.broker_url
-# CELERY_RESULT_BACKEND = settings.celery.result_backend
-# CELERY_ACCEPT_CONTENT = settings.celery.accept_content
-# CELERY_TASK_SERIALIZER = settings.celery.task_serializer
-# CELERY_RESULT_SERIALIZER = settings.celery.result_serializer
-# CELERY_TIMEZONE = settings.celery.timezone
-# CELERY_TASK_TRACK_STARTED = settings.celery.task_track_started
-# CELERY_TASK_TIME_LIMIT = settings.celery.task_time_limit
-# CELERY_WORKER_HIJACK_ROOT_LOGGER = settings.celery.worker_hijack_root_logger
+# Celery Configuration - utilise les variables d'environnement
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Paris'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
 # Application definition
 

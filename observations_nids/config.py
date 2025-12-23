@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     CSRF_TRUSTED_ORIGINS: list[str] = Field(default_factory=list)
     ENVIRONMENT: str = "production"  # Valeurs possibles : production, pilote, development
 
-    gemini_api_key: str | None = None
+    GEMINI_API_KEY: str | None = Field(default=None, alias="gemini_api_key")
     celery: CelerySettings = Field(default_factory=CelerySettings)
     DATABASE: DatabaseSettings
 
