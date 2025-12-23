@@ -87,17 +87,56 @@
                 <input type="hidden" name="repertoire" value="{{ current_path }}">
 
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="modele_ocr" class="form-label">
-                            <i class="fas fa-robot"></i> Modèle OCR
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-robot"></i> Modèles OCR <span class="text-danger">*</span>
                         </label>
-                        <select class="form-select" id="modele_ocr" name="modele_ocr" required>
-                            <option value="">-- Sélectionner un modèle --</option>
-                            <option value="gemini_3_flash">Gemini 3 Flash (Recommandé - Rapide)</option>
-                            <option value="gemini_3_pro">Gemini 3 Pro (Haute qualité)</option>
-                            <option value="gemini_2.5_pro">Gemini 2.5 Pro</option>
-                            <option value="gemini_2.5_flash_lite">Gemini 2.5 Flash-Lite (Économique)</option>
-                        </select>
+                        <div class="form-text mb-2">Sélectionnez un ou plusieurs modèles à tester (exécution séquentielle)</div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input model-checkbox" type="checkbox" value="gemini_3_flash" id="model_gemini_3_flash" checked>
+                                    <label class="form-check-label" for="model_gemini_3_flash">
+                                        <strong>Gemini 3 Flash</strong>
+                                        <small class="text-muted d-block">Rapide et performant (Recommandé)</small>
+                                    </label>
+                                </div>
+                                <hr class="my-2">
+                                <div class="form-check">
+                                    <input class="form-check-input model-checkbox" type="checkbox" value="gemini_3_pro" id="model_gemini_3_pro">
+                                    <label class="form-check-label" for="model_gemini_3_pro">
+                                        <strong>Gemini 3 Pro</strong>
+                                        <small class="text-muted d-block">Haute qualité</small>
+                                    </label>
+                                </div>
+                                <hr class="my-2">
+                                <div class="form-check">
+                                    <input class="form-check-input model-checkbox" type="checkbox" value="gemini_2.5_pro" id="model_gemini_2.5_pro">
+                                    <label class="form-check-label" for="model_gemini_2.5_pro">
+                                        <strong>Gemini 2.5 Pro</strong>
+                                        <small class="text-muted d-block">Équilibre qualité/coût</small>
+                                    </label>
+                                </div>
+                                <hr class="my-2">
+                                <div class="form-check">
+                                    <input class="form-check-input model-checkbox" type="checkbox" value="gemini_2.5_flash_lite" id="model_gemini_2.5_flash_lite">
+                                    <label class="form-check-label" for="model_gemini_2.5_flash_lite">
+                                        <strong>Gemini 2.5 Flash-Lite</strong>
+                                        <small class="text-muted d-block">Économique</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectAllModels()">
+                                <i class="fas fa-check-square"></i> Tout sélectionner
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAllModels()">
+                                <i class="fas fa-square"></i> Tout désélectionner
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -321,19 +360,36 @@ function proceedToBatchConfig() {
     window.location = '{% url "pilot:optimisation_ocr_home" %}';
 }
 
-// Ancien code pour la sélection unique (gardé pour compatibilité)
+// Fonctions pour la sélection de modèles
+function selectAllModels() {
+    document.querySelectorAll('.model-checkbox').forEach(cb => cb.checked = true);
+}
+
+function deselectAllModels() {
+    document.querySelectorAll('.model-checkbox').forEach(cb => cb.checked = false);
+}
+
+function getSelectedModels() {
+    const checkboxes = document.querySelectorAll('.model-checkbox:checked');
+    return Array.from(checkboxes).map(cb => cb.value);
+}
+
+// Gestion du formulaire d'analyse
 if (document.getElementById('analyse-form')) {
     document.getElementById('analyse-form').addEventListener('submit', function(e) {
         e.preventDefault();
 
         const form = this;
         const formData = new FormData(form);
-        const modele = document.getElementById('modele_ocr').value;
+        const modeles = getSelectedModels();
 
-        if (!modele) {
-            alert('Veuillez sélectionner un modèle OCR');
+        if (modeles.length === 0) {
+            alert('Veuillez sélectionner au moins un modèle OCR');
             return;
         }
+
+        // Stocker les modèles sélectionnés pour la transcription
+        window.selectedModels = modeles;
 
         // Afficher un indicateur de chargement
         const resultatsDiv = document.getElementById('resultats-analyse');
@@ -351,7 +407,7 @@ if (document.getElementById('analyse-form')) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                afficherResultats(data, modele);
+                afficherResultats(data, modeles);
             } else {
                 resultatsContent.innerHTML = `<div class="alert alert-danger">Erreur: ${data.error}</div>`;
             }
@@ -363,7 +419,7 @@ if (document.getElementById('analyse-form')) {
     });
 }
 
-function afficherResultats(data, modele) {
+function afficherResultats(data, modeles) {
     const content = document.getElementById('resultats-content');
 
     let html = `
@@ -404,11 +460,17 @@ function afficherResultats(data, modele) {
     `;
 
     if (data.nb_trouvees > 0) {
+        const modelesText = modeles.length > 1
+            ? `${modeles.length} modèles: ${modeles.join(', ')}`
+            : modeles[0];
         html += `
             <div class="alert alert-success">
                 <i class="fas fa-check-circle"></i> ${data.nb_trouvees} correspondance${data.nb_trouvees > 1 ? 's' : ''} trouvée${data.nb_trouvees > 1 ? 's' : ''} automatiquement!
             </div>
-            <button class="btn btn-success btn-lg" onclick="lancerTranscription('${modele}')">
+            <div class="alert alert-info">
+                <i class="fas fa-robot"></i> Modèle${modeles.length > 1 ? 's' : ''} sélectionné${modeles.length > 1 ? 's' : ''}: <strong>${modelesText}</strong>
+            </div>
+            <button class="btn btn-success btn-lg" onclick="lancerTranscription()">
                 <i class="fas fa-play-circle"></i> Lancer la transcription (${data.nb_trouvees} images)
             </button>
         `;
@@ -426,15 +488,22 @@ function afficherResultats(data, modele) {
 
     content.innerHTML = html;
     window.correspondancesData = data;
+    window.selectedModels = modeles;
 }
 
-function lancerTranscription(modele) {
+function lancerTranscription() {
     if (!window.correspondancesData) {
         alert('Erreur: aucune donnée d\'analyse disponible');
         return;
     }
 
+    if (!window.selectedModels || window.selectedModels.length === 0) {
+        alert('Erreur: aucun modèle sélectionné');
+        return;
+    }
+
     const data = window.correspondancesData;
+    const modeles = window.selectedModels;
 
     // Construire la liste des répertoires depuis les données d'analyse
     const directories = [];
@@ -457,7 +526,7 @@ function lancerTranscription(modele) {
     // Préparer les données pour le POST
     const formData = new FormData();
     formData.append('directories', JSON.stringify(directories));
-    formData.append('modeles_ocr', JSON.stringify([modele]));
+    formData.append('modeles_ocr', JSON.stringify(modeles));
 
     // Désactiver le bouton et afficher un loader
     const btn = event.target;
