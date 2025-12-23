@@ -153,8 +153,8 @@ configure_env_file() {
     read -sp "Email password: " EMAIL_PASSWORD
     echo
 
-    echo -e "${YELLOW}Configuration Google API:${NC}"
-    read -p "Google API Key (pour transcription): " GOOGLE_API_KEY
+    echo -e "${YELLOW}Configuration Gemini API:${NC}"
+    read -p "Gemini API Key (pour transcription): " GEMINI_API_KEY
 
     # Créer le fichier .env
     cat > "$PILOTE_DIR/.env" <<EOF
@@ -185,8 +185,8 @@ EMAIL_HOST_PASSWORD=${EMAIL_PASSWORD}
 DEFAULT_FROM_EMAIL=${EMAIL_USER}
 ADMIN_EMAIL=${EMAIL_USER}
 
-# Google API
-GOOGLE_API_KEY=$GOOGLE_API_KEY
+# Gemini API
+GEMINI_API_KEY=$GEMINI_API_KEY
 
 # Environnement
 ENVIRONMENT=pilote
