@@ -3,15 +3,15 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2><i class="fas fa-microscope"></i> Optimisation OCR - Sélection du répertoire</h2>
-    <p class="text-muted">Sélectionnez un répertoire d'images optimisées pour lancer la transcription batch</p>
+    <h2><i class="fas fa-microscope"></i> Transcription - Sélection des fiches</h2>
+    <p class="text-muted">Sélectionnez un répertoire de fiches scannées pour lancer la transcription batch</p>
 
     <!-- Fil d'Ariane -->
     <nav aria-label="breadcrumb" class="mt-4 mb-4">
         <ol class="breadcrumb py-3">
             <li class="breadcrumb-item">
                 <a href="{% url 'pilot:selection_repertoire_ocr' %}">
-                    <i class="fas fa-home"></i> images_optimisees
+                    <i class="fas fa-home"></i> Fiches scannées
                 </a>
             </li>
             {% for crumb in breadcrumb %}
