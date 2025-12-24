@@ -15,6 +15,7 @@ from django.db import connection
 from django.shortcuts import redirect, render
 
 from taxonomy.models import Espece, Famille, Ordre
+from taxonomy.tasks import recuperer_liens_oiseaux_net_task
 
 logger = logging.getLogger(__name__)
 
@@ -170,7 +171,10 @@ def charger_especes_taxref_view(request):
 @user_passes_test(is_admin, login_url='/auth/login/')
 def recuperer_liens_oiseaux_net_view(request):
     """
-    Exécute le script de récupération des liens oiseaux.net.
+    Lance la récupération des liens oiseaux.net en arrière-plan via Celery.
+
+    Cette tâche peut prendre plusieurs minutes et s'exécute de manière asynchrone
+    pour éviter les timeouts 504 Gateway Timeout.
 
     Accessible uniquement aux administrateurs (is_staff=True).
     """
@@ -181,42 +185,39 @@ def recuperer_liens_oiseaux_net_view(request):
     force = request.POST.get('force', 'false') == 'true'
     limit = request.POST.get('limit', '').strip()
     dry_run = request.POST.get('dry_run', 'false') == 'true'
+    delay = request.POST.get('delay', '1.0')
 
     try:
-        # Fermer toute transaction en cours pour éviter les conflits
-        connection.close()
+        # Convertir limit en int ou None
+        limit_int = int(limit) if limit else None
 
-        # Capturer la sortie du script
-        output = StringIO()
+        # Convertir delay en float
+        delay_float = float(delay)
 
-        # Construire les arguments
-        args = []
-        if force:
-            args.append('--force')
-        if limit:
-            args.extend(['--limit', limit])
-        if dry_run:
-            args.append('--dry-run')
-
-        # Exécuter le script
         logger.info(
-            f"Lancement de la récupération des liens oiseaux.net "
-            f"(force={force}, limit={limit or 'none'}, dry_run={dry_run})"
+            f"Lancement asynchrone de la récupération des liens oiseaux.net "
+            f"(force={force}, limit={limit_int or 'none'}, dry_run={dry_run}, delay={delay_float})"
         )
 
-        call_command('recuperer_liens_oiseaux_net', *args, stdout=output, stderr=output)
+        # Lancer la tâche Celery en arrière-plan
+        task = recuperer_liens_oiseaux_net_task.delay(
+            force=force, limit=limit_int, dry_run=dry_run, delay=delay_float
+        )
 
-        # Récupérer le résultat
-        result = output.getvalue()
+        # Message de confirmation avec ID de tâche
+        messages.success(
+            request,
+            f"✅ Tâche lancée avec succès (ID: {task.id})\n\n"
+            f"La récupération des liens s'exécute en arrière-plan. "
+            f"Flower s'est ouvert dans un nouvel onglet pour suivre la progression.",
+        )
+        logger.info(f"Tâche Celery lancée: {task.id}")
 
-        # Afficher le succès
-        messages.success(request, f"✅ Récupération des liens terminée !\n\n{result}")
-        logger.info(f"Récupération des liens réussie: {result}")
+        # Rediriger avec le task_id pour ouvrir Flower automatiquement
+        return redirect(f"{request.scheme}://{request.get_host()}/taxonomy/administration/?task_id={task.id}")
 
     except Exception as e:
-        # Fermer la connexion en cas d'erreur pour éviter TransactionManagementError
-        connection.close()
-        messages.error(request, f"❌ Erreur lors de la récupération des liens: {str(e)}")
-        logger.error(f"Erreur lors de la récupération des liens: {e}", exc_info=True)
+        messages.error(request, f"❌ Erreur lors du lancement de la tâche: {str(e)}")
+        logger.error(f"Erreur lors du lancement de la tâche: {e}", exc_info=True)
 
     return redirect('taxonomy:administration_donnees')

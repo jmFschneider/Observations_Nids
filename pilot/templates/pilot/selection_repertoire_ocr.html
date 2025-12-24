@@ -545,6 +545,10 @@ function lancerTranscription() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // Ouvrir Flower dans un nouvel onglet pour suivre la progression
+            const flowerUrl = `http://${window.location.hostname}:5555/task/${data.task_id}`;
+            window.open(flowerUrl, '_blank', 'noopener,noreferrer');
+
             // Rediriger vers la page de résultats avec tracking
             window.location.href = '{% url "pilot:batch_results" %}?tracking=true&task_id=' + data.task_id;
         } else {
