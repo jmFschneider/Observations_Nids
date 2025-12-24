@@ -390,3 +390,185 @@ def rechercher_nominatim(request):
     }
 
     return render(request, 'geo/rechercher_nominatim.html', context)
+
+
+# ============================================================================
+# VUES D'ADMINISTRATION DES DONNÉES - SCRIPTS DE CHARGEMENT
+# ============================================================================
+
+
+@login_required
+@user_passes_test(is_admin, login_url='/auth/login/')
+def administration_donnees(request):
+    """
+    Page d'administration des données communales.
+
+    Permet d'exécuter les scripts de chargement et maintenance des données.
+    Accessible uniquement aux administrateurs (is_staff=True).
+    """
+    # Statistiques pour affichage
+    stats = {
+        'total': CommuneFrance.objects.count(),
+        'source_api': CommuneFrance.objects.filter(source_ajout='api_geo').count(),
+        'source_nominatim': CommuneFrance.objects.filter(source_ajout='nominatim').count(),
+        'source_manuelle': CommuneFrance.objects.filter(source_ajout='manuel').count(),
+        'communes_fusionnees': AncienneCommune.objects.count(),
+    }
+
+    context = {
+        'stats': stats,
+    }
+
+    return render(request, 'geo/administration_donnees.html', context)
+
+
+@login_required
+@user_passes_test(is_admin, login_url='/auth/login/')
+def charger_communes_api(request):
+    """
+    Exécute le script de chargement des communes depuis l'API Géoplateforme.
+
+    Accessible uniquement aux administrateurs (is_staff=True).
+    """
+    if request.method != 'POST':
+        messages.error(request, "Méthode non autorisée")
+        return redirect('geo:administration_donnees')
+
+    force = request.POST.get('force', 'false') == 'true'
+
+    try:
+        from django.core.management import call_command
+        from django.db import connection
+        from io import StringIO
+
+        # Fermer toute transaction en cours pour éviter les conflits
+        connection.close()
+
+        # Capturer la sortie du script
+        output = StringIO()
+
+        # Exécuter le script
+        logger.info(f"Lancement du chargement des communes depuis l'API (force={force})")
+
+        if force:
+            call_command('charger_communes_france', '--force', stdout=output, stderr=output)
+        else:
+            call_command('charger_communes_france', stdout=output, stderr=output)
+
+        # Récupérer le résultat
+        result = output.getvalue()
+
+        # Afficher le succès
+        messages.success(
+            request,
+            f"✅ Chargement des communes terminé avec succès !\n\n{result}"
+        )
+        logger.info(f"Chargement des communes réussi: {result}")
+
+    except Exception as e:
+        # Fermer la connexion en cas d'erreur pour éviter TransactionManagementError
+        connection.close()
+        messages.error(request, f"❌ Erreur lors du chargement des communes: {str(e)}")
+        logger.error(f"Erreur lors du chargement des communes: {e}", exc_info=True)
+
+    return redirect('geo:administration_donnees')
+
+
+@login_required
+@user_passes_test(is_admin, login_url='/auth/login/')
+def importer_anciennes_communes_view(request):
+    """
+    Exécute le script d'import des anciennes communes depuis le fichier CSV.
+
+    Accessible uniquement aux administrateurs (is_staff=True).
+    """
+    if request.method != 'POST':
+        messages.error(request, "Méthode non autorisée")
+        return redirect('geo:administration_donnees')
+
+    clear = request.POST.get('clear', 'false') == 'true'
+
+    try:
+        from django.core.management import call_command
+        from django.db import connection
+        from io import StringIO
+
+        # Fermer toute transaction en cours pour éviter les conflits
+        connection.close()
+
+        # Capturer la sortie du script
+        output = StringIO()
+
+        # Exécuter le script
+        logger.info(f"Lancement de l'import des anciennes communes (clear={clear})")
+
+        args = []
+        if clear:
+            args.append('--clear')
+
+        call_command('importer_anciennes_communes', *args, stdout=output, stderr=output)
+
+        # Récupérer le résultat
+        result = output.getvalue()
+
+        # Afficher le succès
+        messages.success(
+            request,
+            f"✅ Import des anciennes communes terminé avec succès !\n\n{result}"
+        )
+        logger.info(f"Import des anciennes communes réussi: {result}")
+
+    except Exception as e:
+        # Fermer la connexion en cas d'erreur pour éviter TransactionManagementError
+        connection.close()
+        messages.error(request, f"❌ Erreur lors de l'import des anciennes communes: {str(e)}")
+        logger.error(f"Erreur lors de l'import des anciennes communes: {e}", exc_info=True)
+
+    return redirect('geo:administration_donnees')
+
+
+@login_required
+@user_passes_test(is_admin, login_url='/auth/login/')
+def verifier_communes_deleguees_view(request):
+    """
+    Exécute le script de vérification des communes déléguées.
+
+    Accessible uniquement aux administrateurs (is_staff=True).
+    """
+    if request.method != 'POST':
+        messages.error(request, "Méthode non autorisée")
+        return redirect('geo:administration_donnees')
+
+    try:
+        from django.core.management import call_command
+        from django.db import connection
+        from io import StringIO
+
+        # Fermer toute transaction en cours pour éviter les conflits
+        connection.close()
+
+        # Capturer la sortie du script
+        output = StringIO()
+
+        # Exécuter le script
+        logger.info("Lancement de la vérification des communes déléguées")
+
+        call_command('verifier_communes_deleguees', stdout=output, stderr=output)
+
+        # Récupérer le résultat
+        result = output.getvalue()
+
+        # Afficher le succès
+        messages.success(
+            request,
+            f"✅ Vérification des communes déléguées terminée !\n\n{result}"
+        )
+        logger.info(f"Vérification des communes déléguées réussie: {result}")
+
+    except Exception as e:
+        # Fermer la connexion en cas d'erreur pour éviter TransactionManagementError
+        connection.close()
+        messages.error(request, f"❌ Erreur lors de la vérification des communes déléguées: {str(e)}")
+        logger.error(f"Erreur lors de la vérification des communes déléguées: {e}", exc_info=True)
+
+    return redirect('geo:administration_donnees')

@@ -25,4 +25,26 @@ urlpatterns = [
         views_admin.rechercher_nominatim,
         name='rechercher_nominatim',
     ),
+    # Page d'administration des données
+    path(
+        'communes/administration/',
+        views_admin.administration_donnees,
+        name='administration_donnees',
+    ),
+    # Scripts d'administration des données
+    path(
+        'communes/charger-api/',
+        views_admin.charger_communes_api,
+        name='charger_communes_api',
+    ),
+    path(
+        'communes/importer-anciennes/',
+        views_admin.importer_anciennes_communes_view,
+        name='importer_anciennes_communes',
+    ),
+    path(
+        'communes/verifier-deleguees/',
+        views_admin.verifier_communes_deleguees_view,
+        name='verifier_communes_deleguees',
+    ),
 ]

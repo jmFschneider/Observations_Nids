@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Administration des Données - Communes{% endblock %}
+
+{% block content %}
+<div class="mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-database"></i> Administration des Données</h1>
+        <div>
+            <a href="{% url 'geo:liste_communes' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <i class="fas fa-list fa-2x text-primary"></i>
+                    <div class="mt-2">
+                        <h6 class="mb-0 text-muted">Total communes</h6>
+                        <h3 class="mb-0 text-primary">{{ stats.total }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-database fa-2x text-info"></i>
+                    <div class="mt-2">
+                        <h6 class="mb-0 text-muted">API Géoplateforme</h6>
+                        <h3 class="mb-0 text-info">{{ stats.source_api }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-code-branch fa-2x text-danger"></i>
+                    <div class="mt-2">
+                        <h6 class="mb-0 text-muted">Anciennes communes</h6>
+                        <h3 class="mb-0 text-danger">{{ stats.communes_fusionnees }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Administration des données -->
+    <div class="card mb-4 border-warning">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+                <i class="fas fa-tools"></i> Scripts d'administration
+            </h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-3">
+                <i class="fas fa-info-circle"></i> Ces actions permettent de charger et mettre à jour les données de référence des communes.
+                <strong>Attention :</strong> Ces opérations peuvent prendre plusieurs minutes.
+            </p>
+
+            <div class="row">
+                <!-- Charger communes depuis l'API -->
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-download text-primary"></i> Charger les communes
+                            </h6>
+                            <p class="card-text small text-muted">
+                                Charge toutes les communes de France depuis l'API Géoplateforme (geo.api.gouv.fr).
+                                <br><br>
+                                <strong>Source:</strong> API officielle<br>
+                                <strong>Communes:</strong> ~35 000
+                            </p>
+                            <form method="post" action="{% url 'geo:charger_communes_api' %}" class="mt-3"
+                                  onsubmit="return confirm('⚠️ Voulez-vous charger les communes depuis l\'API Géoplateforme ?\n\nCela peut prendre plusieurs minutes.');">
+                                {% csrf_token %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="force" value="true" id="force-api">
+                                    <label class="form-check-label small" for="force-api">
+                                        <strong>Force</strong> (remplacer les données existantes)
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <i class="fas fa-play-circle"></i> Lancer le chargement
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Importer anciennes communes -->
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-history text-info"></i> Anciennes communes
+                            </h6>
+                            <p class="card-text small text-muted">
+                                Importe les anciennes communes fusionnées depuis le fichier CSV officiel (data.gouv.fr).
+                                <br><br>
+                                <strong>Source:</strong> data.gouv.fr<br>
+                                <strong>Fichier:</strong> communes_nouvelles.csv
+                            </p>
+                            <form method="post" action="{% url 'geo:importer_anciennes_communes' %}" class="mt-3"
+                                  onsubmit="return confirm('⚠️ Voulez-vous importer les anciennes communes ?\n\nCela peut prendre quelques minutes.');">
+                                {% csrf_token %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="clear" value="true" id="clear-anciennes">
+                                    <label class="form-check-label small" for="clear-anciennes">
+                                        <strong>Effacer</strong> les données existantes avant import
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-info btn-sm w-100">
+                                    <i class="fas fa-file-import"></i> Importer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vérifier communes déléguées -->
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-check-circle text-success"></i> Vérifier les communes
+                            </h6>
+                            <p class="card-text small text-muted">
+                                Vérifie et met à jour les informations sur les communes déléguées.
+                                <br><br>
+                                <strong>Action:</strong> Vérification<br>
+                                <strong>Durée:</strong> Rapide
+                            </p>
+                            <form method="post" action="{% url 'geo:verifier_communes_deleguees' %}" class="mt-3"
+                                  onsubmit="return confirm('Voulez-vous lancer la vérification des communes déléguées ?');">
+                                {% csrf_token %}
+                                <div style="height: 38px;"></div> <!-- Spacer pour alignement -->
+                                <button type="submit" class="btn btn-success btn-sm w-100">
+                                    <i class="fas fa-check"></i> Vérifier
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info mb-0 mt-2">
+                <i class="fas fa-lightbulb"></i> <strong>Ordre recommandé pour une nouvelle installation :</strong>
+                <ol class="mb-0 mt-2 small">
+                    <li>Charger les communes depuis l'API (avec force)</li>
+                    <li>Importer les anciennes communes</li>
+                    <li>Vérifier les communes déléguées</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
