@@ -4,9 +4,10 @@ Usage: python manage.py import_users [--input fichier.json] [--skip-existing]
 """
 
 import json
-from django.core.management.base import BaseCommand
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
+from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.dateparse import parse_datetime
 
@@ -41,17 +42,13 @@ class Command(BaseCommand):
 
         # Vérifier que les fichiers existent
         try:
-            with open(input_file, 'r', encoding='utf-8') as f:
+            with open(input_file, encoding='utf-8') as f:
                 users_data = json.load(f)
         except FileNotFoundError:
-            self.stdout.write(
-                self.style.ERROR(f'Fichier {input_file} introuvable')
-            )
+            self.stdout.write(self.style.ERROR(f'Fichier {input_file} introuvable'))
             return
         except json.JSONDecodeError as e:
-            self.stdout.write(
-                self.style.ERROR(f'Erreur de parsing JSON: {e}')
-            )
+            self.stdout.write(self.style.ERROR(f'Erreur de parsing JSON: {e}'))
             return
 
         created_count = 0
@@ -72,17 +69,13 @@ class Command(BaseCommand):
                 if user_exists:
                     if skip_existing:
                         self.stdout.write(
-                            self.style.WARNING(
-                                f'Utilisateur {username} ignoré (déjà existant)'
-                            )
+                            self.style.WARNING(f'Utilisateur {username} ignoré (déjà existant)')
                         )
                         skipped_count += 1
                         continue
                     elif update_existing:
                         self.stdout.write(
-                            self.style.WARNING(
-                                f'Mise à jour de l\'utilisateur {username}'
-                            )
+                            self.style.WARNING(f'Mise à jour de l\'utilisateur {username}')
                         )
                     else:
                         self.stdout.write(
@@ -147,26 +140,10 @@ class Command(BaseCommand):
 
         # Résumé
         self.stdout.write(self.style.SUCCESS('=' * 60))
-        self.stdout.write(
-            self.style.SUCCESS(
-                f'Importation terminée:'
-            )
-        )
-        self.stdout.write(
-            self.style.SUCCESS(
-                f'  - {created_count} utilisateur(s) créé(s)'
-            )
-        )
+        self.stdout.write(self.style.SUCCESS('Importation terminée:'))
+        self.stdout.write(self.style.SUCCESS(f'  - {created_count} utilisateur(s) créé(s)'))
         if update_existing:
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f'  - {updated_count} utilisateur(s) mis à jour'
-                )
-            )
+            self.stdout.write(self.style.SUCCESS(f'  - {updated_count} utilisateur(s) mis à jour'))
         if skip_existing:
-            self.stdout.write(
-                self.style.WARNING(
-                    f'  - {skipped_count} utilisateur(s) ignoré(s)'
-                )
-            )
+            self.stdout.write(self.style.WARNING(f'  - {skipped_count} utilisateur(s) ignoré(s)'))
         self.stdout.write(self.style.SUCCESS('=' * 60))

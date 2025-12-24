@@ -31,6 +31,7 @@ protobuf
 grpcio
 grpcio-status
 pillow
+openpyxl
 python-dotenv
 pydantic
 pydantic-settings
