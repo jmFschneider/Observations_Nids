@@ -140,6 +140,8 @@ nav:
 
       - 'Transcription Gemini': 'developpeurs/architecture/transcription_gemini.md'
 
+      - 'Docker & Nextcloud': 'developpeurs/architecture/docker_nextcloud.md'
+
 
 
     - '🔬 Analyses & Décisions':

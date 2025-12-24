@@ -203,6 +203,25 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Accès référentiels -->
+                            <div class="form-row-table">
+                                <div class="form-label-cell">
+                                    <strong>Référentiels :</strong>
+                                </div>
+                                <div class="form-input-cell">
+                                    <div class="form-check">
+                                        <input type="checkbox"
+                                               name="{{ form.is_staff.name }}"
+                                               id="{{ form.is_staff.id_for_label }}"
+                                               class="form-check-input"
+                                               {% if form.is_staff.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="{{ form.is_staff.id_for_label }}">
+                                            Accès aux référentiels (Espèces, Communes)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group mt-4">

@@ -31,6 +31,7 @@ class UtilisateurChangeForm(UserChangeForm):
             'est_valide',
             'est_transcription',
             'is_active',
+            'is_staff',
         )
 
 
