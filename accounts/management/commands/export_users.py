@@ -4,9 +4,9 @@ Usage: python manage.py export_users [--output fichier.json]
 """
 
 import json
-from django.core.management.base import BaseCommand
+
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group, Permission
+from django.core.management.base import BaseCommand
 
 User = get_user_model()
 
@@ -32,9 +32,7 @@ class Command(BaseCommand):
             groups = list(user.groups.values_list('name', flat=True))
 
             # Récupérer les permissions spécifiques
-            user_permissions = list(
-                user.user_permissions.values_list('codename', flat=True)
-            )
+            user_permissions = list(user.user_permissions.values_list('codename', flat=True))
 
             # Construire les données de l'utilisateur
             user_dict = {

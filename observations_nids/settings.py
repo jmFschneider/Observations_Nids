@@ -327,6 +327,7 @@ if _local is not None:
 # Active Debug Toolbar uniquement si défini dans settings_local ou .env
 try:
     from . import settings_local as _local_debug
+
     USE_DEBUG_TOOLBAR = getattr(_local_debug, 'USE_DEBUG_TOOLBAR', settings.USE_DEBUG_TOOLBAR)
 except ImportError:
     USE_DEBUG_TOOLBAR = settings.USE_DEBUG_TOOLBAR
