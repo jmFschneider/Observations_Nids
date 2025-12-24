@@ -14,32 +14,34 @@
         </div>
     </div>
 
-    <!-- Statistiques rapides -->
+    <!-- Statistiques -->
     <div class="card mb-4">
         <div class="card-body">
-            <div class="row text-center">
-                <div class="col-md-4">
-                    <i class="fas fa-list fa-2x text-primary"></i>
-                    <div class="mt-2">
-                        <h6 class="mb-0 text-muted">Total communes</h6>
-                        <h3 class="mb-0 text-primary">{{ stats.total }}</h3>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <i class="fas fa-database fa-2x text-info"></i>
-                    <div class="mt-2">
-                        <h6 class="mb-0 text-muted">API Géoplateforme</h6>
-                        <h3 class="mb-0 text-info">{{ stats.source_api }}</h3>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <i class="fas fa-code-branch fa-2x text-danger"></i>
-                    <div class="mt-2">
-                        <h6 class="mb-0 text-muted">Anciennes communes</h6>
-                        <h3 class="mb-0 text-danger">{{ stats.communes_fusionnees }}</h3>
-                    </div>
-                </div>
-            </div>
+            <table class="table table-borderless mb-0">
+                <tr>
+                    <td class="text-center" style="width: 33.33%;">
+                        <i class="fas fa-list fa-2x text-primary"></i>
+                        <div class="mt-2">
+                            <h6 class="mb-0 text-muted">Total communes</h6>
+                            <h3 class="mb-0 text-primary">{{ stats.total }}</h3>
+                        </div>
+                    </td>
+                    <td class="text-center" style="width: 33.33%;">
+                        <i class="fas fa-database fa-2x text-info"></i>
+                        <div class="mt-2">
+                            <h6 class="mb-0 text-muted">API Géoplateforme</h6>
+                            <h3 class="mb-0 text-info">{{ stats.source_api }}</h3>
+                        </div>
+                    </td>
+                    <td class="text-center" style="width: 33.33%;">
+                        <i class="fas fa-code-branch fa-2x text-danger"></i>
+                        <div class="mt-2">
+                            <h6 class="mb-0 text-muted">Anciennes communes</h6>
+                            <h3 class="mb-0 text-danger">{{ stats.communes_fusionnees }}</h3>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 
