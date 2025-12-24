@@ -5,10 +5,13 @@ Réservé aux administrateurs uniquement.
 """
 
 import logging
+from io import StringIO
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.management import call_command
 from django.core.paginator import Paginator
+from django.db import connection
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -437,10 +440,6 @@ def charger_communes_api(request):
     force = request.POST.get('force', 'false') == 'true'
 
     try:
-        from django.core.management import call_command
-        from django.db import connection
-        from io import StringIO
-
         # Fermer toute transaction en cours pour éviter les conflits
         connection.close()
 
@@ -459,10 +458,7 @@ def charger_communes_api(request):
         result = output.getvalue()
 
         # Afficher le succès
-        messages.success(
-            request,
-            f"✅ Chargement des communes terminé avec succès !\n\n{result}"
-        )
+        messages.success(request, f"✅ Chargement des communes terminé avec succès !\n\n{result}")
         logger.info(f"Chargement des communes réussi: {result}")
 
     except Exception as e:
@@ -489,10 +485,6 @@ def importer_anciennes_communes_view(request):
     clear = request.POST.get('clear', 'false') == 'true'
 
     try:
-        from django.core.management import call_command
-        from django.db import connection
-        from io import StringIO
-
         # Fermer toute transaction en cours pour éviter les conflits
         connection.close()
 
@@ -513,8 +505,7 @@ def importer_anciennes_communes_view(request):
 
         # Afficher le succès
         messages.success(
-            request,
-            f"✅ Import des anciennes communes terminé avec succès !\n\n{result}"
+            request, f"✅ Import des anciennes communes terminé avec succès !\n\n{result}"
         )
         logger.info(f"Import des anciennes communes réussi: {result}")
 
@@ -540,10 +531,6 @@ def verifier_communes_deleguees_view(request):
         return redirect('geo:administration_donnees')
 
     try:
-        from django.core.management import call_command
-        from django.db import connection
-        from io import StringIO
-
         # Fermer toute transaction en cours pour éviter les conflits
         connection.close()
 
@@ -559,16 +546,15 @@ def verifier_communes_deleguees_view(request):
         result = output.getvalue()
 
         # Afficher le succès
-        messages.success(
-            request,
-            f"✅ Vérification des communes déléguées terminée !\n\n{result}"
-        )
+        messages.success(request, f"✅ Vérification des communes déléguées terminée !\n\n{result}")
         logger.info(f"Vérification des communes déléguées réussie: {result}")
 
     except Exception as e:
         # Fermer la connexion en cas d'erreur pour éviter TransactionManagementError
         connection.close()
-        messages.error(request, f"❌ Erreur lors de la vérification des communes déléguées: {str(e)}")
+        messages.error(
+            request, f"❌ Erreur lors de la vérification des communes déléguées: {str(e)}"
+        )
         logger.error(f"Erreur lors de la vérification des communes déléguées: {e}", exc_info=True)
 
     return redirect('geo:administration_donnees')

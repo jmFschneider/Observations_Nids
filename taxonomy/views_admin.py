@@ -6,9 +6,12 @@ Réservé aux administrateurs uniquement.
 """
 
 import logging
+from io import StringIO
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.management import call_command
+from django.db import connection
 from django.shortcuts import redirect, render
 
 from taxonomy.models import Espece, Famille, Ordre
@@ -73,10 +76,6 @@ def charger_especes_lof_view(request):
     limit = request.POST.get('limit', '').strip()
 
     try:
-        from django.core.management import call_command
-        from django.db import connection
-        from io import StringIO
-
         # Fermer toute transaction en cours pour éviter les conflits
         connection.close()
 
@@ -99,10 +98,7 @@ def charger_especes_lof_view(request):
         result = output.getvalue()
 
         # Afficher le succès
-        messages.success(
-            request,
-            f"✅ Chargement LOF terminé avec succès !\n\n{result}"
-        )
+        messages.success(request, f"✅ Chargement LOF terminé avec succès !\n\n{result}")
         logger.info(f"Chargement LOF réussi: {result}")
 
     except Exception as e:
@@ -131,10 +127,6 @@ def charger_especes_taxref_view(request):
     taxref_version = request.POST.get('taxref_version', '').strip()
 
     try:
-        from django.core.management import call_command
-        from django.db import connection
-        from io import StringIO
-
         # Fermer toute transaction en cours pour éviter les conflits
         connection.close()
 
@@ -162,10 +154,7 @@ def charger_especes_taxref_view(request):
         result = output.getvalue()
 
         # Afficher le succès
-        messages.success(
-            request,
-            f"✅ Chargement TaxRef terminé avec succès !\n\n{result}"
-        )
+        messages.success(request, f"✅ Chargement TaxRef terminé avec succès !\n\n{result}")
         logger.info(f"Chargement TaxRef réussi: {result}")
 
     except Exception as e:
@@ -194,10 +183,6 @@ def recuperer_liens_oiseaux_net_view(request):
     dry_run = request.POST.get('dry_run', 'false') == 'true'
 
     try:
-        from django.core.management import call_command
-        from django.db import connection
-        from io import StringIO
-
         # Fermer toute transaction en cours pour éviter les conflits
         connection.close()
 
@@ -225,10 +210,7 @@ def recuperer_liens_oiseaux_net_view(request):
         result = output.getvalue()
 
         # Afficher le succès
-        messages.success(
-            request,
-            f"✅ Récupération des liens terminée !\n\n{result}"
-        )
+        messages.success(request, f"✅ Récupération des liens terminée !\n\n{result}")
         logger.info(f"Récupération des liens réussie: {result}")
 
     except Exception as e:
