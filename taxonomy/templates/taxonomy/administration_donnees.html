@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Administration des Données - Espèces{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-database"></i> Administration des Données Taxonomiques</h1>
+                <div>
+                    <a href="{% url 'taxonomy:liste_especes' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
+
+            <!-- Statistiques rapides -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-2">
+                            <i class="fas fa-list fa-2x text-primary"></i>
+                            <div class="mt-2">
+                                <h6 class="mb-0 text-muted">Total espèces</h6>
+                                <h3 class="mb-0 text-primary">{{ stats.total }}</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <i class="fas fa-layer-group fa-2x text-success"></i>
+                            <div class="mt-2">
+                                <h6 class="mb-0 text-muted">Ordres</h6>
+                                <h3 class="mb-0 text-success">{{ stats.ordres }}</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <i class="fas fa-sitemap fa-2x text-info"></i>
+                            <div class="mt-2">
+                                <h6 class="mb-0 text-muted">Familles</h6>
+                                <h3 class="mb-0 text-info">{{ stats.familles }}</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <i class="fas fa-flag fa-2x text-warning"></i>
+                            <div class="mt-2">
+                                <h6 class="mb-0 text-muted">LOF</h6>
+                                <h3 class="mb-0 text-warning">{{ stats.source_lof }}</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <i class="fas fa-database fa-2x text-secondary"></i>
+                            <div class="mt-2">
+                                <h6 class="mb-0 text-muted">TaxRef</h6>
+                                <h3 class="mb-0 text-secondary">{{ stats.source_taxref }}</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <i class="fas fa-link fa-2x text-danger"></i>
+                            <div class="mt-2">
+                                <h6 class="mb-0 text-muted">Avec liens</h6>
+                                <h3 class="mb-0 text-danger">{{ stats.avec_liens }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Administration des données -->
+            <div class="card mb-4 border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tools"></i> Scripts d'administration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        <i class="fas fa-info-circle"></i> Ces actions permettent de charger et mettre à jour les données de référence des espèces d'oiseaux.
+                        <strong>Attention :</strong> Ces opérations peuvent prendre plusieurs minutes.
+                    </p>
+
+                    <div class="row">
+                        <!-- Charger espèces depuis LOF -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 border-primary">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-flag text-primary"></i> Liste Officielle de France (LOF)
+                                    </h6>
+                                    <p class="card-text small text-muted">
+                                        Charge les espèces depuis la Liste Officielle des Oiseaux de France (CAF).
+                                        <br><br>
+                                        <strong>Source:</strong> Faune-France<br>
+                                        <strong>Espèces:</strong> ~577<br>
+                                        <strong>Durée:</strong> 10-30 secondes
+                                    </p>
+                                    <form method="post" action="{% url 'taxonomy:charger_especes_lof' %}" class="mt-3"
+                                          onsubmit="return confirm('⚠️ Voulez-vous charger les espèces depuis la LOF ?\n\nCela peut prendre quelques minutes.');">
+                                        {% csrf_token %}
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="force" value="true" id="force-lof">
+                                            <label class="form-check-label small" for="force-lof">
+                                                <strong>Force</strong> (remplacer les données existantes)
+                                            </label>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="form-label small mb-1">Limite (optionnel, pour test)</label>
+                                            <input type="number" class="form-control form-control-sm" name="limit"
+                                                   placeholder="Ex: 50" min="1">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                                            <i class="fas fa-play-circle"></i> Lancer le chargement LOF
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charger espèces depuis TaxRef -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 border-info">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-database text-info"></i> TaxRef (MNHN/INPN)
+                                    </h6>
+                                    <p class="card-text small text-muted">
+                                        Charge depuis le référentiel taxonomique national (alternative à LOF).
+                                        <br><br>
+                                        <strong>Source:</strong> INPN<br>
+                                        <strong>Espèces:</strong> ~574<br>
+                                        <strong>Durée:</strong> 1-3 minutes
+                                    </p>
+                                    <form method="post" action="{% url 'taxonomy:charger_especes_taxref' %}" class="mt-3"
+                                          onsubmit="return confirm('⚠️ Voulez-vous charger les espèces depuis TaxRef ?\n\nCela peut prendre quelques minutes.');">
+                                        {% csrf_token %}
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="force" value="true" id="force-taxref">
+                                            <label class="form-check-label small" for="force-taxref">
+                                                <strong>Force</strong> (remplacer les données existantes)
+                                            </label>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="form-label small mb-1">Version TaxRef (optionnel)</label>
+                                            <input type="text" class="form-control form-control-sm" name="taxref_version"
+                                                   placeholder="Ex: 18.0">
+                                        </div>
+                                        <button type="submit" class="btn btn-info btn-sm w-100">
+                                            <i class="fas fa-play-circle"></i> Lancer le chargement TaxRef
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Récupérer liens oiseaux.net -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 border-success">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-link text-success"></i> Liens oiseaux.net
+                                    </h6>
+                                    <p class="card-text small text-muted">
+                                        Récupère automatiquement les URLs vers les fiches oiseaux.net.
+                                        <br><br>
+                                        <strong>Action:</strong> Enrichissement<br>
+                                        <strong>Stratégies:</strong> 3 méthodes<br>
+                                        <strong>Durée:</strong> Variable
+                                    </p>
+                                    <form method="post" action="{% url 'taxonomy:recuperer_liens_oiseaux_net' %}" class="mt-3"
+                                          onsubmit="return confirm('Voulez-vous lancer la récupération des liens oiseaux.net ?');">
+                                        {% csrf_token %}
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="force" value="true" id="force-liens">
+                                            <label class="form-check-label small" for="force-liens">
+                                                <strong>Force</strong> (remplacer les liens existants)
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="dry_run" value="true" id="dry-run-liens">
+                                            <label class="form-check-label small" for="dry-run-liens">
+                                                <strong>Dry-run</strong> (simulation sans enregistrement)
+                                            </label>
+                                        </div>
+                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                            <i class="fas fa-check"></i> Récupérer les liens
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mb-0 mt-2">
+                        <i class="fas fa-lightbulb"></i> <strong>Ordre recommandé pour une nouvelle installation :</strong>
+                        <ol class="mb-0 mt-2 small">
+                            <li>Charger les espèces depuis la LOF (avec force) - <em>Recommandé</em></li>
+                            <li>Ou charger depuis TaxRef si vous préférez cette source</li>
+                            <li>Récupérer les liens oiseaux.net pour enrichir les données</li>
+                        </ol>
+                        <div class="mt-2 small">
+                            <strong>Note :</strong> La LOF est recommandée car elle est plus rapide et spécifique aux oiseaux de France.
+                            TaxRef est plus complet mais inclut toutes les espèces animales (téléchargement manuel requis).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
