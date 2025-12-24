@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.management import call_command
 from django.db import connection
 from django.shortcuts import redirect, render
+from django.urls import reverse
 
 from taxonomy.models import Espece, Famille, Ordre
 from taxonomy.tasks import recuperer_liens_oiseaux_net_task
@@ -214,7 +215,8 @@ def recuperer_liens_oiseaux_net_view(request):
         logger.info(f"Tâche Celery lancée: {task.id}")
 
         # Rediriger avec le task_id pour ouvrir Flower automatiquement
-        return redirect(f"{request.scheme}://{request.get_host()}/taxonomy/administration/?task_id={task.id}")
+        redirect_url = f"{reverse('taxonomy:administration_donnees')}?task_id={task.id}"
+        return redirect(redirect_url)
 
     except Exception as e:
         messages.error(request, f"❌ Erreur lors du lancement de la tâche: {str(e)}")
