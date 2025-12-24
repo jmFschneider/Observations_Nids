@@ -58,7 +58,7 @@ test_scans/
 
 # MkDocs
 site/
-# site-user/ est maintenant committé (documentation buildée pour collectstatic)
+site-user/
 docs/docs/todo/
 
 # Archives de fichiers orphelins
