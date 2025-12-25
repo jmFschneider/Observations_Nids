@@ -224,14 +224,24 @@ class ImportationService:
             username = f"{base_username}{counter}"
             counter += 1
 
-        # Vérifier si l'utilisateur existe déjà avec ce nom et prénom
-        try:
-            utilisateur = Utilisateur.objects.get(
-                first_name__iexact=prenom, last_name__iexact=nom, est_transcription=True
-            )
+        # Vérifier si l'utilisateur existe déjà avec ce nom et prénom (sans filtrer par est_transcription)
+        # Cela permet de récupérer les utilisateurs existants même s'ils n'étaient pas marqués comme transcription
+        utilisateur = Utilisateur.objects.filter(
+            first_name__iexact=prenom, last_name__iexact=nom
+        ).first()
+
+        if utilisateur:
+            # Utilisateur trouvé - s'assurer qu'il est marqué comme transcription
+            if not utilisateur.est_transcription:
+                utilisateur.est_transcription = True
+                utilisateur.save()
+                logger.info(
+                    f"Utilisateur existant marqué comme transcription: {utilisateur} (ID: {utilisateur.id})"
+                )
             return utilisateur
-        except Utilisateur.DoesNotExist:
-            # Créer un nouvel utilisateur
+
+        # Utilisateur non trouvé - créer un nouveau
+        try:
             utilisateur = Utilisateur.objects.create(
                 username=username,
                 email=email,
@@ -251,6 +261,42 @@ class ImportationService:
 
             logger.info(f"Nouvel utilisateur créé depuis transcription: {utilisateur}")
             return utilisateur
+
+        except Exception as e:
+            # En cas d'erreur (ex: email déjà existant), chercher par email
+            logger.warning(
+                f"Erreur lors de la création de l'utilisateur {prenom} {nom}: {str(e)}. "
+                f"Tentative de récupération par email."
+            )
+            utilisateur_par_email = Utilisateur.objects.filter(email=email).first()
+            if utilisateur_par_email:
+                if not utilisateur_par_email.est_transcription:
+                    utilisateur_par_email.est_transcription = True
+                    utilisateur_par_email.save()
+                logger.info(f"Utilisateur récupéré par email: {utilisateur_par_email}")
+                return utilisateur_par_email
+            else:
+                # Dernière tentative: créer avec un email unique
+                email_unique = (
+                    f"{prenom.lower()}.{nom.lower()}.{get_random_string(4)}@transcription.trans"
+                )
+                utilisateur = Utilisateur.objects.create(
+                    username=username,
+                    email=email_unique,
+                    first_name=prenom,
+                    last_name=nom,
+                    est_transcription=True,
+                    est_valide=True,
+                    role='observateur',
+                )
+                password = get_random_string(12)
+                utilisateur.set_password(password)
+                utilisateur.save()
+                utilisateur._created = True
+                logger.info(
+                    f"Utilisateur créé avec email unique: {utilisateur} (email: {email_unique})"
+                )
+                return utilisateur
 
     def preparer_importations(self):
         """Prépare les importations pour les transcriptions qui ont des candidats validés"""
