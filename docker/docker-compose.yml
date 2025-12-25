@@ -215,7 +215,7 @@ services:
       dockerfile: docker/Dockerfile
     container_name: observations_flower
     restart: unless-stopped
-    command: celery -A observations_nids flower --port=5555
+    command: celery -A observations_nids flower --port=5555 --url-prefix=flower
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DB_NAME=${DB_NAME}
