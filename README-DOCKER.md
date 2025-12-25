@@ -86,10 +86,10 @@ docker/
 - **Django + Gunicorn** - Application web (port 8000)
 - **MariaDB 10.11** - Base de données
 - **Redis** - Cache et broker Celery
-- **Celery Worker + Beat** - Tâches asynchrones
-- **Flower** - Monitoring Celery (port 5555)
-- **Nginx** - Reverse proxy (ports 80/443)
-- **Radicale** - Serveur CalDAV
+- **Celery Worker + Beat** - Tâches asynchrones (OCR Gemini, liens oiseaux.net, etc.)
+- **Flower** - Monitoring Celery en temps réel (port 5555, accessible via `/flower`)
+- **Nginx** - Reverse proxy (port 8010)
+- **phpMyAdmin** - Gestion base de données (port 8081)
 
 ## 🎯 Avantages
 

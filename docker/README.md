@@ -129,9 +129,21 @@ volumes:
 
 **Réponse** : **NON** ! Le conteneur contient une **copie** faite lors du build.
 
-**Solution** :
+**Solution - Rebuild sélectif (recommandé)** :
 ```bash
-# Reconstruire l'image avec les modifications
+# Rebuild uniquement les services concernés
+# Exemple : après modification de templates HTML
+docker compose build web
+docker compose up -d web
+
+# Exemple : après modification de code Python (tâches Celery)
+docker compose build web celery_worker celery_beat
+docker compose up -d web celery_worker celery_beat
+```
+
+**Solution - Rebuild complet** :
+```bash
+# Reconstruire toutes les images
 docker compose down
 docker compose build
 docker compose up -d
@@ -141,6 +153,8 @@ docker compose up -d
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
+
+**💡 Astuce** : Voir la section [Quand reconstruire les images Docker ?](#quand-reconstruire-les-images-docker-) dans "Dépannage" pour un guide détaillé.
 
 ## Installation rapide
 
@@ -446,7 +460,9 @@ docker compose exec web python manage.py collectstatic
 docker compose exec web bash
 ```
 
-### Gestion Celery
+### Gestion Celery et tâches asynchrones
+
+Celery est utilisé pour exécuter des tâches longues en arrière-plan (OCR Gemini, récupération de liens oiseaux.net, etc.) afin d'éviter les timeouts 504 Gateway Timeout.
 
 ```bash
 # Voir les workers actifs
@@ -455,22 +471,143 @@ docker compose exec celery_worker celery -A observations_nids inspect active
 # Voir les tâches planifiées
 docker compose exec celery_beat celery -A observations_nids inspect scheduled
 
+# Voir les tâches enregistrées
+docker compose exec celery_worker celery -A observations_nids inspect registered
+
 # Redémarrer les workers
 docker compose restart celery_worker celery_beat
+
+# Voir les logs des workers
+docker compose logs -f celery_worker
+
+# Purger toutes les tâches en attente (ATTENTION: supprime les tâches)
+docker compose exec celery_worker celery -A observations_nids purge
 ```
+
+### Monitoring avec Flower
+
+**Flower** est l'interface web de monitoring pour Celery. Elle permet de suivre en temps réel l'exécution des tâches asynchrones.
+
+#### Accès à Flower
+
+Flower peut être accessible de deux façons selon votre configuration :
+
+1. **Accès direct (développement local)** :
+   - URL : http://localhost:5555
+   - Accessible uniquement depuis le serveur
+
+2. **Via reverse proxy Apache (production recommandée)** :
+   - URL : https://votre-domaine.com/flower
+   - Nécessite configuration Apache (voir ci-dessous)
+
+#### Configuration Apache pour Flower
+
+Pour accéder à Flower via un reverse proxy Apache (recommandé en production) :
+
+**1. Configurer Apache :**
+
+Ajouter dans votre VirtualHost Apache (par exemple `/etc/apache2/sites-available/pilote.observation-nids.conf`) :
+
+```apache
+# Flower monitoring (Celery)
+ProxyPass /flower http://localhost:5555/flower
+ProxyPassReverse /flower http://localhost:5555/flower
+```
+
+**2. Activer les modules nécessaires :**
+
+```bash
+sudo a2enmod proxy proxy_http proxy_wstunnel
+sudo systemctl restart apache2
+```
+
+**3. Important : Configuration Flower avec url-prefix**
+
+Le fichier `docker-compose.yml` est déjà configuré avec `--url-prefix=flower` :
+
+```yaml
+flower:
+  command: celery -A observations_nids flower --port=5555 --url-prefix=flower
+```
+
+**Cette option est CRITIQUE** : elle permet à Flower de générer correctement les URLs internes quand il est derrière un reverse proxy. Sans cette option, Flower génère des URLs incorrectes comme `/task/...` au lieu de `/flower/task/...`.
+
+#### Ouverture automatique de Flower
+
+L'application est configurée pour **ouvrir automatiquement Flower** dans un nouvel onglet lorsque vous lancez une tâche asynchrone depuis l'interface web (par exemple : récupération de liens oiseaux.net, OCR Gemini).
+
+**Comment ça fonctionne :**
+
+1. L'utilisateur lance une tâche via l'interface web
+2. Django crée la tâche Celery et récupère son ID
+3. La vue redirige vers la page d'origine avec `?task_id=XXX` dans l'URL
+4. Un script JavaScript détecte le paramètre `task_id`
+5. Flower s'ouvre automatiquement dans un nouvel onglet sur `/flower/task/XXX`
+6. L'URL est nettoyée pour éviter de rouvrir Flower au refresh
+
+**Exemple de code JavaScript (déjà implémenté dans les templates)** :
+
+```javascript
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskId = urlParams.get('task_id');
+
+    if (taskId) {
+        // Ouvrir Flower dans un nouvel onglet
+        const flowerUrl = `/flower/task/${taskId}`;
+        window.open(flowerUrl, '_blank', 'noopener,noreferrer');
+
+        // Nettoyer l'URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+});
+```
+
+#### États des tâches dans Flower
+
+Flower affiche les états suivants pour les tâches :
+
+- **PENDING** : Tâche en attente d'exécution
+- **STARTED** : Tâche en cours d'exécution
+- **SUCCESS** : Tâche terminée avec succès
+- **FAILURE** : Tâche échouée
+- **PROGRESS** : État personnalisé (mis à jour par la tâche elle-même)
+
+#### Suivi granulaire de la progression
+
+Les tâches peuvent mettre à jour leur progression avec `self.update_state()` :
+
+```python
+self.update_state(
+    state='PROGRESS',
+    meta={
+        'status': 'processing',
+        'message': 'Traitement de l\'image 5/20...',
+        'percent': 25,
+        'current': 5,
+        'total': 20,
+    }
+)
+```
+
+Flower affiche ces informations en temps réel dans l'interface.
 
 ## Accès aux services
 
 Une fois les conteneurs démarrés :
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Application principale** | http://localhost | Interface web Django |
-| **Admin Django** | http://localhost/admin | Interface d'administration |
-| **phpMyAdmin** | http://localhost:8081 | Gestion de la base de données MariaDB |
-| **Flower** | http://localhost:5555 | Monitoring Celery |
+| Service | URL (développement local) | URL (production avec Apache) | Description |
+|---------|---------------------------|------------------------------|-------------|
+| **Application principale** | http://localhost:8010 | https://votre-domaine.com | Interface web Django |
+| **Admin Django** | http://localhost:8010/admin | https://votre-domaine.com/admin | Interface d'administration |
+| **phpMyAdmin** | http://localhost:8081 | - | Gestion de la base de données MariaDB |
+| **Flower (Celery)** | http://localhost:5555 | https://votre-domaine.com/flower | Monitoring des tâches asynchrones |
 
-**Note :** Depuis un autre PC du réseau local, remplacez `localhost` par l'IP du serveur (exemple: `http://192.168.1.112:8081` pour phpMyAdmin).
+**Notes importantes :**
+
+- **Développement local** : Depuis un autre PC du réseau local, remplacez `localhost` par l'IP du serveur (exemple: `http://192.168.1.112:8081` pour phpMyAdmin)
+- **Production** : Flower nécessite la configuration Apache reverse proxy (voir [Configuration Apache pour Flower](#configuration-apache-pour-flower))
+- **Sécurité** : phpMyAdmin ne devrait JAMAIS être exposé sur Internet sans protection appropriée
 
 ### phpMyAdmin - Gestion de la base de données
 
@@ -520,21 +657,52 @@ docker compose up -d
 
 ### Mises à jour
 
+**Méthode recommandée (rebuild sélectif)** :
+
 ```bash
 # 1. Sauvegarder la base de données (voir ci-dessus)
 
 # 2. Récupérer les dernières modifications
 git pull
 
-# 3. Reconstruire les images
+# 3. Identifier les services modifiés et les reconstruire
+# Si modification de code Python (models, views, tasks, etc.)
+docker compose build web celery_worker celery_beat
+
+# Si modification de templates HTML uniquement
+docker compose build web
+
+# Si modification de docker-compose.yml
+# Pas de rebuild nécessaire, juste redémarrer
+
+# 4. Redémarrer les services modifiés
+docker compose up -d web celery_worker celery_beat
+
+# 5. Vérifier les logs
+docker compose logs -f web celery_worker
+```
+
+**Méthode alternative (rebuild complet)** :
+
+Utile si vous ne savez pas exactement quels fichiers ont été modifiés.
+
+```bash
+# 1. Sauvegarder la base de données (voir ci-dessus)
+
+# 2. Récupérer les dernières modifications
+git pull
+
+# 3. Reconstruire TOUTES les images
 docker compose build --no-cache
 
-# 4. Redémarrer les services
+# 4. Redémarrer TOUS les services
 docker compose up -d
 
 # 5. Vérifier les logs
 docker compose logs -f
 ```
+
+**⚠️ IMPORTANT** : Un simple `git pull` ne suffit PAS à mettre à jour le code dans les conteneurs. Vous DEVEZ reconstruire les images pour que les modifications soient prises en compte. Voir [Quand reconstruire les images Docker ?](#quand-reconstruire-les-images-docker-) pour plus de détails.
 
 ### Nettoyage
 
@@ -676,6 +844,168 @@ docker compose restart celery_worker celery_beat
 docker compose exec redis redis-cli ping
 ```
 
+### Erreur "NotRegistered" dans Flower
+
+Si Flower affiche `NotRegistered('nom.de.la.tache')`, cela signifie que la tâche n'est pas découverte par le worker Celery.
+
+**Cause possible 1 : Fichier de tâche manquant dans l'image Docker**
+
+Vérifier si le fichier `tasks.py` existe dans le conteneur :
+
+```bash
+docker compose exec celery_worker ls -la taxonomy/tasks.py
+docker compose exec celery_worker ls -la pilot/tasks.py
+```
+
+Si vous obtenez "No such file or directory", c'est que le fichier n'a pas été copié lors du build.
+
+**Solution : Rebuild l'image du worker**
+
+```bash
+docker compose build celery_worker
+docker compose up -d celery_worker
+```
+
+**Cause possible 2 : Tâche non enregistrée**
+
+Vérifier que la tâche est bien décorée avec `@shared_task` :
+
+```python
+from celery import shared_task
+
+@shared_task(bind=True, name='taxonomy.ma_tache')
+def ma_tache(self):
+    pass
+```
+
+Vérifier que l'application Celery découvre bien les tâches dans `observations_nids/__init__.py` :
+
+```python
+from .celery import app as celery_app
+
+__all__ = ('celery_app',)
+```
+
+Et dans `observations_nids/celery.py` :
+
+```python
+app.autodiscover_tasks()
+```
+
+**Vérification finale** :
+
+```bash
+# Voir toutes les tâches enregistrées
+docker compose exec celery_worker celery -A observations_nids inspect registered
+
+# Redémarrer le worker
+docker compose restart celery_worker
+```
+
+### Template HTML non mis à jour après git pull
+
+Si après un `git pull`, les modifications de templates HTML ne sont pas visibles dans l'application :
+
+**Cause** : Les templates sont **copiés dans l'image Docker** lors du build, pas servis depuis le volume. Un simple `git pull` met à jour les fichiers sur l'hôte, mais pas dans le conteneur.
+
+**Solution : Rebuild l'image web**
+
+```bash
+docker compose build web
+docker compose up -d web
+```
+
+**Vérification** :
+
+```bash
+# Voir le code source dans le navigateur (Ctrl+U)
+# Ou vérifier directement dans le conteneur
+docker compose exec web cat taxonomy/templates/taxonomy/administration_donnees.html | grep "task_id"
+```
+
+### Flower inaccessible via reverse proxy (404 Not Found)
+
+Si l'URL `/flower` retourne 404 Not Found :
+
+**Cause 1 : Apache ProxyPass non configuré**
+
+Vérifier que Apache a bien la configuration :
+
+```apache
+ProxyPass /flower http://localhost:5555/flower
+ProxyPassReverse /flower http://localhost:5555/flower
+```
+
+Vérifier que les modules Apache sont activés :
+
+```bash
+sudo a2enmod proxy proxy_http proxy_wstunnel
+sudo systemctl restart apache2
+```
+
+**Cause 2 : Flower n'a pas le --url-prefix**
+
+Vérifier dans `docker-compose.yml` :
+
+```yaml
+flower:
+  command: celery -A observations_nids flower --port=5555 --url-prefix=flower
+```
+
+Si vous avez modifié le `docker-compose.yml`, **rebuild l'image flower** :
+
+```bash
+docker compose build flower
+docker compose up -d flower
+```
+
+**Vérification** :
+
+```bash
+# Tester l'accès direct
+curl http://localhost:5555/flower
+
+# Tester via Apache
+curl http://localhost/flower
+```
+
+### Quand reconstruire les images Docker ?
+
+**⚠️ IMPORTANT** : Docker copie les fichiers dans l'image lors du `build`. Les modifications de code sur l'hôte ne sont PAS automatiquement reflétées dans les conteneurs.
+
+**Vous DEVEZ reconstruire l'image quand :**
+
+| Modification | Services à rebuild | Commande |
+|--------------|-------------------|----------|
+| Templates HTML (`.html`) | `web` | `docker compose build web && docker compose up -d web` |
+| Code Python (`.py`) | `web`, `celery_worker`, `celery_beat` | `docker compose build web celery_worker celery_beat && docker compose up -d` |
+| `docker-compose.yml` | Tous les services modifiés | `docker compose up -d` (suffit pour les changements de config) |
+| `Dockerfile` | Tous | `docker compose build --no-cache && docker compose up -d` |
+| Fichiers statiques (CSS/JS) | `web` | `docker compose exec web python manage.py collectstatic && docker compose restart nginx` |
+| `.env` | Tous | `docker compose down && docker compose up -d` (pas de rebuild) |
+
+**Vous N'AVEZ PAS besoin de rebuild pour :**
+
+- Modifications des volumes montés (ex: `media/`, `logs/`)
+- Modifications de `.env` (simple redémarrage suffit)
+- Modifications de fichiers de configuration montés en volume
+
+**Exemple complet après modification de code Python :**
+
+```bash
+# 1. git pull pour récupérer les modifications
+git pull
+
+# 2. Rebuild les services qui utilisent le code Python
+docker compose build web celery_worker celery_beat
+
+# 3. Redémarrer les services
+docker compose up -d web celery_worker celery_beat
+
+# 4. Vérifier les logs
+docker compose logs -f web celery_worker
+```
+
 ## Production
 
 ### Checklist de déploiement en production
@@ -731,24 +1061,35 @@ Pour améliorer les performances en production :
 ## Architecture Docker
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Nginx (Port 8010)                    │
-│                   Reverse Proxy / SSL                   │
-└─────────────────────────┬───────────────────────────────┘
-                          │
-                          ▼
-                ┌─────────────────────┐
-                │   Django + Gunicorn │
-                │      (Port 8000)    │
-                └──────────┬──────────┘
-                           │
-                           │
-            ┌──────────────┼──────────────┬──────────────┐
-            ▼              ▼              ▼              ▼
-      ┌─────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐
-      │ MariaDB │  │  Redis   │  │  Celery  │  │  Flower │
-      │  10.11  │  │  Cache   │  │  Worker  │  │  (5555) │
-      └─────────┘  └──────────┘  └──────────┘  └─────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                  Nginx (Port 8010)                           │
+│           Reverse Proxy / Static Files / SSL                 │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+           ┌─────────────┼─────────────┐
+           │                           │
+           ▼                           ▼
+  ┌──────────────────┐       ┌──────────────────┐
+  │ Django + Gunicorn│       │  Flower (5555)   │
+  │   (Port 8000)    │       │ Celery Monitoring│
+  └────────┬─────────┘       └──────────────────┘
+           │
+           │ Utilise
+           │
+    ┌──────┼──────┬──────────┬──────────┬──────────┐
+    ▼      ▼      ▼          ▼          ▼          ▼
+┌────────┐  ┌────────┐  ┌─────────┐  ┌────────┐  ┌────────┐
+│MariaDB │  │ Redis  │  │ Celery  │  │ Celery │  │ Celery │
+│ 10.11  │  │ Cache  │  │ Worker  │  │  Beat  │  │ Flower │
+│        │  │Broker  │  │(async)  │  │(cron)  │  │(UI)    │
+└────────┘  └────────┘  └─────────┘  └────────┘  └────────┘
+
+Flux de tâches asynchrones:
+1. Utilisateur lance une tâche via Django (ex: OCR, liens oiseaux.net)
+2. Django envoie la tâche à Redis (broker Celery)
+3. Celery Worker récupère et exécute la tâche
+4. Flower affiche la progression en temps réel
+5. Django affiche le résultat à l'utilisateur
 ```
 
 ## Support
@@ -762,4 +1103,14 @@ Pour toute question ou problème :
 ---
 
 **Auteur** : Équipe Observations Nids
-**Dernière mise à jour** : 2025-12-21
+**Dernière mise à jour** : 2025-12-25
+
+## Changelog récent
+
+### 2025-12-25 : Celery et Flower
+- Ajout de la documentation complète sur Celery et les tâches asynchrones
+- Configuration Apache reverse proxy pour Flower (`/flower`)
+- Ouverture automatique de Flower depuis l'interface web
+- Guide de troubleshooting pour NotRegistered, templates non mis à jour, etc.
+- Tableau détaillé : Quand reconstruire les images Docker
+- Architecture mise à jour avec flux de tâches asynchrones
