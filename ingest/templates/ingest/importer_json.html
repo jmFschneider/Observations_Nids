@@ -1,49 +1,165 @@
 {% extends "base.html" %}
 {% load static %}
-<!-- templates/importation/importer_json.html -->
 
 {% block title %}Importer des fichiers JSON{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'ingest:accueil_importation' %}">Importation</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Importer JSON</li>
+    <h2><i class="fas fa-file-import"></i> Importation JSON - Sélection du répertoire</h2>
+    <p class="text-muted">Sélectionnez un répertoire contenant des fichiers JSON à importer</p>
+
+    <!-- Fil d'Ariane -->
+    <nav aria-label="breadcrumb" class="mt-4 mb-4">
+        <ol class="breadcrumb py-3">
+            <li class="breadcrumb-item">
+                <a href="{% url 'ingest:importer_json' %}">
+                    <i class="fas fa-home"></i> Résultats de transcription
+                </a>
+            </li>
+            {% for crumb in breadcrumb %}
+                {% if forloop.last %}
+                    <li class="breadcrumb-item active" aria-current="page">{{ crumb.name }}</li>
+                {% else %}
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'ingest:importer_json' %}?path={{ crumb.path }}">{{ crumb.name }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
         </ol>
     </nav>
 
-    <h1 class="mb-4">Importer des fichiers JSON transcrits</h1>
-    
-    <div class="alert alert-info">
-        <p>Cette étape permet d'importer les fichiers JSON générés par le processus de transcription des fiches manuscrites.</p>
-        <p>Sélectionnez le répertoire contenant les fichiers JSON à importer.</p>
-    </div>
-    
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Sélection du répertoire</h5>
+    <!-- Informations sur le répertoire actuel -->
+    <div class="card mb-4">
+        <div class="card-body py-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-2"><i class="fas fa-folder-open"></i> RÉPERTOIRE</h6>
+                    <p class="h5 mb-0">
+                        {% if current_path %}{{ current_path }}{% else %}<em>Racine</em>{% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-2"><i class="fas fa-file-code"></i> FICHIERS JSON</h6>
+                    <p class="h5 mb-0">
+                        {% if json_count > 0 %}
+                            <span class="badge bg-success" style="font-size: 1.1rem;">{{ json_count }}</span>
+                        {% else %}
+                            <span class="text-muted">Aucun</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
+    </div>
+
+    <!-- Bouton d'action si le répertoire contient des fichiers JSON -->
+    {% if json_count > 0 %}
+    <div class="card mb-5 border-primary">
+        <div class="card-body py-4">
+            <h5 class="card-title mb-3">
+                <i class="fas fa-check-circle text-primary"></i> Répertoire prêt pour l'importation
+            </h5>
+            <p class="card-text mb-4">
+                Ce répertoire contient <strong>{{ json_count }} fichier{{ json_count|pluralize }} JSON</strong> prêt{{ json_count|pluralize }} à être importé{{ json_count|pluralize }}.
+            </p>
+
             <form method="post">
                 {% csrf_token %}
-                
-                <div class="form-group">
-                    <label for="repertoire">Répertoire des fichiers JSON:</label>
-                    <select name="repertoire" id="repertoire" class="form-control" required>
-                        <option value="">-- Sélectionnez un répertoire --</option>
-                        {% for dir in directories %}
-                            <option value="{{ dir }}">{{ dir }}</option>
-                        {% endfor %}
-                    </select>
-                    <small class="form-text text-muted">
-                        Les fichiers JSON doivent se trouver dans un sous-répertoire de MEDIA_ROOT/transcription_results/
-                    </small>
-                </div>
-                
-                <button type="submit" class="btn btn-primary mt-3">Importer les fichiers</button>
+                <input type="hidden" name="repertoire" value="{{ current_path }}">
+
+                <button type="submit" class="btn btn-primary btn-lg" onclick="return confirm('Confirmer l\'importation de {{ json_count }} fichier{{ json_count|pluralize }} JSON ?');">
+                    <i class="fas fa-upload"></i> Importer les fichiers JSON
+                </button>
             </form>
         </div>
     </div>
+    {% endif %}
+
+    <!-- Liste des sous-répertoires -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-folder"></i> Sous-répertoires disponibles</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if parent_path is not None %}
+            <div class="p-3 border-bottom bg-light">
+                <a href="{% url 'ingest:importer_json' %}?path={{ parent_path }}"
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-level-up-alt"></i> Remonter au dossier parent
+                </a>
+            </div>
+            {% endif %}
+
+            {% if directories %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="directories-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;"></th>
+                            <th>Nom du répertoire</th>
+                            <th class="text-center" style="width: 150px;">
+                                <i class="fas fa-folder"></i> Sous-dossiers
+                            </th>
+                            <th class="text-center" style="width: 150px;">
+                                <i class="fas fa-file-code"></i> Fichiers JSON
+                            </th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dir in directories %}
+                        <tr class="directory-row clickable-row" onclick="navigateToDir('{{ current_path }}{% if current_path %}/{% endif %}{{ dir.name }}')">
+                            <td class="text-center">
+                                <i class="fas fa-folder text-warning fa-lg"></i>
+                            </td>
+                            <td>
+                                <strong>{{ dir.name }}</strong>
+                            </td>
+                            <td class="text-center">
+                                {% if dir.subdirs_count > 0 %}
+                                    <span class="badge bg-info">{{ dir.subdirs_count }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if dir.json_count > 0 %}
+                                    <span class="badge bg-success">{{ dir.json_count }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <i class="fas fa-chevron-right text-muted"></i>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-3">
+                <p class="text-muted mb-0">
+                    <i class="fas fa-info-circle"></i> Aucun sous-répertoire disponible dans ce dossier.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
+<style>
+    .clickable-row {
+        cursor: pointer;
+    }
+    .clickable-row:hover {
+        background-color: #f8f9fa !important;
+    }
+</style>
+
+<script>
+    function navigateToDir(path) {
+        window.location.href = '{% url "ingest:importer_json" %}?path=' + encodeURIComponent(path);
+    }
+</script>
 {% endblock %}
