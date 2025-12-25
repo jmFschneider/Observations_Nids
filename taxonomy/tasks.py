@@ -95,9 +95,7 @@ def recuperer_liens_oiseaux_net_task(self, force=False, limit=None, dry_run=Fals
                     stats['total'] = int(line.split(':')[-1].strip())
 
         total_success = stats['success_direct'] + stats['success_google']
-        success_rate = (
-            round((total_success / stats['total']) * 100, 1) if stats['total'] > 0 else 0
-        )
+        success_rate = round((total_success / stats['total']) * 100, 1) if stats['total'] > 0 else 0
 
         logger.info(
             f"Tâche recuperer_liens_oiseaux_net terminée avec succès: "

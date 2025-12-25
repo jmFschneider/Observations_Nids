@@ -37,9 +37,11 @@ def importer_json(request):
     # Récupérer le chemin actuel depuis les paramètres GET
     current_path = request.GET.get('path', '')
 
-    # Sécurité : normaliser le chemin
-    safe_path = os.path.normpath(current_path).replace('..', '')
-    full_current_path = os.path.join(base_dir, safe_path)
+    # Sécurité : normaliser le chemin (utiliser '/' pour compatibilité URL)
+    # Remplacer les backslashes par des forward slashes et supprimer '..'
+    safe_path = current_path.replace('\\', '/').replace('..', '').strip('/')
+    # Reconstruire le chemin complet avec os.path.join (qui gère le séparateur OS)
+    full_current_path = os.path.join(base_dir, safe_path.replace('/', os.sep))
 
     # Vérifier que le chemin est dans le répertoire de base
     if not full_current_path.startswith(base_dir):
@@ -69,8 +71,7 @@ def importer_json(request):
                     [
                         f
                         for f in os.listdir(dir_path)
-                        if os.path.isfile(os.path.join(dir_path, f))
-                        and f.lower().endswith('.json')
+                        if os.path.isfile(os.path.join(dir_path, f)) and f.lower().endswith('.json')
                     ]
                 )
 
@@ -100,11 +101,12 @@ def importer_json(request):
     # Créer le fil d'Ariane
     breadcrumb = []
     if safe_path:
-        parts = safe_path.split(os.sep)
+        # Utiliser '/' comme séparateur pour les URLs (indépendant de l'OS)
+        parts = safe_path.replace('\\', '/').split('/')
         current = ''
         for part in parts:
             if part:
-                current = os.path.join(current, part) if current else part
+                current = f"{current}/{part}" if current else part
                 breadcrumb.append({'name': part, 'path': current})
 
     # Compter les fichiers JSON dans le répertoire actuel
@@ -143,12 +145,19 @@ def importer_json(request):
 
         return redirect('ingest:accueil_importation')
 
+    # Calculer le chemin parent avec '/' pour les URLs
+    parent_path = None
+    if safe_path:
+        # Utiliser '/' comme séparateur pour les URLs
+        path_parts = safe_path.replace('\\', '/').split('/')
+        parent_path = '/'.join(path_parts[:-1]) if len(path_parts) > 1 else ''
+
     context = {
         'directories': directories,
         'current_path': safe_path,
         'breadcrumb': breadcrumb,
         'json_count': json_count,
-        'parent_path': os.path.dirname(safe_path) if safe_path else None,
+        'parent_path': parent_path,
     }
 
     return render(request, 'ingest/importer_json.html', context)
