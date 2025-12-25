@@ -228,8 +228,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const taskId = urlParams.get('task_id');
 
     if (taskId) {
-        // Ouvrir Flower dans un nouvel onglet
-        const flowerUrl = `http://${window.location.hostname}:5555/task/${taskId}`;
+        // Ouvrir Flower dans un nouvel onglet (via reverse proxy Apache /flower)
+        const flowerUrl = `/flower/task/${taskId}`;
         window.open(flowerUrl, '_blank', 'noopener,noreferrer');
 
         // Nettoyer l'URL pour éviter de rouvrir Flower au refresh
