@@ -69,4 +69,4 @@ docs/docs/todo/
 .claude/settings.local.json
 
 # Fichiers Windows réservés
-nul
+nul.env_ubuntu
