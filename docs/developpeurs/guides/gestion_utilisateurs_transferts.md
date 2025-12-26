@@ -828,7 +828,13 @@ python manage.py import_users users_export.json
 **Comportement de l'import** :
 - Si l'utilisateur existe déjà (même username) → **Mise à jour** des informations
 - Si l'utilisateur n'existe pas → **Création**
+- Si l'email existe déjà (avec un username différent) → **Conflit détecté**, utilisateur ignoré avec message d'erreur
 - Les mots de passe hashés sont importés tels quels (les utilisateurs conservent leurs mots de passe)
+
+**Options disponibles** :
+- `--skip-existing` : Ignore les utilisateurs existants (basé sur username et email)
+- `--update-existing` : Met à jour les utilisateurs existants au lieu de les ignorer
+- `--input fichier.json` : Spécifie le fichier d'entrée (défaut: users_export.json)
 
 ##### Cas d'usage
 
@@ -863,6 +869,29 @@ Créer une sauvegarde avant modifications importantes :
 
 ```bash
 python manage.py export_users --output backup_users_avant_migration.json
+```
+
+**4. Import avec gestion des conflits**
+
+Pour éviter les erreurs lors de l'import d'utilisateurs en cas de conflit (username ou email déjà existant) :
+
+```bash
+# Ignorer les utilisateurs déjà existants
+python manage.py import_users users_backup.json --skip-existing
+
+# Mettre à jour les utilisateurs existants
+python manage.py import_users users_backup.json --update-existing
+```
+
+Exemple de sortie avec conflits détectés :
+```
+Utilisateur PAULE-M ignoré (déjà existant)
+Conflit d'email pour Odiles: l'email odile.mp.schneider@free.fr est déjà utilisé par test_jms. Utilisateur Odiles ignoré.
+============================================================
+Importation terminée:
+  - 10 utilisateur(s) créé(s)
+  - 7 utilisateur(s) ignoré(s)
+============================================================
 ```
 
 ### 4.6 Synchronisation complète Production → Pilote
