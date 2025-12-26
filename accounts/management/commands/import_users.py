@@ -27,7 +27,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--skip-existing',
             action='store_true',
-            help='Ignore les utilisateurs qui existent déjà (basé sur username)',
+            help='Ignore les utilisateurs qui existent déjà (basé sur username et email)',
         )
         parser.add_argument(
             '--update-existing',
@@ -58,13 +58,36 @@ class Command(BaseCommand):
         with transaction.atomic():
             for user_data in users_data:
                 username = user_data['username']
+                email = user_data['email']
 
-                # Vérifier si l'utilisateur existe
+                # Vérifier si l'utilisateur existe par username
                 try:
                     user = User.objects.get(username=username)
                     user_exists = True
                 except User.DoesNotExist:
                     user_exists = False
+
+                # Vérifier si l'email existe déjà (avec un username différent)
+                email_exists = False
+                email_conflict_user = None
+                if not user_exists:  # Seulement si le username n'existe pas
+                    try:
+                        email_conflict_user = User.objects.get(email=email)
+                        email_exists = True
+                    except User.DoesNotExist:
+                        email_exists = False
+
+                # Gérer le conflit d'email (même email, username différent)
+                if email_exists:
+                    self.stdout.write(
+                        self.style.ERROR(
+                            f'Conflit d\'email pour {username}: '
+                            f'l\'email {email} est déjà utilisé par {email_conflict_user.username}. '
+                            f'Utilisateur {username} ignoré.'
+                        )
+                    )
+                    skipped_count += 1
+                    continue
 
                 if user_exists:
                     if skip_existing:
@@ -92,7 +115,7 @@ class Command(BaseCommand):
 
                 # Assigner les champs de base
                 user.username = username
-                user.email = user_data['email']
+                user.email = email
                 user.first_name = user_data['first_name']
                 user.last_name = user_data['last_name']
                 user.password = user_data['password']  # Déjà hashé
