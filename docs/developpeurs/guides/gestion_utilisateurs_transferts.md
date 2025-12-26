@@ -922,6 +922,130 @@ ssh pilote "cd /var/www/observations_nids_pilote && python manage.py import_user
 
 Cela garantit que les schémas de base de données sont identiques avant le transfert.
 
+### 4.7 Synchronisation Pilote → Dev (Docker)
+
+**Emplacement** : `scripts/sync_pilote_to_dev.sh`
+
+Ce script permet de synchroniser la base Pilote vers l'environnement de développement Docker pour travailler sur des données réelles.
+
+#### Prérequis
+
+1. Accès à la base Pilote (MySQL local ou via SSH)
+2. Docker compose lancé sur l'environnement de développement
+3. Variables d'environnement Docker configurées (`.env`)
+4. Même version de code déployée sur Pilote et Dev
+
+#### Utilisation
+
+```bash
+cd /opt/observations_nids_pilote
+./scripts/sync_pilote_to_dev.sh
+```
+
+#### Modes disponibles
+
+**Mode 1: Migration COMPLÈTE (avec utilisateurs)**
+- Transfère toutes les données y compris les utilisateurs
+- Écrase les utilisateurs de Dev
+
+**Mode 2: Migration SÉLECTIVE (sans utilisateurs) - RECOMMANDÉ**
+- Transfère toutes les données **sauf** les utilisateurs
+- Préserve les comptes de développement existants
+- Tables exclues :
+  - `accounts_utilisateur`
+  - `accounts_utilisateur_groups`
+  - `accounts_utilisateur_user_permissions`
+  - `auth_group`
+  - `auth_group_permissions`
+
+#### Workflow du script
+
+1. **Vérification des migrations** - Compare Pilote et Dev
+2. **Choix du mode** - Complet ou sélectif
+3. **Confirmation** - Demande validation avant écrasement
+4. **Backup automatique** - Sauvegarde la base Dev
+5. **Export Pilote** - Dump de la base source
+6. **Import Docker** - Restauration dans le conteneur
+7. **Nettoyage** - Suppression optionnelle des dumps
+
+#### Exemple d'exécution
+
+```bash
+$ ./scripts/sync_pilote_to_dev.sh
+
+==========================================
+  Synchronisation Pilote → Dev (Docker)
+==========================================
+
+--- 1. Vérification de la concordance des schémas via les migrations ---
+✓ OK : Les schémas sont identiques.
+
+--- 2. Mode de synchronisation ---
+1) Migration COMPLÈTE (avec utilisateurs)
+2) Migration SÉLECTIVE (sans utilisateurs) - RECOMMANDÉ pour Dev
+
+Votre choix (1/2) : 2
+Mode choisi: Migration SÉLECTIVE (sans utilisateurs)
+
+--- 3. Confirmation ---
+Source      : Base Pilote (pilote_observations_nids)
+Destination : Base Dev Docker (observations_nids_dev)
+Mode        : SÉLECTIF (sans users)
+
+ATTENTION : Les données de Dev vont être écrasées. Continuer ? (o/N) o
+
+--- 4. Sauvegarde de sécurité de la base Dev... ---
+✓ Sauvegarde créée: /tmp/dev_backup_2025-12-26-143052.sql
+
+--- 5. Export de la base Pilote (pilote_observations_nids)... ---
+✓ Export terminé: /tmp/pilote_to_dev_dump_2025-12-26-143052.sql
+
+--- 6. Import dans la base Dev (Docker - observations_nids_dev)... ---
+✓ Import terminé.
+
+--- 7. Nettoyage des fichiers temporaires... ---
+Supprimer le dump Pilote ? (o/N) o
+✓ Dump supprimé
+
+==========================================
+  ✓ Synchronisation terminée avec succès !
+==========================================
+
+📋 Résumé:
+  - Source : Pilote (pilote_observations_nids)
+  - Destination : Dev Docker (observations_nids_dev)
+  - Mode : SÉLECTIF (sans users)
+  - Backup Dev : /tmp/dev_backup_2025-12-26-143052.sql
+
+⚠️  Pour restaurer en cas de problème:
+  docker exec -i observations_db mysql -uuser -ppass observations_nids_dev < /tmp/dev_backup_2025-12-26-143052.sql
+```
+
+#### Configuration
+
+Modifiez les variables dans le script si nécessaire :
+
+```bash
+# Base source (Pilote)
+PILOTE_DB_NAME="pilote_observations_nids"
+PILOTE_PROJECT_DIR="/var/www/observations_nids_pilote"
+
+# Base destination (Dev Docker)
+DEV_DOCKER_DIR="/opt/observations_nids_pilote/docker"
+DEV_CONTAINER_DB="observations_db"
+DEV_CONTAINER_WEB="observations_web"
+```
+
+#### Restauration en cas de problème
+
+Le script crée automatiquement un backup. Pour restaurer :
+
+```bash
+docker exec -i observations_db mysql \
+  -u$DB_USER -p$DB_PASSWORD \
+  $DB_NAME < /tmp/dev_backup_YYYY-MM-DD-HHMMSS.sql
+```
+
 ---
 
 ## 5. Architecture technique
