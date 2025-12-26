@@ -34,6 +34,10 @@ class Command(BaseCommand):
             # Récupérer les permissions spécifiques
             user_permissions = list(user.user_permissions.values_list('codename', flat=True))
 
+            # Calculer l'accès aux référentiels (Espèces, Communes)
+            # Seuls les administrateurs peuvent modifier les référentiels
+            acces_referentiels = user.role == 'administrateur' or user.is_superuser
+
             # Construire les données de l'utilisateur
             user_dict = {
                 'username': user.username,
@@ -51,6 +55,7 @@ class Command(BaseCommand):
                 'est_valide': user.est_valide,
                 'est_refuse': user.est_refuse,
                 'est_transcription': user.est_transcription,
+                'acces_referentiels': acces_referentiels,  # Accès aux référentiels (Espèces, Communes)
                 # Relations
                 'groups': groups,
                 'user_permissions': user_permissions,

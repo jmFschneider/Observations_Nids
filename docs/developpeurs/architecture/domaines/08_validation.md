@@ -498,9 +498,9 @@ for validation in Validation.objects.select_related(
 ## Voir aussi
 
 - **[Workflow de correction](09_workflow-correction.md)** - Modèle `EtatCorrection` complémentaire
-- **[Gestion des utilisateurs](01_users_and_auth.md)** - Rôle `reviewer`
+- **[Utilisateurs & Transferts](../../guides/gestion_utilisateurs_transferts.md)** - Rôle `reviewer` et gestion des utilisateurs
 - **[Audit](04_audit.md)** - Traçabilité complémentaire via `HistoriqueModification`
-- **[Notifications](01_users_and_auth.md#modele-notification)** - Système de notifications
+- **[Notifications](../../guides/gestion_utilisateurs_transferts.md#5-architecture-technique)** - Système de notifications
 - **[Diagramme ERD](../diagrammes/erd.md)** - Vue d'ensemble des relations
 
 ---

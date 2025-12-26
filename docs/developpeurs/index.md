@@ -72,8 +72,8 @@ Cette documentation est organisée en plusieurs sections pour vous aider à trou
 - **[Installation](installation/01_development_setup.md)**
   - Guides pas à pas pour mettre en place un environnement de développement local ou de production.
 
-- **[Guides Pratiques](guides/01_taxonomie.md)**
-  - Des guides sur des sujets spécifiques comme le processus de développement (Git, CI/CD), le dépannage, la taxonomie, la géolocalisation, etc.
+- **[Guides Pratiques](guides/gestion_utilisateurs_transferts.md)**
+  - Des guides sur des sujets spécifiques comme la gestion des utilisateurs, les espèces, les communes, le processus de développement (Git, CI/CD), le dépannage, etc.
 
 - **[Qualité & Tests](quality_and_testing/01_STRATEGIE_TESTS.md)**
   - La stratégie de test du projet, des exemples de tests et des guides sur la manière de contribuer à la qualité du code.

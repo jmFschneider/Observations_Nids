@@ -120,8 +120,6 @@ nav:
 
       - 'Domaines':
 
-        - 'Utilisateurs & Auth': 'developpeurs/architecture/domaines/01_users_and_auth.md'
-
         - 'Observations Core': 'developpeurs/architecture/domaines/02_observations_core.md'
 
         - 'OCR & Ingestion': 'developpeurs/architecture/domaines/03_ocr_ingestion.md'
@@ -131,8 +129,6 @@ nav:
         - 'Localisation': 'developpeurs/architecture/domaines/05_localisation.md'
 
         - 'Nidification': 'developpeurs/architecture/domaines/06_nidification.md'
-
-        - 'Taxonomie': 'developpeurs/architecture/domaines/07_taxonomie.md'
 
         - 'Validation': 'developpeurs/architecture/domaines/08_validation.md'
 
@@ -174,17 +170,13 @@ nav:
 
       - 'Guides Fonctionnels':
 
-        - 'Taxonomie': 'developpeurs/guides/01_taxonomie.md'
+        - 'Utilisateurs & Transferts': 'developpeurs/guides/gestion_utilisateurs_transferts.md'
 
-        - 'Géolocalisation': 'developpeurs/guides/02_geolocalisation.md'
+        - 'Espèces & Taxonomie': 'developpeurs/guides/gestion_especes_taxonomie.md'
+
+        - 'Communes & Géolocalisation': 'developpeurs/guides/gestion_communes_geolocalisation.md'
 
         - 'Helpdesk': 'developpeurs/guides/03_django-helpdesk.md'
-
-        - 'Comptes Utilisateurs': 'developpeurs/guides/07_account.md'
-
-        - 'Gestion Communes': 'developpeurs/guides/08_gestion_communes.md'
-
-        - 'Anciennes Communes': 'developpeurs/guides/09_anciennes_communes.md'
 
         - 'Menu Latéral': 'developpeurs/guides/06_side_bar.md'
 

@@ -106,6 +106,20 @@ class Command(BaseCommand):
                 user.est_refuse = user_data.get('est_refuse', False)
                 user.est_transcription = user_data.get('est_transcription', False)
 
+                # Vérification de cohérence pour acces_referentiels (champ calculé)
+                if 'acces_referentiels' in user_data:
+                    acces_referentiels_export = user_data['acces_referentiels']
+                    acces_referentiels_calcule = user.role == 'administrateur' or user.is_superuser
+
+                    if acces_referentiels_export != acces_referentiels_calcule:
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f'Incohérence pour {username}: acces_referentiels={acces_referentiels_export} '
+                                f'mais role={user.role}, is_superuser={user.is_superuser}. '
+                                f'Le rôle sera utilisé comme source de vérité.'
+                            )
+                        )
+
                 # Dates
                 if user_data.get('date_joined'):
                     user.date_joined = parse_datetime(user_data['date_joined'])
