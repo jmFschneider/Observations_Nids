@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
@@ -317,6 +318,23 @@ class EtatCorrection(models.Model):
     )
     date_validation = models.DateTimeField(null=True, blank=True)
 
+    # Champs de verrouillage pour les corrections
+    en_correction_par = models.ForeignKey(
+        Utilisateur,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="fiches_en_correction",
+        verbose_name="En correction par",
+        help_text="Reviewer qui a verrouillé la fiche pour correction"
+    )
+    date_debut_correction = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Date début correction",
+        help_text="Date à laquelle le verrouillage a été activé"
+    )
+
     class Meta:
         constraints = [
             models.CheckConstraint(
@@ -401,6 +419,94 @@ class EtatCorrection(models.Model):
         self.validee_par = utilisateur
         self.date_validation = timezone.now()
         self.save()
+
+    def est_verrouillee(self):
+        """
+        Vérifie si la fiche est verrouillée pour correction.
+        Retourne True si verrouillée, False sinon.
+        Gère également le déblocage automatique après la durée configurée.
+        """
+        if not self.en_correction_par or not self.date_debut_correction:
+            return False
+
+        # Vérifier si la durée de verrouillage a expiré
+        try:
+            config = ConfigurationVerrouillage.get_instance()
+            if config.duree_verrouillage_jours > 0:  # 0 = jamais débloquer automatiquement
+                duree_max = timedelta(days=config.duree_verrouillage_jours)
+                temps_ecoule = timezone.now() - self.date_debut_correction
+
+                if temps_ecoule > duree_max:
+                    # Déblocage automatique
+                    self.liberer_verrou()
+                    return False
+        except ConfigurationVerrouillage.DoesNotExist:
+            # Configuration par défaut : 5 jours
+            duree_max = timedelta(days=5)
+            temps_ecoule = timezone.now() - self.date_debut_correction
+            if temps_ecoule > duree_max:
+                self.liberer_verrou()
+                return False
+
+        return True
+
+    def liberer_verrou(self):
+        """Libère le verrou de correction de la fiche"""
+        self.en_correction_par = None
+        self.date_debut_correction = None
+        self.save(update_fields=['en_correction_par', 'date_debut_correction'])
+
+    def verrouiller_pour(self, reviewer):
+        """
+        Verrouille la fiche pour un reviewer spécifique.
+        À appeler lors de la première sauvegarde en statut 'en_cours'.
+        """
+        if not self.en_correction_par:
+            self.en_correction_par = reviewer
+            self.date_debut_correction = timezone.now()
+            self.save(update_fields=['en_correction_par', 'date_debut_correction'])
+
+
+class ConfigurationVerrouillage(models.Model):
+    """
+    Configuration singleton pour le système de verrouillage des fiches en correction.
+    Un seul enregistrement doit exister dans cette table.
+    """
+    DUREE_CHOICES = [
+        (1, '1 jour'),
+        (2, '2 jours'),
+        (5, '5 jours'),
+        (10, '10 jours'),
+        (0, 'Jamais (verrouillage permanent)'),
+    ]
+
+    duree_verrouillage_jours = models.IntegerField(
+        choices=DUREE_CHOICES,
+        default=5,
+        verbose_name="Durée du verrouillage",
+        help_text="Durée après laquelle une fiche verrouillée sera automatiquement débloquée. 0 = jamais."
+    )
+    date_modification = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Configuration du verrouillage"
+        verbose_name_plural = "Configuration du verrouillage"
+
+    def __str__(self):
+        if self.duree_verrouillage_jours == 0:
+            return "Verrouillage permanent (pas de déblocage automatique)"
+        return f"Déblocage automatique après {self.duree_verrouillage_jours} jour(s)"
+
+    @classmethod
+    def get_instance(cls):
+        """Retourne l'instance unique de configuration (pattern Singleton)"""
+        instance, created = cls.objects.get_or_create(pk=1)
+        return instance
+
+    def save(self, *args, **kwargs):
+        """Force l'ID à 1 pour garantir un seul enregistrement"""
+        self.pk = 1
+        super().save(*args, **kwargs)
 
 
 class ImageSource(models.Model):

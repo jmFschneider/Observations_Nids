@@ -3,6 +3,8 @@ from django.utils.html import format_html
 
 from .models import (
     CausesEchec,
+    ConfigurationVerrouillage,
+    EtatCorrection,
     FicheObservation,
     ImageSource,
     Nid,
@@ -88,6 +90,69 @@ class ImageSourceAdmin(admin.ModelAdmin):
                 obj.fiche_observation.num_fiche,
             )
         return "Aucune fiche"
+
+
+@admin.register(ConfigurationVerrouillage)
+class ConfigurationVerrouillageAdmin(admin.ModelAdmin):
+    """
+    Administration de la configuration du verrouillage (Singleton).
+    Seul un enregistrement peut exister.
+    """
+    list_display = ('duree_verrouillage_jours', 'date_modification')
+    fieldsets = (
+        ('Configuration du verrouillage', {
+            'fields': ('duree_verrouillage_jours',),
+            'description': 'Définit la durée après laquelle une fiche verrouillée sera automatiquement débloquée.'
+        }),
+    )
+
+    def has_add_permission(self, request):
+        """Empêche la création de multiples instances (singleton)"""
+        if ConfigurationVerrouillage.objects.exists():
+            return False
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        """Empêche la suppression de la configuration"""
+        return False
+
+
+@admin.register(EtatCorrection)
+class EtatCorrectionAdmin(admin.ModelAdmin):
+    """Administration des états de correction des fiches"""
+    list_display = (
+        'fiche',
+        'statut',
+        'pourcentage_completion',
+        'en_correction_par',
+        'date_debut_correction',
+        'date_derniere_modification',
+    )
+    list_filter = ('statut', 'en_correction_par')
+    search_fields = ('fiche__num_fiche', 'en_correction_par__username')
+    readonly_fields = ('date_derniere_modification', 'date_debut_correction')
+    actions = ['liberer_verrous']
+
+    @admin.action(description='Libérer les verrous des fiches sélectionnées')
+    def liberer_verrous(self, request, queryset):
+        """Action pour libérer les verrous de plusieurs fiches à la fois"""
+        nb_liberes = 0
+        for etat in queryset:
+            if etat.est_verrouillee():
+                etat.liberer_verrou()
+                nb_liberes += 1
+
+        if nb_liberes > 0:
+            self.message_user(
+                request,
+                f"{nb_liberes} verrou(s) libéré(s) avec succès."
+            )
+        else:
+            self.message_user(
+                request,
+                "Aucune fiche n'était verrouillée parmi la sélection.",
+                level='WARNING'
+            )
 
 
 admin.site.register(Nid)

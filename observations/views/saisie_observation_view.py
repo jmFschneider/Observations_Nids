@@ -181,6 +181,30 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
                     redirect_response = redirect(
                         'observations:fiche_observation', fiche_id=fiche_id
                     )
+                # Si la fiche est en cours de correction (en_cours), vérifier le verrouillage
+                elif etat.statut == 'en_cours':
+                    if etat.est_verrouillee():
+                        # La fiche est verrouillée
+                        if user != etat.en_correction_par:
+                            # Un autre reviewer ou un admin tente d'accéder
+                            if user.role == 'administrateur':
+                                messages.warning(
+                                    request,
+                                    f"Cette fiche est en cours de correction par "
+                                    f"{etat.en_correction_par.get_full_name() or etat.en_correction_par.username}. "
+                                    f"Pour la modifier, vous devez d'abord la débloquer.",
+                                )
+                            else:
+                                messages.info(
+                                    request,
+                                    f"Cette fiche est en cours de correction par "
+                                    f"{etat.en_correction_par.get_full_name() or etat.en_correction_par.username}. "
+                                    f"Vous pouvez consulter la fiche en lecture seule.",
+                                )
+                            # Rediriger vers la vue en lecture seule
+                            redirect_response = redirect(
+                                'observations:fiche_observation', fiche_id=fiche_id
+                            )
                 # Si la fiche est en cours de saisie (nouveau ou en_edition),
                 # seul l'auteur ou un administrateur peut l'éditer
                 elif (
@@ -585,6 +609,16 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
                             fiche, fiche_avant.annee, fiche.annee, request.user
                         )
 
+                    # Verrouiller la fiche si elle est en cours de correction et pas encore verrouillée
+                    if hasattr(fiche, 'etat_correction'):
+                        etat = fiche.etat_correction
+                        if etat.statut == 'en_cours' and not etat.est_verrouillee():
+                            # Verrouiller la fiche pour le reviewer actuel
+                            etat.verrouiller_pour(request.user)
+                            logger.info(
+                                f"Fiche {fiche.pk} verrouillée pour {request.user.username}"
+                            )
+
                     messages.success(request, "Fiche d'observation sauvegardée avec succès!")
 
                     # Vérifier si une redirection après sauvegarde a été demandée (depuis JavaScript)
@@ -962,3 +996,63 @@ def rechercher_fiches(request):
         )
 
     return JsonResponse({'fiches': resultats})
+
+
+@login_required
+def liberer_verrou_fiche(request, fiche_id):
+    """
+    Vue pour libérer manuellement le verrou d'une fiche en cours de correction.
+
+    Permissions:
+    - Un reviewer peut libérer le verrou de sa propre fiche
+    - Un administrateur peut libérer le verrou de n'importe quelle fiche
+    """
+    fiche = get_object_or_404(FicheObservation, pk=fiche_id)
+    user = cast(Utilisateur, request.user)
+
+    # Vérifier que la fiche a un état de correction
+    if not hasattr(fiche, 'etat_correction'):
+        messages.error(request, "Cette fiche n'a pas d'état de correction.")
+        return redirect('observations:fiche_observation', fiche_id=fiche_id)
+
+    etat = fiche.etat_correction
+
+    # Vérifier que la fiche est verrouillée
+    if not etat.est_verrouillee():
+        messages.info(request, "Cette fiche n'est pas verrouillée.")
+        return redirect('observations:fiche_observation', fiche_id=fiche_id)
+
+    # Vérifier les permissions
+    peut_debloquer = False
+
+    if user.role == 'administrateur':
+        # Les administrateurs peuvent toujours débloquer
+        peut_debloquer = True
+    elif etat.en_correction_par == user:
+        # Un reviewer peut débloquer sa propre fiche
+        peut_debloquer = True
+
+    if not peut_debloquer:
+        messages.error(
+            request,
+            f"Vous n'êtes pas autorisé à débloquer cette fiche. "
+            f"Elle est actuellement en correction par {etat.en_correction_par.get_full_name() or etat.en_correction_par.username}."
+        )
+        return redirect('observations:fiche_observation', fiche_id=fiche_id)
+
+    # Débloquer la fiche
+    reviewer_precedent = etat.en_correction_par.get_full_name() or etat.en_correction_par.username
+    etat.liberer_verrou()
+
+    logger.info(
+        f"Fiche {fiche_id} débloquée par {user.username}. "
+        f"Était verrouillée par {reviewer_precedent}."
+    )
+
+    messages.success(
+        request,
+        f"La fiche #{fiche_id} a été débloquée avec succès. "
+        f"Elle était en correction par {reviewer_precedent}."
+    )
+
+    return redirect('observations:modifier_observation', fiche_id=fiche_id)

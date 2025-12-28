@@ -8,6 +8,7 @@ from .views.saisie_observation_view import (
     ajouter_observation,
     fiche_observation_view,
     historique_modifications,
+    liberer_verrou_fiche,
     rechercher_fiches,
     saisie_observation,
     soumettre_pour_correction,
@@ -79,6 +80,12 @@ urlpatterns = [
         'observations/valider/<int:fiche_id>/',
         valider_correction,
         name='valider_correction',
+    ),
+    # Route pour libérer le verrou d'une fiche
+    path(
+        'observations/<int:fiche_id>/liberer-verrou/',
+        liberer_verrou_fiche,
+        name='liberer_verrou_fiche',
     ),
     # Route AJAX pour rechercher des fiches
     path(
