@@ -84,6 +84,42 @@
 </div>
 {% endif %}
 
+{% if fiches_en_correction %}
+<div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+        <h3>Fiches en cours de correction</h3>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>N° Fiche</th>
+                    <th>Espèce</th>
+                    <th>Année</th>
+                    <th>Début correction</th>
+                    <th>Dernière modification</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fiche in fiches_en_correction %}
+                <tr>
+                    <td>{{ fiche.num_fiche }}</td>
+                    <td>{{ fiche.espece.nom }}</td>
+                    <td>{{ fiche.annee }}</td>
+                    <td>{{ fiche.etat_correction.date_debut_correction|date:"d/m/Y H:i" }}</td>
+                    <td>{{ fiche.etat_correction.date_derniere_modification|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <a href="{% url 'observations:modifier_observation' fiche_id=fiche.num_fiche %}" class="btn btn-sm btn-warning">Continuer la correction</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
 {% if user.est_transcription or user.role == 'administrateur' %}
 <div class="card mb-4">
     <div class="card-header bg-success text-white">

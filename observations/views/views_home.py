@@ -35,6 +35,16 @@ def home(request):
         .order_by('-date_creation')[:5]
     )
 
+    # Récupérer les fiches en cours de correction par l'utilisateur connecté
+    fiches_en_correction = (
+        FicheObservation.objects.filter(
+            etat_correction__statut='en_cours',
+            etat_correction__en_correction_par=user
+        )
+        .select_related('espece', 'etat_correction', 'etat_correction__en_correction_par')
+        .order_by('-etat_correction__date_debut_correction')[:10]
+    )
+
     # Compter les demandes de compte en attente (pour les administrateurs)
     demandes_en_attente = 0
     if user.role == 'administrateur':
@@ -48,6 +58,7 @@ def home(request):
             'users_count': users_count,
             'observations_count': observations_count,
             'fiches_en_edition': fiches_en_edition,
+            'fiches_en_correction': fiches_en_correction,
             'demandes_en_attente': demandes_en_attente,
         },
     )
