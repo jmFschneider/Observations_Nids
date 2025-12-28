@@ -24,6 +24,7 @@ def home(request):
     user = request.user  # L'utilisateur Django connecté
 
     users_count = Utilisateur.objects.count()
+    fiches_count = FicheObservation.objects.count()
     observations_count = Observation.objects.count()
 
     # Récupérer les fiches en cours d'édition de l'observateur connecté
@@ -56,6 +57,7 @@ def home(request):
         {
             'user': user,  # Renommé pour éviter la confusion avec le modèle
             'users_count': users_count,
+            'fiches_count': fiches_count,
             'observations_count': observations_count,
             'fiches_en_edition': fiches_en_edition,
             'fiches_en_correction': fiches_en_correction,
