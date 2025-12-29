@@ -129,7 +129,9 @@ def rechercher_communes(request):
         communes_startswith = CommuneFrance.objects.filter(nom__istartswith=query)
 
         # 1b. Communes qui CONTIENNENT la recherche SANS commencer par elle (basse priorité)
-        communes_contains = CommuneFrance.objects.filter(nom__icontains=query).exclude(nom__istartswith=query)
+        communes_contains = CommuneFrance.objects.filter(nom__icontains=query).exclude(
+            nom__istartswith=query
+        )
 
         # Si coordonnées GPS fournies ET valides (pas 0,0), filtrer par bounding box (~10 km)
         if lat and lon:
@@ -187,8 +189,14 @@ def rechercher_communes(request):
         )
 
         # 2. Rechercher dans les anciennes communes avec la même stratégie
-        anciennes_startswith = AncienneCommune.objects.filter(nom__istartswith=query).select_related('commune_actuelle')
-        anciennes_contains = AncienneCommune.objects.filter(nom__icontains=query).exclude(nom__istartswith=query).select_related('commune_actuelle')
+        anciennes_startswith = AncienneCommune.objects.filter(
+            nom__istartswith=query
+        ).select_related('commune_actuelle')
+        anciennes_contains = (
+            AncienneCommune.objects.filter(nom__icontains=query)
+            .exclude(nom__istartswith=query)
+            .select_related('commune_actuelle')
+        )
 
         # Appliquer le même filtrage GPS si nécessaire
         if lat and lon:

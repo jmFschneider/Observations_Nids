@@ -98,19 +98,21 @@ class ConfigurationVerrouillageAdmin(admin.ModelAdmin):
     Administration de la configuration du verrouillage (Singleton).
     Seul un enregistrement peut exister.
     """
+
     list_display = ('duree_verrouillage_jours', 'date_modification')
     fieldsets = (
-        ('Configuration du verrouillage', {
-            'fields': ('duree_verrouillage_jours',),
-            'description': 'Définit la durée après laquelle une fiche verrouillée sera automatiquement débloquée.'
-        }),
+        (
+            'Configuration du verrouillage',
+            {
+                'fields': ('duree_verrouillage_jours',),
+                'description': 'Définit la durée après laquelle une fiche verrouillée sera automatiquement débloquée.',
+            },
+        ),
     )
 
     def has_add_permission(self, request):
         """Empêche la création de multiples instances (singleton)"""
-        if ConfigurationVerrouillage.objects.exists():
-            return False
-        return True
+        return not ConfigurationVerrouillage.objects.exists()
 
     def has_delete_permission(self, request, obj=None):
         """Empêche la suppression de la configuration"""
@@ -120,6 +122,7 @@ class ConfigurationVerrouillageAdmin(admin.ModelAdmin):
 @admin.register(EtatCorrection)
 class EtatCorrectionAdmin(admin.ModelAdmin):
     """Administration des états de correction des fiches"""
+
     list_display = (
         'fiche',
         'statut',
@@ -143,15 +146,10 @@ class EtatCorrectionAdmin(admin.ModelAdmin):
                 nb_liberes += 1
 
         if nb_liberes > 0:
-            self.message_user(
-                request,
-                f"{nb_liberes} verrou(s) libéré(s) avec succès."
-            )
+            self.message_user(request, f"{nb_liberes} verrou(s) libéré(s) avec succès.")
         else:
             self.message_user(
-                request,
-                "Aucune fiche n'était verrouillée parmi la sélection.",
-                level='WARNING'
+                request, "Aucune fiche n'était verrouillée parmi la sélection.", level='WARNING'
             )
 
 

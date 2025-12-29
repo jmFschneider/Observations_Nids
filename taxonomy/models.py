@@ -22,6 +22,7 @@ class Espece(models.Model):
     nom = models.CharField(max_length=100, unique=True)
     nom_anglais = models.CharField(max_length=100, blank=True)
     nom_scientifique = models.CharField(max_length=100, blank=True)
+    code_gonm = models.CharField(max_length=10, blank=True, help_text="Code GONM de l'espèce")
     statut = models.CharField(max_length=50, blank=True)
     famille = models.ForeignKey(
         Famille, on_delete=models.SET_NULL, blank=True, null=True, related_name='especes'

@@ -326,13 +326,13 @@ class EtatCorrection(models.Model):
         blank=True,
         related_name="fiches_en_correction",
         verbose_name="En correction par",
-        help_text="Reviewer qui a verrouillé la fiche pour correction"
+        help_text="Reviewer qui a verrouillé la fiche pour correction",
     )
     date_debut_correction = models.DateTimeField(
         null=True,
         blank=True,
         verbose_name="Date début correction",
-        help_text="Date à laquelle le verrouillage a été activé"
+        help_text="Date à laquelle le verrouillage a été activé",
     )
 
     class Meta:
@@ -472,6 +472,7 @@ class ConfigurationVerrouillage(models.Model):
     Configuration singleton pour le système de verrouillage des fiches en correction.
     Un seul enregistrement doit exister dans cette table.
     """
+
     DUREE_CHOICES = [
         (1, '1 jour'),
         (2, '2 jours'),
@@ -484,7 +485,7 @@ class ConfigurationVerrouillage(models.Model):
         choices=DUREE_CHOICES,
         default=5,
         verbose_name="Durée du verrouillage",
-        help_text="Durée après laquelle une fiche verrouillée sera automatiquement débloquée. 0 = jamais."
+        help_text="Durée après laquelle une fiche verrouillée sera automatiquement débloquée. 0 = jamais.",
     )
     date_modification = models.DateTimeField(auto_now=True)
 
@@ -497,16 +498,16 @@ class ConfigurationVerrouillage(models.Model):
             return "Verrouillage permanent (pas de déblocage automatique)"
         return f"Déblocage automatique après {self.duree_verrouillage_jours} jour(s)"
 
+    def save(self, *args, **kwargs):
+        """Force l'ID à 1 pour garantir un seul enregistrement"""
+        self.pk = 1
+        super().save(*args, **kwargs)
+
     @classmethod
     def get_instance(cls):
         """Retourne l'instance unique de configuration (pattern Singleton)"""
         instance, created = cls.objects.get_or_create(pk=1)
         return instance
-
-    def save(self, *args, **kwargs):
-        """Force l'ID à 1 pour garantir un seul enregistrement"""
-        self.pk = 1
-        super().save(*args, **kwargs)
 
 
 class ImageSource(models.Model):

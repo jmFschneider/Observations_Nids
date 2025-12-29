@@ -378,24 +378,38 @@ class ImportationService:
             )  # Exemple : Image_1_result.json
             nom_image = nom_fichier_json.replace('_result.json', '.jpg')  # Exemple : Image_1.jpg
 
-            # Déterminer le répertoire source (chercher où se trouve le fichier JSON)
-            repertoire_source = None
+            # Déterminer le répertoire source (chercher récursivement où se trouve le fichier JSON)
+            chemin_json_complet = None
+            chemin_image_complet = None
+
             base_dir = os.path.join(settings.MEDIA_ROOT, 'transcription_results')
-            for subdir in os.listdir(base_dir):
-                subdir_path = os.path.join(base_dir, subdir)
-                if os.path.isdir(subdir_path) and os.path.exists(
-                    os.path.join(subdir_path, nom_fichier_json)
-                ):
-                    repertoire_source = subdir
+
+            # Parcourir récursivement tous les sous-dossiers
+            for root, _dirs, files in os.walk(base_dir):
+                if nom_fichier_json in files:
+                    # Chemin complet du JSON trouvé
+                    json_absolu = os.path.join(root, nom_fichier_json)
+                    # Chemin relatif à MEDIA_ROOT
+                    chemin_json_complet = os.path.relpath(json_absolu, settings.MEDIA_ROOT)
+
+                    # Déduire le chemin de l'image depuis le chemin du JSON
+                    # Ex: transcription_results/jpeg/TRI_ANCIEN/FUSION_FULL/gemini_3_flash/fiche_25_result.json
+                    #  -> jpeg/TRI_ANCIEN/FUSION_FULL/fiche_25.jpg
+                    parts = chemin_json_complet.split(os.sep)
+                    if len(parts) >= 5 and parts[0] == 'transcription_results':
+                        # Reconstruire le chemin image : jpeg/TRI_ANCIEN/FUSION_FULL/nom_image
+                        chemin_image_complet = os.path.join(parts[1], parts[2], parts[3], nom_image)
                     break
 
-            # Construire les chemins avec le bon répertoire
-            if repertoire_source:
-                chemin_image = os.path.join(repertoire_source, nom_image)
-                chemin_json = os.path.join(repertoire_source, nom_fichier_json)
+            # Normaliser les chemins pour utiliser des slashes (compatible Linux/Windows)
+            if chemin_image_complet:
+                chemin_image = chemin_image_complet.replace(os.sep, '/')
             else:
-                # Fallback si le répertoire n'est pas trouvé
                 chemin_image = nom_image
+
+            if chemin_json_complet:
+                chemin_json = chemin_json_complet.replace(os.sep, '/')
+            else:
                 chemin_json = nom_fichier_json
 
             # Création de la fiche d'observation (les objets liés seront créés automatiquement
