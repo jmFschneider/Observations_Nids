@@ -39,8 +39,7 @@ def home(request):
     # Récupérer les fiches en cours de correction par l'utilisateur connecté
     fiches_en_correction = (
         FicheObservation.objects.filter(
-            etat_correction__statut='en_cours',
-            etat_correction__en_correction_par=user
+            etat_correction__statut='en_cours', etat_correction__en_correction_par=user
         )
         .select_related('espece', 'etat_correction', 'etat_correction__en_correction_par')
         .order_by('-etat_correction__date_debut_correction')[:10]
