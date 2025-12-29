@@ -10,6 +10,9 @@
 ### API (Application Programming Interface)
 Interface de programmation permettant la communication entre différents logiciels. Dans Observations Nids, les API servent à interroger des services externes (communes, coordonnées GPS, etc.).
 
+### Actions flottantes (Barre d')
+🆕 **Nouveauté Décembre 2025** - Barre fixe en bas de l'écran (mobile/tablette) contenant les boutons principaux (Enregistrer, Valider). Elle reste accessible pendant le scroll et se masque automatiquement quand on arrive au footer.
+
 ### Auto-complétion
 Fonctionnalité qui suggère automatiquement des valeurs pendant la saisie. Utilisée pour les communes et les espèces.
 
@@ -49,6 +52,9 @@ Moment où les jeunes oiseaux quittent définitivement le nid. Marque générale
 
 ### Fiche d'observation
 Document numérique contenant toutes les informations sur un nid : localisation, espèce, observations temporelles, remarques.
+
+### Fiche ID
+🆕 **Nouveauté Décembre 2025** - Numéro unique attribué automatiquement par le système à chaque fiche d'observation. Affiché en **gris** pour indiquer qu'il n'est pas modifiable. Remplace l'ancien terme "N° Fiche". Permet d'identifier précisément et de façon unique chaque fiche dans la base de données.
 
 ### Formset
 Composant technique Django permettant d'ajouter dynamiquement plusieurs observations à une même fiche.
@@ -114,6 +120,9 @@ Informations sur les données elles-mêmes (date de création, auteur, date de m
 
 ## N
 
+### N° perso de fiche
+🆕 **Nouveauté Décembre 2025** - Numéro de référence personnel que vous pouvez attribuer à vos fiches. Contrairement au Fiche ID (automatique), ce numéro est **modifiable** et **optionnel**. Utile si vous avez votre propre système de numérotation. Remplace l'ancien terme "N° Personnel".
+
 ### Nid
 Structure construite par les oiseaux pour pondre leurs œufs et élever leurs petits. Objet central de l'application.
 
@@ -136,6 +145,14 @@ Reconnaissance optique de caractères. Technologie permettant de lire du texte s
 ---
 
 ## P
+
+### Pertinence (Tri par)
+🆕 **Nouveauté Décembre 2025** - Système de tri intelligent pour la recherche de communes. Les résultats sont classés par ordre de pertinence :
+1. **Match exact** (ex: "Ger" trouve d'abord la commune "Ger")
+2. **Commence par** (ex: "Ger" trouve "Gerbéviller")
+3. **Contient** (ex: "Ger" trouve "Angers")
+
+À pertinence égale, les communes avec les noms les plus courts sont favorisées.
 
 ### Ponte
 Période pendant laquelle la femelle pond ses œufs dans le nid.
@@ -273,6 +290,9 @@ Division d'une longue liste en plusieurs pages pour faciliter la navigation.
 ### Popup / Modale
 Fenêtre qui s'affiche par-dessus le contenu principal pour afficher des informations ou demander une action.
 
+### Sticky / Flottant
+Élément qui reste fixe à l'écran pendant le scroll. Ex: La barre d'actions flottante 🆕 qui reste en bas d'écran sur mobile.
+
 ### Toast / Message de confirmation
 Petit message temporaire qui apparaît (généralement en haut ou en bas de l'écran) pour confirmer une action.
 
@@ -291,4 +311,18 @@ Si un terme utilisé dans l'application n'est pas dans ce glossaire, n'hésitez 
 
 ---
 
-*Version 1.0 - Novembre 2025*
+*Version 1.1 - Décembre 2025*
+
+---
+
+## 🆕 Termes ajoutés (Décembre 2025)
+
+Les nouveaux termes suivants ont été ajoutés suite aux améliorations de l'interface :
+
+- **Actions flottantes (Barre d')** - Nouveau composant d'interface mobile
+- **Fiche ID** - Nouvelle terminologie pour le numéro unique
+- **N° perso de fiche** - Nouvelle terminologie pour le numéro personnel
+- **Pertinence (Tri par)** - Nouveau système de recherche
+- **Sticky / Flottant** - Terme technique pour éléments fixes
+
+**→ Consultez le [Guide rapide](./00_guide_rapide.md) pour voir ces nouveautés en action !**

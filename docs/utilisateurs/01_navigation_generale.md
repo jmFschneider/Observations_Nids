@@ -57,52 +57,64 @@ Une fois connecté, vous accédez au tableau de bord avec plusieurs sections :
 ┌─────────────────────────────────────────────────┐
 │  Observations Nids            [Votre nom] ▼     │
 ├─────────────────────────────────────────────────┤
+│  🏠 Accueil                                      │
 │                                                 │
-│  📝 Nouvelle observation                        │
-│  🔍 Consulter les observations                  │
-│  ✏️  Corriger des fiches (transcription)        │
+│  FICHES OBSERVATIONS                            │
+│  📝 Nouvelle fiche                              │
+│  📋 Liste des fiches                            │
+│                                                 │
+│  ✏️  Transcription                              │
 │  📊 Statistiques                                │
+│  🎫 Support                                     │
 │                                                 │
 └─────────────────────────────────────────────────┘
 ```
 
-### Barre de navigation
+### Barre de navigation latérale
 
 - **Accueil** : Retour au tableau de bord
-- **Observations** : Liste de toutes vos observations
-- **Transcription** : Accès à l'outil de correction des fiches scannées
+- **Fiches Observations** : Créer ou consulter des fiches
+  - Nouvelle fiche
+  - Liste des fiches
+- **Transcription** : Accès à l'outil de transcription automatique
 - **Mon compte** : Paramètres de votre profil
 - **Aide** : Documentation et tutoriels
+
+💡 **Nouveau** : Le menu actif est surligné en bleu clair pour faciliter la navigation !
 
 ---
 
 ## 3. Les différentes sections
 
-### 📝 Nouvelle observation
+### 📝 Nouvelle fiche
 
 **Quand l'utiliser** : Vous souhaitez enregistrer une nouvelle observation de terrain.
 
 **Accès** :
-- Bouton "Nouvelle observation" sur l'accueil
-- Menu "Observations" > "Nouvelle saisie"
+- Menu "Fiches Observations" → "Nouvelle fiche"
+- Bouton rapide sur l'accueil
 
-Voir le guide détaillé : [Saisir une nouvelle observation](./02_saisie_nouvelle_observation.md)
+💡 **Astuce** : Sur mobile/tablette, une barre d'actions flottante reste accessible en bas d'écran pour un accès rapide aux boutons "Enregistrer" et "Valider" !
+
+Voir le guide détaillé : [Saisir une nouvelle fiche](./02_saisie_nouvelle_observation.md)
 
 ---
 
-### 🔍 Consulter les observations
+### 📋 Liste des fiches
 
 **Quand l'utiliser** : Visualiser, rechercher ou filtrer les observations existantes.
 
 **Fonctionnalités** :
-- **Liste des observations** : Affichage de toutes les fiches
+- **Liste des fiches** : Affichage avec Fiche ID, N° perso de fiche, Espèce, Commune
 - **Filtres** : Par date, espèce, lieu, observateur
-- **Recherche** : Recherche par mots-clés
+- **Recherche de communes** : 🆕 Recherche optimisée par pertinence
+  - Les communes courtes (Ur, Ger, Eu) apparaissent en premier
+  - Tri intelligent : match exact → commence par → contient
 - **Export** : Télécharger les données (CSV, JSON)
 
 **Actions possibles** :
-- Voir les détails d'une observation
-- Modifier vos propres observations
+- Voir les détails d'une fiche (cliquer sur le Fiche ID)
+- Modifier vos propres fiches (bouton "Corriger")
 - Consulter l'historique des modifications
 
 ---
@@ -261,4 +273,31 @@ Maintenant que vous connaissez la navigation générale, consultez les guides sp
 
 ---
 
-*Version 1.0 - Novembre 2025*
+*Version 1.1 - Décembre 2025*
+
+---
+
+## 🆕 Nouveautés (Décembre 2025)
+
+### Améliorations de navigation et ergonomie
+
+1. **Menu restructuré**
+   - Section "Fiches Observations" plus claire
+   - "Nouvelle fiche" au lieu de "Nouvelle observation"
+   - Menu actif surligné en bleu clair
+
+2. **Barre d'actions flottante**
+   - Sur mobile/tablette, boutons toujours accessibles en bas d'écran
+   - Facilite l'enregistrement et la validation
+   - Se masque automatiquement en bas de page
+
+3. **Recherche de communes optimisée**
+   - Tri intelligent par pertinence
+   - Communes courtes (Ur, Ger, Eu, Ay) trouvées facilement
+   - Plus besoin de scroller dans de longues listes
+
+4. **Terminologie clarifiée**
+   - **Fiche ID** : Numéro unique attribué automatiquement (non modifiable, affiché en gris)
+   - **N° perso de fiche** : Votre numéro de référence personnel (modifiable)
+
+**→ Consultez le [Guide rapide](./00_guide_rapide.md) pour découvrir ces nouveautés en action !**

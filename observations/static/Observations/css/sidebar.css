@@ -111,13 +111,13 @@ body {
 }
 
 #sidebar .nav-link.active {
-    background-color: #007bff;
+    background-color: #66b3ff;
     color: white;
-    border-left-color: #0056b3;
+    border-left-color: #3399ff;
 }
 
 #sidebar .nav-link.active:hover {
-    background-color: #0056b3;
+    background-color: #3399ff;
 }
 
 /* Texte des liens (caché quand sidebar repliée) */

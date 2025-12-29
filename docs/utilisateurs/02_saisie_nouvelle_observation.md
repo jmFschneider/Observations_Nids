@@ -1,8 +1,10 @@
-# Guide utilisateur - Saisir une nouvelle observation
+# Guide utilisateur - Saisir une nouvelle fiche d'observation
 
 ## Vue d'ensemble
 
 Ce guide vous accompagne **pas à pas** dans la saisie d'une nouvelle fiche d'observation de nid.
+
+💡 **Nouveau** : Profitez de la barre d'actions flottante sur mobile/tablette et de la recherche de communes optimisée !
 
 ---
 
@@ -25,10 +27,15 @@ Ce guide vous accompagne **pas à pas** dans la saisie d'une nouvelle fiche d'ob
 
 ### Accéder au formulaire de saisie
 
-1. **Depuis l'accueil** : Cliquez sur "📝 Nouvelle observation"
-2. **Depuis le menu** : "Observations" > "Nouvelle saisie"
+1. **Depuis le menu** : "Fiches Observations" → "Nouvelle fiche"
+2. **Depuis l'accueil** : Bouton rapide "Nouvelle fiche"
 
 Vous arrivez sur la page de saisie avec plusieurs sections.
+
+En haut du formulaire, vous verrez :
+- **Fiche ID** : Sera attribué automatiquement après le premier enregistrement (affiché en gris = non modifiable)
+- **N° perso de fiche** : Votre numéro de référence personnel (optionnel, modifiable)
+- **Observateur** : Votre nom (auto-rempli)
 
 ---
 
@@ -41,15 +48,27 @@ La localisation est la **première étape obligatoire**. Vous avez deux méthode
 **Quand l'utiliser** : Vous connaissez le nom de la commune
 
 1. **Champ "Commune"**
-   - Tapez les premières lettres du nom de la commune
-   - Un menu déroulant s'affiche avec les suggestions
+   - Tapez au moins 2 lettres du nom de la commune
+   - Un menu déroulant s'affiche avec les suggestions **triées par pertinence** 🆕
+   - Les correspondances exactes apparaissent en premier
+   - Les communes à nom court (Ur, Ger, Eu, Ay) sont facilement trouvées !
    - Sélectionnez la commune dans la liste
 
-2. **Précision automatique**
+2. **Tri intelligent** 🆕
+   ```
+   Recherche : "ger"
+
+   Résultats :
+   1. Ger (65) - Hautes-Pyrénées        ← Match exact
+   2. Gerbéviller (54) - Meurthe-et-Moselle ← Commence par
+   3. Angers (49) - Maine-et-Loire      ← Contient
+   ```
+
+3. **Précision automatique**
    - Les coordonnées GPS de la commune sont automatiquement ajoutées
    - Le code postal et le département sont renseignés
 
-3. **Affiner la localisation (optionnel)**
+4. **Affiner la localisation (optionnel)**
    - Vous pouvez ajuster manuellement les coordonnées
    - Utilisez les champs "Latitude" et "Longitude"
 
@@ -151,11 +170,13 @@ Une fois la localisation renseignée, vous **DEVEZ enregistrer la fiche** avant 
 
 2. **Cliquez sur le bouton "💾 Enregistrer"**
    - Le bouton se trouve en bas du formulaire
+   - 💡 **Nouveau** : Sur mobile/tablette, utilisez la **barre flottante** en bas d'écran pour un accès rapide !
    - Un message de confirmation s'affiche
    - La page se recharge avec votre fiche sauvegardée
 
 3. **Vous êtes maintenant en mode "Modification"**
-   - La fiche a un numéro d'identification
+   - La fiche a un **Fiche ID** (numéro unique, affiché en gris)
+   - Le **N° perso de fiche** peut être ajouté/modifié
    - Les sections "Observations" et "Remarques" sont maintenant actives
    - Vous pouvez ajouter autant d'observations que nécessaire
 
@@ -373,6 +394,7 @@ Le bouton "Enregistrer" peut être utilisé **plusieurs fois** pendant la saisie
 ✅ **Enregistrez régulièrement** pour ne pas perdre vos données
 ✅ **Enregistrez AVANT d'ajouter des observations**
 ✅ **Enregistrez après chaque modification importante**
+💡 **Utilisez la barre flottante** (mobile/tablette) pour accéder rapidement au bouton Enregistrer
 
 ❌ **Ne fermez pas votre navigateur sans enregistrer**
 ❌ **N'utilisez pas le bouton "Retour" du navigateur** (utilisez les liens de navigation)
@@ -383,11 +405,11 @@ Le bouton "Enregistrer" peut être utilisé **plusieurs fois** pendant la saisie
 
 ### Accéder à une fiche existante
 
-1. **Depuis la liste des observations**
-   - Menu "Observations" > "Mes observations"
-   - Cliquez sur la fiche à modifier
+1. **Depuis la liste des fiches**
+   - Menu "Fiches Observations" → "Liste des fiches"
+   - Cliquez sur le **Fiche ID** ou l'espèce pour voir les détails
 
-2. **Cliquez sur "✏️ Modifier"**
+2. **Cliquez sur "Corriger" ou "✏️ Modifier"**
    - Le bouton apparaît si vous avez les droits
    - Vous accédez au formulaire de modification
 
@@ -509,4 +531,39 @@ Pour consulter l'historique :
 
 ---
 
-*Version 1.0 - Novembre 2025*
+*Version 1.1 - Décembre 2025*
+
+---
+
+## 🆕 Nouveautés (Décembre 2025)
+
+### Améliorations de l'interface de saisie
+
+1. **Barre d'actions flottante (Mobile/Tablette)**
+   - Boutons "Enregistrer" et "Valider" toujours accessibles en bas d'écran
+   - Plus besoin de scroller jusqu'en bas du long formulaire !
+   - Se masque automatiquement quand vous arrivez au footer
+
+2. **Recherche de communes optimisée**
+   - **Tri intelligent par pertinence** :
+     - Match exact en premier (ex: "Ger" pour la commune de Ger)
+     - Puis communes qui commencent par la recherche (ex: "Gerbéviller")
+     - Puis communes qui contiennent la recherche (ex: "Angers")
+   - **Communes courtes enfin trouvées facilement !**
+     - Ur (66), Ger (65), Eu (76), Ay (51)
+     - Elles apparaissent en tête de liste avec un score de pertinence maximal
+
+3. **Terminologie clarifiée**
+   - **Fiche ID** : Numéro unique attribué automatiquement par le système
+     - Affiché en **gris** pour indiquer qu'il n'est pas modifiable
+     - Permet d'identifier précisément chaque fiche
+   - **N° perso de fiche** : Votre propre système de numérotation
+     - Modifiable, optionnel
+     - Utile si vous avez votre propre référencement
+
+4. **Navigation améliorée**
+   - Menu "Fiches Observations" plus clair
+   - "Nouvelle fiche" au lieu de "Nouvelle observation"
+   - Menu actif surligné en bleu clair
+
+**→ Voir le [Guide rapide](./00_guide_rapide.md) pour un aperçu complet des nouveautés !**

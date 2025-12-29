@@ -35,10 +35,11 @@
 
 ### A. Localiser le nid (1 minute)
 
-1. Cliquez sur **"📝 Nouvelle observation"** depuis l'accueil
+1. Cliquez sur **"📝 Nouvelle fiche"** depuis l'accueil ou le menu **"Fiches Observations"**
 2. **Renseignez la localisation** :
-   - **Option 1 (rapide)** : Cliquez sur "📍 Me géolocaliser" → Vérifiez la commune suggérée
+   - **Option 1 (rapide)** : Cliquez sur "📍 Ma position" → Vérifiez la commune suggérée
    - **Option 2 (manuelle)** : Tapez le nom de la commune dans le champ "Commune"
+   - 💡 **Astuce** : La recherche de communes est intelligente - même les communes à nom court (Ur, Ger, Eu) apparaissent en premier !
 
 ### B. Renseigner le nid (1 minute)
 
@@ -48,8 +49,11 @@
 
 ### C. Enregistrer (30 secondes)
 
-6. **Cliquez sur "💾 Enregistrer"** en bas du formulaire
+6. **Cliquez sur "💾 Enregistrer"**
+   - Le bouton est en bas du formulaire
+   - 💡 **Nouveau** : Sur petit écran, une **barre flottante** reste visible en bas pour un accès rapide aux boutons !
 7. ✅ **Votre fiche est créée !**
+   - Le **Fiche ID** (numéro unique) est automatiquement attribué et affiché en gris
 
 ### D. Ajouter une observation (30 secondes)
 
@@ -65,8 +69,11 @@
 
 ## 🔍 Étape 3 : Consulter vos observations (30 secondes)
 
-1. Cliquez sur **"🔍 Consulter les observations"** dans le menu
-2. Vous voyez la liste de vos observations
+1. Cliquez sur **"Liste des fiches"** dans le menu **"Fiches Observations"**
+2. Vous voyez la liste de vos observations avec :
+   - **Fiche ID** : Numéro unique de la fiche
+   - **N° perso de fiche** : Votre numéro personnel (si renseigné)
+   - Espèce, commune, état de correction
 3. Cliquez sur une fiche pour voir les détails
 
 ---
@@ -95,12 +102,13 @@ Vous savez maintenant :
 
 #### ➕ Ajouter une nouvelle visite à un nid existant
 
-1. Allez dans **"Consulter les observations"**
+1. Allez dans **"Liste des fiches"** (menu "Fiches Observations")
 2. Cliquez sur la fiche du nid
-3. Cliquez sur **"✏️ Modifier"**
-4. Cliquez sur **"+ Ajouter une observation"**
-5. Renseignez la date et les détails de la nouvelle visite
-6. Enregistrez
+3. Cliquez sur **"✏️ Modifier"** ou **"Corriger"**
+4. Scrollez jusqu'à la section **"Observations"**
+5. Cliquez sur **"+ Ajouter une observation"**
+6. Renseignez la date et les détails de la nouvelle visite
+7. Cliquez sur **"Enregistrer"** (accessible via la barre flottante en bas sur mobile !)
 
 #### 🗺️ Utiliser la géolocalisation GPS
 
@@ -134,6 +142,7 @@ Vous savez maintenant :
 2. **Commune obligatoire** : Même si vous avez les coordonnées GPS
 3. **Première sauvegarde obligatoire** : Enregistrez AVANT d'ajouter des observations
 4. **Vérifiez avant de soumettre** : Une fois soumise, vous ne pouvez plus modifier seul
+5. **Barre flottante** : Sur mobile/tablette, les boutons restent accessibles en bas d'écran pendant le scroll
 
 ### ❌ Erreurs courantes
 
@@ -141,7 +150,7 @@ Vous savez maintenant :
    → Avez-vous enregistré la fiche au moins une fois ?
 
 2. **"Ma commune n'est pas trouvée"**
-   → Essayez différentes orthographes ou un village voisin
+   → Tapez au moins 2 lettres - la recherche est optimisée et trouve même les communes à nom court (Ur, Ger, Eu)
 
 3. **"La géolocalisation ne marche pas"**
    → Vérifiez les autorisations GPS de votre navigateur
@@ -163,11 +172,11 @@ Vous savez maintenant :
 
 | Action | Chemin |
 |--------|--------|
-| **Nouvelle observation** | Accueil → "Nouvelle observation" |
-| **Consulter mes fiches** | Menu → "Observations" |
-| **Modifier une fiche** | Liste → Cliquer sur la fiche → "Modifier" |
-| **Transcrire des carnets** | Menu → "Transcription" |
-| **Obtenir de l'aide** | Menu → "Support" |
+| **Nouvelle fiche** | Menu "Fiches Observations" → "Nouvelle fiche" |
+| **Consulter mes fiches** | Menu "Fiches Observations" → "Liste des fiches" |
+| **Modifier une fiche** | Liste → Cliquer sur la fiche → "Corriger" |
+| **Transcrire des carnets** | Menu "Transcription" → "Transcription d'images" |
+| **Obtenir de l'aide** | Menu "Aide" → "Support" |
 
 ---
 
@@ -204,4 +213,13 @@ Maintenant que vous maîtrisez les bases :
 
 ---
 
-*Version 1.0 - Novembre 2025*
+*Version 1.1 - Décembre 2025*
+
+---
+
+## 🆕 Nouveautés (Décembre 2025)
+
+- ✨ **Barre d'actions flottante** : Boutons toujours accessibles en bas d'écran (mobile/tablette)
+- 🔍 **Recherche de communes améliorée** : Tri intelligent par pertinence, communes courtes trouvées facilement
+- 🏷️ **Terminologie clarifiée** : "Fiche ID" (numéro unique), "N° perso de fiche" (votre numéro)
+- 📋 **Menu restructuré** : "Fiches Observations" pour plus de clarté

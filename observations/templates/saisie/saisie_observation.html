@@ -4,6 +4,71 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'Observations/css/styles.css' %}">
 <style>
+/* === BARRE D'ACTIONS FLOTTANTE === */
+.floating-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border-top: 2px solid #dee2e6;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 12px 20px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.floating-action-bar.hidden {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.floating-action-bar-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.floating-action-bar .btn {
+    white-space: nowrap;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.floating-action-bar .btn i {
+    font-size: 0.85rem;
+}
+
+/* Responsive pour petits écrans */
+@media (max-width: 768px) {
+    .floating-action-bar {
+        padding: 10px;
+    }
+
+    .floating-action-bar-content {
+        gap: 6px;
+    }
+
+    .floating-action-bar .btn {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+
+    /* Sur très petits écrans, masquer le texte des boutons secondaires */
+    .floating-action-bar .btn-secondary span:not(.fas),
+    .floating-action-bar .btn-info span:not(.fas) {
+        display: none;
+    }
+}
+
 /* Styles pour les observations marquées pour suppression */
 .observation-row.marked-for-deletion {
     background-color: #f8f9fa;
@@ -64,6 +129,50 @@
 {% if fiche_form.instance.pk %}
 <div data-fiche-id="{{ fiche_form.instance.pk }}" style="display: none;"></div>
 {% endif %}
+
+<!-- Script pour gérer la barre d'actions flottante -->
+<script>
+(function() {
+    const floatingBar = document.getElementById('floating-action-bar');
+    const originalButtons = document.getElementById('original-buttons');
+
+    if (!floatingBar || !originalButtons) return;
+
+    let ticking = false;
+
+    function updateFloatingBar() {
+        // Obtenir la position des boutons originaux
+        const rect = originalButtons.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+
+        // Si les boutons originaux sont visibles à l'écran (en bas), masquer la barre flottante
+        // On ajoute une marge de 100px pour une transition douce
+        if (rect.top < windowHeight + 100) {
+            floatingBar.classList.add('hidden');
+        } else {
+            floatingBar.classList.remove('hidden');
+        }
+
+        ticking = false;
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateFloatingBar);
+            ticking = true;
+        }
+    }
+
+    // Écouter le scroll avec throttling via requestAnimationFrame
+    window.addEventListener('scroll', requestTick, { passive: true });
+
+    // Vérifier au chargement de la page
+    updateFloatingBar();
+
+    // Re-vérifier après un petit délai (pour s'assurer que tout est chargé)
+    setTimeout(updateFloatingBar, 500);
+})();
+</script>
 
 <!-- Rouvrir la modale des remarques après sauvegarde si demandé -->
 <script>
@@ -309,7 +418,7 @@ function fermerModalRecherche() {
                 {% endif %}
 
                 {% if fiche_form.instance.chemin_json %}
-                    <a href="{{ MEDIA_URL }}transcription_results/{{ fiche_form.instance.chemin_json }}"
+                    <a href="{{ MEDIA_URL }}{{ fiche_form.instance.chemin_json }}"
                        target="_blank"
                        class="btn-action btn-json">
                         <i class="fas fa-file-code"></i>
@@ -333,16 +442,16 @@ function fermerModalRecherche() {
             <table class="fiche-table table table-bordered">
                 <thead>
                     <tr>
-                        <th scope="col" style="width: 10%;">N° Fiche</th>
+                        <th scope="col" style="width: 10%;">Fiche ID</th>
                         <th scope="col" style="width: 45%;">Observateur</th>
-                        <th scope="col" style="width: 15%;">N° Personnel</th>
+                        <th scope="col" style="width: 15%;">N° perso de fiche</th>
                         <th scope="col" style="width: 20%;">Espèce</th>
                         <th scope="col" style="width: 10%;">Année</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
+                        <td style="background-color: #e9ecef; color: #6c757d;">
                             {% if fiche_form.instance.pk %}
                                 {{ fiche_form.instance.pk }}
                             {% else %}
@@ -894,8 +1003,8 @@ function fermerModalRecherche() {
 
 
 
-    <!-- Boutons de formulaire -->
-    <div class="form-buttons">
+    <!-- Boutons de formulaire (originaux en bas de page) -->
+    <div class="form-buttons" id="original-buttons">
         <button type="submit" class="btn btn-primary" onclick="return confirm('Voulez-vous vraiment enregistrer les modifications ?');">Enregistrer</button>
         {% if fiche_form.instance.pk %}
             {% if fiche_form.instance.etat_correction.statut == 'nouveau' or fiche_form.instance.etat_correction.statut == 'en_edition' %}
@@ -912,6 +1021,33 @@ function fermerModalRecherche() {
         {% else %}
             <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary">Annuler</a>
         {% endif %}
+    </div>
+
+    <!-- Barre d'actions flottante (sticky en bas d'écran) -->
+    <div class="floating-action-bar" id="floating-action-bar">
+        <div class="floating-action-bar-content">
+            <button type="submit" class="btn btn-primary" onclick="return confirm('Voulez-vous vraiment enregistrer les modifications ?');">
+                <i class="fas fa-save"></i> Enregistrer
+            </button>
+            {% if fiche_form.instance.pk %}
+                {% if fiche_form.instance.etat_correction.statut == 'nouveau' or fiche_form.instance.etat_correction.statut == 'en_edition' %}
+                    <button type="submit" class="btn btn-success" formaction="{% url 'observations:soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" onclick="return confirm('Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.');">
+                        <i class="fas fa-paper-plane"></i> Soumettre pour correction
+                    </button>
+                {% elif fiche_form.instance.etat_correction.statut == 'en_cours' %}
+                    <button type="submit" class="btn btn-success" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" onclick="return confirm('Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.');">
+                        <i class="fas fa-check-circle"></i> Valider la correction
+                    </button>
+                {% endif %}
+                <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </a>
+            {% else %}
+                <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+            {% endif %}
+        </div>
     </div>
 </form>
 
@@ -937,7 +1073,7 @@ function fermerModalRecherche() {
                         <input type="number" id="filtreAnnee" class="form-control" placeholder="Ex: 2024">
                     </div>
                     <div class="col-md-3">
-                        <label for="filtreNumPersonnel" class="form-label">N° Personnel</label>
+                        <label for="filtreNumPersonnel" class="form-label">N° perso de fiche</label>
                         <input type="number" id="filtreNumPersonnel" class="form-control" placeholder="N°">
                     </div>
                 </div>
@@ -949,11 +1085,11 @@ function fermerModalRecherche() {
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="filtreFicheMin" class="form-label">Fiche N° min</label>
+                        <label for="filtreFicheMin" class="form-label">Fiche ID min</label>
                         <input type="number" id="filtreFicheMin" class="form-control" placeholder="Min">
                     </div>
                     <div class="col-md-3">
-                        <label for="filtreFicheMax" class="form-label">Fiche N° max</label>
+                        <label for="filtreFicheMax" class="form-label">Fiche ID max</label>
                         <input type="number" id="filtreFicheMax" class="form-control" placeholder="Max">
                     </div>
                 </div>
@@ -968,9 +1104,9 @@ function fermerModalRecherche() {
                     <table class="table table-striped table-hover">
                         <thead class="table-light sticky-top">
                             <tr>
-                                <th>N° Fiche</th>
+                                <th>Fiche ID</th>
                                 <th>Observateur</th>
-                                <th>N° Perso</th>
+                                <th>N° perso de fiche</th>
                                 <th>Espèce</th>
                                 <th>Année</th>
                                 <th>Commune</th>

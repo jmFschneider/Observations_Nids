@@ -122,8 +122,8 @@ La transcription permet de **numériser automatiquement** des carnets d'observat
 
 ### Accéder à l'outil de transcription
 
-1. **Depuis le menu principal** : Cliquez sur "✏️ Corriger des fiches (transcription)"
-2. **Ou depuis** : Menu "Transcription" > "Nouvelle transcription"
+1. **Depuis le menu principal** : Menu "Transcription" → "Transcription d'images"
+2. **Ou depuis** : Menu "Transcription" → "Préparer des images" (pour le pré-traitement)
 
 ---
 
@@ -305,36 +305,36 @@ La page de correction ressemble à la page de saisie manuelle, avec des sections
 ┌─────────────────────────────────────────────────┐
 │  Correction de fiche - carnet_page_01.jpg       │
 ├─────────────────────────────────────────────────┤
-│                                                 │
 │  📷 Image source      📄 JSON source            │
 │  [Aperçu JPEG]       [Aperçu JSON]             │
-│                                                 │
+├─────────────────────────────────────────────────┤
+│  📋 Informations générales                      │
+│  Fiche ID : 12345 (grisé = non modifiable)     │
+│  N° perso de fiche : 2024-001                   │
+│  Observateur : Jean Dupont                      │
 ├─────────────────────────────────────────────────┤
 │  📍 Localisation                                │
 │  Commune : Strasbourg                           │
 │  Coordonnées : 48.5734, 7.7521                  │
-│                                                 │
 ├─────────────────────────────────────────────────┤
-│  🐦 Informations du nid                         │
+│  🐦 Description du Nid                          │
 │  Espèce : Cigogne blanche                       │
 │  Année : 2024                                   │
-│  ...                                            │
-│                                                 │
 ├─────────────────────────────────────────────────┤
 │  📊 Observations                                │
 │  [Liste des observations extraites]             │
 │  + Ajouter une observation                      │
-│                                                 │
 ├─────────────────────────────────────────────────┤
-│  📝 Remarques                                   │
+│  📝 Causes d'échec et remarques                 │
 │  [Remarques de transcription]                   │
-│  + Ajouter une remarque                         │
-│                                                 │
+│  + Ajouter/Modifier                             │
 ├─────────────────────────────────────────────────┤
-│  [Enregistrer]  [Valider la fiche]             │
-│                                                 │
+│  [💾 Enregistrer]  [✓ Valider la correction]   │
+│  ↑ Boutons aussi en barre flottante mobile     │
 └─────────────────────────────────────────────────┘
 ```
+
+💡 **Nouveau** : Sur mobile/tablette, une **barre flottante** reste visible en bas pour un accès rapide aux boutons, même quand vous scrollez dans le long formulaire !
 
 ---
 
@@ -344,6 +344,8 @@ Pour chaque section, vérifiez et corrigez si nécessaire :
 
 #### 1. Localisation
 - **Vérifier la commune** : L'IA peut se tromper
+  - 💡 **Astuce** : La recherche de communes est optimisée - tapez quelques lettres et les résultats s'affichent par ordre de pertinence
+  - Les communes à nom court (Ur, Ger, Eu) apparaissent en premier dans les résultats
 - **Corriger les coordonnées** : Si imprécises
 - **Préciser le lieu-dit** : Si manquant
 
@@ -445,6 +447,7 @@ Référez-vous au guide de saisie pour les détails : [Saisir une nouvelle obser
 1. **La fiche doit être enregistrée au moins une fois**
    - Comme pour la saisie manuelle
    - Cliquez sur "💾 Enregistrer" si ce n'est pas déjà fait
+   - 💡 **Astuce mobile** : Utilisez la barre flottante en bas pour accéder rapidement au bouton Enregistrer
 
 2. **Cliquez sur "+ Ajouter une observation"**
    - Formulaire identique à la saisie manuelle
@@ -502,9 +505,11 @@ Référez-vous au guide de saisie pour les détails : [Saisir une nouvelle obser
 | Aspect | Saisie manuelle | Correction transcription |
 |--------|----------------|--------------------------|
 | **Données initiales** | Vides | Pré-remplies par l'IA |
+| **Fiche ID** | Attribué automatiquement | Attribué automatiquement |
 | **Image source** | Non disponible | Disponible (JPEG scanné) |
 | **JSON source** | Non applicable | Disponible |
 | **Remarques auto** | Non | Oui (générées par l'IA) |
+| **Barre flottante** | Oui (mobile) | Oui (mobile) |
 | **Workflow** | Identique | Identique |
 
 ---
@@ -660,4 +665,28 @@ Sur Raspberry Pi, comptez **2-3x plus long** que sur un PC puissant.
 
 ---
 
-*Version 1.0 - Novembre 2025*
+*Version 1.1 - Décembre 2025*
+
+---
+
+## 🆕 Nouveautés (Décembre 2025)
+
+### Améliorations de l'interface de correction
+
+1. **Barre d'actions flottante**
+   - Boutons Enregistrer/Valider toujours accessibles en bas d'écran
+   - Particulièrement utile sur mobile et tablette
+   - Se masque automatiquement quand vous arrivez en bas de page
+
+2. **Recherche de communes optimisée**
+   - Tri intelligent par pertinence
+   - Les communes à nom court (Ur, Ger, Eu, Ay) apparaissent en premier
+   - Plus besoin de scroller pour trouver votre commune !
+
+3. **Terminologie clarifiée**
+   - **Fiche ID** : Numéro unique attribué automatiquement (non modifiable, affiché en gris)
+   - **N° perso de fiche** : Votre numéro de référence personnel (modifiable)
+
+4. **Menu restructuré**
+   - Section "Fiches Observations" pour plus de clarté
+   - "Nouvelle fiche" au lieu de "Nouvelle observation"

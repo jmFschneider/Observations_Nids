@@ -1,0 +1,294 @@
+# Index de navigation - Documentation utilisateur
+# Observations Nids - v1.1 (Décembre 2025)
+
+meta:
+  title: "Documentation utilisateur - Observations Nids"
+  version: "1.1"
+  date: "2025-12-29"
+  description: "Guide complet pour utiliser l'application Observations Nids"
+
+# ========================================
+# NAVIGATION PRINCIPALE
+# ========================================
+
+navigation:
+  accueil:
+    titre: "🏠 Page d'accueil"
+    fichier: "README.md"
+    description: "Vue d'ensemble et point d'entrée de la documentation"
+    mots_cles: ["introduction", "démarrage", "vue d'ensemble"]
+
+  guide_rapide:
+    titre: "⚡ Guide rapide (5 minutes)"
+    fichier: "00_guide_rapide.md"
+    description: "Démarrez rapidement avec l'essentiel"
+    priorite: "haute"
+    pour_qui: ["nouveaux utilisateurs", "découverte rapide"]
+    mots_cles: ["démarrage", "rapide", "tutoriel", "quickstart"]
+
+# ========================================
+# GUIDES DÉTAILLÉS
+# ========================================
+
+guides:
+  navigation:
+    titre: "📍 Navigation générale"
+    fichier: "01_navigation_generale.md"
+    description: "Comprendre l'interface et les rôles"
+    sections:
+      - "Inscription et connexion"
+      - "Menu et navigation"
+      - "Rôles et permissions"
+      - "Cycle de vie d'une fiche"
+    mots_cles: ["menu", "interface", "rôles", "permissions", "statuts"]
+
+  saisie:
+    titre: "📝 Saisir une nouvelle fiche"
+    fichier: "02_saisie_nouvelle_observation.md"
+    description: "Guide complet de création de fiche"
+    sections:
+      - "Localisation (communes optimisées)"
+      - "Enregistrement initial"
+      - "Informations du nid"
+      - "Ajout d'observations"
+      - "Remarques"
+      - "Validation"
+    nouveautes:
+      - "Recherche de communes par pertinence"
+      - "Barre d'actions flottante"
+      - "Fiche ID / N° perso de fiche"
+    mots_cles: ["créer", "saisir", "observation", "fiche", "nid", "commune"]
+
+  correction:
+    titre: "✏️ Correction et transcription"
+    fichier: "03_correction_transcription.md"
+    description: "Transcrire et corriger des carnets papier"
+    sections:
+      - "Préparation des images"
+      - "Upload et sélection"
+      - "Lancement OCR"
+      - "Suivi du traitement"
+      - "Correction des fiches"
+    pour_qui: ["correcteurs", "utilisateurs avancés"]
+    mots_cles: ["transcription", "OCR", "IA", "correction", "carnets"]
+
+  support:
+    titre: "🎫 Support et tickets"
+    fichier: "04_support_tickets.md"
+    description: "Obtenir de l'aide et signaler des problèmes"
+    mots_cles: ["aide", "support", "ticket", "bug", "problème"]
+
+  glossaire:
+    titre: "📖 Glossaire"
+    fichier: "05_glossaire.md"
+    description: "Définitions des termes techniques"
+    nouveautes:
+      - "Fiche ID"
+      - "N° perso de fiche"
+      - "Barre d'actions flottantes"
+      - "Tri par pertinence"
+    mots_cles: ["définitions", "termes", "vocabulaire", "acronymes"]
+
+# ========================================
+# PARCOURS PAR PROFIL UTILISATEUR
+# ========================================
+
+parcours:
+  nouveau_utilisateur:
+    titre: "🆕 Je débute"
+    ordre_lecture:
+      - fichier: "00_guide_rapide.md"
+        temps: "5 minutes"
+        description: "Découverte rapide"
+      - fichier: "01_navigation_generale.md"
+        temps: "10 minutes"
+        description: "Comprendre l'interface"
+      - fichier: "02_saisie_nouvelle_observation.md"
+        temps: "15 minutes"
+        description: "Créer ma première fiche"
+      - fichier: "05_glossaire.md"
+        temps: "Consultation"
+        description: "Référence des termes"
+
+  observateur:
+    titre: "🐦 Je suis observateur"
+    ordre_lecture:
+      - fichier: "02_saisie_nouvelle_observation.md"
+        focus: ["Localisation", "Observations", "Enregistrement"]
+      - fichier: "01_navigation_generale.md"
+        focus: ["Cycle de vie", "Permissions"]
+      - fichier: "04_support_tickets.md"
+        focus: ["Signaler un problème"]
+
+  correcteur:
+    titre: "✅ Je suis correcteur"
+    ordre_lecture:
+      - fichier: "03_correction_transcription.md"
+        focus: ["Transcription OCR", "Correction"]
+      - fichier: "01_navigation_generale.md"
+        focus: ["Rôles", "Permissions"]
+      - fichier: "02_saisie_nouvelle_observation.md"
+        focus: ["Validation"]
+
+# ========================================
+# INDEX PAR THÉMATIQUE
+# ========================================
+
+thematiques:
+  localisation:
+    titre: "📍 Localisation et communes"
+    fichiers:
+      - "02_saisie_nouvelle_observation.md#localisation"
+      - "00_guide_rapide.md#localiser-nid"
+    nouveaute: "Recherche optimisée par pertinence"
+    mots_cles: ["commune", "GPS", "coordonnées", "géolocalisation"]
+
+  ergonomie_mobile:
+    titre: "📱 Mobile et tablette"
+    fichiers:
+      - "00_guide_rapide.md"
+      - "02_saisie_nouvelle_observation.md"
+      - "03_correction_transcription.md"
+    nouveaute: "Barre d'actions flottante"
+    description: "Améliorations pour petits écrans"
+    mots_cles: ["mobile", "tablette", "responsive", "flottant", "sticky"]
+
+  workflow:
+    titre: "🔄 Workflow et statuts"
+    fichiers:
+      - "01_navigation_generale.md#cycle-de-vie"
+      - "02_saisie_nouvelle_observation.md#validation"
+    description: "Comprendre les états des fiches"
+    mots_cles: ["statut", "workflow", "validation", "EN_COURS", "VALIDEE"]
+
+  transcription:
+    titre: "✏️ Transcription IA"
+    fichiers:
+      - "03_correction_transcription.md"
+    description: "OCR et correction automatique"
+    mots_cles: ["OCR", "IA", "Gemini", "transcription", "carnets"]
+
+# ========================================
+# FONCTIONNALITÉS PAR VERSION
+# ========================================
+
+versions:
+  v1.1:
+    date: "2025-12-29"
+    nouveautes:
+      barre_flottante:
+        titre: "Barre d'actions flottante"
+        fichiers:
+          - "00_guide_rapide.md"
+          - "02_saisie_nouvelle_observation.md"
+          - "03_correction_transcription.md"
+        description: "Boutons accessibles en bas d'écran (mobile)"
+
+      recherche_communes:
+        titre: "Recherche de communes optimisée"
+        fichiers:
+          - "02_saisie_nouvelle_observation.md#localisation"
+          - "00_guide_rapide.md"
+        description: "Tri intelligent par pertinence"
+        exemples: ["Ger", "Ur", "Eu", "Ay"]
+
+      terminologie:
+        titre: "Terminologie clarifiée"
+        fichiers:
+          - "05_glossaire.md#fiche-id"
+          - "05_glossaire.md#n-perso-fiche"
+        changements:
+          - ancien: "N° Fiche"
+            nouveau: "Fiche ID"
+          - ancien: "N° Personnel"
+            nouveau: "N° perso de fiche"
+
+      menu:
+        titre: "Menu restructuré"
+        fichiers:
+          - "01_navigation_generale.md#menu"
+        changements:
+          - ancien: "OBSERVATIONS"
+            nouveau: "FICHES OBSERVATIONS"
+          - ancien: "Nouvelle observation"
+            nouveau: "Nouvelle fiche"
+
+  v1.0:
+    date: "2025-11"
+    description: "Version initiale de la documentation"
+
+# ========================================
+# LIENS RAPIDES PAR BESOIN
+# ========================================
+
+liens_rapides:
+  problemes_frequents:
+    titre: "❓ Problèmes fréquents"
+    liens:
+      - question: "Ma commune n'est pas trouvée"
+        fichier: "00_guide_rapide.md#erreurs-courantes"
+        reponse: "Recherche optimisée - tapez au moins 2 lettres"
+
+      - question: "Je ne peux pas ajouter d'observations"
+        fichier: "02_saisie_nouvelle_observation.md#questions-frequentes"
+        reponse: "Enregistrer la fiche d'abord"
+
+      - question: "Mes données ont disparu"
+        fichier: "01_navigation_generale.md#problemes-courants"
+        reponse: "Toujours enregistrer régulièrement"
+
+      - question: "La géolocalisation ne marche pas"
+        fichier: "02_saisie_nouvelle_observation.md#questions-frequentes"
+        reponse: "Vérifier autorisations GPS"
+
+  actions_courantes:
+    titre: "⚡ Actions courantes"
+    liens:
+      - action: "Créer une nouvelle fiche"
+        fichier: "00_guide_rapide.md#etape-2"
+        raccourci: "Menu → Fiches Observations → Nouvelle fiche"
+
+      - action: "Ajouter une observation à un nid existant"
+        fichier: "00_guide_rapide.md#actions-courantes"
+        etapes: ["Liste → Fiche → Modifier → + Observation"]
+
+      - action: "Soumettre pour validation"
+        fichier: "02_saisie_nouvelle_observation.md#validation"
+        prerequis: "Fiche complète à 80%"
+
+      - action: "Transcrire un carnet"
+        fichier: "03_correction_transcription.md"
+        prerequis: "Images JPEG de bonne qualité"
+
+# ========================================
+# RECHERCHE PAR MOTS-CLÉS
+# ========================================
+
+index_mots_cles:
+  barre_flottante: ["00_guide_rapide.md", "02_saisie_nouvelle_observation.md", "05_glossaire.md"]
+  commune: ["02_saisie_nouvelle_observation.md", "00_guide_rapide.md"]
+  correction: ["03_correction_transcription.md", "01_navigation_generale.md"]
+  enregistrer: ["02_saisie_nouvelle_observation.md", "00_guide_rapide.md"]
+  fiche_id: ["05_glossaire.md", "02_saisie_nouvelle_observation.md"]
+  geolocalisation: ["02_saisie_nouvelle_observation.md"]
+  mobile: ["00_guide_rapide.md", "02_saisie_nouvelle_observation.md"]
+  n_perso: ["05_glossaire.md", "02_saisie_nouvelle_observation.md"]
+  observation: ["02_saisie_nouvelle_observation.md"]
+  ocr: ["03_correction_transcription.md", "05_glossaire.md"]
+  pertinence: ["02_saisie_nouvelle_observation.md", "05_glossaire.md"]
+  permissions: ["01_navigation_generale.md"]
+  roles: ["01_navigation_generale.md"]
+  statut: ["01_navigation_generale.md", "05_glossaire.md"]
+  transcription: ["03_correction_transcription.md"]
+  validation: ["02_saisie_nouvelle_observation.md", "01_navigation_generale.md"]
+
+# ========================================
+# MÉTADONNÉES POUR GÉNÉRATEURS DE DOC
+# ========================================
+
+metadata:
+  auteur: "Équipe Observations Nids"
+  licence: "Documentation interne"
+  langue: "fr"
+  plateforme: "Django / PostgreSQL / Celery"
+  technologies: ["Google Gemini", "GPS", "OCR"]

@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="{% static 'Observations/css/normalize.css' %}">
     <link rel="stylesheet" href="{% static 'Observations/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'Observations/css/styles.css' %}?v=20251121b">
-    <link rel="stylesheet" href="{% static 'Observations/css/sidebar.css' %}?v=202511043">
+    <link rel="stylesheet" href="{% static 'Observations/css/sidebar.css' %}?v=202512280">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     {% block extra_css %}{% endblock %}
 </head>
@@ -68,14 +68,14 @@
                     </li>
 
                     {% if user.is_authenticated %}
-                    <!-- Section Observations -->
+                    <!-- Section Fiches Observations -->
                     <li class="nav-item">
-                        <h6 class="sidebar-heading">Observations</h6>
+                        <h6 class="sidebar-heading">Fiches Observations</h6>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'observations:observations_list' %}" data-title="Nouvelle observation">
+                        <a class="nav-link" href="{% url 'observations:observations_list' %}" data-title="Nouvelle fiche">
                             <i class="fas fa-plus-circle"></i>
-                            <span class="link-text">Nouvelle observation</span>
+                            <span class="link-text">Nouvelle fiche</span>
                         </a>
                     </li>
                     <li class="nav-item">

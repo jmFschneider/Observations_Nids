@@ -119,12 +119,17 @@ def rechercher_communes(request):
     query = request.GET.get('q', '').strip()
     lat = request.GET.get('lat', '').strip()
     lon = request.GET.get('lon', '').strip()
-    limit = int(request.GET.get('limit', 10))
+    limit = int(request.GET.get('limit', 20))  # Augmenté de 10 à 20 pour plus de résultats
 
     # Recherche par nom de commune
     if query and len(query) >= 2:
-        # 1. Rechercher dans les communes actuelles
-        communes_queryset = CommuneFrance.objects.filter(nom__icontains=query)
+        # Stratégie optimisée : 2 requêtes séparées pour prioriser les communes qui commencent par la recherche
+
+        # 1a. Communes qui COMMENCENT par la recherche (haute priorité)
+        communes_startswith = CommuneFrance.objects.filter(nom__istartswith=query)
+
+        # 1b. Communes qui CONTIENNENT la recherche SANS commencer par elle (basse priorité)
+        communes_contains = CommuneFrance.objects.filter(nom__icontains=query).exclude(nom__istartswith=query)
 
         # Si coordonnées GPS fournies ET valides (pas 0,0), filtrer par bounding box (~10 km)
         if lat and lon:
@@ -138,7 +143,13 @@ def rechercher_communes(request):
                     # Filtrage rapide par bounding box avant calcul exact
                     delta = 0.1
 
-                    communes_queryset = communes_queryset.filter(
+                    communes_startswith = communes_startswith.filter(
+                        latitude__gte=lat_float - delta,
+                        latitude__lte=lat_float + delta,
+                        longitude__gte=lon_float - delta,
+                        longitude__lte=lon_float + delta,
+                    )
+                    communes_contains = communes_contains.filter(
                         latitude__gte=lat_float - delta,
                         latitude__lte=lat_float + delta,
                         longitude__gte=lon_float - delta,
@@ -147,9 +158,10 @@ def rechercher_communes(request):
             except ValueError:
                 logger.warning(f"Coordonnées GPS invalides: lat={lat}, lon={lon}")
 
+        # Récupérer les communes : priorité aux "startswith" (100), puis "contains" (100)
         communes = list(
-            communes_queryset.values(
-                'id',  # Ajout de l'ID pour l'autocomplétion
+            communes_startswith.values(
+                'id',
                 'nom',
                 'departement',
                 'code_departement',
@@ -158,13 +170,25 @@ def rechercher_communes(request):
                 'latitude',
                 'longitude',
                 'altitude',
-            )[:50]
-        )  # Récupérer 50 communes actuelles
-
-        # 2. Rechercher dans les anciennes communes
-        anciennes_queryset = AncienneCommune.objects.filter(nom__icontains=query).select_related(
-            'commune_actuelle'
+            )[:100]
         )
+        communes += list(
+            communes_contains.values(
+                'id',
+                'nom',
+                'departement',
+                'code_departement',
+                'code_postal',
+                'code_insee',
+                'latitude',
+                'longitude',
+                'altitude',
+            )[:100]
+        )
+
+        # 2. Rechercher dans les anciennes communes avec la même stratégie
+        anciennes_startswith = AncienneCommune.objects.filter(nom__istartswith=query).select_related('commune_actuelle')
+        anciennes_contains = AncienneCommune.objects.filter(nom__icontains=query).exclude(nom__istartswith=query).select_related('commune_actuelle')
 
         # Appliquer le même filtrage GPS si nécessaire
         if lat and lon:
@@ -173,7 +197,13 @@ def rechercher_communes(request):
                 lon_float = float(lon)
                 if lat_float != 0.0 and lon_float != 0.0:
                     delta = 0.1
-                    anciennes_queryset = anciennes_queryset.filter(
+                    anciennes_startswith = anciennes_startswith.filter(
+                        commune_actuelle__latitude__gte=lat_float - delta,
+                        commune_actuelle__latitude__lte=lat_float + delta,
+                        commune_actuelle__longitude__gte=lon_float - delta,
+                        commune_actuelle__longitude__lte=lon_float + delta,
+                    )
+                    anciennes_contains = anciennes_contains.filter(
                         commune_actuelle__latitude__gte=lat_float - delta,
                         commune_actuelle__latitude__lte=lat_float + delta,
                         commune_actuelle__longitude__gte=lon_float - delta,
@@ -182,8 +212,10 @@ def rechercher_communes(request):
             except ValueError:
                 pass
 
-        # Ajouter les anciennes communes au résultat
-        for ancienne in anciennes_queryset[:50]:
+        # Ajouter les anciennes communes au résultat : priorité aux "startswith" (50), puis "contains" (50)
+        anciennes_list = list(anciennes_startswith[:50]) + list(anciennes_contains[:50])
+
+        for ancienne in anciennes_list:
             # Utiliser les coordonnées de l'ancienne commune si disponibles, sinon celles de la commune actuelle
             lat_ancienne = (
                 ancienne.latitude if ancienne.latitude else ancienne.commune_actuelle.latitude
@@ -265,6 +297,21 @@ def rechercher_communes(request):
                 logger.debug(f"Erreur calcul distance: {e}")
                 distance_km = None
 
+        # Calculer le score de pertinence pour le tri
+        nom_lower = commune['nom'].lower()
+        query_lower = query.lower()
+        nom_length = len(commune['nom'])
+
+        if nom_lower == query_lower:
+            # Correspondance exacte : priorité maximale
+            relevance_score = 1000
+        elif nom_lower.startswith(query_lower):
+            # Commence par : haute priorité, favorise les noms courts
+            relevance_score = 500 - nom_length
+        else:
+            # Contient : priorité normale, favorise les noms courts
+            relevance_score = 100 - nom_length
+
         # Construire le label selon que c'est une ancienne commune ou non
         if commune.get('est_fusionnee'):
             label = f"{commune['nom']} → {commune['nom_actuel']} ({commune['code_departement']}) - {commune['departement']}{distance_info}"
@@ -286,20 +333,24 @@ def rechercher_communes(request):
                 'altitude': commune['altitude'] if commune.get('altitude') is not None else None,
                 'est_fusionnee': commune.get('est_fusionnee', False),
                 'distance_km': distance_km,  # Pour le tri
+                'relevance_score': relevance_score,  # Score de pertinence pour le tri
             }
         )
 
-    # Trier par distance si GPS fourni, sinon par ordre alphabétique
+    # Trier par distance si GPS fourni, sinon par pertinence
     if has_gps:
+        # Tri par distance croissante
         results.sort(key=lambda x: x['distance_km'] if x['distance_km'] is not None else 999)
     else:
-        results.sort(key=lambda x: x['nom'])
+        # Tri par pertinence décroissante, puis par nom alphabétique
+        results.sort(key=lambda x: (-x['relevance_score'], x['nom']))
 
     # Limiter le nombre de résultats
     results = results[:limit]
 
-    # Retirer distance_km de la réponse (utilisé uniquement pour le tri)
+    # Retirer distance_km et relevance_score de la réponse (utilisés uniquement pour le tri)
     for result in results:
         result.pop('distance_km', None)
+        result.pop('relevance_score', None)
 
     return JsonResponse({'communes': results})

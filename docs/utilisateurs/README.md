@@ -51,11 +51,12 @@ Ou suivez ces étapes :
   - Comprendre les rôles et permissions
   - Cycle de vie d'une observation
 
-- **[📝 Saisir une nouvelle observation](./02_saisie_nouvelle_observation.md)**
-  - Renseigner la localisation
+- **[📝 Saisir une nouvelle fiche d'observation](./02_saisie_nouvelle_observation.md)**
+  - Renseigner la localisation (recherche de communes optimisée !)
   - Enregistrer les informations du nid
   - Ajouter des observations au fil du temps
   - Soumettre pour validation
+  - 🆕 Barre d'actions flottante pour faciliter l'accès aux boutons
 
 - **[🎫 Support et tickets](./04_support_tickets.md)**
   - Signaler un problème
@@ -82,8 +83,10 @@ Ou suivez ces étapes :
 ### 📝 Gestion des observations
 - ✅ **Saisie en ligne** : Formulaire intuitif avec auto-complétion
 - ✅ **Suivi temporel** : Ajoutez plusieurs observations pour un même nid
-- ✅ **Géolocalisation** : GPS automatique ou recherche par commune
+- ✅ **Géolocalisation** : GPS automatique ou recherche intelligente par commune
+  - 🆕 Recherche optimisée par pertinence (communes courtes trouvées facilement)
 - ✅ **Validation collaborative** : Workflow de correction et validation
+- 🆕 **Barre flottante** : Accès rapide aux boutons sur mobile/tablette
 
 ### 🔍 Transcription automatique (IA)
 - ✅ **OCR intelligent** : Transcription automatique via Google Gemini
@@ -123,9 +126,22 @@ Ou suivez ces étapes :
 
 ## 📝 Notes de version
 
-**Version actuelle : 1.0** (Novembre 2025)
+**Version actuelle : 1.1** (Décembre 2025)
 
-Fonctionnalités principales :
+### 🆕 Nouveautés (v1.1 - Décembre 2025)
+
+**Ergonomie améliorée** :
+- 🎯 **Barre d'actions flottante** : Boutons toujours accessibles en bas d'écran (mobile/tablette)
+- 🔍 **Recherche de communes optimisée** : Tri intelligent par pertinence
+  - Les communes à nom court (Ur, Ger, Eu, Ay) apparaissent en premier
+  - Match exact prioritaire, puis commence par, puis contient
+- 🏷️ **Terminologie clarifiée** :
+  - "Fiche ID" pour le numéro unique (non modifiable)
+  - "N° perso de fiche" pour votre numéro personnel
+- 📋 **Menu restructuré** : Section "Fiches Observations" plus claire
+
+### Fonctionnalités principales (v1.0)
+
 - Interface de saisie complète
 - Transcription automatique via IA (Google Gemini)
 - Système de validation collaborative
