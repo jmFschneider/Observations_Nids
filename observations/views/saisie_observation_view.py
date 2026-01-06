@@ -379,7 +379,9 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
                     # Sauvegarder la fiche principale
                     fiche = fiche_form.save(commit=False)
                     if not fiche_id:
-                        fiche.annee = datetime.now().year
+                        # Définir l'année actuelle seulement si non fournie
+                        if not fiche.annee:
+                            fiche.annee = datetime.now().year
                     else:
                         original_fiche = FicheObservation.objects.get(pk=fiche_id)
                         if original_fiche.chemin_image and not fiche.chemin_image:
