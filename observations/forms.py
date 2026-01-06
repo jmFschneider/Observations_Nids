@@ -49,9 +49,9 @@ class FicheObservationForm(forms.ModelForm):
             # Toujours définir la valeur initiale
             self.fields["observateur"].initial = user.id
 
-            # Pour les non-admins/reviewers, désactiver mais garder la valeur
-            if user.role not in ['administrateur', 'reviewer']:
-                self.fields["observateur"].disabled = True
+            # Note: Le champ observateur utilise HiddenInput, donc l'utilisateur ne peut pas
+            # le modifier manuellement. Pas besoin de le désactiver avec disabled=True
+            # car cela empêcherait l'envoi de la valeur dans le POST.
 
 
 class LocalisationForm(forms.ModelForm):
