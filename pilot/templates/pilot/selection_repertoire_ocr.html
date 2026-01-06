@@ -70,8 +70,8 @@
         </div>
     </div>
 
-    <!-- Bouton d'action si le répertoire contient des images -->
-    {% if image_count > 0 %}
+    <!-- Bouton d'action si le répertoire contient des images ET n'a pas de sous-répertoires (répertoire final) -->
+    {% if image_count > 0 and not directories %}
     <div class="card mb-5 border-primary">
         <div class="card-body py-4">
             <h5 class="card-title mb-3">

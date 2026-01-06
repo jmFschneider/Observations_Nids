@@ -8,9 +8,9 @@ $ProjectDir   = "C:\Projets\observations_nids"
 $VenvActivate = "$ProjectDir\.venv\Scripts\Activate.ps1"
 
 # Chemin complet vers redis-server.exe (ex: C:\Redis\redis-server.exe)
-$RedisExe     = "C:\Projets\Redis\redis-server.exe"
+$RedisExe     = "C:\Programmes non installes\Redis\redis-server.exe"
 # (Optionnel) Chemin vers redis-cli.exe si tu veux tester un PING spécifique
-$RedisCli     = "C:\Projets\Redis\redis-cli.exe"
+$RedisCli     = "C:\Programmes non installes\Redis\redis-cli.exe"
 
 # Réseau / Ports
 $DjangoHost   = "127.0.0.1"
