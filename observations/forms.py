@@ -41,7 +41,7 @@ class FicheObservationForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
-        # Stocker l'utilisateur pour l'utiliser dans clean()
+        # Stocker l'utilisateur pour l'utiliser dans save()
         self.user = user
 
         if user:
@@ -52,18 +52,21 @@ class FicheObservationForm(forms.ModelForm):
             # Toujours définir la valeur initiale
             self.fields["observateur"].initial = user.id
 
-            # Rendre le champ non-required car il sera géré automatiquement
+            # Rendre le champ non-required car il sera géré automatiquement dans save()
             self.fields["observateur"].required = False
 
-    def clean_observateur(self):
+    def save(self, commit=True):
         """Assurer que l'observateur est toujours défini."""
-        observateur = self.cleaned_data.get('observateur')
+        instance = super().save(commit=False)
 
-        # Si pas d'observateur fourni, utiliser l'utilisateur courant
-        if not observateur and self.user:
-            observateur = self.user
+        # Si pas d'observateur défini, utiliser l'utilisateur courant
+        if not instance.observateur and self.user:
+            instance.observateur = self.user
 
-        return observateur
+        if commit:
+            instance.save()
+
+        return instance
 
 
 class LocalisationForm(forms.ModelForm):
