@@ -42,7 +42,7 @@ cachetools==6.2.4
     # via
     #   -r requirements-base.in
     #   google-auth
-celery==5.6.0
+celery==5.6.2
     # via
     #   -r requirements-base.in
     #   django-celery-results
@@ -146,8 +146,6 @@ et-xmlfile==2.0.0
     # via openpyxl
 eventlet==0.40.4
     # via -r requirements-base.in
-exceptiongroup==1.3.1
-    # via celery
 flower==2.0.1
     # via -r requirements-base.in
 geographiclib==2.1
@@ -446,7 +444,6 @@ typing-extensions==4.15.0
     #   beautifulsoup4
     #   django-stubs
     #   django-stubs-ext
-    #   exceptiongroup
     #   google-genai
     #   grpcio
     #   mypy
