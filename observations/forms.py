@@ -41,6 +41,9 @@ class FicheObservationForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
+        # Stocker l'utilisateur pour l'utiliser dans clean()
+        self.user = user
+
         if user:
             # Définir l'observateur comme l'utilisateur actuel
             if not self.instance.pk:  # Nouvelle instance
@@ -49,9 +52,18 @@ class FicheObservationForm(forms.ModelForm):
             # Toujours définir la valeur initiale
             self.fields["observateur"].initial = user.id
 
-            # Note: Le champ observateur utilise HiddenInput, donc l'utilisateur ne peut pas
-            # le modifier manuellement. Pas besoin de le désactiver avec disabled=True
-            # car cela empêcherait l'envoi de la valeur dans le POST.
+            # Rendre le champ non-required car il sera géré automatiquement
+            self.fields["observateur"].required = False
+
+    def clean_observateur(self):
+        """Assurer que l'observateur est toujours défini."""
+        observateur = self.cleaned_data.get('observateur')
+
+        # Si pas d'observateur fourni, utiliser l'utilisateur courant
+        if not observateur and self.user:
+            observateur = self.user
+
+        return observateur
 
 
 class LocalisationForm(forms.ModelForm):
