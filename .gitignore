@@ -2,6 +2,8 @@
 
 # Environnement et configuration
 .env
+.env_*
+*.env_*
 observations_nids/settings_local.py
 
 # Python
@@ -51,10 +53,18 @@ htmlcov/
 # OS
 Thumbs.db
 .DS_Store
+*.lnk
 
 # Fichiers temporaires et tests
 tmp/
 test_scans/
+
+# Syncthing
+.stfolder/
+.stignore
+
+# Fichiers CSV temporaires (racine uniquement)
+/*.csv
 
 # MkDocs
 site/
