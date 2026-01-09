@@ -63,67 +63,42 @@ markdown_extensions:
 # Navigation Structurée
 
 nav:
-  - '🏠 Accueil': 'index.md'
 
-  - '📚 Documentation de Référence':
-    - 'Architecture':
-      - 'Vue d''ensemble': 'reference/architecture/index.md'
-      - 'Modèles de données': 'reference/architecture/models.md'
-      - 'Architecture Transcription': 'reference/architecture/transcription_gemini.md'
-      - 'Infrastructure Globale': 'reference/architecture/documentation_infrastructure.md'
-      - 'Système de Transcription': 'reference/architecture/ARCHITECTURE_TRANSCRIPTION_GEMINI.md'
-      - 'API': 'reference/api/index.md'
-    - 'Infrastructure':
-      - 'Vue d''ensemble': 'reference/infrastructure/index.md'
-      - 'Déploiement': 'reference/infrastructure/deployment.md'
-      - 'Sauvegardes': 'reference/infrastructure/backup.md'
-    - 'Intégration':
-      - 'Codes GONM': 'reference/integration/INTEGRATION_CODES_GONM.md'
+  - '🏠 Accueil': 'utilisateurs/README.md'
 
-  - '⚙️ Opérations':
-    - 'Procédures':
-      - 'Démarrage/Arrêt': 'operations/procedures/start-stop.md'
-      - 'Sauvegardes': 'operations/procedures/backup.md'
-    - 'Monitoring':
-      - 'Supervision': 'operations/monitoring/supervision.md'
-      - 'Alertes': 'operations/monitoring/alerts.md'
-    - 'Maintenance':
-      - 'Base de données': 'operations/maintenance/database.md'
-      - 'Logs': 'operations/maintenance/logs.md'
+  
 
-  - '📖 Guides':
-    - 'Utilisateurs':
-      - 'Démarrage rapide': 'guides/utilisateurs/quickstart.md'
-      - 'Navigation': 'guides/utilisateurs/navigation.md'
-      - 'Saisie': 'guides/utilisateurs/saisie.md'
-    - 'Administrateurs':
-      - 'Configuration': 'guides/administrateurs/configuration.md'
-      - 'Gestion utilisateurs': 'guides/administrateurs/users.md'
-    - 'Développeurs':
-      - 'Installation': 'guides/developpeurs/installation.md'
-      - 'Contribution': 'guides/developpeurs/contributing.md'
+  - '👤 Espace Utilisateurs':
 
-  - '📋 Suivi':
-    - 'Décisions':
-      - 'Architecture': 'suivi/decisions/architecture.md'
-      - 'Techniques': 'suivi/decisions/techniques.md'
-    - 'Analyses':
-      - 'Automatisation Transcription': 'suivi/analyses/ANALYSE_AUTOMATISATION_TRANSCRIPTION.md'
-      - 'Flux Transcription': 'suivi/analyses/ANALYSE_FLUX_TRANSCRIPTION_PUR.md'
-      - 'Revue ChatGPT': 'suivi/analyses/REVUE_ANALYSE_TRANSCRIPTION_ChatGPT.md'
-      - 'Revue Gemini': 'suivi/analyses/REVUE_ANALYSE_TRANSCRIPTION_gemini.md'
-      - 'Performances': 'suivi/analyses/performances.md'
-      - 'Qualité': 'suivi/analyses/qualite.md'
-    - 'Rapports':
-      - 'Statistiques Projet': 'suivi/rapports/STATISTIQUES_PROJET.md'
-      - 'Synthèse Infrastructure': 'suivi/rapports/synthese_globale_infrastructure.md'
-      - 'Synthèse URBackup': 'suivi/rapports/urbackup-synthese-globale.md'
-    - 'Planification':
-      - 'Plan Global': 'suivi/planification/plan_travail_global.md'
-      - 'Récapitulatif Modifications': 'suivi/planification/RECAPITULATIF_MODIFICATIONS_TRANSCRIPTION.md'
-    - 'Logs':
-      - 'Changelog': 'suivi/logs/changelog.md'
-      - 'Releases': 'suivi/logs/releases.md'
+    - '⚡ Démarrage Rapide': 'utilisateurs/00_guide_rapide.md'
+
+    - '📖 Guides':
+
+      - 'Navigation Générale': 'utilisateurs/01_navigation_generale.md'
+
+      - 'Saisir une Observation': 'utilisateurs/02_saisie_nouvelle_observation.md'
+
+      - 'Corriger des Fiches': 'utilisateurs/03_correction_transcription.md'
+
+      - 'Support et Tickets': 'utilisateurs/04_support_tickets.md'
+
+    - '📖 Glossaire': 'utilisateurs/05_glossaire.md'
+
+
+
+  - '💻 Espace Développeurs':
+
+    - '🏠 Accueil Développeur': 'developpeurs/index.md'
+
+    
+
+    - '🎯 Projet':
+
+      - 'Fonctionnalités': 'developpeurs/01_features.md'
+
+      - 'Roadmap': 'developpeurs/roadmap.md'
+
+      - 'Changelog': 'developpeurs/CHANGELOG.md'
 
 
 
