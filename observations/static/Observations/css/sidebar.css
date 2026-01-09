@@ -12,7 +12,8 @@
 
 /* === Layout principal === */
 body {
-    overflow-x: hidden;
+    overflow-x: hidden; /* Protège contre les débordements (sidebar mobile cachée) */
+    overflow-y: auto; /* Scroll vertical normal */
 }
 
 /* Navbar supérieure fixe */
@@ -158,20 +159,28 @@ body {
 
 /* === CONTENU PRINCIPAL === */
 #content {
-    width: 100%;
     padding: 0;
-    min-height: 100vh;
+    /* Position fixed avec inset (left/right au lieu de width/margin) */
+    position: fixed;
+    top: var(--navbar-height);
+    left: var(--sidebar-width);  /* Commence après la sidebar */
+    right: 0;                      /* Va jusqu'au bord droit */
+    bottom: 0;
     transition: all var(--transition-speed) ease;
-    margin-left: var(--sidebar-width);
+    /* Double scroll : vertical et horizontal */
+    overflow-x: auto;
+    overflow-y: auto;
 }
 
 #content.expanded {
-    margin-left: var(--sidebar-collapsed-width);
+    left: var(--sidebar-collapsed-width);  /* Ajuste quand sidebar repliée */
 }
 
 /* Container interne avec padding */
 #content .content-inner {
     padding: 20px;
+    min-width: 1200px; /* Largeur minimale pour forcer le débordement horizontal */
+    min-height: calc(100vh - var(--navbar-height)); /* Pour assurer le scroll vertical */
 }
 
 /* === BOUTON TOGGLE === */
@@ -253,7 +262,16 @@ body {
     }
 
     #content {
-        margin-left: 0;
+        /* Sur mobile, revenir à un comportement normal (pas de position fixed) */
+        position: relative;
+        left: 0;  /* Reset de la position */
+        height: auto;
+        min-height: 100vh;
+    }
+
+    #content .content-inner {
+        /* Réduire la largeur minimale sur mobile */
+        min-width: 800px;
     }
 
     .sidebar-toggle {
@@ -286,6 +304,7 @@ body {
 @media (max-width: 576px) {
     #content .content-inner {
         padding: 15px 10px;
+        min-width: 600px; /* Largeur minimale encore plus réduite pour très petits écrans */
     }
 
     .navbar-top .navbar-brand {
@@ -294,6 +313,8 @@ body {
 }
 
 /* === SCROLLBAR PERSONNALISÉE === */
+
+/* Scrollbar de la sidebar */
 #sidebar::-webkit-scrollbar {
     width: 6px;
 }
@@ -310,6 +331,8 @@ body {
 #sidebar::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+/* Note: Scrollbars de #content utilisent les styles natifs du navigateur */
 
 /* === ANIMATIONS === */
 @keyframes slideIn {
