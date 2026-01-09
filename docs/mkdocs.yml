@@ -71,6 +71,7 @@ nav:
       - 'Modèles de données': 'reference/architecture/models.md'
       - 'Architecture Transcription': 'reference/architecture/transcription_gemini.md'
       - 'Infrastructure Globale': 'reference/architecture/documentation_infrastructure.md'
+      - 'Système de Transcription': 'reference/architecture/ARCHITECTURE_TRANSCRIPTION_GEMINI.md'
       - 'API': 'reference/api/index.md'
     - 'Infrastructure':
       - 'Vue d''ensemble': 'reference/infrastructure/index.md'
