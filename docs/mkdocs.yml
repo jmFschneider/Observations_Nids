@@ -69,11 +69,15 @@ nav:
     - 'Architecture':
       - 'Vue d''ensemble': 'reference/architecture/index.md'
       - 'Modèles de données': 'reference/architecture/models.md'
+      - 'Architecture Transcription': 'reference/architecture/transcription_gemini.md'
+      - 'Infrastructure Globale': 'reference/architecture/documentation_infrastructure.md'
       - 'API': 'reference/api/index.md'
     - 'Infrastructure':
       - 'Vue d''ensemble': 'reference/infrastructure/index.md'
       - 'Déploiement': 'reference/infrastructure/deployment.md'
       - 'Sauvegardes': 'reference/infrastructure/backup.md'
+    - 'Intégration':
+      - 'Codes GONM': 'reference/integration/INTEGRATION_CODES_GONM.md'
 
   - '⚙️ Opérations':
     - 'Procédures':
@@ -103,8 +107,19 @@ nav:
       - 'Architecture': 'suivi/decisions/architecture.md'
       - 'Techniques': 'suivi/decisions/techniques.md'
     - 'Analyses':
+      - 'Automatisation Transcription': 'suivi/analyses/ANALYSE_AUTOMATISATION_TRANSCRIPTION.md'
+      - 'Flux Transcription': 'suivi/analyses/ANALYSE_FLUX_TRANSCRIPTION_PUR.md'
+      - 'Revue ChatGPT': 'suivi/analyses/REVUE_ANALYSE_TRANSCRIPTION_ChatGPT.md'
+      - 'Revue Gemini': 'suivi/analyses/REVUE_ANALYSE_TRANSCRIPTION_gemini.md'
       - 'Performances': 'suivi/analyses/performances.md'
       - 'Qualité': 'suivi/analyses/qualite.md'
+    - 'Rapports':
+      - 'Statistiques Projet': 'suivi/rapports/STATISTIQUES_PROJET.md'
+      - 'Synthèse Infrastructure': 'suivi/rapports/synthese_globale_infrastructure.md'
+      - 'Synthèse URBackup': 'suivi/rapports/urbackup-synthese-globale.md'
+    - 'Planification':
+      - 'Plan Global': 'suivi/planification/plan_travail_global.md'
+      - 'Récapitulatif Modifications': 'suivi/planification/RECAPITULATIF_MODIFICATIONS_TRANSCRIPTION.md'
     - 'Logs':
       - 'Changelog': 'suivi/logs/changelog.md'
       - 'Releases': 'suivi/logs/releases.md'
