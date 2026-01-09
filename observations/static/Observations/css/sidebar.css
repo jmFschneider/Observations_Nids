@@ -165,7 +165,7 @@ body {
     top: var(--navbar-height);
     left: var(--sidebar-width);  /* Commence après la sidebar */
     right: 0;                      /* Va jusqu'au bord droit */
-    bottom: 0;
+    bottom: 70px;                   /* Laisse 70px en bas pour la barre flottante */
     transition: all var(--transition-speed) ease;
     /* Double scroll : vertical et horizontal */
     overflow-x: auto;
@@ -265,6 +265,7 @@ body {
         /* Sur mobile, revenir à un comportement normal (pas de position fixed) */
         position: relative;
         left: 0;  /* Reset de la position */
+        bottom: 0;  /* Reset du bottom */
         height: auto;
         min-height: 100vh;
     }

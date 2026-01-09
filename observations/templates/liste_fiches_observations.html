@@ -66,13 +66,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const cellsEtatCorrection = document.querySelectorAll('.etat-correction-cell');
 
     cellsEtatCorrection.forEach(function(cell) {
-        // Vérifier si c'est une fiche "En cours de saisie" (statut en_edition ou nouveau)
-        const badgeElement = cell.querySelector('.badge-info');
-        if (badgeElement) {
+        const statut = cell.dataset.statut;
+        
+        if (statut === 'valide') {
+            // Vert pour les fiches validées (correction terminée)
+            cell.style.backgroundColor = 'rgba(40, 167, 69, 0.2)'; // Bootstrap success color avec transparence
+        } else if (statut === 'en_edition' || statut === 'nouveau') {
             // Couleur bleu clair pour les fiches en cours de saisie
             cell.style.backgroundColor = 'rgba(23, 162, 184, 0.15)'; // Bootstrap info color avec transparence
         } else {
-            // Utiliser la colorisation basée sur le pourcentage pour les autres statuts
+            // Utiliser la colorisation basée sur le pourcentage pour les autres statuts (ex: en_cours)
             const percentage = parseInt(cell.dataset.percentage);
             if (!isNaN(percentage)) {
                 cell.style.backgroundColor = getColorForPercentage(percentage);
@@ -166,6 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 {% endif %}
                             </td>
                             <td class="etat-correction-cell"
+                                data-statut="{% if fiche.etat_correction %}{{ fiche.etat_correction.statut }}{% else %}nouveau{% endif %}"
                                 data-percentage="{% if fiche.etat_correction %}{{ fiche.etat_correction.pourcentage_completion }}{% else %}0{% endif %}">
                                 {% if fiche.etat_correction %}
                                     <div class="d-flex align-items-center">
