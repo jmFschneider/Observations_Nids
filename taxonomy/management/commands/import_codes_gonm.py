@@ -77,6 +77,8 @@ class Command(BaseCommand):
     def _import_codes(self, csv_file: Path, dry_run: bool = False) -> ImportStats:
         """
         Importe les codes GONM depuis le fichier TSV validé.
+
+        Le matching se fait par nom français (case-insensitive) qui est plus stable que l'ID.
         """
         stats: ImportStats = {
             'total_lines': 0,
@@ -158,8 +160,8 @@ class Command(BaseCommand):
                     continue
 
                 try:
-                    # Récupérer l'espèce directement par son ID (plus fiable)
-                    espece = Espece.objects.filter(id=int(espece_id)).first()
+                    # Récupérer l'espèce par son nom français (plus stable que l'ID)
+                    espece = Espece.objects.filter(nom__iexact=espece_nom).first()
 
                     if espece:
                         # Mettre à jour le code GONM
@@ -188,7 +190,7 @@ class Command(BaseCommand):
                     stats['erreurs'] += 1
                     self.stdout.write(
                         self.style.WARNING(
-                            f"\nErreur ligne {stats['total_lines']}: ID d'espèce invalide '{espece_id}'\n"
+                            f"\nErreur ligne {stats['total_lines']}: Données invalides\n"
                             f"  Code: {code_gonm} - {espece_nom}"
                         )
                     )

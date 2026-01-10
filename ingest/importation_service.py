@@ -130,6 +130,41 @@ class ImportationService:
                             # Tenter une correspondance automatique
                             self._trouver_correspondance_espece(espece)
 
+                    elif code_gonm and isinstance(code_gonm, str):
+                        # Cas particulier : nom absent mais code GONM présent
+                        # Chercher directement l'espèce par son code
+                        try:
+                            espece_bdd = Espece.objects.get(
+                                code_gonm__iexact=code_gonm, valide_par_admin=True
+                            )
+
+                            # Créer EspeceCandidate avec le nom officiel de la BDD
+                            espece, created = EspeceCandidate.objects.get_or_create(
+                                nom_transcrit=espece_bdd.nom,
+                                defaults={'code_gonm_transcrit': code_gonm},
+                            )
+
+                            if created:
+                                especes_ajoutees += 1
+                                # Valider automatiquement (100% confiance sur code GONM)
+                                espece.espece_validee = espece_bdd
+                                espece.score_similarite = 100.0
+                                espece.save()
+                                logger.info(
+                                    f"Espèce identifiée par code GONM '{code_gonm}': {espece_bdd.nom}"
+                                )
+
+                        except Espece.DoesNotExist:
+                            logger.warning(
+                                f"Code GONM '{code_gonm}' introuvable en BDD "
+                                f"(fichier {transcription.fichier_source}, pas de nom d'espèce fourni)"
+                            )
+                        except Espece.MultipleObjectsReturned:
+                            logger.error(
+                                f"Plusieurs espèces avec code GONM '{code_gonm}' "
+                                f"(fichier {transcription.fichier_source})"
+                            )
+
                 # Extraire et créer/récupérer l'observateur directement
                 if (
                     'informations_generales' in donnees
