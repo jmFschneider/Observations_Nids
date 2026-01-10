@@ -71,6 +71,12 @@ class TranscriptionBrute(models.Model):
 
 class EspeceCandidate(models.Model):
     nom_transcrit = models.CharField(max_length=100, unique=True)
+    code_gonm_transcrit = models.CharField(
+        max_length=10,
+        blank=True,
+        default='',
+        help_text="Code GONM extrait du JSON (champ n_espece)",
+    )
     espece_validee = models.ForeignKey(Espece, on_delete=models.SET_NULL, null=True, blank=True)
     validation_manuelle = models.BooleanField(default=False)
     score_similarite = models.FloatField(

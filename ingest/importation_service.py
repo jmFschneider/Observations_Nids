@@ -97,17 +97,33 @@ class ImportationService:
             try:
                 donnees = transcription.json_brut
 
-                # Extraire l'espèce
-                if (
-                    'informations_generales' in donnees
-                    and 'espece' in donnees['informations_generales']
-                ):
-                    nom_espece = donnees['informations_generales']['espece']
+                # Extraire l'espèce et le code GONM
+                if 'informations_generales' in donnees:
+                    info_gen = donnees['informations_generales']
+                    nom_espece = info_gen.get('espece', '')
+                    code_gonm = info_gen.get('n_espece', '')
+
                     if nom_espece and isinstance(nom_espece, str):
                         # Vérifier si cette espèce existe déjà comme candidate
                         espece, created = EspeceCandidate.objects.get_or_create(
-                            nom_transcrit=nom_espece
+                            nom_transcrit=nom_espece,
+                            defaults={
+                                'code_gonm_transcrit': code_gonm
+                                if isinstance(code_gonm, str)
+                                else ''
+                            },
                         )
+
+                        # Si l'espèce existait déjà mais sans code GONM, le mettre à jour
+                        if (
+                            not created
+                            and code_gonm
+                            and isinstance(code_gonm, str)
+                            and not espece.code_gonm_transcrit
+                        ):
+                            espece.code_gonm_transcrit = code_gonm
+                            espece.save()
+
                         if created:
                             especes_ajoutees += 1
 
@@ -165,7 +181,16 @@ class ImportationService:
         }
 
     def _trouver_correspondance_espece(self, espece_candidate):
-        """Tente de trouver une correspondance pour une espèce candidate"""
+        """
+        Tente de trouver une correspondance pour une espèce candidate avec logique en cascade:
+        1. Priorité au matching par nom (fuzzy)
+        2. Fallback sur code GONM si le nom échoue
+        3. Détection d'incohérences entre nom et code
+        """
+        espece_trouvee = None
+        methode_matching = None
+
+        # PRIORITÉ 1 : Essayer le matching par nom (comportement actuel)
         especes_existantes = Espece.objects.filter(valide_par_admin=True)
         meilleure_correspondance = None
         meilleur_score = 0
@@ -180,10 +205,64 @@ class ImportationService:
                 meilleure_correspondance = espece_existante
 
         if meilleure_correspondance:
-            espece_candidate.espece_validee = meilleure_correspondance
+            espece_trouvee = meilleure_correspondance
+            methode_matching = 'nom'
+            logger.info(
+                f"Espèce '{espece_candidate.nom_transcrit}' identifiée par nom: "
+                f"'{espece_trouvee.nom}' (score: {meilleur_score:.0%})"
+            )
+
+        # PRIORITÉ 2 : Fallback sur code GONM si le nom a échoué
+        if not espece_trouvee and espece_candidate.code_gonm_transcrit:
+            try:
+                espece_par_code = Espece.objects.get(
+                    code_gonm__iexact=espece_candidate.code_gonm_transcrit, valide_par_admin=True
+                )
+                espece_trouvee = espece_par_code
+                methode_matching = 'code_gonm'
+                logger.info(
+                    f"Espèce '{espece_candidate.nom_transcrit}' identifiée par code GONM "
+                    f"'{espece_candidate.code_gonm_transcrit}': '{espece_trouvee.nom}'"
+                )
+            except Espece.DoesNotExist:
+                logger.warning(
+                    f"Code GONM '{espece_candidate.code_gonm_transcrit}' introuvable pour "
+                    f"'{espece_candidate.nom_transcrit}'"
+                )
+            except Espece.MultipleObjectsReturned:
+                logger.error(
+                    f"Plusieurs espèces avec le code GONM '{espece_candidate.code_gonm_transcrit}' - "
+                    f"intervention manuelle requise"
+                )
+
+        # Vérifier cohérence nom/code si les deux sont présents
+        if (
+            espece_trouvee
+            and methode_matching == 'nom'
+            and espece_candidate.code_gonm_transcrit
+            and espece_trouvee.code_gonm
+            and espece_trouvee.code_gonm.upper() != espece_candidate.code_gonm_transcrit.upper()
+        ):
+            logger.warning(
+                f"INCOHÉRENCE détectée pour '{espece_candidate.nom_transcrit}': "
+                f"nom→'{espece_trouvee.nom}' (code:{espece_trouvee.code_gonm}) "
+                f"mais JSON indique code '{espece_candidate.code_gonm_transcrit}'"
+            )
+
+        # Sauvegarder le résultat
+        if espece_trouvee:
+            espece_candidate.espece_validee = espece_trouvee
+            espece_candidate.score_similarite = (
+                meilleur_score * 100 if methode_matching == 'nom' else 100.0
+            )
             espece_candidate.save()
             return True
 
+        # PRIORITÉ 3 : Échec d'identification
+        logger.warning(
+            f"Impossible d'identifier '{espece_candidate.nom_transcrit}' "
+            f"(code GONM: '{espece_candidate.code_gonm_transcrit or 'absent'}')"
+        )
         return False
 
     def creer_ou_recuperer_utilisateur(self, nom_observateur):
