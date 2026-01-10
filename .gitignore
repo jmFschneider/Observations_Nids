@@ -80,3 +80,4 @@ docs/docs/todo/
 
 # Fichiers Windows réservés
 nul.env_ubuntu
+.aider*

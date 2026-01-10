@@ -290,17 +290,18 @@ function rechercherFiches() {
                     '<td>' + fiche.observateur + '</td>' +
                     '<td>' + (fiche.numero_personnel || '-') + '</td>' +
                     '<td>' + fiche.espece + '</td>' +
+                    '<td>' + (fiche.code_gonm || '-') + '</td>' +
                     '<td>' + fiche.annee + '</td>' +
                     '<td>' + fiche.commune + '</td>' +
                     '<td><button type="button" class="btn btn-sm btn-success" onclick="selectionnerFiche(' + fiche.num_fiche + ')"><i class="fas fa-check"></i> Sélectionner</button></td>';
                 tbody.appendChild(tr);
             });
         } else {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Aucune fiche trouvée avec ces critères</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Aucune fiche trouvée avec ces critères</td></tr>';
         }
     })
     .catch(function(error) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erreur lors de la recherche: ' + error.message + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Erreur lors de la recherche: ' + error.message + '</td></tr>';
     });
 }
 
@@ -443,9 +444,10 @@ function fermerModalRecherche() {
                 <thead>
                     <tr>
                         <th scope="col" style="width: 10%;">Fiche ID</th>
-                        <th scope="col" style="width: 45%;">Observateur</th>
-                        <th scope="col" style="width: 15%;">N° perso de fiche</th>
-                        <th scope="col" style="width: 20%;">Espèce</th>
+                        <th scope="col" style="width: 40%;">Observateur</th>
+                        <th scope="col" style="width: 12%;">N° perso de fiche</th>
+                        <th scope="col" style="width: 18%;">Espèce</th>
+                        <th scope="col" style="width: 10%;">Code GONM</th>
                         <th scope="col" style="width: 10%;">Année</th>
                     </tr>
                 </thead>
@@ -461,6 +463,7 @@ function fermerModalRecherche() {
                         <td>{{ fiche_form.instance.observateur.first_name }} {{ fiche_form.instance.observateur.last_name }}</td>
                         <td>{{ fiche_form.numero_personnel }}</td>
                         <td>{{ fiche_form.espece }}</td>
+                        <td>{% if fiche_form.instance.espece.code_gonm %}{{ fiche_form.instance.espece.code_gonm }}{% else %}-{% endif %}</td>
                         <td>{{ fiche_form.annee }}</td>
                     </tr>
                 </tbody>
@@ -1108,6 +1111,7 @@ function fermerModalRecherche() {
                                 <th>Observateur</th>
                                 <th>N° perso de fiche</th>
                                 <th>Espèce</th>
+                                <th>Code GONM</th>
                                 <th>Année</th>
                                 <th>Commune</th>
                                 <th>Action</th>
@@ -1115,7 +1119,7 @@ function fermerModalRecherche() {
                         </thead>
                         <tbody id="resultatsRecherche">
                             <tr>
-                                <td colspan="7" class="text-center text-muted">
+                                <td colspan="8" class="text-center text-muted">
                                     Utilisez les filtres ci-dessus pour rechercher des fiches
                                 </td>
                             </tr>

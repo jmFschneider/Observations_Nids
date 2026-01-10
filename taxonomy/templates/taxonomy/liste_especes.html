@@ -116,6 +116,7 @@
                             <thead>
                                 <tr>
                                     <th>Nom français</th>
+                                    <th>Code GONM</th>
                                     <th>Nom scientifique</th>
                                     <th>Famille</th>
                                     <th>Ordre</th>
@@ -128,6 +129,13 @@
                                 {% for espece in page_obj %}
                                 <tr>
                                     <td><strong>{{ espece.nom }}</strong></td>
+                                    <td>
+                                        {% if espece.code_gonm %}
+                                        <span class="badge bg-secondary">{{ espece.code_gonm }}</span>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
                                     <td><em>{{ espece.nom_scientifique }}</em></td>
                                     <td>{{ espece.famille.nom|default:"-" }}</td>
                                     <td>{{ espece.famille.ordre.nom|default:"-" }}</td>

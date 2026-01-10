@@ -4,6 +4,7 @@ Interface d'administration pour l'app de pilote OCR
 
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from .models import TranscriptionOCR
 
@@ -107,10 +108,10 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
     @admin.display(description='Fiche')
     def fiche_numero(self, obj):
         """Affiche le numéro de fiche avec lien"""
-        return format_html(
-            '<a href="/admin/observations/ficheobservation/{}/change/">Fiche #{}</a>',
-            obj.fiche.pk,
-            obj.fiche.num_fiche,
+        if not obj.fiche:
+            return mark_safe('<span style="color: #dc3545;">Aucune fiche</span>')
+        return mark_safe(
+            f'<a href="/admin/observations/ficheobservation/{obj.fiche.pk}/change/">Fiche #{obj.fiche.num_fiche}</a>'
         )
 
     @admin.display(description='Modèle')
@@ -191,8 +192,8 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
         """Affiche le nombre total d'erreurs"""
         total = obj.nombre_erreurs_total
         if total == 0:
-            return format_html('<span style="color: #28a745;">✓ Aucune</span>')
-        return format_html('<span style="color: #dc3545;">✗ {}</span>', total)
+            return mark_safe('<span style="color: #28a745;">✓ Aucune</span>')
+        return mark_safe(f'<span style="color: #dc3545;">✗ {total}</span>')
 
     # Actions personnalisées
     actions = ['marquer_comme_evaluee', 'marquer_comme_non_evaluee']

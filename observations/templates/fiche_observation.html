@@ -110,6 +110,7 @@
         <th>Observateur</th>
         <th>N° perso de fiche</th>
         <th>Espèce</th>
+        <th>Code GONM</th>
         <th>Année</th>
     </tr>
     <tr>
@@ -117,6 +118,7 @@
         <td>{{ fiche.observateur.first_name }} {{ fiche.observateur.last_name }}</td>
         <td>{% if fiche.numero_personnel %}{{ fiche.numero_personnel }}{% else %}-{% endif %}</td>
         <td>{{ fiche.espece.nom }}</td>
+        <td>{% if fiche.espece.code_gonm %}{{ fiche.espece.code_gonm }}{% else %}-{% endif %}</td>
         <td>{{ fiche.annee }}</td>
     </tr>
 </table>

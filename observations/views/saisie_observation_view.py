@@ -989,6 +989,7 @@ def rechercher_fiches(request):
                 'num_fiche': fiche.num_fiche,
                 'observateur': f"{fiche.observateur.first_name} {fiche.observateur.last_name}",
                 'espece': fiche.espece.nom,
+                'code_gonm': fiche.espece.code_gonm or '-',
                 'annee': fiche.annee,
                 'numero_personnel': fiche.numero_personnel or '',
                 'commune': commune,

@@ -2,11 +2,12 @@
 Commande Django pour importer les codes GONM des espèces d'oiseaux.
 
 Cette commande met à jour le champ code_gonm des espèces existantes
-à partir d'un fichier CSV fourni par le GONM (Groupe Ornithologique Normand).
+à partir du fichier TSV validé contenant les correspondances analysées.
 
 Usage:
     python manage.py import_codes_gonm
-    python manage.py import_codes_gonm --file /chemin/vers/codes-especes.csv
+    python manage.py import_codes_gonm --file /chemin/vers/analyse-correspondances-gonm.tsv
+    python manage.py import_codes_gonm --dry-run  # Simulation sans modification
 """
 
 import csv
@@ -30,17 +31,17 @@ class ImportStats(TypedDict):
 
 
 class Command(BaseCommand):
-    help = "Importe les codes GONM des espèces depuis un fichier CSV"
+    help = "Importe les codes GONM des espèces depuis le fichier TSV validé"
 
-    # Chemin par défaut du fichier CSV
-    DEFAULT_CSV_PATH = r"C:\Projets\GONM\codes-especes-normandie.csv"
+    # Chemin par défaut du fichier TSV validé
+    DEFAULT_TSV_PATH = r"C:\Projets\observations_nids\analyse-correspondances-gonm____80%.xlsx - analyse-correspondances-gonm.tsv"
 
     def add_arguments(self, parser):
         parser.add_argument(
             '--file',
             type=str,
-            default=self.DEFAULT_CSV_PATH,
-            help='Chemin vers le fichier CSV contenant les codes GONM',
+            default=self.DEFAULT_TSV_PATH,
+            help='Chemin vers le fichier TSV validé contenant les correspondances GONM',
         )
         parser.add_argument(
             '--dry-run',
@@ -75,7 +76,7 @@ class Command(BaseCommand):
 
     def _import_codes(self, csv_file: Path, dry_run: bool = False) -> ImportStats:
         """
-        Importe les codes GONM depuis le fichier CSV.
+        Importe les codes GONM depuis le fichier TSV validé.
         """
         stats: ImportStats = {
             'total_lines': 0,
@@ -113,53 +114,57 @@ class Command(BaseCommand):
         self.stdout.write(f"Encodage détecté: {used_encoding}\n")
 
         try:
-            # Parser le CSV
+            # Parser le TSV (délimiteur tabulation)
             lines = file_content.split('\n')
             if not lines:
                 return stats
-            # Détecter le délimiteur (';' ou ',')
-            first_line = lines[0]
-            delimiter = ';' if ';' in first_line else ','
 
-            reader = csv.DictReader(lines, delimiter=delimiter)
+            # Le TSV utilise des tabulations comme délimiteur
+            reader = csv.DictReader(lines, delimiter='\t')
 
             # Vérifier les colonnes attendues
             if not reader.fieldnames:
-                self.stdout.write(self.style.ERROR("Impossible de lire les en-têtes du CSV"))
+                self.stdout.write(self.style.ERROR("Impossible de lire les en-têtes du TSV"))
                 return stats
 
             self.stdout.write(f"Colonnes détectées: {', '.join(reader.fieldnames)}\n")
+
+            # Vérifier que les colonnes nécessaires sont présentes
+            required_cols = ['code_gonm', 'espece_trouvee_id', 'espece_trouvee_nom']
+            missing_cols = [col for col in required_cols if col not in reader.fieldnames]
+            if missing_cols:
+                self.stdout.write(
+                    self.style.ERROR(f"Colonnes manquantes dans le TSV: {', '.join(missing_cols)}")
+                )
+                return stats
 
             # Traiter chaque ligne
             for row in reader:
                 stats['total_lines'] += 1
 
-                # Récupérer les valeurs (gérer différentes variantes de noms de colonnes)
-                code = (row.get('Code') or row.get('code') or '').strip()
-
-                nom_scientifique = (
-                    row.get('Nom scientifique') or row.get('nom_scientifique') or ''
-                ).strip()
+                # Récupérer les valeurs du TSV validé
+                code_gonm = (row.get('code_gonm') or '').strip()
+                espece_id = (row.get('espece_trouvee_id') or '').strip()
+                espece_nom = (row.get('espece_trouvee_nom') or '').strip()
+                score = (row.get('score_pourcent') or '').strip()
 
                 # Ignorer les lignes vides
-                if not nom_scientifique:
+                if not espece_id:
                     continue
 
-                # Ignorer les lignes sans code
-                if not code:
+                # Ignorer les lignes sans code GONM
+                if not code_gonm:
                     stats['empty_codes'] += 1
                     continue
 
                 try:
-                    # Chercher l'espèce par nom scientifique
-                    espece = Espece.objects.filter(
-                        nom_scientifique__iexact=nom_scientifique
-                    ).first()
+                    # Récupérer l'espèce directement par son ID (plus fiable)
+                    espece = Espece.objects.filter(id=int(espece_id)).first()
 
                     if espece:
                         # Mettre à jour le code GONM
                         if not dry_run:
-                            espece.code_gonm = code
+                            espece.code_gonm = code_gonm
                             espece.save(update_fields=['code_gonm'])
 
                         stats['especes_updated'] += 1
@@ -172,18 +177,27 @@ class Command(BaseCommand):
                         stats['especes_not_found'] += 1
                         especes_non_trouvees.append(
                             {
-                                'code': code,
-                                'nom_scientifique': nom_scientifique,
-                                'nom_francais': row.get('Nom français vernaculaire', ''),
+                                'code': code_gonm,
+                                'espece_id': espece_id,
+                                'nom_francais': espece_nom,
+                                'score': score,
                             }
                         )
 
+                except ValueError:
+                    stats['erreurs'] += 1
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"\nErreur ligne {stats['total_lines']}: ID d'espèce invalide '{espece_id}'\n"
+                            f"  Code: {code_gonm} - {espece_nom}"
+                        )
+                    )
                 except Exception as e:
                     stats['erreurs'] += 1
                     self.stdout.write(
                         self.style.WARNING(
                             f"\nErreur ligne {stats['total_lines']}: {e}\n"
-                            f"  Code: {code} - {nom_scientifique}"
+                            f"  Code: {code_gonm} - {espece_nom}"
                         )
                     )
 
@@ -226,7 +240,7 @@ class Command(BaseCommand):
             especes_non_trouvees = stats.get('especes_non_trouvees_details', [])
             for esp in especes_non_trouvees[:10]:  # Afficher les 10 premières
                 self.stdout.write(
-                    f"  - {esp['code']}: {esp['nom_scientifique']} ({esp['nom_francais']})"
+                    f"  - {esp['code']}: {esp['nom_francais']} (ID: {esp['espece_id']}, Score: {esp.get('score', 'N/A')})"
                 )
 
             if len(especes_non_trouvees) > 10:
