@@ -30,9 +30,17 @@ def select_directory(request):
     current_path = request.GET.get('path', '')
 
     # Sécurité : empêcher de sortir du répertoire racine
-    # Normaliser le chemin pour éviter les attaques de type "../../../"
-    safe_path = os.path.normpath(current_path).replace('..', '')
-    full_current_path = os.path.join(base_dir, safe_path)
+    # Nettoyer le chemin pour éviter les attaques de type "../../../"
+    safe_path = current_path.replace('..', '').strip()
+    # Normaliser les séparateurs (utiliser / au lieu de \)
+    safe_path = safe_path.replace('\\', '/')
+    # Supprimer les doubles slashes
+    while '//' in safe_path:
+        safe_path = safe_path.replace('//', '/')
+    # Supprimer le slash initial et final
+    safe_path = safe_path.strip('/')
+
+    full_current_path = os.path.join(base_dir, safe_path) if safe_path else base_dir
 
     # Vérifier que le chemin est bien dans le répertoire racine
     if not full_current_path.startswith(base_dir):
@@ -132,16 +140,13 @@ def select_directory(request):
                 current = os.path.join(current, part) if current else part
                 breadcrumb.append({'name': part, 'path': current})
 
-    # Compter les fichiers images dans le répertoire actuel
+    # Compter les fichiers images dans le répertoire actuel (récursivement)
     try:
-        image_count = len(
-            [
-                f
-                for f in os.listdir(full_current_path)
-                if os.path.isfile(os.path.join(full_current_path, f))
-                and f.lower().endswith(('.jpg', '.jpeg', '.png'))
-            ]
-        )
+        image_count = 0
+        for _root, _dirs, files in os.walk(full_current_path):
+            for f in files:
+                if f.lower().endswith(('.jpg', '.jpeg', '.png')):
+                    image_count += 1
     except (OSError, PermissionError):
         image_count = 0
 
