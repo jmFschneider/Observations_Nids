@@ -371,5 +371,5 @@ def start_transcription_view(request):
 
 
 def redirect_to_pilot_ocr(request):
-    """Redirection de l'ancien système de transcription vers le système Pilot (Transcription OCR)"""
-    return redirect('pilot:selection_repertoire_ocr')
+    """Redirection de l'ancien système de transcription vers le système OCR"""
+    return redirect('ocr:selection_repertoire_ocr')

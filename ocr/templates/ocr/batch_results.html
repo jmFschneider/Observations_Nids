@@ -95,7 +95,7 @@
         <i class="fas fa-exclamation-triangle"></i>
         <strong>Aucun résultat disponible.</strong>
         <p class="mb-0">Veuillez lancer un traitement batch d'abord.</p>
-        <a href="{% url 'pilot:selection_repertoire_ocr' %}" class="btn btn-primary mt-2">
+        <a href="{% url 'ocr:selection_repertoire_ocr' %}" class="btn btn-primary mt-2">
             <i class="fas fa-arrow-left"></i> Retour à la sélection
         </a>
     </div>
@@ -273,7 +273,7 @@
                                             <i class="fas fa-file-code"></i> JSON
                                         </a>
                                         {% if img.transcription_id %}
-                                        <a href="/admin/pilot/transcriptionocr/{{ img.transcription_id }}/change/"
+                                        <a href="/admin/ocr/transcriptionocr/{{ img.transcription_id }}/change/"
                                            target="_blank" class="btn btn-sm btn-outline-secondary">
                                             <i class="fas fa-eye"></i> Admin
                                         </a>
@@ -296,10 +296,10 @@
 
         <!-- Actions -->
         <div class="mt-4 d-flex justify-content-between">
-            <a href="{% url 'pilot:selection_repertoire_ocr' %}" class="btn btn-secondary">
+            <a href="{% url 'ocr:selection_repertoire_ocr' %}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Retour à la sélection
             </a>
-            <a href="/admin/pilot/transcriptionocr/" target="_blank" class="btn btn-primary">
+            <a href="/admin/ocr/transcriptionocr/" target="_blank" class="btn btn-primary">
                 <i class="fas fa-chart-bar"></i> Voir toutes les transcriptions
             </a>
         </div>
@@ -383,7 +383,7 @@ if (isTracking) {
     });
 
     function checkProgress() {
-        fetch('{% url "pilot:check_batch_progress" %}')
+        fetch('{% url "ocr:check_batch_progress" %}')
             .then(response => response.json())
             .then(data => {
                 console.log('Progress data:', data);
@@ -423,7 +423,7 @@ if (isTracking) {
                     if (data.redirect) {
                         window.location.href = data.redirect;
                     } else {
-                        window.location.href = '{% url "pilot:batch_results" %}';
+                        window.location.href = '{% url "ocr:batch_results" %}';
                     }
                 } else if (data.status === 'FAILURE') {
                     clearInterval(progressCheckInterval);
