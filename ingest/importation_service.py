@@ -37,6 +37,76 @@ class ImportationService:
         )
         self.geocodeur = get_geocodeur()  # Réutiliser l'instance singleton
 
+        # Cache pour optimiser les recherches d'espèces
+        self._especes_cache = None
+        self._especes_index = None  # Index par première lettre
+
+        # Cache pour optimiser la recherche de fichiers (évite os.walk répétitifs)
+        self._fichiers_cache = None
+
+    def _initialiser_cache_especes(self):
+        """Construit le cache des espèces indexé par première lettre pour optimiser le matching"""
+        if self._especes_cache is not None:
+            return  # Cache déjà initialisé
+
+        logger.info("Initialisation du cache des espèces...")
+        self._especes_cache = list(Espece.objects.filter(valide_par_admin=True))
+        self._especes_index = {}
+
+        # Créer un index par première lettre pour accélérer la recherche
+        for espece in self._especes_cache:
+            premiere_lettre = espece.nom[0].lower() if espece.nom else ''
+            if premiere_lettre not in self._especes_index:
+                self._especes_index[premiere_lettre] = []
+            self._especes_index[premiere_lettre].append(espece)
+
+        logger.info(
+            f"Cache espèces initialisé: {len(self._especes_cache)} espèces, "
+            f"{len(self._especes_index)} lettres indexées"
+        )
+
+    def _initialiser_cache_fichiers(self):
+        """Construit le cache des chemins de fichiers JSON pour éviter os.walk() répétitif"""
+        if self._fichiers_cache is not None:
+            return  # Cache déjà initialisé
+
+        logger.info("Initialisation du cache des fichiers JSON...")
+        self._fichiers_cache = {}
+
+        base_dir = os.path.join(settings.MEDIA_ROOT, 'transcription_results')
+        if not os.path.exists(base_dir):
+            logger.warning(f"Répertoire {base_dir} introuvable")
+            return
+
+        # Parcourir récursivement une seule fois
+        fichiers_trouves = 0
+        for root, _dirs, files in os.walk(base_dir):
+            for fichier in files:
+                if fichier.endswith('_result.json'):
+                    # Chemin complet du JSON
+                    json_absolu = os.path.join(root, fichier)
+                    # Chemin relatif à MEDIA_ROOT
+                    chemin_json_relatif = os.path.relpath(json_absolu, settings.MEDIA_ROOT)
+
+                    # Déduire le chemin de l'image depuis le chemin du JSON
+                    nom_image = fichier.replace('_result.json', '.jpg')
+                    parts = chemin_json_relatif.split(os.sep)
+
+                    if len(parts) >= 5 and parts[0] == 'transcription_results':
+                        # Reconstruire le chemin image : jpeg/TRI_ANCIEN/FUSION_FULL/nom_image
+                        chemin_image_relatif = os.path.join(parts[1], parts[2], parts[3], nom_image)
+                    else:
+                        chemin_image_relatif = nom_image
+
+                    # Normaliser les chemins avec des slashes
+                    self._fichiers_cache[fichier] = {
+                        'chemin_json': chemin_json_relatif.replace(os.sep, '/'),
+                        'chemin_image': chemin_image_relatif.replace(os.sep, '/'),
+                    }
+                    fichiers_trouves += 1
+
+        logger.info(f"Cache fichiers initialisé: {fichiers_trouves} fichiers JSON indexés")
+
     def importer_fichiers_json(self, repertoire):
         """Importe tous les fichiers JSON d'un répertoire vers la table TranscriptionBrute"""
         chemin_complet = os.path.join(settings.MEDIA_ROOT, 'transcription_results', repertoire)
@@ -91,7 +161,6 @@ class ImportationService:
         transcriptions = TranscriptionBrute.objects.filter(traite=False)
         especes_ajoutees = 0
         utilisateurs_crees = 0
-        communes_geocodees = 0
 
         for transcription in transcriptions:
             try:
@@ -177,31 +246,8 @@ class ImportationService:
                         if utilisateur and getattr(utilisateur, '_created', False):
                             utilisateurs_crees += 1
 
-                # Extraire et géocoder la commune
-                if 'localisation' in donnees:
-                    loc = donnees['localisation']
-                    nom_commune = loc.get('commune') or loc.get('IGN_50000')
-                    departement = loc.get('dep_t')
-
-                    if (
-                        nom_commune
-                        and isinstance(nom_commune, str)
-                        and nom_commune != 'Non spécifiée'
-                    ):
-                        try:
-                            # Rechercher la commune via le géocodeur
-                            resultat = self.geocodeur.geocoder_commune(nom_commune, departement)
-
-                            if resultat:
-                                logger.info(
-                                    f"Commune trouvée pour '{nom_commune}': {resultat['adresse_complete']} "
-                                    f"(source: {resultat['source']}, coordonnées: {resultat['coordonnees_gps']})"
-                                )
-                                communes_geocodees += 1
-                            else:
-                                logger.warning(f"Aucune commune trouvée pour '{nom_commune}'")
-                        except Exception as e:
-                            logger.error(f"Erreur lors du géocodage de '{nom_commune}': {str(e)}")
+                # NOTE: Le géocodage des communes est maintenant fait uniquement dans finaliser_importation()
+                # pour éviter de géocoder 2 fois la même commune
 
             except Exception as e:
                 logger.error(
@@ -212,7 +258,6 @@ class ImportationService:
         return {
             'especes_ajoutees': especes_ajoutees,
             'utilisateurs_crees': utilisateurs_crees,
-            'communes_geocodees': communes_geocodees,
         }
 
     def _trouver_correspondance_espece(self, espece_candidate):
@@ -222,15 +267,27 @@ class ImportationService:
         2. Fallback sur code GONM si le nom échoue
         3. Détection d'incohérences entre nom et code
         """
+        # Initialiser le cache si nécessaire
+        self._initialiser_cache_especes()
+
         espece_trouvee = None
         methode_matching = None
 
         # PRIORITÉ 1 : Essayer le matching par nom (comportement actuel)
-        especes_existantes = Espece.objects.filter(valide_par_admin=True)
+        # Optimisation : ne comparer qu'avec les espèces ayant la même première lettre
+        premiere_lettre = (
+            espece_candidate.nom_transcrit[0].lower() if espece_candidate.nom_transcrit else ''
+        )
+        especes_candidates = self._especes_index.get(premiere_lettre, [])
+
+        # Si aucune espèce avec cette première lettre, chercher dans toutes les espèces
+        if not especes_candidates:
+            especes_candidates = self._especes_cache
+
         meilleure_correspondance = None
         meilleur_score = 0
 
-        for espece_existante in especes_existantes:
+        for espece_existante in especes_candidates:
             score = SequenceMatcher(
                 None, espece_candidate.nom_transcrit.lower(), espece_existante.nom.lower()
             ).ratio()
@@ -467,7 +524,17 @@ class ImportationService:
     @transaction.atomic
     def finaliser_importation(self, importation_id):
         try:
-            importation = ImportationEnCours.objects.select_for_update().get(id=importation_id)
+            # Optimisation: précharger les relations pour éviter les requêtes N+1
+            importation = (
+                ImportationEnCours.objects.select_for_update()
+                .select_related(
+                    'transcription',
+                    'espece_candidate',
+                    'espece_candidate__espece_validee',
+                    'observateur',
+                )
+                .get(id=importation_id)
+            )
 
             if not importation.espece_candidate or not importation.espece_candidate.espece_validee:
                 importation.statut = 'erreur'
@@ -490,41 +557,23 @@ class ImportationService:
             nom_fichier_json = (
                 importation.transcription.fichier_source
             )  # Exemple : Image_1_result.json
-            nom_image = nom_fichier_json.replace('_result.json', '.jpg')  # Exemple : Image_1.jpg
 
-            # Déterminer le répertoire source (chercher récursivement où se trouve le fichier JSON)
-            chemin_json_complet = None
-            chemin_image_complet = None
+            # Utiliser le cache de fichiers pour éviter os.walk() répétitif
+            self._initialiser_cache_fichiers()
 
-            base_dir = os.path.join(settings.MEDIA_ROOT, 'transcription_results')
-
-            # Parcourir récursivement tous les sous-dossiers
-            for root, _dirs, files in os.walk(base_dir):
-                if nom_fichier_json in files:
-                    # Chemin complet du JSON trouvé
-                    json_absolu = os.path.join(root, nom_fichier_json)
-                    # Chemin relatif à MEDIA_ROOT
-                    chemin_json_complet = os.path.relpath(json_absolu, settings.MEDIA_ROOT)
-
-                    # Déduire le chemin de l'image depuis le chemin du JSON
-                    # Ex: transcription_results/jpeg/TRI_ANCIEN/FUSION_FULL/gemini_3_flash/fiche_25_result.json
-                    #  -> jpeg/TRI_ANCIEN/FUSION_FULL/fiche_25.jpg
-                    parts = chemin_json_complet.split(os.sep)
-                    if len(parts) >= 5 and parts[0] == 'transcription_results':
-                        # Reconstruire le chemin image : jpeg/TRI_ANCIEN/FUSION_FULL/nom_image
-                        chemin_image_complet = os.path.join(parts[1], parts[2], parts[3], nom_image)
-                    break
-
-            # Normaliser les chemins pour utiliser des slashes (compatible Linux/Windows)
-            if chemin_image_complet:
-                chemin_image = chemin_image_complet.replace(os.sep, '/')
+            # Récupérer les chemins depuis le cache
+            if nom_fichier_json in self._fichiers_cache:
+                chemins = self._fichiers_cache[nom_fichier_json]
+                chemin_json = chemins['chemin_json']
+                chemin_image = chemins['chemin_image']
             else:
-                chemin_image = nom_image
-
-            if chemin_json_complet:
-                chemin_json = chemin_json_complet.replace(os.sep, '/')
-            else:
+                # Fallback si fichier non trouvé dans le cache
+                nom_image = nom_fichier_json.replace('_result.json', '.jpg')
                 chemin_json = nom_fichier_json
+                chemin_image = nom_image
+                logger.warning(
+                    f"Fichier {nom_fichier_json} non trouvé dans le cache, utilisation des chemins par défaut"
+                )
 
             # Création de la fiche d'observation (les objets liés seront créés automatiquement
             # par la méthode save() du modèle FicheObservation)
@@ -621,26 +670,50 @@ class ImportationService:
                 nid.details_nid = nid_data.get('nid') or 'Aucun détail'
                 nid.save()
 
-            # Création des observations
+            # Création des observations en lot (bulk_create pour performance)
             if 'tableau_donnees' in donnees and isinstance(donnees['tableau_donnees'], list):
+                observations_a_creer = []
                 for obs in donnees['tableau_donnees']:
                     try:
                         jour = int(obs.get('Jour') or 1)
                         mois = int(obs.get('Mois') or 1)
-                        heure = int(str(obs.get('Heure') or 12).replace('e', ''))
+
+                        heure_brute = obs.get('Heure')
+                        heure_connue = True
+                        if (
+                            heure_brute is None
+                            or str(heure_brute).strip() == ""
+                            or str(heure_brute).lower() == "null"
+                        ):
+                            heure = 0
+                            heure_connue = False
+                        else:
+                            try:
+                                heure = int(str(heure_brute).replace('e', ''))
+                            except (ValueError, TypeError):
+                                heure = 0
+                                heure_connue = False
+
                         date_obs = timezone.make_aware(
                             datetime.datetime(annee, mois, jour, heure, 0)
                         )
 
-                        Observation.objects.create(
-                            fiche=fiche,
-                            date_observation=date_obs,
-                            nombre_oeufs=int(obs.get('Nombre_oeuf') or 0),
-                            nombre_poussins=int(obs.get('Nombre_pou') or 0),
-                            observations=obs.get('observations') or '',
+                        observations_a_creer.append(
+                            Observation(
+                                fiche=fiche,
+                                date_observation=date_obs,
+                                heure_connue=heure_connue,
+                                nombre_oeufs=int(obs.get('Nombre_oeuf') or 0),
+                                nombre_poussins=int(obs.get('Nombre_pou') or 0),
+                                observations=obs.get('observations') or '',
+                            )
                         )
                     except Exception as e:
                         logger.warning(f"Observation ignorée (fiche {fiche.num_fiche}) : {str(e)}")
+
+                # Créer toutes les observations en une seule requête
+                if observations_a_creer:
+                    Observation.objects.bulk_create(observations_a_creer)
 
             # Mise à jour de l'objet ResumeObservation qui existe déjà
             if 'tableau_donnees_2' in donnees:
@@ -725,29 +798,25 @@ class ImportationService:
                 causes_echec.description = donnees['causes_echec'].get('causes_d_echec') or ''
                 causes_echec.save()
 
-            # Ajout d'une remarque si elle existe
-            if "remarque" in donnees and donnees["remarque"]:
-                Remarque.objects.create(fiche=fiche, remarque=donnees["remarque"])
+            # Ajout d'une remarque si présente dans les données
+            if 'remarque' in donnees and donnees['remarque']:
+                Remarque.objects.create(fiche=fiche, texte=donnees['remarque'])
 
-            # Mettre l'état de correction à "En cours de correction"
-            etat_correction = fiche.etat_correction
-            etat_correction.statut = 'en_cours'
-            etat_correction.save()
-
-            importation.statut = 'complete'
-            importation.transcription.traite = True
+            # Marquer l'importation comme terminée
+            importation.statut = 'termine'
             importation.save()
+
+            # Marquer la transcription comme traitée
+            importation.transcription.traite = True
             importation.transcription.save()
 
-            return True, f"Fiche d'observation #{fiche.num_fiche} créée avec succès"
+            logger.info(f"Importation finalisée avec succès pour la fiche {fiche.num_fiche}")
+            return True, f"Fiche {fiche.num_fiche} créée avec succès"
 
-        except ImportationEnCours.DoesNotExist:
-            return False, "importation non trouvée"
         except Exception as e:
-            logger.error(f"Erreur lors de l'importation {importation_id}: {str(e)}")
-            if 'importation' in locals():
-                importation.statut = 'erreur'
-                importation.save()
+            logger.error(
+                f"Erreur lors de la finalisation de l'importation {importation_id}: {str(e)}"
+            )
             return False, str(e)
 
     def reinitialiser_importation(self, importation_id=None, fichier_source=None):
