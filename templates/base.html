@@ -116,21 +116,15 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'observations:select_directory' %}" data-title="Transcription d'images">
-                            <i class="fas fa-images"></i>
-                            <span class="link-text">Transcription d'images</span>
+                        <a class="nav-link" href="{% url 'pilot:selection_repertoire_ocr' %}" data-title="Transcription OCR">
+                            <i class="fas fa-robot"></i>
+                            <span class="link-text">Transcription OCR</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'ingest:accueil_importation' %}" data-title="Importation JSON">
                             <i class="fas fa-file-import"></i>
                             <span class="link-text">Importation JSON</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'pilot:selection_repertoire_ocr' %}" data-title="Transcription">
-                            <i class="fas fa-file-alt"></i>
-                            <span class="link-text">Transcription</span>
                         </a>
                     </li>
                     {% endif %}
