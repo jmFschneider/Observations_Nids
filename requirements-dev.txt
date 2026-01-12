@@ -465,7 +465,7 @@ uritemplate==4.2.0
     # via
     #   -r requirements-base.in
     #   google-api-python-client
-urllib3==2.6.2
+urllib3==2.6.3
     # via
     #   -r requirements-base.in
     #   requests
