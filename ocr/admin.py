@@ -1,5 +1,5 @@
 """
-Interface d'administration pour l'app de pilote OCR
+Interface d'administration pour l'app OCR
 """
 
 from django.contrib import admin

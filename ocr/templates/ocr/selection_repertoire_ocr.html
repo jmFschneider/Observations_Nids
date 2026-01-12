@@ -10,7 +10,7 @@
     <nav aria-label="breadcrumb" class="mt-4 mb-4">
         <ol class="breadcrumb py-3">
             <li class="breadcrumb-item">
-                <a href="{% url 'pilot:selection_repertoire_ocr' %}">
+                <a href="{% url 'ocr:selection_repertoire_ocr' %}">
                     <i class="fas fa-home"></i> Fiches scannées
                 </a>
             </li>
@@ -19,7 +19,7 @@
                     <li class="breadcrumb-item active" aria-current="page">{{ crumb.name }}</li>
                 {% else %}
                     <li class="breadcrumb-item">
-                        <a href="{% url 'pilot:selection_repertoire_ocr' %}?path={{ crumb.path }}">{{ crumb.name }}</a>
+                        <a href="{% url 'ocr:selection_repertoire_ocr' %}?path={{ crumb.path }}">{{ crumb.name }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
@@ -82,7 +82,7 @@
                 {% if type_traitement %}avec le traitement <strong>{{ type_traitement }}</strong>{% endif %}.
             </p>
 
-            <form id="analyse-form" method="post" action="{% url 'pilot:analyser_correspondances' %}">
+            <form id="analyse-form" method="post" action="{% url 'ocr:analyser_correspondances' %}">
                 {% csrf_token %}
                 <input type="hidden" name="repertoire" value="{{ current_path }}">
 
@@ -163,7 +163,7 @@
         <div class="card-body p-0">
             {% if parent_path is not None %}
             <div class="p-3 border-bottom bg-light">
-                <a href="{% url 'pilot:selection_repertoire_ocr' %}?path={{ parent_path }}"
+                <a href="{% url 'ocr:selection_repertoire_ocr' %}?path={{ parent_path }}"
                    class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-level-up-alt"></i> Remonter au dossier parent
                 </a>
@@ -305,7 +305,7 @@ const selectedListEl = document.getElementById('selected-list');
 
 // Fonction pour naviguer vers un répertoire
 function navigateToDir(path) {
-    window.location = '{% url "pilot:selection_repertoire_ocr" %}?path=' + path;
+    window.location = '{% url "ocr:selection_repertoire_ocr" %}?path=' + path;
 }
 
 // Mettre à jour l'affichage de la sélection
@@ -357,7 +357,7 @@ function proceedToBatchConfig() {
     sessionStorage.setItem('currentPath', '{{ current_path }}');
 
     // Rediriger vers la page de configuration
-    window.location = '{% url "pilot:optimisation_ocr_home" %}';
+    window.location = '{% url "ocr:optimisation_ocr_home" %}';
 }
 
 // Fonctions pour la sélection de modèles
@@ -534,7 +534,7 @@ function lancerTranscription() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Lancement en cours...';
 
     // Lancer la tâche batch
-    fetch('{% url "pilot:lancer_transcription_batch" %}', {
+    fetch('{% url "ocr:lancer_transcription_batch" %}', {
         method: 'POST',
         body: formData,
         headers: {
@@ -550,7 +550,7 @@ function lancerTranscription() {
             window.open(flowerUrl, '_blank', 'noopener,noreferrer');
 
             // Rediriger vers la page de résultats avec tracking
-            window.location.href = '{% url "pilot:batch_results" %}?tracking=true&task_id=' + data.task_id;
+            window.location.href = '{% url "ocr:batch_results" %}?tracking=true&task_id=' + data.task_id;
         } else {
             alert('Erreur: ' + (data.error || 'Erreur inconnue'));
             btn.disabled = false;

@@ -21,9 +21,9 @@ from PIL import Image
 
 from observations.json_rep.json_sanitizer import corriger_json, validate_json_structure
 from observations.models import FicheObservation
-from pilot.models import TranscriptionOCR
+from ocr.models import TranscriptionOCR
 
-logger = logging.getLogger('pilot')
+logger = logging.getLogger('ocr')
 
 
 # ========================================
@@ -359,7 +359,7 @@ def _log_progress(task_self, message, level='info', details=None):
     log_method(f"[{timestamp}] {message}")
 
 
-@shared_task(bind=True, name='pilot.process_batch_transcription')
+@shared_task(bind=True, name='ocr.process_batch_transcription')
 def process_batch_transcription_task(self, directories: list[dict], modeles_ocr: list[str]):
     """
     Tâche Celery pour traiter plusieurs répertoires en batch avec plusieurs modèles OCR.

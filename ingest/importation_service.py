@@ -587,6 +587,12 @@ class ImportationService:
             )
             importation.fiche_observation = fiche
 
+            # Mettre à jour l'état de correction à "en cours de correction"
+            # car la fiche issue d'une transcription OCR nécessite une correction manuelle
+            etat_correction = fiche.etat_correction
+            etat_correction.statut = 'en_cours'
+            etat_correction.save()
+
             # Mise à jour de l'objet Localisation qui existe déjà
             if 'localisation' in donnees:
                 loc = donnees['localisation']
@@ -727,15 +733,11 @@ class ImportationService:
 
                 resume = ResumeObservation.objects.get(fiche=fiche)
 
-                # Récupération des valeurs
-                nombre_oeufs_pondus = (
-                    safe_int(resume_data.get('nombre_oeufs', {}).get('pondus')) or 0
-                )
-                nombre_oeufs_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('eclos')) or 0
-                nombre_oeufs_non_eclos = (
-                    safe_int(resume_data.get('nombre_oeufs', {}).get('n_ecl')) or 0
-                )
-                nombre_poussins = safe_int(resume_data.get('nombre_poussins', {}).get('vol_t')) or 0
+                # Récupération des valeurs (None si pas renseigné, pas 0)
+                nombre_oeufs_pondus = safe_int(resume_data.get('nombre_oeufs', {}).get('pondus'))
+                nombre_oeufs_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('eclos'))
+                nombre_oeufs_non_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('n_ecl'))
+                nombre_poussins = safe_int(resume_data.get('nombre_poussins', {}).get('vol_t'))
 
                 # Log des valeurs pour debugging
                 logger.info(
@@ -745,22 +747,30 @@ class ImportationService:
 
                 # Validation et correction automatique des contraintes
                 # Si on a des poussins mais pas d'œufs éclos renseignés, on déduit le minimum d'œufs éclos
-                if nombre_poussins > 0 and nombre_oeufs_eclos == 0:
+                if (
+                    nombre_poussins
+                    and nombre_poussins > 0
+                    and (nombre_oeufs_eclos is None or nombre_oeufs_eclos == 0)
+                ):
                     nombre_oeufs_eclos = nombre_poussins
                     logger.warning(
                         f"Fiche {fiche.num_fiche}: Correction automatique - œufs éclos ajusté à {nombre_oeufs_eclos} pour cohérence avec {nombre_poussins} poussins"
                     )
 
                 # Si on a plus de poussins que d'œufs éclos, ajuster les œufs éclos
-                if nombre_poussins > nombre_oeufs_eclos:
+                if nombre_poussins and nombre_oeufs_eclos and nombre_poussins > nombre_oeufs_eclos:
                     nombre_oeufs_eclos = nombre_poussins
                     logger.warning(
-                        f"Fiche {fiche.num_fiche}: Correction automatique - œufs éclos ajusté de à {nombre_oeufs_eclos} pour respecter la contrainte"
+                        f"Fiche {fiche.num_fiche}: Correction automatique - œufs éclos ajusté à {nombre_oeufs_eclos} pour respecter la contrainte"
                     )
 
                 # Si on a des œufs éclos mais pas d'œufs pondus renseignés, ajuster
-                if nombre_oeufs_eclos > nombre_oeufs_pondus:
-                    nombre_oeufs_pondus = nombre_oeufs_eclos + nombre_oeufs_non_eclos
+                if (
+                    nombre_oeufs_eclos
+                    and nombre_oeufs_eclos > 0
+                    and (nombre_oeufs_pondus is None or nombre_oeufs_eclos > nombre_oeufs_pondus)
+                ):
+                    nombre_oeufs_pondus = nombre_oeufs_eclos + (nombre_oeufs_non_eclos or 0)
                     logger.warning(
                         f"Fiche {fiche.num_fiche}: Correction automatique - œufs pondus ajusté à {nombre_oeufs_pondus} pour cohérence"
                     )

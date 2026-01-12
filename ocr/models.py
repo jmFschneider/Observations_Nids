@@ -26,7 +26,7 @@ class TranscriptionOCR(models.Model):
     fiche = models.ForeignKey(
         FicheObservation,
         on_delete=models.CASCADE,
-        related_name="transcriptions_ocr_pilot",
+        related_name="transcriptions_ocr",
         verbose_name="Fiche de référence",
         help_text="Fiche d'observation corrigée manuellement (vérité terrain)",
         null=True,
@@ -172,9 +172,9 @@ class TranscriptionOCR(models.Model):
     )
 
     class Meta:
-        db_table = 'pilot_transcription_ocr'
-        verbose_name = '[PILOTE] Transcription OCR'
-        verbose_name_plural = '[PILOTE] Transcriptions OCR'
+        db_table = 'ocr_transcription_ocr'
+        verbose_name = 'Transcription OCR'
+        verbose_name_plural = 'Transcriptions OCR'
         ordering = ['-date_transcription']
         indexes = [
             models.Index(fields=['fiche', 'modele_ocr']),
@@ -184,7 +184,7 @@ class TranscriptionOCR(models.Model):
 
     def __str__(self):
         fiche_num = self.fiche.num_fiche if self.fiche else 'N/A'
-        return f"[PILOTE] OCR {self.modele_ocr} - {self.type_image} (Fiche #{fiche_num})"
+        return f"OCR {self.modele_ocr} - {self.type_image} (Fiche #{fiche_num})"
 
     @property
     def taux_precision(self):
