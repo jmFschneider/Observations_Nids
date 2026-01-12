@@ -70,17 +70,14 @@ click-repl==0.3.0
     #   -r requirements-base.in
     #   celery
 colorama==0.4.6
-    # via
-    #   -r requirements-base.in
-    #   click
-    #   tqdm
+    # via -r requirements-base.in
 crispy-bootstrap5==2025.6
     # via -r requirements-base.in
 defusedxml==0.7.1
     # via radicale
 distro==1.9.0
     # via google-genai
-django==6.0
+django==6.0.1
     # via
     #   -r requirements-base.in
     #   crispy-bootstrap5
@@ -332,9 +329,7 @@ typing-inspection==0.4.2
 tzdata==2025.3
     # via
     #   -r requirements-base.in
-    #   django
     #   kombu
-    #   tzlocal
 tzlocal==5.3.1
     # via celery
 uritemplate==4.2.0
