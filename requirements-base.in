@@ -39,7 +39,7 @@ pydantic_core
 requests
 certifi
 charset-normalizer
-urllib3
+urllib3>=2.6.3
 httplib2
 idna
 geopy
