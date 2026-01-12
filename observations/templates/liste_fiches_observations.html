@@ -61,6 +61,35 @@ function getColorForPercentage(percentage) {
     }
 }
 
+function openResizableImageWindow(imageUrl) {
+    const width = 800;
+    const height = 600;
+    const left = (screen.width - width) / 2;
+    const top = (screen.height - height) / 2;
+
+    const windowFeatures = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`;
+    const newWindow = window.open('', '_blank', windowFeatures);
+
+    if (newWindow) {
+        newWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Image de la fiche</title>
+                <style>
+                    body { margin: 0; padding: 10px; background: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+                    img { max-width: 100%; height: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: white; }
+                </style>
+            </head>
+            <body>
+                <img src="${imageUrl}" alt="Image de la fiche">
+            </body>
+            </html>
+        `);
+        newWindow.document.close();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Appliquer la colorisation à toutes les cellules d'état de correction
     const cellsEtatCorrection = document.querySelectorAll('.etat-correction-cell');
@@ -113,6 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <th>Observateur</th>
                             <th>Espèce</th>
                             <th>Commune</th>
+                            <th>Image source</th>
                             <th>État de correction</th>
                             <th>Actions</th>
                         </tr>
@@ -130,6 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <th>
                                 {{ filter.form.commune }}
                             </th>
+                            <th></th> {# Image source #}
                             <th>
                                 {{ filter.form.statut_correction }}
                             </th>
@@ -166,6 +197,16 @@ document.addEventListener('DOMContentLoaded', function() {
                                     {% endif %}
                                 {% else %}
                                     <span class="text-muted">Non renseignée</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if fiche.chemin_image %}
+                                    <a href="javascript:void(0);"
+                                       onclick="openResizableImageWindow('{{ MEDIA_URL|escapejs }}{{ fiche.chemin_image|escapejs }}')">
+                                        {{ fiche.chemin_image|basename }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">—</span>
                                 {% endif %}
                             </td>
                             <td class="etat-correction-cell"
@@ -236,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center py-3">Aucune fiche d'observation trouvée.</td>
+                            <td colspan="8" class="text-center py-3">Aucune fiche d'observation trouvée.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
