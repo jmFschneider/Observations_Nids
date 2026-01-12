@@ -222,6 +222,8 @@ kombu==5.6.2
     # via
     #   -r requirements-base.in
     #   celery
+libpass==1.9.3
+    # via radicale
 librt==0.7.4
     # via mypy
 lxml==6.0.2
@@ -270,10 +272,9 @@ packaging==25.0
     #   kombu
     #   mkdocs
     #   pytest
+    #   radicale
 paginate==0.5.7
     # via mkdocs-material
-passlib==1.7.4
-    # via radicale
 pathspec==0.12.1
     # via
     #   -r requirements-dev.in
@@ -382,7 +383,7 @@ pyyaml==6.0.3
     #   pyyaml-env-tag
 pyyaml-env-tag==1.1
     # via mkdocs
-radicale==3.5.10
+radicale==3.6.0
     # via -r requirements-base.in
 redis==7.1.0
     # via -r requirements-base.in
