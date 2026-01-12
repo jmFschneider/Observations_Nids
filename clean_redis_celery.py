@@ -18,12 +18,13 @@ print("=" * 60)
 # Lister toutes les clés Celery
 print("\n🔍 Recherche des clés Celery dans Redis...")
 
-celery_keys = []
+celery_keys: list[str] = []
 patterns = ['celery*', '*task-meta*', '_kombu*', 'unacked*']
 
 for pattern in patterns:
     keys = r.keys(pattern)
-    celery_keys.extend(keys)
+    if isinstance(keys, list):
+        celery_keys.extend(keys)
 
 if not celery_keys:
     print("✅ Aucune clé Celery trouvée dans Redis")
