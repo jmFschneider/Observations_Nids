@@ -94,7 +94,7 @@
                 <hr>
 
                 <div class="d-flex justify-content-between align-items-center">
-                    <a href="{% url 'pilot:selection_repertoire_ocr' %}" class="btn btn-outline-secondary">
+                    <a href="{% url 'ocr:selection_repertoire_ocr' %}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Retour à la sélection
                     </a>
                     <button type="submit" class="btn btn-success btn-lg">
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('selected-dirs-list').innerHTML = `
             <div class="alert alert-warning">
                 <i class="fas fa-exclamation-triangle"></i>
-                Aucun répertoire sélectionné. <a href="{% url 'pilot:selection_repertoire_ocr' %}">Retourner à la sélection</a>
+                Aucun répertoire sélectionné. <a href="{% url 'ocr:selection_repertoire_ocr' %}">Retourner à la sélection</a>
             </div>
         `;
         document.getElementById('batch-config-form').style.display = 'none';
@@ -198,7 +198,7 @@ function lancerTranscriptionBatch(directories, modeles) {
     formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
 
     // Envoyer la requête
-    fetch('{% url "pilot:lancer_transcription_batch" %}', {
+    fetch('{% url "ocr:lancer_transcription_batch" %}', {
         method: 'POST',
         body: formData
     })
@@ -206,7 +206,7 @@ function lancerTranscriptionBatch(directories, modeles) {
     .then(data => {
         if (data.success) {
             // Rediriger vers la page de suivi
-            window.location.href = '{% url "pilot:batch_results" %}?task_id=' + data.task_id + '&tracking=true';
+            window.location.href = '{% url "ocr:batch_results" %}?task_id=' + data.task_id + '&tracking=true';
         } else {
             alert('Erreur: ' + (data.error || 'Erreur inconnue'));
             submitBtn.disabled = false;

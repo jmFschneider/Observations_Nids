@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('observations', '0011_allow_null_oeufs_poussins'),
-        ('pilot', '0001_initial'),
+        ('ocr', '0001_initial'),
     ]
 
     operations = [

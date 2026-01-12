@@ -18,6 +18,7 @@ from .views.upload_views import mes_images_sources, upload_image_source, upload_
 from .views.view_transcription import (
     check_progress,
     process_images,
+    redirect_to_pilot_ocr,
     select_directory,
     start_transcription_view,
     transcription_results,
@@ -58,6 +59,8 @@ urlpatterns = [
     path('observations/modifier/<int:fiche_id>/', saisie_observation, name='modifier_observation'),
     path('observations/ajouter/<int:fiche_id>/', ajouter_observation, name='ajouter_observation'),
     # Routes de transcription
+    # Redirection de l'ancien système de transcription vers le nouveau (Pilot)
+    path('transcription/', redirect_to_pilot_ocr, name='transcription_redirect'),
     path('transcription/selection-repertoire/', select_directory, name='select_directory'),
     path('transcription/traiter-images/', process_images, name='process_images'),
     path('transcription/verifier-progression/', check_progress, name='check_progress'),

@@ -1,5 +1,5 @@
 """
-Vues pour l'app pilot - Optimisation OCR
+Vues pour l'app ocr - Optimisation OCR
 
 Système de transcription batch pour l'évaluation des modèles OCR
 """
@@ -19,7 +19,7 @@ from django.utils import timezone
 
 from observations.decorators import transcription_required
 from observations.models import FicheObservation
-from pilot.tasks import process_batch_transcription_task
+from ocr.tasks import process_batch_transcription_task
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 @transcription_required
 def optimisation_ocr_home(request):
     """Page d'accueil de l'optimisation OCR"""
-    return render(request, 'pilot/optimisation_ocr_home.html')
+    return render(request, 'ocr/optimisation_ocr_home.html')
 
 
 @transcription_required
@@ -148,7 +148,7 @@ def selection_repertoire_ocr(request):
         'type_traitement': type_traitement,
     }
 
-    return render(request, 'pilot/selection_repertoire_ocr.html', context)
+    return render(request, 'ocr/selection_repertoire_ocr.html', context)
 
 
 @transcription_required
@@ -300,13 +300,13 @@ def lancer_transcription_batch(request):  # noqa: PLR0911
             f"{len(modeles_ocr)} modèle(s) ({', '.join(modeles_ocr)}) - Mode évaluation (JSON uniquement)"
         )
 
-        # Lancer la tâche Celery (mode pilote : génération JSON uniquement)
+        # Lancer la tâche Celery (mode OCR : génération JSON uniquement)
         task = process_batch_transcription_task.delay(directories, modeles_ocr)
         task_id = task.id
 
         # Stocker l'ID de tâche en session pour le suivi
-        request.session['pilot_task_id'] = task_id
-        request.session['pilot_batch_config'] = {
+        request.session['ocr_task_id'] = task_id
+        request.session['ocr_batch_config'] = {
             'directories': directories,
             'modeles_ocr': modeles_ocr,
             'start_time': timezone.now().isoformat(),
@@ -319,7 +319,7 @@ def lancer_transcription_batch(request):  # noqa: PLR0911
                 'success': True,
                 'task_id': task_id,
                 'message': 'Traitement batch démarré',
-                'progress_url': '/pilot/optimisation-ocr/verifier-progression/',
+                'progress_url': '/ocr/verifier-progression/',
             }
         )
 
@@ -333,7 +333,7 @@ def check_batch_progress(request):
     """
     Endpoint AJAX pour vérifier la progression du traitement batch
     """
-    task_id = request.session.get('pilot_task_id')
+    task_id = request.session.get('ocr_task_id')
     if not task_id:
         logger.warning("check_batch_progress called with no task_id in session")
         return JsonResponse({'status': 'NO_TASK'})
@@ -373,10 +373,10 @@ def check_batch_progress(request):
         response['message'] = 'Traitement terminé avec succès'
 
         # Stocker les résultats en session
-        request.session['pilot_batch_results'] = ok
+        request.session['ocr_batch_results'] = ok
 
         # Redirection vers la page de résultats
-        response['redirect'] = '/pilot/optimisation-ocr/resultats/'
+        response['redirect'] = '/ocr/resultats/'
         response['force_redirect'] = True
         logger.info(f"Task {task_id} completed. Sending redirect to results page")
 
@@ -403,20 +403,20 @@ def batch_results(request):
     is_tracking = request.GET.get('tracking') == 'true'
 
     # Récupérer les résultats stockés en session
-    results = request.session.get('pilot_batch_results', {})
-    config = request.session.get('pilot_batch_config', {})
+    results = request.session.get('ocr_batch_results', {})
+    config = request.session.get('ocr_batch_config', {})
 
     # Si pas de résultats ET qu'on n'est pas en mode tracking, afficher un message d'erreur
     if not results and not is_tracking:
         messages.warning(
             request, "Aucun résultat disponible. Veuillez lancer un traitement batch d'abord."
         )
-        return render(request, 'pilot/batch_results.html', {'no_results': True})
+        return render(request, 'ocr/batch_results.html', {'no_results': True})
 
     # Si on est en mode tracking mais pas encore de résultats, afficher le template sans no_results
     # Le JavaScript va gérer le polling
     if is_tracking and not results:
-        return render(request, 'pilot/batch_results.html', {'no_results': False})
+        return render(request, 'ocr/batch_results.html', {'no_results': False})
 
     # Enrichir le contexte
     modeles_ocr = results.get('modeles_ocr', config.get('modeles_ocr', []))
@@ -442,4 +442,4 @@ def batch_results(request):
         'directory_results': results.get('results', []),
     }
 
-    return render(request, 'pilot/batch_results.html', context)
+    return render(request, 'ocr/batch_results.html', context)
