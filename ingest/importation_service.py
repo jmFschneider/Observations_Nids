@@ -523,18 +523,34 @@ class ImportationService:
 
     @transaction.atomic
     def finaliser_importation(self, importation_id):
+        def safe_int(val, default=None):
+            if val is None or str(val).strip().lower() in ["", "null", "none"]:
+                return default
+            try:
+                return int(float(str(val).replace(",", ".")))
+            except (ValueError, TypeError):
+                return default
+
         try:
+            logger.info(f"[DEBUT] Finalisation de l'importation {importation_id}")
             # Optimisation: précharger les relations pour éviter les requêtes N+1
             importation = (
                 ImportationEnCours.objects.select_for_update()
                 .select_related(
-                    'transcription',
-                    'espece_candidate',
-                    'espece_candidate__espece_validee',
-                    'observateur',
+                    "transcription",
+                    "espece_candidate",
+                    "espece_candidate__espece_validee",
+                    "observateur",
                 )
                 .get(id=importation_id)
             )
+
+            logger.info(f"Importation récupérée. Statut actuel: {importation.statut}")
+
+            # Vérifier que l'importation n'est pas déjà terminée
+            if importation.statut == 'complete':
+                logger.warning(f"Importation {importation_id} déjà finalisée")
+                return False, "Cette importation a déjà été finalisée"
 
             if not importation.espece_candidate or not importation.espece_candidate.espece_validee:
                 importation.statut = 'erreur'
@@ -593,10 +609,10 @@ class ImportationService:
             etat_correction.statut = 'en_cours'
             etat_correction.save()
 
-            # Mise à jour de l'objet Localisation qui existe déjà
+            # Mise à jour de l'objet Localisation (créé automatiquement ou récupéré)
             if 'localisation' in donnees:
                 loc = donnees['localisation']
-                localisation = Localisation.objects.get(fiche=fiche)
+                localisation, _ = Localisation.objects.get_or_create(fiche=fiche)
 
                 # Récupérer les données brutes
                 nom_commune = loc.get('commune') or loc.get('IGN_50000') or 'Non spécifiée'
@@ -659,20 +675,14 @@ class ImportationService:
                 localisation.alentours = loc.get('alentours') or 'Non spécifié'
                 localisation.save()
 
-            # Mise à jour de l'objet Nid qui existe déjà
+            # Mise à jour de l'objet Nid (créé automatiquement ou récupéré)
             if 'nid' in donnees:
                 nid_data = donnees['nid']
 
-                def safe_float_to_int(val):
-                    try:
-                        return int(float(str(val).replace(',', '.')))
-                    except Exception:
-                        return 0
-
-                nid = Nid.objects.get(fiche=fiche)
+                nid, _ = Nid.objects.get_or_create(fiche=fiche)
                 nid.nid_prec_t_meme_couple = bool(nid_data.get('nid_prec_t_meme_c_ple'))
-                nid.hauteur_nid = safe_float_to_int(nid_data.get('haut_nid'))
-                nid.hauteur_couvert = safe_float_to_int(nid_data.get('h_c_vert'))
+                nid.hauteur_nid = safe_int(nid_data.get('haut_nid'))
+                nid.hauteur_couvert = safe_int(nid_data.get('h_c_vert'))
                 nid.details_nid = nid_data.get('nid') or 'Aucun détail'
                 nid.save()
 
@@ -709,8 +719,8 @@ class ImportationService:
                                 fiche=fiche,
                                 date_observation=date_obs,
                                 heure_connue=heure_connue,
-                                nombre_oeufs=int(obs.get('Nombre_oeuf') or 0),
-                                nombre_poussins=int(obs.get('Nombre_pou') or 0),
+                                nombre_oeufs=safe_int(obs.get('Nombre_oeuf')),
+                                nombre_poussins=safe_int(obs.get('Nombre_pou')),
                                 observations=obs.get('observations') or '',
                             )
                         )
@@ -721,23 +731,21 @@ class ImportationService:
                 if observations_a_creer:
                     Observation.objects.bulk_create(observations_a_creer)
 
-            # Mise à jour de l'objet ResumeObservation qui existe déjà
+            # Mise à jour de l'objet ResumeObservation (créé automatiquement ou récupéré)
             if 'tableau_donnees_2' in donnees:
                 resume_data = donnees['tableau_donnees_2']
 
-                def safe_int(value):
-                    try:
-                        return int(value)
-                    except Exception:
-                        return None
-
-                resume = ResumeObservation.objects.get(fiche=fiche)
+                resume, _ = ResumeObservation.objects.get_or_create(fiche=fiche)
 
                 # Récupération des valeurs (None si pas renseigné, pas 0)
-                nombre_oeufs_pondus = safe_int(resume_data.get('nombre_oeufs', {}).get('pondus'))
-                nombre_oeufs_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('eclos'))
-                nombre_oeufs_non_eclos = safe_int(resume_data.get('nombre_oeufs', {}).get('n_ecl'))
-                nombre_poussins = safe_int(resume_data.get('nombre_poussins', {}).get('vol_t'))
+                # Sécurisation de l'accès aux dictionnaires imbriqués
+                nombre_oeufs_dict = resume_data.get('nombre_oeufs') or {}
+                nombre_poussins_dict = resume_data.get('nombre_poussins') or {}
+
+                nombre_oeufs_pondus = safe_int(nombre_oeufs_dict.get('pondus'))
+                nombre_oeufs_eclos = safe_int(nombre_oeufs_dict.get('eclos'))
+                nombre_oeufs_non_eclos = safe_int(nombre_oeufs_dict.get('n_ecl'))
+                nombre_poussins = safe_int(nombre_poussins_dict.get('vol_t'))
 
                 # Log des valeurs pour debugging
                 logger.info(
@@ -776,24 +784,17 @@ class ImportationService:
                     )
 
                 # Attribution des valeurs validées
-                resume.premier_oeuf_pondu_jour = safe_int(
-                    resume_data.get('1er_o_pondu', {}).get('jour')
-                )
-                resume.premier_oeuf_pondu_mois = safe_int(
-                    resume_data.get('1er_o_pondu', {}).get('Mois')
-                )
-                resume.premier_poussin_eclos_jour = safe_int(
-                    resume_data.get('1er_p_eclos', {}).get('jour')
-                )
-                resume.premier_poussin_eclos_mois = safe_int(
-                    resume_data.get('1er_p_eclos', {}).get('Mois')
-                )
-                resume.premier_poussin_volant_jour = safe_int(
-                    resume_data.get('1er_p_volant', {}).get('jour')
-                )
-                resume.premier_poussin_volant_mois = safe_int(
-                    resume_data.get('1er_p_volant', {}).get('Mois')
-                )
+                # Sécurisation de l'accès aux dictionnaires imbriqués
+                premier_oeuf_dict = resume_data.get('1er_o_pondu') or {}
+                premier_poussin_eclos_dict = resume_data.get('1er_p_eclos') or {}
+                premier_poussin_volant_dict = resume_data.get('1er_p_volant') or {}
+
+                resume.premier_oeuf_pondu_jour = safe_int(premier_oeuf_dict.get('jour'))
+                resume.premier_oeuf_pondu_mois = safe_int(premier_oeuf_dict.get('Mois'))
+                resume.premier_poussin_eclos_jour = safe_int(premier_poussin_eclos_dict.get('jour'))
+                resume.premier_poussin_eclos_mois = safe_int(premier_poussin_eclos_dict.get('Mois'))
+                resume.premier_poussin_volant_jour = safe_int(premier_poussin_volant_dict.get('jour'))
+                resume.premier_poussin_volant_mois = safe_int(premier_poussin_volant_dict.get('Mois'))
                 resume.nombre_oeufs_pondus = nombre_oeufs_pondus
                 resume.nombre_oeufs_eclos = nombre_oeufs_eclos
                 resume.nombre_oeufs_non_eclos = nombre_oeufs_non_eclos
@@ -802,19 +803,25 @@ class ImportationService:
                 resume.save()
                 logger.info(f"Fiche {fiche.num_fiche}: Résumé sauvegardé avec succès")
 
-            # Mise à jour de l'objet CausesEchec qui existe déjà
+            # Mise à jour de l'objet CausesEchec (créé automatiquement ou récupéré)
             if 'causes_echec' in donnees:
-                causes_echec = CausesEchec.objects.get(fiche=fiche)
+                causes_echec, _ = CausesEchec.objects.get_or_create(fiche=fiche)
                 causes_echec.description = donnees['causes_echec'].get('causes_d_echec') or ''
                 causes_echec.save()
 
             # Ajout d'une remarque si présente dans les données
             if 'remarque' in donnees and donnees['remarque']:
-                Remarque.objects.create(fiche=fiche, texte=donnees['remarque'])
+                Remarque.objects.create(fiche=fiche, remarque=donnees['remarque'])
 
             # Marquer l'importation comme terminée
-            importation.statut = 'termine'
+            logger.info(f"Mise à jour du statut de l'importation {importation_id} vers 'complete'")
+            importation.statut = 'complete'
             importation.save()
+            logger.info(f"Statut sauvegardé. Valeur après save: {importation.statut}")
+
+            # Vérification immédiate en base
+            importation.refresh_from_db()
+            logger.info(f"Statut après refresh_from_db: {importation.statut}")
 
             # Marquer la transcription comme traitée
             importation.transcription.traite = True
