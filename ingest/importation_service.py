@@ -522,6 +522,256 @@ class ImportationService:
         return importations_creees
 
     @transaction.atomic
+    def traiter_fichier_json(self, fichier_source, repertoire=None):  # noqa: PLR0911
+        """
+        Méthode unifiée pour traiter un fichier JSON de bout en bout :
+        1. Importer le JSON → TranscriptionBrute
+        2. Extraire et matcher l'espèce (avec fallback sur placeholders)
+        3. Créer/récupérer l'utilisateur
+        4. Créer ImportationEnCours
+        5. Créer la FicheObservation immédiatement
+
+        Args:
+            fichier_source: Nom du fichier JSON (ex: "Image_1_result.json")
+            repertoire: Chemin relatif du répertoire contenant le JSON (ex: "2025/batch_001")
+
+        Returns:
+            dict: {
+                'success': bool,
+                'message': str,
+                'fiche_id': int (si success=True),
+                'transcription_id': int,
+                'importation_id': int (si créé)
+            }
+        """
+        try:
+            logger.info(f"[DEBUT] Traitement unifié du fichier {fichier_source}")
+
+            # ÉTAPE 1 : Importer le JSON dans TranscriptionBrute (si pas déjà fait)
+            transcription = TranscriptionBrute.objects.filter(fichier_source=fichier_source).first()
+
+            if not transcription:
+                # Le fichier n'a pas encore été importé, on le crée
+                if not repertoire:
+                    return {
+                        'success': False,
+                        'message': f"Le fichier {fichier_source} n'existe pas en base et aucun répertoire n'a été spécifié pour l'importer",
+                    }
+
+                chemin_complet = os.path.join(
+                    settings.MEDIA_ROOT, 'transcription_results', repertoire, fichier_source
+                )
+
+                if not os.path.exists(chemin_complet):
+                    return {
+                        'success': False,
+                        'message': f"Le fichier {chemin_complet} n'existe pas sur le disque",
+                    }
+
+                # Lire et parser le JSON
+                with open(chemin_complet, encoding='utf-8') as f:
+                    contenu = f.read()
+
+                # Supprimer les marqueurs Markdown si présents
+                if contenu.startswith('```json') and contenu.endswith('```'):
+                    contenu = contenu[7:-3].strip()
+
+                try:
+                    contenu_json = json.loads(contenu)
+                except json.JSONDecodeError as e:
+                    return {
+                        'success': False,
+                        'message': f"Erreur de format JSON dans {fichier_source}: {str(e)}",
+                    }
+
+                # Créer la transcription
+                transcription = TranscriptionBrute.objects.create(
+                    fichier_source=fichier_source, json_brut=contenu_json
+                )
+                logger.info(f"TranscriptionBrute créée : {transcription.id}")
+            else:
+                logger.info(f"TranscriptionBrute existante : {transcription.id}")
+
+            # ÉTAPE 2 : Extraire et matcher l'espèce
+            donnees = transcription.json_brut
+            espece_candidate = None
+
+            # Récupérer les espèces placeholder
+            try:
+                espece_a_determiner = Espece.objects.get(code_gonm='INDET', valide_par_admin=True)
+            except Espece.DoesNotExist:
+                return {
+                    'success': False,
+                    'message': "L'espèce placeholder 'Espèce à déterminer' (INDET) n'existe pas en base. Veuillez la créer d'abord.",
+                }
+
+            try:
+                espece_absente = Espece.objects.get(code_gonm='ABSENT', valide_par_admin=True)
+            except Espece.DoesNotExist:
+                return {
+                    'success': False,
+                    'message': "L'espèce placeholder 'Espèce absente' (ABSENT) n'existe pas en base. Veuillez la créer d'abord.",
+                }
+
+            if 'informations_generales' in donnees:
+                info_gen = donnees['informations_generales']
+                nom_espece = info_gen.get('espece', '')
+                code_gonm = info_gen.get('n_espece', '')
+
+                # CAS 1 : Nom d'espèce présent
+                if nom_espece and isinstance(nom_espece, str) and nom_espece.strip():
+                    # Créer/récupérer l'EspeceCandidate
+                    espece_candidate, created = EspeceCandidate.objects.get_or_create(
+                        nom_transcrit=nom_espece,
+                        defaults={
+                            'code_gonm_transcrit': code_gonm if isinstance(code_gonm, str) else ''
+                        },
+                    )
+
+                    # Mettre à jour le code GONM si nécessaire
+                    if (
+                        not created
+                        and code_gonm
+                        and isinstance(code_gonm, str)
+                        and not espece_candidate.code_gonm_transcrit
+                    ):
+                        espece_candidate.code_gonm_transcrit = code_gonm
+                        espece_candidate.save()
+
+                    # Tenter le matching automatique si pas déjà fait
+                    if not espece_candidate.espece_validee:
+                        self._trouver_correspondance_espece(espece_candidate)
+                        espece_candidate.refresh_from_db()
+
+                    # Si toujours pas trouvé, utiliser le placeholder "à déterminer"
+                    if not espece_candidate.espece_validee:
+                        espece_candidate.espece_validee = espece_a_determiner
+                        espece_candidate.save()
+                        logger.info(
+                            f"Espèce '{nom_espece}' non reconnue → placeholder 'Espèce à déterminer'"
+                        )
+
+                # CAS 2 : Pas de nom mais code GONM présent
+                elif code_gonm and isinstance(code_gonm, str) and code_gonm.strip():
+                    try:
+                        espece_bdd = Espece.objects.get(
+                            code_gonm__iexact=code_gonm, valide_par_admin=True
+                        )
+
+                        # Créer EspeceCandidate avec le nom officiel
+                        espece_candidate, created = EspeceCandidate.objects.get_or_create(
+                            nom_transcrit=espece_bdd.nom,
+                            defaults={'code_gonm_transcrit': code_gonm},
+                        )
+
+                        if not espece_candidate.espece_validee:
+                            espece_candidate.espece_validee = espece_bdd
+                            espece_candidate.score_similarite = 100.0
+                            espece_candidate.save()
+
+                        logger.info(
+                            f"Espèce identifiée par code GONM '{code_gonm}': {espece_bdd.nom}"
+                        )
+
+                    except Espece.DoesNotExist:
+                        # Code GONM inconnu → créer candidate avec placeholder
+                        espece_candidate, created = EspeceCandidate.objects.get_or_create(
+                            nom_transcrit=f"[Code GONM: {code_gonm}]",
+                            defaults={'code_gonm_transcrit': code_gonm},
+                        )
+                        espece_candidate.espece_validee = espece_a_determiner
+                        espece_candidate.save()
+                        logger.warning(
+                            f"Code GONM '{code_gonm}' introuvable → placeholder 'Espèce à déterminer'"
+                        )
+
+                    except Espece.MultipleObjectsReturned:
+                        logger.error(f"Plusieurs espèces avec code GONM '{code_gonm}'")
+                        return {
+                            'success': False,
+                            'message': f"Plusieurs espèces trouvées avec le code GONM '{code_gonm}'",
+                        }
+
+                # CAS 3 : Ni nom ni code → espèce absente
+                else:
+                    espece_candidate, created = EspeceCandidate.objects.get_or_create(
+                        nom_transcrit="[Espèce absente]", defaults={'code_gonm_transcrit': ''}
+                    )
+                    espece_candidate.espece_validee = espece_absente
+                    espece_candidate.save()
+                    logger.info("Aucune espèce transcrite → placeholder 'Espèce absente'")
+            else:
+                # Pas d'informations générales → espèce absente
+                espece_candidate, created = EspeceCandidate.objects.get_or_create(
+                    nom_transcrit="[Espèce absente]", defaults={'code_gonm_transcrit': ''}
+                )
+                espece_candidate.espece_validee = espece_absente
+                espece_candidate.save()
+                logger.info(
+                    "Section 'informations_generales' absente → placeholder 'Espèce absente'"
+                )
+
+            # ÉTAPE 3 : Créer/récupérer l'utilisateur
+            utilisateur = None
+            if (
+                'informations_generales' in donnees
+                and 'observateur' in donnees['informations_generales']
+            ):
+                nom_observateur = donnees['informations_generales']['observateur']
+                utilisateur = self.creer_ou_recuperer_utilisateur(nom_observateur)
+            else:
+                # Pas d'observateur → créer un observateur par défaut
+                utilisateur = self.creer_ou_recuperer_utilisateur("")
+
+            # ÉTAPE 4 : Créer ImportationEnCours (si n'existe pas déjà)
+            importation, created = ImportationEnCours.objects.get_or_create(
+                transcription=transcription,
+                defaults={
+                    'espece_candidate': espece_candidate,
+                    'observateur': utilisateur,
+                    'statut': 'en_attente',
+                },
+            )
+
+            if not created:
+                # Mettre à jour si nécessaire
+                importation.espece_candidate = espece_candidate
+                importation.observateur = utilisateur
+                importation.statut = 'en_attente'
+                importation.save()
+                logger.info(f"ImportationEnCours existante mise à jour : {importation.id}")
+            else:
+                logger.info(f"ImportationEnCours créée : {importation.id}")
+
+            # ÉTAPE 5 : Finaliser l'importation (créer la fiche)
+            success, message = self.finaliser_importation(importation.id)
+
+            if success:
+                importation.refresh_from_db()
+                return {
+                    'success': True,
+                    'message': message,
+                    'fiche_id': importation.fiche_observation.num_fiche
+                    if importation.fiche_observation
+                    else None,
+                    'transcription_id': transcription.id,
+                    'importation_id': importation.id,
+                }
+            else:
+                return {
+                    'success': False,
+                    'message': message,
+                    'transcription_id': transcription.id,
+                    'importation_id': importation.id,
+                }
+
+        except Exception as e:
+            logger.error(
+                f"Erreur lors du traitement unifié de {fichier_source}: {str(e)}", exc_info=True
+            )
+            return {'success': False, 'message': f"Erreur lors du traitement: {str(e)}"}
+
+    @transaction.atomic
     def finaliser_importation(self, importation_id):
         def safe_int(val, default=None):
             if val is None or str(val).strip().lower() in ["", "null", "none"]:
@@ -793,8 +1043,12 @@ class ImportationService:
                 resume.premier_oeuf_pondu_mois = safe_int(premier_oeuf_dict.get('Mois'))
                 resume.premier_poussin_eclos_jour = safe_int(premier_poussin_eclos_dict.get('jour'))
                 resume.premier_poussin_eclos_mois = safe_int(premier_poussin_eclos_dict.get('Mois'))
-                resume.premier_poussin_volant_jour = safe_int(premier_poussin_volant_dict.get('jour'))
-                resume.premier_poussin_volant_mois = safe_int(premier_poussin_volant_dict.get('Mois'))
+                resume.premier_poussin_volant_jour = safe_int(
+                    premier_poussin_volant_dict.get('jour')
+                )
+                resume.premier_poussin_volant_mois = safe_int(
+                    premier_poussin_volant_dict.get('Mois')
+                )
                 resume.nombre_oeufs_pondus = nombre_oeufs_pondus
                 resume.nombre_oeufs_eclos = nombre_oeufs_eclos
                 resume.nombre_oeufs_non_eclos = nombre_oeufs_non_eclos

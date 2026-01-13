@@ -20,6 +20,7 @@ urlpatterns = [
     path('liste-preparations/', preparation.liste_preparations_view, name='liste_preparations'),
     path('preparer/', importation.preparer_importations, name='preparer_importations'),
     path('importer-json/', importation.importer_json, name='importer_json'),
+    path('importer-json-batch/', importation.importer_json_batch, name='importer_json_batch'),
     path('extraire-candidats/', importation.extraire_candidats, name='extraire_candidats'),
     # Gestion des espèces candidates
     path('especes/', especes.liste_especes_candidates, name='liste_especes_candidates'),

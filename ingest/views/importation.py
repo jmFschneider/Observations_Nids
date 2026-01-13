@@ -341,3 +341,163 @@ def reinitialiser_toutes_importations(request):
             messages.info(request, "Aucune importation n'a été réinitialisée")
 
     return redirect('ingest:liste_importations')
+
+
+@login_required
+@user_passes_test(peut_transcrire)
+def importer_json_batch(request):
+    """
+    Vue pour importer et traiter des fichiers JSON en une seule étape (workflow unifié).
+
+    Cette vue utilise la méthode traiter_fichier_json() qui :
+    - Importe le JSON
+    - Matche l'espèce (avec fallback sur placeholders)
+    - Crée l'utilisateur
+    - Crée la fiche immédiatement
+    """
+    # Répertoire de base : MEDIA_ROOT/transcription_results/
+    base_dir = os.path.join(settings.MEDIA_ROOT, 'transcription_results')
+
+    # Vérifier si le répertoire existe
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir, exist_ok=True)
+        logger.info(f"Répertoire créé: {base_dir}")
+
+    # Récupérer le chemin actuel depuis les paramètres GET
+    current_path = request.GET.get('path', '')
+
+    # Sécurité : normaliser le chemin
+    safe_path = current_path.replace('\\', '/').replace('..', '').strip('/')
+    full_current_path = os.path.join(base_dir, safe_path.replace('/', os.sep))
+
+    # Vérifier que le chemin est dans le répertoire de base
+    if not full_current_path.startswith(base_dir):
+        safe_path = ''
+        full_current_path = base_dir
+
+    # Récupérer la liste des sous-répertoires avec statistiques
+    directories = []
+    try:
+        dir_list = [
+            d
+            for d in os.listdir(full_current_path)
+            if os.path.isdir(os.path.join(full_current_path, d))
+        ]
+
+        for dir_name in dir_list:
+            dir_path = os.path.join(full_current_path, dir_name)
+
+            try:
+                # Compter les sous-répertoires
+                subdirs_count = len(
+                    [d for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))]
+                )
+
+                # Compter les fichiers JSON
+                json_count = len(
+                    [
+                        f
+                        for f in os.listdir(dir_path)
+                        if os.path.isfile(os.path.join(dir_path, f)) and f.lower().endswith('.json')
+                    ]
+                )
+
+                directories.append(
+                    {
+                        'name': dir_name,
+                        'subdirs_count': subdirs_count,
+                        'json_count': json_count,
+                    }
+                )
+            except (OSError, PermissionError):
+                directories.append(
+                    {
+                        'name': dir_name,
+                        'subdirs_count': 0,
+                        'json_count': 0,
+                    }
+                )
+
+        directories.sort(key=lambda x: str(x['name']).lower())
+    except (OSError, PermissionError):
+        directories = []
+        messages.error(request, "Impossible d'accéder à ce répertoire")
+        safe_path = ''
+        full_current_path = base_dir
+
+    # Créer le fil d'Ariane
+    breadcrumb = []
+    if safe_path:
+        parts = safe_path.replace('\\', '/').split('/')
+        current = ''
+        for part in parts:
+            if part:
+                current = f"{current}/{part}" if current else part
+                breadcrumb.append({'name': part, 'path': current})
+
+    # Compter les fichiers JSON dans le répertoire actuel
+    try:
+        fichiers_json = [
+            f
+            for f in os.listdir(full_current_path)
+            if os.path.isfile(os.path.join(full_current_path, f)) and f.lower().endswith('.json')
+        ]
+        json_count = len(fichiers_json)
+    except (OSError, PermissionError):
+        fichiers_json = []
+        json_count = 0
+
+    # Traitement du formulaire POST
+    if request.method == 'POST':
+        repertoire = request.POST.get('repertoire')
+        if not repertoire:
+            messages.error(request, "Veuillez sélectionner un répertoire")
+            return redirect('ingest:importer_json_batch')
+
+        service = ImportationService()
+
+        # Compter les résultats
+        success_count = 0
+        error_count = 0
+        fiches_creees = []
+        erreurs = []
+
+        # Traiter chaque fichier JSON
+        for fichier in fichiers_json:
+            resultat = service.traiter_fichier_json(fichier, repertoire)
+
+            if resultat['success']:
+                success_count += 1
+                fiches_creees.append({'fichier': fichier, 'fiche_id': resultat.get('fiche_id')})
+                logger.info(f"✓ {fichier} → Fiche {resultat.get('fiche_id')} créée")
+            else:
+                error_count += 1
+                erreurs.append({'fichier': fichier, 'message': resultat['message']})
+                logger.error(f"✗ {fichier} → Erreur: {resultat['message']}")
+
+        # Afficher les messages de résultat
+        if success_count > 0:
+            messages.success(request, f"✅ {success_count} fiche(s) créée(s) avec succès")
+
+        if error_count > 0:
+            messages.warning(request, f"⚠️ {error_count} erreur(s) - Voir les détails ci-dessous")
+            for erreur in erreurs[:5]:  # Limiter à 5 messages d'erreur
+                messages.error(request, f"{erreur['fichier']}: {erreur['message']}")
+
+        return redirect('ingest:accueil_importation')
+
+    # Calculer le chemin parent
+    parent_path = None
+    if safe_path:
+        path_parts = safe_path.replace('\\', '/').split('/')
+        parent_path = '/'.join(path_parts[:-1]) if len(path_parts) > 1 else ''
+
+    context = {
+        'directories': directories,
+        'current_path': safe_path,
+        'breadcrumb': breadcrumb,
+        'json_count': json_count,
+        'parent_path': parent_path,
+    }
+
+    return render(request, 'ingest/importer_json_batch.html', context)
