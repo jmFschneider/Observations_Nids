@@ -16,7 +16,7 @@ set -e
 # Base source (OCR - anciennement Pilote)
 # Note: Les répertoires et noms de bases peuvent encore contenir "pilote" dans leur nom
 OCR_DB_NAME="pilote_observations_nids"
-OCR_PROJECT_DIR="/var/www/observations_nids_pilote"
+OCR_PROJECT_DIR="/opt/observations_nids_pilote"
 
 # Base destination (Dev Docker)
 DEV_DOCKER_DIR="/opt/observations_nids_pilote/docker"
