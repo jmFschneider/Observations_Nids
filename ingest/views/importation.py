@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from ingest.importation_service import ImportationService
-from ingest.models import ImportationEnCours
+from ingest.models import ImportationEnCours, TranscriptionBrute
 
 from .auth import peut_transcrire
 
@@ -459,11 +459,18 @@ def importer_json_batch(request):
         # Compter les résultats
         success_count = 0
         error_count = 0
+        ignored_count = 0
         fiches_creees = []
         erreurs = []
 
         # Traiter chaque fichier JSON
         for fichier in fichiers_json:
+            # Éviter les doublons : si la transcription existe déjà, ignorer
+            if TranscriptionBrute.objects.filter(fichier_source=fichier).exists():
+                ignored_count += 1
+                logger.info(f"✗ {fichier} ignoré (déjà importé)")
+                continue
+
             resultat = service.traiter_fichier_json(fichier, repertoire)
 
             if resultat['success']:
@@ -478,6 +485,12 @@ def importer_json_batch(request):
         # Afficher les messages de résultat
         if success_count > 0:
             messages.success(request, f"✅ {success_count} fiche(s) créée(s) avec succès")
+
+        if ignored_count > 0:
+            messages.info(
+                request,
+                f"ℹ️ {ignored_count} fichier(s) ignoré(s) (déjà importés)",
+            )
 
         if error_count > 0:
             messages.warning(request, f"⚠️ {error_count} erreur(s) - Voir les détails ci-dessous")

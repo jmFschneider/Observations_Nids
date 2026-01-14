@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import logging
 import os
 from pathlib import Path
 from types import ModuleType
@@ -245,6 +246,38 @@ try:
 except Exception:
     pass
 
+# Handler personnalisé pour console avec support UTF-8 sur Windows
+
+
+class UTF8StreamHandler(logging.StreamHandler):
+    """StreamHandler qui force l'encodage UTF-8 pour éviter les erreurs Unicode sur Windows"""
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            stream = self.stream
+
+            # Ne pas wrapper le stream système, gérer l'encodage dans emit seulement
+            try:
+                # Essayer d'écrire directement
+                stream.write(msg + self.terminator)
+                self.flush()
+            except UnicodeEncodeError:
+                # Si échec d'encodage (Windows cp1252), utiliser le buffer avec UTF-8
+                if hasattr(stream, 'buffer'):
+                    # Écrire directement dans le buffer avec UTF-8
+                    encoded_msg = (msg + self.terminator).encode('utf-8', errors='replace')
+                    stream.buffer.write(encoded_msg)
+                    stream.buffer.flush()
+                else:
+                    # Fallback : remplacer les caractères non-ASCII
+                    safe_msg = msg.encode('ascii', errors='replace').decode('ascii')
+                    stream.write(safe_msg + self.terminator)
+                    self.flush()
+        except Exception:
+            self.handleError(record)
+
+
 LOGGING: dict[str, Any] = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -266,10 +299,11 @@ LOGGING: dict[str, Any] = {
             'maxBytes': 5 * 1024 * 1024,
             'backupCount': 5,
             'formatter': 'verbose',
+            'encoding': 'utf-8',  # Support Unicode (œ, é, etc.)
         },
         'console': {
             'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
+            '()': UTF8StreamHandler,  # Handler personnalisé avec support UTF-8
             'formatter': 'simple',
         },
     },

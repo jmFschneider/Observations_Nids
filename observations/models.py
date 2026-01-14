@@ -286,7 +286,7 @@ class CausesEchec(models.Model):
 
 class Remarque(models.Model):
     fiche = models.ForeignKey(FicheObservation, on_delete=models.CASCADE, related_name="remarques")
-    remarque = models.CharField(max_length=200, blank=True, default='')
+    remarque = models.TextField(blank=True, default='')  # Changé de CharField à TextField
     date_remarque = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
