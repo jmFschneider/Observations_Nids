@@ -17,6 +17,9 @@ set -e
 # Note: Les répertoires et noms de bases peuvent encore contenir "pilote" dans leur nom
 OCR_DB_NAME="pilote_observations_nids"
 OCR_PROJECT_DIR="/opt/observations_nids_pilote"
+OCR_DOCKER_DIR="/opt/observations_nids_pilote/docker"
+OCR_CONTAINER_WEB="observations_web"
+OCR_CONTAINER_DB="observations_db"
 
 # Base destination (Dev Docker)
 DEV_DOCKER_DIR="/opt/observations_nids_pilote/docker"
@@ -46,17 +49,17 @@ echo ""
 # --- 1. Vérification de la concordance des schémas ---
 echo "--- 1. Vérification de la concordance des schémas via les migrations ---"
 
-# Migrations OCR
-if [ -d "$OCR_PROJECT_DIR" ]; then
-    (cd "$OCR_PROJECT_DIR" && python3 manage.py showmigrations | grep '\[X\]') > "$OCR_MIGRATIONS_LIST"
+# Migrations OCR (depuis Docker)
+if [ -d "$OCR_DOCKER_DIR" ]; then
+    (cd "$OCR_DOCKER_DIR" && docker compose exec -T "$OCR_CONTAINER_WEB" python manage.py showmigrations | grep '\[X\]') > "$OCR_MIGRATIONS_LIST"
 else
-    echo "ERREUR: Répertoire OCR introuvable: $OCR_PROJECT_DIR"
-    echo "Modifiez la variable OCR_PROJECT_DIR dans le script"
+    echo "ERREUR: Répertoire Docker OCR introuvable: $OCR_DOCKER_DIR"
+    echo "Modifiez la variable OCR_DOCKER_DIR dans le script"
     exit 1
 fi
 
 # Migrations Dev (Docker)
-docker exec "$DEV_CONTAINER_WEB" python manage.py showmigrations | grep '\[X\]' > "$DEV_MIGRATIONS_LIST"
+(cd "$DEV_DOCKER_DIR" && docker compose exec -T "$DEV_CONTAINER_WEB" python manage.py showmigrations | grep '\[X\]') > "$DEV_MIGRATIONS_LIST"
 
 # Comparaison
 if ! diff -q "$OCR_MIGRATIONS_LIST" "$DEV_MIGRATIONS_LIST" > /dev/null 2>&1; then
@@ -129,9 +132,10 @@ echo "✓ Sauvegarde créée: $BACKUP_FILE"
 # --- 5. Export de la base OCR ---
 echo ""
 echo "--- 5. Export de la base OCR ($OCR_DB_NAME)... ---"
-mysqldump --single-transaction --routines --triggers \
+(cd "$OCR_DOCKER_DIR" && docker compose exec -T "$OCR_CONTAINER_DB" mysqldump \
+    --single-transaction --routines --triggers \
     $EXCLUDE_TABLES \
-    "$OCR_DB_NAME" > "$DUMP_FILE"
+    "$OCR_DB_NAME") > "$DUMP_FILE"
 echo "✓ Export terminé: $DUMP_FILE"
 
 # --- 6. Import dans la base Dev (Docker) ---
