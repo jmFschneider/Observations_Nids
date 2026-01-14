@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 
@@ -59,6 +60,18 @@ def accueil_importation(request):
     )
     transcriptions_non_traitees = transcriptions_a_preparer.count()
     especes_non_validees = especes_candidates - especes_validees
+
+    # Récupérer les messages batch depuis la session (si présents)
+    if 'batch_success_message' in request.session:
+        messages.success(request, request.session.pop('batch_success_message'))
+    if 'batch_info_message' in request.session:
+        messages.info(request, request.session.pop('batch_info_message'))
+    if 'batch_warning_message' in request.session:
+        messages.warning(request, request.session.pop('batch_warning_message'))
+    if 'batch_errors' in request.session:
+        erreurs = request.session.pop('batch_errors')
+        for erreur in erreurs:
+            messages.error(request, f"{erreur.get('fichier', 'Fichier')}: {erreur.get('message', 'Erreur inconnue')}")
 
     context = {
         'total_transcriptions': total_transcriptions,

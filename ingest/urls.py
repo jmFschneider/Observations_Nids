@@ -21,6 +21,8 @@ urlpatterns = [
     path('preparer/', importation.preparer_importations, name='preparer_importations'),
     path('importer-json/', importation.importer_json, name='importer_json'),
     path('importer-json-batch/', importation.importer_json_batch, name='importer_json_batch'),
+    path('batch-progress/', importation.batch_progress, name='batch_progress'),
+    path('check-batch-progress/', importation.check_batch_progress, name='check_batch_progress'),
     path('extraire-candidats/', importation.extraire_candidats, name='extraire_candidats'),
     # Gestion des espèces candidates
     path('especes/', especes.liste_especes_candidates, name='liste_especes_candidates'),

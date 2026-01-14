@@ -1,16 +1,20 @@
 import json
 import logging
 import os
+from typing import Any, cast
 
+from celery.result import AsyncResult
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from ingest.importation_service import ImportationService
 from ingest.models import ImportationEnCours, TranscriptionBrute
+from ingest.tasks import process_json_batch_task
 
 from .auth import peut_transcrire
 
@@ -454,50 +458,17 @@ def importer_json_batch(request):
             messages.error(request, "Veuillez sélectionner un répertoire")
             return redirect('ingest:importer_json_batch')
 
-        service = ImportationService()
+        # Lancer la tâche Celery en arrière-plan
+        task = process_json_batch_task.delay(fichiers_json, repertoire)
+        task_id = task.id
 
-        # Compter les résultats
-        success_count = 0
-        error_count = 0
-        ignored_count = 0
-        fiches_creees = []
-        erreurs = []
+        # Stocker le task_id en session pour récupération ultérieure
+        request.session['ingest_batch_task_id'] = task_id
 
-        # Traiter chaque fichier JSON
-        for fichier in fichiers_json:
-            # Éviter les doublons : si la transcription existe déjà, ignorer
-            if TranscriptionBrute.objects.filter(fichier_source=fichier).exists():
-                ignored_count += 1
-                logger.info(f"✗ {fichier} ignoré (déjà importé)")
-                continue
+        logger.info(f"Tâche batch lancée: {task_id} pour {len(fichiers_json)} fichier(s)")
 
-            resultat = service.traiter_fichier_json(fichier, repertoire)
-
-            if resultat['success']:
-                success_count += 1
-                fiches_creees.append({'fichier': fichier, 'fiche_id': resultat.get('fiche_id')})
-                logger.info(f"✓ {fichier} → Fiche {resultat.get('fiche_id')} créée")
-            else:
-                error_count += 1
-                erreurs.append({'fichier': fichier, 'message': resultat['message']})
-                logger.error(f"✗ {fichier} → Erreur: {resultat['message']}")
-
-        # Afficher les messages de résultat
-        if success_count > 0:
-            messages.success(request, f"✅ {success_count} fiche(s) créée(s) avec succès")
-
-        if ignored_count > 0:
-            messages.info(
-                request,
-                f"ℹ️ {ignored_count} fichier(s) ignoré(s) (déjà importés)",
-            )
-
-        if error_count > 0:
-            messages.warning(request, f"⚠️ {error_count} erreur(s) - Voir les détails ci-dessous")
-            for erreur in erreurs[:5]:  # Limiter à 5 messages d'erreur
-                messages.error(request, f"{erreur['fichier']}: {erreur['message']}")
-
-        return redirect('ingest:accueil_importation')
+        # Rediriger vers la page de progression
+        return redirect('ingest:batch_progress')
 
     # Calculer le chemin parent
     parent_path = None
@@ -514,3 +485,117 @@ def importer_json_batch(request):
     }
 
     return render(request, 'ingest/importer_json_batch.html', context)
+
+
+@login_required
+@user_passes_test(peut_transcrire)
+def check_batch_progress(request):
+    """
+    Endpoint AJAX pour vérifier la progression du traitement batch.
+    """
+    task_id = request.session.get('ingest_batch_task_id')
+    if not task_id:
+        logger.warning("check_batch_progress called with no task_id in session")
+        return JsonResponse({'status': 'NO_TASK'})
+
+    result = AsyncResult(task_id)
+    logger.debug(f"check_batch_progress for task {task_id}: status={result.status}")
+
+    response: dict[str, Any] = {
+        'status': result.status,
+        'task_id': task_id,
+    }
+
+    if result.status == 'PENDING':
+        response['message'] = 'Tâche en attente de démarrage...'
+        response['percent'] = 0
+
+    elif result.status in ('STARTED', 'RETRY', 'PROGRESS'):
+        raw_info: Any = result.info
+        info: dict = cast(dict, raw_info if isinstance(raw_info, dict) else {})
+
+        total = int(info.get('total', 0) or 0)
+        processed = int(info.get('processed', 0) or 0)
+        success_count = int(info.get('success_count', 0) or 0)
+        error_count = int(info.get('error_count', 0) or 0)
+        ignored_count = int(info.get('ignored_count', 0) or 0)
+
+        response['percent'] = int((processed / total) * 100) if total > 0 else 0
+        response['processed'] = processed
+        response['total'] = total
+        response['success_count'] = success_count
+        response['error_count'] = error_count
+        response['ignored_count'] = ignored_count
+        response['current_file'] = info.get('current_file', '')
+        response['message'] = f"Traitement en cours... ({processed}/{total})"
+        response['logs'] = info.get('logs', [])
+
+    elif result.status == 'SUCCESS':
+        raw_ok: Any = result.result
+        ok: dict = cast(dict, raw_ok if isinstance(raw_ok, dict) else {})
+
+        response.update(ok)
+        response['percent'] = 100
+
+        success_count = ok.get('success_count', 0)
+        ignored_count = ok.get('ignored_count', 0)
+        error_count = ok.get('error_count', 0)
+
+        response['message'] = f"✅ Traitement terminé: {success_count} réussis, {ignored_count} ignorés, {error_count} erreurs"
+
+        # Stocker les messages dans la session pour affichage après redirection
+        if success_count > 0:
+            request.session['batch_success_message'] = f"✅ {success_count} fiche(s) créée(s) avec succès"
+
+        if ignored_count > 0:
+            request.session['batch_info_message'] = f"ℹ️ {ignored_count} fichier(s) ignoré(s) (déjà importés)"
+
+        if error_count > 0:
+            request.session['batch_warning_message'] = f"⚠️ {error_count} erreur(s)"
+            # Stocker les premières erreurs pour affichage
+            erreurs = ok.get('erreurs', [])[:5]
+            if erreurs:
+                request.session['batch_errors'] = erreurs
+
+        # Nettoyer le task_id de la session
+        if 'ingest_batch_task_id' in request.session:
+            del request.session['ingest_batch_task_id']
+
+        # Redirection vers la page d'accueil
+        response['redirect'] = '/ingest/'
+        response['force_redirect'] = True
+        logger.info(f"Task {task_id} completed. Sending redirect to accueil")
+
+    elif result.status == 'FAILURE':
+        response['percent'] = 0
+        response['error'] = str(result.result)
+        response['message'] = "Une erreur s'est produite lors du traitement batch."
+        logger.error(f"Task {task_id} failed: {result.result}")
+
+        # Nettoyer le task_id de la session
+        if 'ingest_batch_task_id' in request.session:
+            del request.session['ingest_batch_task_id']
+
+    else:
+        response['message'] = f"État de tâche : {result.status}"
+        response['percent'] = 0
+
+    logger.debug(f"check_batch_progress response for task {task_id}: {response}")
+    return JsonResponse(response)
+
+
+@login_required
+@user_passes_test(peut_transcrire)
+def batch_progress(request):
+    """
+    Page d'affichage de la progression du traitement batch.
+    """
+    task_id = request.session.get('ingest_batch_task_id')
+    if not task_id:
+        messages.warning(request, "Aucune tâche batch en cours")
+        return redirect('ingest:accueil_importation')
+
+    context = {
+        'task_id': task_id,
+    }
+    return render(request, 'ingest/batch_progress.html', context)
