@@ -40,6 +40,16 @@
                                     <td>{{ espece.nom_anglais|default:"-" }}</td>
                                 </tr>
                                 <tr>
+                                    <th>Code GONM</th>
+                                    <td>
+                                        {% if espece.code_gonm %}
+                                        <span class="badge bg-secondary">{{ espece.code_gonm }}</span>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
                                     <th>Famille</th>
                                     <td>{{ espece.famille.nom|default:"-" }}</td>
                                 </tr>

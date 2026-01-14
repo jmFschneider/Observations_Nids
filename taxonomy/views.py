@@ -24,6 +24,7 @@ def liste_especes(request):
     """Liste paginée des espèces avec recherche et filtres."""
     # Récupérer les paramètres de recherche et filtrage
     search_query = request.GET.get('q', '')
+    code_gonm_filter = request.GET.get('code_gonm', '')
     famille_filter = request.GET.get('famille', '')
     ordre_filter = request.GET.get('ordre', '')
     statut_filter = request.GET.get('statut', '')
@@ -40,6 +41,8 @@ def liste_especes(request):
         )
 
     # Appliquer les filtres
+    if code_gonm_filter:
+        especes = especes.filter(code_gonm__icontains=code_gonm_filter)
     if famille_filter:
         especes = especes.filter(famille_id=famille_filter)
     if ordre_filter:
@@ -67,6 +70,7 @@ def liste_especes(request):
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
+        'code_gonm_filter': code_gonm_filter,
         'famille_filter': famille_filter,
         'ordre_filter': ordre_filter,
         'statut_filter': statut_filter,
@@ -107,6 +111,7 @@ def creer_espece(request):
         nom = request.POST.get('nom', '').strip()
         nom_scientifique = request.POST.get('nom_scientifique', '').strip()
         nom_anglais = request.POST.get('nom_anglais', '').strip()
+        code_gonm = request.POST.get('code_gonm', '').strip()
         famille_id = request.POST.get('famille')
         statut = request.POST.get('statut', '').strip()
         commentaire = request.POST.get('commentaire', '').strip()
@@ -132,6 +137,7 @@ def creer_espece(request):
                         nom=nom,
                         nom_scientifique=nom_scientifique,
                         nom_anglais=nom_anglais,
+                        code_gonm=code_gonm,
                         famille=famille,
                         statut=statut,
                         commentaire=commentaire,
@@ -167,6 +173,7 @@ def modifier_espece(request, espece_id):
         nom = request.POST.get('nom', '').strip()
         nom_scientifique = request.POST.get('nom_scientifique', '').strip()
         nom_anglais = request.POST.get('nom_anglais', '').strip()
+        code_gonm = request.POST.get('code_gonm', '').strip()
         famille_id = request.POST.get('famille')
         statut = request.POST.get('statut', '').strip()
         commentaire = request.POST.get('commentaire', '').strip()
@@ -194,6 +201,7 @@ def modifier_espece(request, espece_id):
                     espece.nom = nom
                     espece.nom_scientifique = nom_scientifique
                     espece.nom_anglais = nom_anglais
+                    espece.code_gonm = code_gonm
                     espece.famille = Famille.objects.get(pk=famille_id) if famille_id else None
                     espece.statut = statut
                     espece.commentaire = commentaire
