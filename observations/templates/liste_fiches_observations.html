@@ -38,6 +38,101 @@
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
+/* Styles pour la pagination avec curseur (Solution 4) - Force les styles malgré le CSS global */
+.card-footer nav .btn-link {
+    border: none !important;
+    background: transparent !important;
+    color: #0d6efd !important;
+    padding: 0.5rem 0.75rem !important;
+    font-weight: 400 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    display: inline-block !important;
+}
+.card-footer nav .btn-link::before {
+    display: none !important;
+}
+.card-footer nav .btn-link:hover {
+    color: #0a58ca !important;
+    text-decoration: underline !important;
+    background: transparent !important;
+    border: none !important;
+}
+.card-footer nav .btn-link.disabled,
+.card-footer nav .btn-link:disabled,
+.card-footer nav .btn-link.text-muted {
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+    text-decoration: none !important;
+}
+
+/* Barre de progression */
+.card-footer .progress {
+    background-color: #e9ecef !important;
+    border-radius: 0.375rem !important;
+    height: 20px !important;
+    display: block !important;
+    overflow: visible !important;
+}
+.card-footer .progress-bar {
+    background-color: #0d6efd !important;
+    transition: width 0.3s ease !important;
+    height: 100% !important;
+}
+
+.pagination-progress {
+    cursor: pointer;
+    position: relative;
+}
+.pagination-progress:hover {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Curseur/slider */
+.pagination-slider {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    background: transparent !important;
+}
+.pagination-slider::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    height: 20px !important;
+    width: 20px !important;
+    background: #0d6efd !important;
+    cursor: pointer !important;
+    border-radius: 50% !important;
+    border: 2px solid white !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+.pagination-slider::-moz-range-thumb {
+    height: 20px !important;
+    width: 20px !important;
+    background: #0d6efd !important;
+    cursor: pointer !important;
+    border-radius: 50% !important;
+    border: 2px solid white !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+/* Badge de pagination */
+.card-footer nav .badge {
+    display: inline-block !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+}
+
+/* Force flexbox pour les contrôles de navigation */
+.card-footer .d-flex {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+.card-footer .d-flex > div {
+    flex: 0 0 auto !important;
+}
 </style>
 
 <script>
@@ -285,55 +380,88 @@ document.addEventListener('DOMContentLoaded', function() {
             </form>
         </div>
         {% if fiches.paginator.num_pages > 1 %}
-        <div class="card-footer">
+        <div class="card-footer border-top">
             <nav aria-label="Pagination">
-                <ul class="pagination justify-content-center mb-0">
-                    {% if fiches.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?{% urlencode_without_page %}&page=1">
-                                &laquo; Première
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?{% urlencode_without_page %}&page={{ fiches.previous_page_number }}">
-                                Précédente
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link">&laquo; Première</span>
-                        </li>
-                        <li class="page-item disabled">
-                            <span class="page-link">Précédente</span>
-                        </li>
-                    {% endif %}
+                <div class="row align-items-center">
+                    <!-- Curseur interactif intégré dans la barre de progression -->
+                    <div class="col-12 mb-3 position-relative">
+                        <div class="progress pagination-progress" style="height: 20px;" onclick="navigateToPageFromSlider()">
+                            <div class="progress-bar" role="progressbar" 
+                                 id="pagination-progress-bar"
+                                 style="width: {% if fiches.paginator.num_pages > 1 %}{% widthratio fiches.number|add:-1 fiches.paginator.num_pages|add:-1 100 %}{% else %}0{% endif %}%; height: 100%;"
+                                 aria-valuenow="{{ fiches.number }}" 
+                                 aria-valuemin="1" 
+                                 aria-valuemax="{{ fiches.paginator.num_pages }}">
+                            </div>
+                            <!-- Curseur/slider par-dessus la barre de progression -->
+                            <input type="range" 
+                                   class="form-range pagination-slider position-absolute" 
+                                   id="pagination-slider"
+                                   min="1" 
+                                   max="{{ fiches.paginator.num_pages }}" 
+                                   value="{{ fiches.number }}"
+                                   style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;"
+                                   oninput="updatePaginationProgress(this.value, {{ fiches.paginator.num_pages }})"
+                                   onchange="navigateToPage(this.value)">
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small class="text-muted">Page 1</small>
+                            <small class="text-muted fw-bold">Page <span id="pagination-current-page">{{ fiches.number }}</span></small>
+                            <small class="text-muted">Page {{ fiches.paginator.num_pages }}</small>
+                        </div>
+                    </div>
 
-                    <li class="page-item active">
-                        <span class="page-link">
-                            Page {{ fiches.number }} sur {{ fiches.paginator.num_pages }}
-                        </span>
-                    </li>
+                    <!-- Contrôles de navigation -->
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                {% if fiches.has_previous %}
+                                    <a href="?{% urlencode_without_page %}&page=1" class="btn btn-link text-decoration-none">
+                                        <i class="fas fa-fast-backward me-1"></i><span class="d-none d-sm-inline">Première</span>
+                                    </a>
+                                    <a href="?{% urlencode_without_page %}&page={{ fiches.previous_page_number }}" class="btn btn-link text-decoration-none">
+                                        <i class="fas fa-backward me-1"></i><span class="d-none d-sm-inline">Précédente</span>
+                                    </a>
+                                {% else %}
+                                    <span class="btn btn-link text-muted disabled">
+                                        <i class="fas fa-fast-backward me-1"></i><span class="d-none d-sm-inline">Première</span>
+                                    </span>
+                                    <span class="btn btn-link text-muted disabled">
+                                        <i class="fas fa-backward me-1"></i><span class="d-none d-sm-inline">Précédente</span>
+                                    </span>
+                                {% endif %}
+                            </div>
 
-                    {% if fiches.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?{% urlencode_without_page %}&page={{ fiches.next_page_number }}">
-                                Suivante
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?{% urlencode_without_page %}&page={{ fiches.paginator.num_pages }}">
-                                Dernière &raquo;
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link">Suivante</span>
-                        </li>
-                        <li class="page-item disabled">
-                            <span class="page-link">Dernière &raquo;</span>
-                        </li>
-                    {% endif %}
-                </ul>
+                        <div class="text-center">
+                            <span class="badge bg-light text-dark border px-4 py-2" style="font-size: 1rem;">
+                                <i class="fas fa-file-alt me-1"></i>
+                                Page <strong class="text-primary">{{ fiches.number }}</strong> / <strong>{{ fiches.paginator.num_pages }}</strong>
+                            </span>
+                            <small class="d-block text-muted mt-1">
+                                {{ fiches.paginator.count }} fiches au total
+                            </small>
+                        </div>
+
+                        <div>
+                            {% if fiches.has_next %}
+                                <a href="?{% urlencode_without_page %}&page={{ fiches.next_page_number }}" class="btn btn-link text-decoration-none">
+                                    <span class="d-none d-sm-inline">Suivante</span><i class="fas fa-forward ms-1"></i>
+                                </a>
+                                <a href="?{% urlencode_without_page %}&page={{ fiches.paginator.num_pages }}" class="btn btn-link text-decoration-none">
+                                    <span class="d-none d-sm-inline">Dernière</span><i class="fas fa-fast-forward ms-1"></i>
+                                </a>
+                            {% else %}
+                                <span class="btn btn-link text-muted disabled">
+                                    <span class="d-none d-sm-inline">Suivante</span><i class="fas fa-forward ms-1"></i>
+                                </span>
+                                <span class="btn btn-link text-muted disabled">
+                                    <span class="d-none d-sm-inline">Dernière</span><i class="fas fa-fast-forward ms-1"></i>
+                                </span>
+                            {% endif %}
+                        </div>
+                        </div>
+                    </div>
+                </div>
             </nav>
         </div>
         {% endif %}
@@ -372,5 +500,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Fonctions pour la pagination avec curseur (Solution 4)
+function updatePaginationProgress(page, totalPages) {
+    // Calculer le pourcentage (page 1 = 0%, dernière page = 100%)
+    const percentage = totalPages > 1 ? ((page - 1) / (totalPages - 1)) * 100 : 0;
+    const progressBar = document.getElementById('pagination-progress-bar');
+    const currentPageSpan = document.getElementById('pagination-current-page');
+    
+    if (progressBar) {
+        progressBar.style.width = percentage + '%';
+        progressBar.setAttribute('aria-valuenow', page);
+    }
+    if (currentPageSpan) {
+        currentPageSpan.textContent = page;
+    }
+}
+
+function navigateToPage(page) {
+    // Récupérer les paramètres actuels de l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('page', page);
+    window.location.search = urlParams.toString();
+}
+
+function navigateToPageFromSlider() {
+    // Cette fonction est appelée quand on clique sur la barre de progression
+    // On peut l'utiliser pour positionner le curseur à l'endroit du clic
+    // Pour simplifier, on laisse le curseur gérer la navigation
+}
 </script>
 {% endblock %}

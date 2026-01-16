@@ -275,13 +275,12 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
         return handle_get_remarques(request, fiche_instance)
 
     if request.method == "POST":
-        # Préparer les données POST pour s'assurer que l'observateur est correctement défini
+        # Préparer les données POST
         post_data = request.POST.copy()
-        if not post_data.get('observateur'):
-            if not fiche_id:
-                post_data['observateur'] = request.user.id
-            else:
-                post_data['observateur'] = str(fiche_instance.observateur.id)
+        # Ne définir l'observateur que s'il n'est pas fourni dans le formulaire (pour les nouvelles fiches uniquement)
+        if not post_data.get('observateur') and not fiche_id:
+            # Pour une nouvelle fiche, utiliser l'utilisateur courant comme valeur par défaut
+            post_data['observateur'] = request.user.id
 
         # Si le champ coordonnees est vide, donner une valeur par défaut
         if not post_data.get('coordonnees'):
@@ -387,7 +386,9 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
                         if original_fiche.chemin_image and not fiche.chemin_image:
                             fiche.chemin_image = original_fiche.chemin_image
 
-                    if not hasattr(fiche, 'observateur') or not fiche.observateur:
+                    # L'observateur est géré par le formulaire, mais on garde un fallback de sécurité
+                    # Le formulaire.save() a déjà défini l'observateur à partir de la valeur du formulaire
+                    if not fiche.observateur:
                         fiche.observateur = request.user
 
                     # Gérer le numéro personnel

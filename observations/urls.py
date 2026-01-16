@@ -4,6 +4,13 @@ from django.urls import path
 
 from accounts.views.auth import CustomLoginView
 
+from .views.api_observateurs import (
+    creer_observateur,
+    fusionner_observateurs,
+    obtenir_nom_ocr_json,
+    rechercher_observateurs,
+    rechercher_observateurs_similaires,
+)
 from .views.saisie_observation_view import (
     ajouter_observation,
     fiche_observation_view,
@@ -95,6 +102,32 @@ urlpatterns = [
         'observations/rechercher/',
         rechercher_fiches,
         name='rechercher_fiches',
+    ),
+    # Routes API observateurs (recherche similaire, autocomplétion, fusion)
+    path(
+        'api/observateurs/similaires/',
+        rechercher_observateurs_similaires,
+        name='api_observateurs_similaires',
+    ),
+    path(
+        'api/observateurs/rechercher/',
+        rechercher_observateurs,
+        name='api_rechercher_observateurs',
+    ),
+    path(
+        'api/observateurs/fusionner/',
+        fusionner_observateurs,
+        name='api_fusionner_observateurs',
+    ),
+    path(
+        'api/observateurs/nom-ocr/',
+        obtenir_nom_ocr_json,
+        name='api_nom_ocr_json',
+    ),
+    path(
+        'api/observateurs/creer/',
+        creer_observateur,
+        name='api_creer_observateur',
     ),
 ]
 '''

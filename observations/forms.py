@@ -1,6 +1,7 @@
 from django import forms
 from django.utils import timezone
 
+from accounts.models import Utilisateur
 from geo.models import Localisation
 from geo.services.geocodeur import geocoder_commune_unifiee
 from observations.models import (
@@ -15,11 +16,22 @@ from observations.models import (
 
 
 class FicheObservationForm(forms.ModelForm):
+    # Définir explicitement le champ observateur comme ModelChoiceField pour le rendre modifiable
+    observateur = forms.ModelChoiceField(
+        queryset=Utilisateur.objects.all(),
+        widget=forms.Select(
+            attrs={
+                'class': 'form-control',
+            }
+        ),
+        required=True,
+        label="Observateur",
+    )
+
     class Meta:
         model = FicheObservation
         fields = ["observateur", "espece", "annee", "numero_personnel", "chemin_image"]
         widgets = {
-            "observateur": forms.HiddenInput(),  # Changer pour HiddenInput
             "espece": forms.Select(
                 attrs={
                     'class': 'form-control espece-select',
@@ -41,25 +53,26 @@ class FicheObservationForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
-        # Stocker l'utilisateur pour l'utiliser dans save()
+        # Stocker l'utilisateur pour l'utiliser comme fallback dans save()
         self.user = user
 
+        # Configurer le queryset des observateurs (utilisateurs actifs et validés)
+        self.fields["observateur"].queryset = Utilisateur.objects.filter(
+            is_active=True, est_valide=True
+        ).order_by('first_name', 'last_name')
+
+        # Définir la valeur initiale si c'est une nouvelle instance
         if user:
-            # Définir l'observateur comme l'utilisateur actuel
             if not self.instance.pk:  # Nouvelle instance
-                self.instance.observateur = user
-
-            # Toujours définir la valeur initiale
-            self.fields["observateur"].initial = user.id
-
-            # Rendre le champ non-required car il sera géré automatiquement dans save()
-            self.fields["observateur"].required = False
+                self.fields["observateur"].initial = user
+            elif not self.instance.observateur:  # Instance existante sans observateur
+                self.fields["observateur"].initial = user
 
     def save(self, commit=True):
-        """Assurer que l'observateur est toujours défini."""
+        """Sauvegarder avec la valeur du formulaire pour l'observateur."""
         instance = super().save(commit=False)
 
-        # Si pas d'observateur défini, utiliser l'utilisateur courant
+        # Utiliser la valeur du formulaire si fournie, sinon utiliser l'utilisateur courant comme fallback
         if not instance.observateur and self.user:
             instance.observateur = self.user
 

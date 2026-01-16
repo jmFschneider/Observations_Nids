@@ -541,14 +541,20 @@ def check_batch_progress(request):
         ignored_count = ok.get('ignored_count', 0)
         error_count = ok.get('error_count', 0)
 
-        response['message'] = f"✅ Traitement terminé: {success_count} réussis, {ignored_count} ignorés, {error_count} erreurs"
+        response['message'] = (
+            f"✅ Traitement terminé: {success_count} réussis, {ignored_count} ignorés, {error_count} erreurs"
+        )
 
         # Stocker les messages dans la session pour affichage après redirection
         if success_count > 0:
-            request.session['batch_success_message'] = f"✅ {success_count} fiche(s) créée(s) avec succès"
+            request.session['batch_success_message'] = (
+                f"✅ {success_count} fiche(s) créée(s) avec succès"
+            )
 
         if ignored_count > 0:
-            request.session['batch_info_message'] = f"ℹ️ {ignored_count} fichier(s) ignoré(s) (déjà importés)"
+            request.session['batch_info_message'] = (
+                f"ℹ️ {ignored_count} fichier(s) ignoré(s) (déjà importés)"
+            )
 
         if error_count > 0:
             request.session['batch_warning_message'] = f"⚠️ {error_count} erreur(s)"

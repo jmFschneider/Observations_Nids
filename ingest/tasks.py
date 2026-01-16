@@ -76,7 +76,9 @@ def process_json_batch_task(self, fichiers_json, repertoire):
     Returns:
         dict: Résultats du traitement avec statistiques
     """
-    _log_progress(self, f"🚀 Démarrage du traitement batch de {len(fichiers_json)} fichier(s)", 'info')
+    _log_progress(
+        self, f"🚀 Démarrage du traitement batch de {len(fichiers_json)} fichier(s)", 'info'
+    )
     _log_progress(self, f"📁 Répertoire: {repertoire}", 'info')
 
     service = ImportationService()
@@ -134,9 +136,7 @@ def process_json_batch_task(self, fichiers_json, repertoire):
                 success_count += 1
                 fiche_id = resultat.get('fiche_id')
                 fiches_creees.append({'fichier': fichier, 'fiche_id': fiche_id})
-                _log_progress(
-                    self, f"✅ {fichier} → Fiche {fiche_id} créée avec succès", 'success'
-                )
+                _log_progress(self, f"✅ {fichier} → Fiche {fiche_id} créée avec succès", 'success')
             else:
                 error_count += 1
                 message = resultat.get('message', 'Erreur inconnue')

@@ -43,7 +43,7 @@ def liste_fiches_observations(request):
             'observateur', 'espece', 'localisation', 'etat_correction'
         )
         .all()
-        .order_by('-date_creation')
+        .order_by('date_creation')
     )
 
     fiche_filter = FicheObservationFilter(request.GET, queryset=fiches_queryset)

@@ -71,7 +71,10 @@ def accueil_importation(request):
     if 'batch_errors' in request.session:
         erreurs = request.session.pop('batch_errors')
         for erreur in erreurs:
-            messages.error(request, f"{erreur.get('fichier', 'Fichier')}: {erreur.get('message', 'Erreur inconnue')}")
+            messages.error(
+                request,
+                f"{erreur.get('fichier', 'Fichier')}: {erreur.get('message', 'Erreur inconnue')}",
+            )
 
     context = {
         'total_transcriptions': total_transcriptions,
