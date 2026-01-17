@@ -181,16 +181,16 @@
                                     <td class="font-monospace small">{{ commune.latitude }}, {{ commune.longitude }}</td>
                                     <td>
                                         {% if commune.source_ajout == 'api_geo' %}
-                                        <span class="badge bg-info">API Géo</span>
+                                        <span class="badge -subtle text-primary-emphasis">API Géo</span>
                                         {% elif commune.source_ajout == 'nominatim' %}
-                                        <span class="badge bg-success">Nominatim</span>
+                                        <span class="badge -subtle text-primary-emphasis">Nominatim</span>
                                         {% elif commune.source_ajout == 'manuel' %}
-                                        <span class="badge bg-warning">Manuel</span>
+                                        <span class="badge -subtle text-primary-emphasis">Manuel</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         {% if commune.autres_noms %}
-                                        <span class="badge bg-body-tertiary" title="{{ commune.autres_noms }}">
+                                        <span class="badge -tertiary" title="{{ commune.autres_noms }}">
                                             <i class="fas fa-tags"></i> {{ commune.autres_noms|truncatewords:2 }}
                                         </span>
                                         {% else %}
@@ -217,8 +217,8 @@
                                 {% if commune.anciennes_communes.count > 0 %}
                                 <tr id="details-{{ commune.id }}" class="anciennes-communes-details" style="display: none;">
                                     <td colspan="8">
-                                        <div class="card bg-light m-2">
-                                            <div class="card-header bg-body-tertiary text-white">
+                                        <div class="card  m-2">
+                                            <div class="card-header -tertiary ">
                                                 <i class="fas fa-info-circle"></i> Anciennes communes de <strong>{{ commune.nom }}</strong>
                                             </div>
                                             <div class="card-body p-2">

@@ -1312,7 +1312,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 section.style.display = 'block';
                 container.innerHTML = data.suggestions.map(function(obs) {
                     var scorePercent = Math.round(obs.score_similarite * 100);
-                    var badgeClass = scorePercent >= 90 ? 'bg-success' : 'bg-warning';
+                    var badgeClass = scorePercent >= 90 ? '-subtle text-primary-emphasis' : '-subtle text-primary-emphasis';
                     return '<div class="card mb-2">' +
                         '<div class="card-body py-2 d-flex justify-content-between align-items-center">' +
                         '<div>' +
@@ -1405,13 +1405,13 @@ document.addEventListener('DOMContentLoaded', function() {
             var similarite = '-';
             if (obs.score_similarite !== null) {
                 var scorePercent = Math.round(obs.score_similarite * 100);
-                var badgeClass = scorePercent >= 80 ? 'bg-success' : 'bg-secondary';
+                var badgeClass = scorePercent >= 80 ? '-subtle text-primary-emphasis' : '';
                 similarite = '<span class="badge ' + badgeClass + '">' + scorePercent + '%</span>';
             }
 
             var type = obs.est_transcription ?
-                '<span class="badge bg-warning">OCR</span>' :
-                '<span class="badge bg-info">Valide</span>';
+                '<span class="badge -subtle text-primary-emphasis">OCR</span>' :
+                '<span class="badge -subtle text-primary-emphasis">Valide</span>';
 
             return '<tr>' +
                 '<td><strong>' + escapeHtml(obs.nom_complet) + '</strong></td>' +

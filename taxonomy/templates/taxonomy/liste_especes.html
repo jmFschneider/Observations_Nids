@@ -27,15 +27,15 @@
                             <table class="table">
                                 <tr>
                                     <th width="200">Espèces totales</th>
-                                    <td><span class="badge bg-body-tertiary">{{ stats.total }}</span></td>
+                                    <td><span class="badge -tertiary">{{ stats.total }}</span></td>
                                 </tr>
                                 <tr>
                                     <th>Familles</th>
-                                    <td><span class="badge bg-info">{{ stats.familles }}</span></td>
+                                    <td><span class="badge -subtle text-primary-emphasis">{{ stats.familles }}</span></td>
                                 </tr>
                                 <tr>
                                     <th>Ordres</th>
-                                    <td><span class="badge bg-success">{{ stats.ordres }}</span></td>
+                                    <td><span class="badge -subtle text-primary-emphasis">{{ stats.ordres }}</span></td>
                                 </tr>
                             </table>
                         </div>
@@ -145,7 +145,7 @@
                                     <td><strong>{{ espece.nom }}</strong></td>
                                     <td>
                                         {% if espece.code_gonm %}
-                                        <span class="badge bg-body-tertiary">{{ espece.code_gonm }}</span>
+                                        <span class="badge -tertiary">{{ espece.code_gonm }}</span>
                                         {% else %}
                                         <span class="text-muted">-</span>
                                         {% endif %}
@@ -155,7 +155,7 @@
                                     <td>{{ espece.famille.ordre.nom|default:"-" }}</td>
                                     <td>
                                         {% if espece.statut %}
-                                        <span class="badge bg-info">{{ espece.statut }}</span>
+                                        <span class="badge -subtle text-primary-emphasis">{{ espece.statut }}</span>
                                         {% else %}
                                         -
                                         {% endif %}

@@ -22,7 +22,7 @@
 <p>Nombre d'observations : {{ observations_count }}</p>
 
 <div class="card mb-4">
-    <div class="card-header bg-body-tertiary text-white">
+    <div class="card-header -tertiary ">
         <h3>Observations</h3>
     </div>
     <div class="card-body">
@@ -34,7 +34,7 @@
 </div>
 
 <div class="card mb-4">
-    <div class="card-header bg-body-tertiary text-white">
+    <div class="card-header -tertiary ">
         <h3>Mes Images</h3>
     </div>
     <div class="card-body">
@@ -47,7 +47,7 @@
 
 {% if fiches_en_edition %}
 <div class="card mb-4">
-    <div class="card-header bg-info text-white">
+    <div class="card-header -subtle text-primary-emphasis ">
         <h3>Mes fiches en cours d'édition</h3>
     </div>
     <div class="card-body">
@@ -69,7 +69,7 @@
                     <td>{{ fiche.espece.nom }}</td>
                     <td>{{ fiche.annee }}</td>
                     <td>
-                        <span class="badge {% if fiche.etat_correction.statut == 'nouveau' %}bg-body-tertiary{% elif fiche.etat_correction.statut == 'en_edition' %}bg-warning{% endif %}">
+                        <span class="badge {% if fiche.etat_correction.statut == 'nouveau' %}-tertiary{% elif fiche.etat_correction.statut == 'en_edition' %}-subtle text-primary-emphasis{% endif %}">
                             {{ fiche.etat_correction.get_statut_display }}
                         </span>
                     </td>
@@ -87,7 +87,7 @@
 
 {% if fiches_en_correction %}
 <div class="card mb-4">
-    <div class="card-header bg-warning text-dark">
+    <div class="card-header -subtle text-primary-emphasis text-dark">
         <h3>Fiches en cours de correction</h3>
     </div>
     <div class="card-body">
@@ -123,7 +123,7 @@
 
 {% if user.est_transcription or user.role == 'administrateur' %}
 <div class="card mb-4">
-    <div class="card-header bg-success text-white">
+    <div class="card-header -subtle text-primary-emphasis ">
         <h3>Transcription & Importation</h3>
     </div>
     <div class="card-body">
@@ -137,7 +137,7 @@
 
 {% if user.is_authenticated and user.role == 'administrateur' %}
 <div class="card mb-4">
-    <div class="card-header bg-warning text-white">
+    <div class="card-header -subtle text-primary-emphasis ">
         <h3>Administration</h3>
     </div>
     <div class="card-body">
@@ -151,7 +151,7 @@
 
 {% if user.is_authenticated and user.is_superuser and user.role != 'administrateur' %}
 <div class="card">
-    <div class="card-header bg-danger text-white">
+    <div class="card-header -subtle text-primary-emphasis ">
         <h3>Accès d'urgence</h3>
     </div>
     <div class="card-body">

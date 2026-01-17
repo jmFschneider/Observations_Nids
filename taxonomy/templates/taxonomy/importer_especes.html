@@ -16,7 +16,7 @@
             <!-- Statistiques -->
             <div class="row mb-4">
                 <div class="col-md-3">
-                    <div class="card bg-body-tertiary text-white">
+                    <div class="card -tertiary ">
                         <div class="card-body">
                             <h5><i class="fas fa-list"></i> Espèces totales</h5>
                             <h2>{{ stats.total_especes }}</h2>
@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card bg-success text-white">
+                    <div class="card -subtle text-primary-emphasis ">
                         <div class="card-body">
                             <h5><i class="fas fa-dove"></i> Import LOF</h5>
                             <h2>{{ stats.especes_lof }}</h2>
@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card bg-info text-white">
+                    <div class="card -subtle text-primary-emphasis ">
                         <div class="card-body">
                             <h5><i class="fas fa-book"></i> Import TaxRef</h5>
                             <h2>{{ stats.especes_taxref }}</h2>
@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card bg-warning text-dark">
+                    <div class="card -subtle text-primary-emphasis text-dark">
                         <div class="card-body">
                             <h5><i class="fas fa-user-edit"></i> Manuelles</h5>
                             <h2>{{ stats.especes_manuelles }}</h2>
@@ -51,7 +51,7 @@
 
             <!-- Méthode 1: LOF (Recommandé) -->
             <div class="card mb-4 border-success">
-                <div class="card-header bg-success text-white">
+                <div class="card-header -subtle text-primary-emphasis ">
                     <h4><i class="fas fa-star"></i> Méthode 1: Liste des Oiseaux de France (LOF) - RECOMMANDÉ</h4>
                 </div>
                 <div class="card-body">
@@ -72,7 +72,7 @@
                         </div>
                         <div class="col-md-6">
                             <h5>Commande</h5>
-                            <div class="bg-body-tertiary text-light p-3 rounded">
+                            <div class="-tertiary text-light p-3 rounded">
                                 <code>python manage.py charger_lof</code>
                             </div>
                             <p class="mt-2 text-muted small">
@@ -99,7 +99,7 @@
 
             <!-- Méthode 2: TaxRef (Alternative) -->
             <div class="card mb-4">
-                <div class="card-header bg-info text-white">
+                <div class="card-header -subtle text-primary-emphasis ">
                     <h4><i class="fas fa-book"></i> Méthode 2: TaxRef (INPN/MNHN) - ALTERNATIVE</h4>
                 </div>
                 <div class="card-body">
@@ -119,7 +119,7 @@
                         </div>
                         <div class="col-md-6">
                             <h5>Commande</h5>
-                            <div class="bg-body-tertiary text-light p-3 rounded">
+                            <div class="-tertiary text-light p-3 rounded">
                                 <code>python manage.py charger_taxref --file /chemin/vers/TAXREFv17.txt</code>
                             </div>
                         </div>
@@ -169,11 +169,11 @@
                                     <td>{{ espece.famille.nom|default:"-" }}</td>
                                     <td>
                                         {% if "LOF" in espece.commentaire %}
-                                        <span class="badge bg-success">LOF</span>
+                                        <span class="badge -subtle text-primary-emphasis">LOF</span>
                                         {% elif "TaxRef" in espece.commentaire %}
-                                        <span class="badge bg-info">TaxRef</span>
+                                        <span class="badge -subtle text-primary-emphasis">TaxRef</span>
                                         {% else %}
-                                        <span class="badge bg-body-tertiary">Manuel</span>
+                                        <span class="badge -tertiary">Manuel</span>
                                         {% endif %}
                                     </td>
                                 </tr>

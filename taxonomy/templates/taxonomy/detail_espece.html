@@ -43,7 +43,7 @@
                                     <th>Code GONM</th>
                                     <td>
                                         {% if espece.code_gonm %}
-                                        <span class="badge bg-body-tertiary">{{ espece.code_gonm }}</span>
+                                        <span class="badge -tertiary">{{ espece.code_gonm }}</span>
                                         {% else %}
                                         -
                                         {% endif %}
@@ -61,7 +61,7 @@
                                     <th>Statut</th>
                                     <td>
                                         {% if espece.statut %}
-                                        <span class="badge bg-info">{{ espece.statut }}</span>
+                                        <span class="badge -subtle text-primary-emphasis">{{ espece.statut }}</span>
                                         {% else %}
                                         -
                                         {% endif %}
@@ -76,9 +76,9 @@
                                     <th width="200">Validé par admin</th>
                                     <td>
                                         {% if espece.valide_par_admin %}
-                                        <span class="badge bg-success"><i class="fas fa-check"></i> Oui</span>
+                                        <span class="badge -subtle text-primary-emphasis"><i class="fas fa-check"></i> Oui</span>
                                         {% else %}
-                                        <span class="badge bg-warning"><i class="fas fa-times"></i> Non</span>
+                                        <span class="badge -subtle text-primary-emphasis"><i class="fas fa-times"></i> Non</span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -101,7 +101,7 @@
                                 <tr>
                                     <th>Fiches d'observation</th>
                                     <td>
-                                        <span class="badge bg-body-tertiary">{{ nombre_fiches }}</span> fiche(s)
+                                        <span class="badge -tertiary">{{ nombre_fiches }}</span> fiche(s)
                                     </td>
                                 </tr>
                             </table>

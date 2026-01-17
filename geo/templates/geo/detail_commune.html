@@ -20,7 +20,7 @@
                         <i class="fas fa-map-marker-alt text-primary"></i>
                         {{ commune.nom }}
                         {% if commune.commune_actuelle %}
-                        <span class="badge bg-warning text-dark">Commune fusionnée</span>
+                        <span class="badge -subtle text-primary-emphasis text-dark">Commune fusionnée</span>
                         {% endif %}
                     </h1>
                 </div>
@@ -39,7 +39,7 @@
                 <div class="col-md-8">
                     <!-- Informations de base -->
                     <div class="card mb-4">
-                        <div class="card-header bg-body-tertiary text-white">
+                        <div class="card-header -tertiary ">
                             <h5 class="mb-0"><i class="fas fa-info-circle"></i> Informations générales</h5>
                         </div>
                         <div class="card-body">
@@ -84,7 +84,7 @@
 
                     <!-- Coordonnées GPS -->
                     <div class="card mb-4">
-                        <div class="card-header bg-success text-white">
+                        <div class="card-header -subtle text-primary-emphasis ">
                             <h5 class="mb-0"><i class="fas fa-map-pin"></i> Coordonnées géographiques</h5>
                         </div>
                         <div class="card-body">
@@ -120,7 +120,7 @@
                     <!-- Autres appellations -->
                     {% if commune.autres_noms %}
                     <div class="card mb-4">
-                        <div class="card-header bg-body-tertiary text-white">
+                        <div class="card-header -tertiary ">
                             <h5 class="mb-0"><i class="fas fa-tags"></i> Autres appellations</h5>
                         </div>
                         <div class="card-body">
@@ -135,7 +135,7 @@
                     <!-- Commune actuelle (si fusionnée) -->
                     {% if commune.commune_actuelle %}
                     <div class="card mb-4 border-warning">
-                        <div class="card-header bg-warning">
+                        <div class="card-header -subtle text-primary-emphasis">
                             <h5 class="mb-0"><i class="fas fa-code-branch"></i> Commune fusionnée</h5>
                         </div>
                         <div class="card-body">
@@ -152,7 +152,7 @@
                     <!-- Anciennes communes rattachées -->
                     {% if anciennes_communes %}
                     <div class="card mb-4">
-                        <div class="card-header bg-info text-white">
+                        <div class="card-header -subtle text-primary-emphasis ">
                             <h5 class="mb-0"><i class="fas fa-project-diagram"></i> Anciennes communes rattachées</h5>
                         </div>
                         <div class="card-body">
@@ -196,11 +196,11 @@
                                         <th style="width: 50%;">Source</th>
                                         <td>
                                             {% if commune.source_ajout == 'api_geo' %}
-                                            <span class="badge bg-info">API Géoplateforme</span>
+                                            <span class="badge -subtle text-primary-emphasis">API Géoplateforme</span>
                                             {% elif commune.source_ajout == 'nominatim' %}
-                                            <span class="badge bg-success">Nominatim</span>
+                                            <span class="badge -subtle text-primary-emphasis">Nominatim</span>
                                             {% elif commune.source_ajout == 'manuel' %}
-                                            <span class="badge bg-warning">Manuel</span>
+                                            <span class="badge -subtle text-primary-emphasis">Manuel</span>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -227,7 +227,7 @@
 
                     <!-- Utilisation -->
                     <div class="card mb-4">
-                        <div class="card-header {% if nombre_fiches > 0 %}bg-success text-white{% else %}bg-light{% endif %}">
+                        <div class="card-header {% if nombre_fiches > 0 %}-subtle text-primary-emphasis {% else %}{% endif %}">
                             <h5 class="mb-0"><i class="fas fa-file-alt"></i> Utilisation</h5>
                         </div>
                         <div class="card-body">

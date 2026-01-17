@@ -36,7 +36,7 @@
                 <!-- Statistiques en temps réel -->
                 <div class="row mt-4">
                     <div class="col-md-4">
-                        <div class="card bg-success text-white">
+                        <div class="card -subtle text-primary-emphasis ">
                             <div class="card-body text-center">
                                 <h3 class="mb-0" id="success-count">0</h3>
                                 <p class="mb-0">Succès</p>
@@ -44,7 +44,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card bg-warning text-white">
+                        <div class="card -subtle text-primary-emphasis ">
                             <div class="card-body text-center">
                                 <h3 class="mb-0" id="ignored-count">0</h3>
                                 <p class="mb-0">Ignorés</p>
@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card bg-danger text-white">
+                        <div class="card -subtle text-primary-emphasis ">
                             <div class="card-body text-center">
                                 <h3 class="mb-0" id="error-count">0</h3>
                                 <p class="mb-0">Erreurs</p>
@@ -235,7 +235,7 @@ function checkProgress() {
                 clearInterval(progressCheckInterval);
                 document.getElementById('progress-message').textContent = '❌ Erreur: ' + (data.error || 'Erreur inconnue');
                 document.getElementById('progress-bar').classList.remove('progress-bar-animated');
-                document.getElementById('progress-bar').classList.add('bg-danger');
+                document.getElementById('progress-bar').classList.add('-subtle text-primary-emphasis');
             } else if (data.status === 'NO_TASK') {
                 clearInterval(progressCheckInterval);
                 document.getElementById('progress-message').textContent = '⚠️ Aucune tâche trouvée';

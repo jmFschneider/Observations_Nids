@@ -40,7 +40,7 @@
                     <h6 class="text-muted mb-2"><i class="fas fa-images"></i> IMAGES</h6>
                     <p class="h5 mb-0">
                         {% if image_count > 0 %}
-                            <span class="badge bg-success" style="font-size: 1.1rem;">{{ image_count }}</span>
+                            <span class="badge -subtle text-primary-emphasis" style="font-size: 1.1rem;">{{ image_count }}</span>
                         {% else %}
                             <span class="text-muted">Aucune</span>
                         {% endif %}
@@ -50,7 +50,7 @@
                     <h6 class="text-muted mb-2"><i class="fas fa-file-alt"></i> TYPE FICHE</h6>
                     <p class="h5 mb-0">
                         {% if type_fiche %}
-                            <span class="badge bg-info" style="font-size: 1.1rem;">{{ type_fiche }}</span>
+                            <span class="badge -subtle text-primary-emphasis" style="font-size: 1.1rem;">{{ type_fiche }}</span>
                         {% else %}
                             <span class="text-muted">-</span>
                         {% endif %}
@@ -60,7 +60,7 @@
                     <h6 class="text-muted mb-2"><i class="fas fa-magic"></i> TRAITEMENT</h6>
                     <p class="h5 mb-0">
                         {% if type_traitement %}
-                            <span class="badge bg-warning text-dark" style="font-size: 1.1rem;">{{ type_traitement }}</span>
+                            <span class="badge -subtle text-primary-emphasis text-dark" style="font-size: 1.1rem;">{{ type_traitement }}</span>
                         {% else %}
                             <span class="text-muted">-</span>
                         {% endif %}
@@ -162,7 +162,7 @@
         </div>
         <div class="card-body p-0">
             {% if parent_path is not None %}
-            <div class="p-3 border-bottom bg-light">
+            <div class="p-3 border-bottom ">
                 <a href="{% url 'ocr:selection_repertoire_ocr' %}?path={{ parent_path }}"
                    class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-level-up-alt"></i> Remonter au dossier parent
@@ -208,7 +208,7 @@
                             <td class="text-center clickable-cell"
                                 onclick="navigateToDir('{{ current_path }}{% if current_path %}/{% endif %}{{ dir.name }}')">
                                 {% if dir.subdirs_count > 0 %}
-                                    <span class="badge bg-info">{{ dir.subdirs_count }}</span>
+                                    <span class="badge -subtle text-primary-emphasis">{{ dir.subdirs_count }}</span>
                                 {% else %}
                                     <span class="text-muted">-</span>
                                 {% endif %}
@@ -216,7 +216,7 @@
                             <td class="text-center clickable-cell"
                                 onclick="navigateToDir('{{ current_path }}{% if current_path %}/{% endif %}{{ dir.name }}')">
                                 {% if dir.images_count > 0 %}
-                                    <span class="badge bg-success">{{ dir.images_count }}</span>
+                                    <span class="badge -subtle text-primary-emphasis">{{ dir.images_count }}</span>
                                 {% else %}
                                     <span class="text-muted">-</span>
                                 {% endif %}
@@ -232,7 +232,7 @@
             </div>
 
             <!-- Bouton de sélection batch -->
-            <div id="batch-selection-panel" class="p-3 border-top bg-light" style="display: none;">
+            <div id="batch-selection-panel" class="p-3 border-top " style="display: none;">
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <strong id="selected-count">0</strong> répertoire(s) sélectionné(s)
@@ -425,7 +425,7 @@ function afficherResultats(data, modeles) {
     let html = `
         <div class="row mb-3">
             <div class="col-md-3">
-                <div class="card bg-success text-white">
+                <div class="card -subtle text-primary-emphasis ">
                     <div class="card-body text-center">
                         <h3>${data.nb_trouvees}</h3>
                         <p class="mb-0">Trouvées</p>
@@ -433,7 +433,7 @@ function afficherResultats(data, modeles) {
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card bg-warning">
+                <div class="card -subtle text-primary-emphasis">
                     <div class="card-body text-center">
                         <h3>${data.nb_multiples}</h3>
                         <p class="mb-0">Multiples</p>
@@ -441,7 +441,7 @@ function afficherResultats(data, modeles) {
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card bg-danger text-white">
+                <div class="card -subtle text-primary-emphasis ">
                     <div class="card-body text-center">
                         <h3>${data.nb_non_trouvees}</h3>
                         <p class="mb-0">Non trouvées</p>
@@ -449,7 +449,7 @@ function afficherResultats(data, modeles) {
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card bg-info text-white">
+                <div class="card -subtle text-primary-emphasis ">
                     <div class="card-body text-center">
                         <h3>${data.total_images}</h3>
                         <p class="mb-0">Total</p>

@@ -8,7 +8,7 @@
 
     <!-- Répertoires sélectionnés -->
     <div class="card mb-4">
-        <div class="card-header bg-body-tertiary text-white">
+        <div class="card-header -tertiary ">
             <h5 class="mb-0"><i class="fas fa-folder-open"></i> Répertoires sélectionnés</h5>
         </div>
         <div class="card-body">
@@ -107,7 +107,7 @@
 
     <!-- Résultats de l'analyse (masqué par défaut) -->
     <div id="analyse-results" class="card" style="display: none;">
-        <div class="card-header bg-info text-white">
+        <div class="card-header -subtle text-primary-emphasis ">
             <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Résultats de l'analyse</h5>
         </div>
         <div class="card-body" id="analyse-content">
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <i class="fas fa-folder text-warning"></i>
                     <strong>${dir.path}</strong>
                 </span>
-                <span class="badge bg-body-tertiary rounded-pill">${dir.name}</span>
+                <span class="badge -tertiary rounded-pill">${dir.name}</span>
             </li>
         `;
     });

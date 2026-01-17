@@ -16,7 +16,7 @@
 
     <!-- INDICATEUR DE PROGRESSION - STEPPER -->
     <div class="card mb-4">
-        <div class="card-header bg-body-tertiary text-white">
+        <div class="card-header -tertiary ">
             <h5 class="mb-0"><i class="fas fa-tasks"></i> Workflow d'importation</h5>
         </div>
         <div class="card-body">
@@ -74,11 +74,11 @@
                                 <i class="fas fa-search"></i> Extraire les espèces
                             </h5>
                             {% if especes_candidates > 0 %}
-                                <span class="badge bg-success">{{ especes_candidates }} espèce{{ especes_candidates|pluralize }} extraite{{ especes_candidates|pluralize }}</span>
+                                <span class="badge -subtle text-primary-emphasis">{{ especes_candidates }} espèce{{ especes_candidates|pluralize }} extraite{{ especes_candidates|pluralize }}</span>
                             {% elif transcriptions_non_traitees > 0 %}
-                                <span class="badge bg-warning">{{ transcriptions_non_traitees }} transcription{{ transcriptions_non_traitees|pluralize }} à traiter</span>
+                                <span class="badge -subtle text-primary-emphasis">{{ transcriptions_non_traitees }} transcription{{ transcriptions_non_traitees|pluralize }} à traiter</span>
                             {% else %}
-                                <span class="badge bg-body-tertiary">En attente de l'étape 1</span>
+                                <span class="badge -tertiary">En attente de l'étape 1</span>
                             {% endif %}
                         </div>
                         <p class="text-muted mb-2">
@@ -121,11 +121,11 @@
                                 <i class="fas fa-check-double"></i> Valider les espèces candidates
                             </h5>
                             {% if especes_non_validees > 0 %}
-                                <span class="badge bg-warning">{{ especes_non_validees }} espèce{{ especes_non_validees|pluralize }} à valider</span>
+                                <span class="badge -subtle text-primary-emphasis">{{ especes_non_validees }} espèce{{ especes_non_validees|pluralize }} à valider</span>
                             {% elif especes_candidates > 0 %}
-                                <span class="badge bg-success">Toutes validées</span>
+                                <span class="badge -subtle text-primary-emphasis">Toutes validées</span>
                             {% else %}
-                                <span class="badge bg-body-tertiary">En attente de l'étape 2</span>
+                                <span class="badge -tertiary">En attente de l'étape 2</span>
                             {% endif %}
                         </div>
                         <p class="text-muted mb-2">
@@ -168,13 +168,13 @@
                                 <i class="fas fa-cogs"></i> Préparer les importations
                             </h5>
                             {% if transcriptions_non_traitees > 0 %}
-                                <span class="badge bg-warning">{{ transcriptions_non_traitees }} transcription{{ transcriptions_non_traitees|pluralize }} à préparer</span>
+                                <span class="badge -subtle text-primary-emphasis">{{ transcriptions_non_traitees }} transcription{{ transcriptions_non_traitees|pluralize }} à préparer</span>
                             {% elif total_importations > 0 %}
-                                <span class="badge bg-success">{{ total_importations }} importation{{ total_importations|pluralize }} créée{{ total_importations|pluralize }}</span>
+                                <span class="badge -subtle text-primary-emphasis">{{ total_importations }} importation{{ total_importations|pluralize }} créée{{ total_importations|pluralize }}</span>
                             {% elif especes_validees > 0 %}
-                                <span class="badge bg-info">Prêt à préparer</span>
+                                <span class="badge -subtle text-primary-emphasis">Prêt à préparer</span>
                             {% else %}
-                                <span class="badge bg-body-tertiary">En attente de l'étape 3</span>
+                                <span class="badge -tertiary">En attente de l'étape 3</span>
                             {% endif %}
                         </div>
                         <p class="text-muted mb-2">
@@ -218,11 +218,11 @@
                                 <i class="fas fa-check"></i> Finaliser les importations
                             </h5>
                             {% if importations_en_attente > 0 %}
-                                <span class="badge bg-danger">{{ importations_en_attente }} à finaliser</span>
+                                <span class="badge -subtle text-primary-emphasis">{{ importations_en_attente }} à finaliser</span>
                             {% elif importations_completees > 0 %}
-                                <span class="badge bg-success">{{ importations_completees }} terminée{{ importations_completees|pluralize }}</span>
+                                <span class="badge -subtle text-primary-emphasis">{{ importations_completees }} terminée{{ importations_completees|pluralize }}</span>
                             {% else %}
-                                <span class="badge bg-body-tertiary">En attente de l'étape 4</span>
+                                <span class="badge -tertiary">En attente de l'étape 4</span>
                             {% endif %}
                         </div>
                         <p class="text-muted mb-2">
@@ -242,7 +242,7 @@
                             </button>
                         {% endif %}
                         {% if importations_erreur > 0 %}
-                            <span class="badge bg-warning ms-2">{{ importations_erreur }} en erreur</span>
+                            <span class="badge -subtle text-primary-emphasis ms-2">{{ importations_erreur }} en erreur</span>
                         {% endif %}
                     </div>
                 </div>
@@ -252,9 +252,9 @@
 
     <!-- STATISTIQUES DÉTAILLÉES (repliable) -->
     <div class="card">
-        <div class="card-header bg-body-tertiary text-white">
+        <div class="card-header -tertiary ">
             <h5 class="mb-0">
-                <button class="btn btn-link text-white text-decoration-none w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#statsDetails">
+                <button class="btn btn-link  text-decoration-none w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#statsDetails">
                     <i class="fas fa-chart-pie"></i> Statistiques détaillées
                     <i class="fas fa-chevron-down float-end"></i>
                 </button>

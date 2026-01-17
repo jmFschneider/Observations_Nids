@@ -23,25 +23,25 @@
 </head>
 <body>
     {% if environment == 'development' %}
-    <div class="d-flex align-items-center justify-content-center text-white fw-bold"
+    <div class="d-flex align-items-center justify-content-center  fw-bold"
          style="position: fixed; top: 50%; right: 0; transform: translateY(-50%); background-color: #dc3545; padding: 0.75rem 1rem; writing-mode: vertical-rl; text-orientation: mixed; z-index: 1050; border-radius: 0.25rem 0 0 0.25rem; box-shadow: -2px 0 4px rgba(0,0,0,0.2);">
         🔧 ENVIRONNEMENT DE DÉVELOPPEMENT
     </div>
     {% elif environment == 'pilote' %}
-    <div class="d-flex align-items-center justify-content-center text-white fw-bold"
+    <div class="d-flex align-items-center justify-content-center  fw-bold"
          style="position: fixed; top: 50%; right: 0; transform: translateY(-50%); background-color: #28a745; padding: 0.75rem 1rem; writing-mode: vertical-rl; text-orientation: mixed; z-index: 1050; border-radius: 0.25rem 0 0 0.25rem; box-shadow: -2px 0 4px rgba(0,0,0,0.2);">
         🧪 ENVIRONNEMENT PILOTE
     </div>
     {% endif %}
 
     <!-- Navbar supérieure -->
-    <nav class="navbar navbar-dark bg-body-tertiary navbar-top">
+    <nav class="navbar navbar-dark -tertiary navbar-top">
         <div class="container-fluid">
             <span class="navbar-brand mb-0 h1">
                 <i class="fas fa-kiwi-bird"></i> Suivi des nids
             </span>
             {% if user.is_authenticated %}
-            <div class="navbar-text text-white d-flex align-items-center">
+            <div class="navbar-text  d-flex align-items-center">
                 <i class="fas fa-user-circle me-2"></i>
                 <span class="me-3">{{ user.username }}</span>
                 <form method="post" action="{% url 'observations:logout' %}" class="d-inline">

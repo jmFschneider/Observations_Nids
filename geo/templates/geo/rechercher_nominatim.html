@@ -16,7 +16,7 @@
             </nav>
 
             <div class="card mb-4">
-                <div class="card-header bg-info text-white">
+                <div class="card-header -subtle text-primary-emphasis ">
                     <h3 class="mb-0">
                         <i class="fas fa-search-location"></i> Rechercher une commune sur Nominatim
                     </h3>
@@ -63,7 +63,7 @@
             <!-- Résultat de la recherche -->
             {% if result %}
             <div class="card border-success">
-                <div class="card-header bg-success text-white">
+                <div class="card-header -subtle text-primary-emphasis ">
                     <h4 class="mb-0">
                         <i class="fas fa-check-circle"></i> Commune trouvée !
                     </h4>
@@ -104,9 +104,9 @@
                                     <th>Source</th>
                                     <td>
                                         {% if result.source == 'base_locale' %}
-                                        <span class="badge bg-info">Base locale</span>
+                                        <span class="badge -subtle text-primary-emphasis">Base locale</span>
                                         {% elif result.source == 'nominatim' %}
-                                        <span class="badge bg-success">Nominatim (OpenStreetMap)</span>
+                                        <span class="badge -subtle text-primary-emphasis">Nominatim (OpenStreetMap)</span>
                                         {% endif %}
                                     </td>
                                 </tr>

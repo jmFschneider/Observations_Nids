@@ -44,7 +44,7 @@
                     </h6>
                     <p class="h5 mb-0">
                         {% if image_count > 0 %}
-                            <span class="badge bg-success" style="font-size: 1.1rem;">{{ image_count }} fichier{{ image_count|pluralize }}</span>
+                            <span class="badge -subtle text-primary-emphasis" style="font-size: 1.1rem;">{{ image_count }} fichier{{ image_count|pluralize }}</span>
                         {% else %}
                             <span class="text-muted">Aucune image</span>
                         {% endif %}
@@ -100,7 +100,7 @@
         </div>
         <div class="card-body p-0">
             {% if parent_path is not None %}
-            <div class="p-3 border-bottom bg-light">
+            <div class="p-3 border-bottom ">
                 <a href="{% url 'observations:select_directory' %}{% if parent_path %}?path={{ parent_path|urlencode }}{% endif %}"
                    class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-level-up-alt"></i> Remonter au dossier parent
@@ -141,14 +141,14 @@
                             </td>
                             <td class="text-center">
                                 {% if dir.subdirs_count > 0 %}
-                                    <span class="badge bg-info">{{ dir.subdirs_count }}</span>
+                                    <span class="badge -subtle text-primary-emphasis">{{ dir.subdirs_count }}</span>
                                 {% else %}
                                     <span class="text-muted">-</span>
                                 {% endif %}
                             </td>
                             <td class="text-center">
                                 {% if dir.images_count > 0 %}
-                                    <span class="badge bg-success">{{ dir.images_count }}</span>
+                                    <span class="badge -subtle text-primary-emphasis">{{ dir.images_count }}</span>
                                 {% else %}
                                     <span class="text-muted">-</span>
                                 {% endif %}
@@ -176,14 +176,14 @@
                             </td>
                             <td class="text-center">
                                 {% if dir.subdirs_count > 0 %}
-                                    <span class="badge bg-info">{{ dir.subdirs_count }}</span>
+                                    <span class="badge -subtle text-primary-emphasis">{{ dir.subdirs_count }}</span>
                                 {% else %}
                                     <span class="text-muted">-</span>
                                 {% endif %}
                             </td>
                             <td class="text-center">
                                 {% if dir.images_count > 0 %}
-                                    <span class="badge bg-success">{{ dir.images_count }}</span>
+                                    <span class="badge -subtle text-primary-emphasis">{{ dir.images_count }}</span>
                                 {% else %}
                                     <span class="text-muted">-</span>
                                 {% endif %}

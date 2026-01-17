@@ -22,7 +22,7 @@
     <!-- Statistiques -->
     <div class="row mb-4">
         <div class="col-md-4">
-            <div class="card bg-light">
+            <div class="card ">
                 <div class="card-body text-center">
                     <h5 class="card-title text-muted">Total</h5>
                     <h2 class="mb-0">{{ total_images }}</h2>
@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card bg-success text-white">
+            <div class="card -subtle text-primary-emphasis ">
                 <div class="card-body text-center">
                     <h5 class="card-title">Transcrites</h5>
                     <h2 class="mb-0">{{ images_transcrites }}</h2>
@@ -40,7 +40,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card bg-warning text-dark">
+            <div class="card -subtle text-primary-emphasis text-dark">
                 <div class="card-body text-center">
                     <h5 class="card-title">En attente</h5>
                     <h2 class="mb-0">{{ images_en_attente }}</h2>
@@ -79,11 +79,11 @@
                 <!-- Badge de statut -->
                 <div class="position-absolute" style="top: 10px; right: 10px;">
                     {% if image_source.est_transcrite %}
-                    <span class="badge bg-success">
+                    <span class="badge -subtle text-primary-emphasis">
                         <i class="fas fa-check-circle"></i> Transcrite
                     </span>
                     {% else %}
-                    <span class="badge bg-warning text-dark">
+                    <span class="badge -subtle text-primary-emphasis text-dark">
                         <i class="fas fa-clock"></i> En attente
                     </span>
                     {% endif %}

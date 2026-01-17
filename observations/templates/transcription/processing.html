@@ -44,7 +44,7 @@ setTimeout(function() {
     <h2>Traitement des images en cours</h2>
 
     <div class="card mb-4">
-        <div class="card-header bg-body-tertiary text-white">
+        <div class="card-header -tertiary ">
             Progression du traitement
         </div>
         <div class="card-body">
@@ -71,7 +71,7 @@ setTimeout(function() {
     </div>
 
     <div class="card">
-        <div class="card-header bg-info text-white">
+        <div class="card-header -subtle text-primary-emphasis ">
             Résultats récents
         </div>
         <div class="card-body">
@@ -223,9 +223,9 @@ function updateUI(data) {
             // Créer la cellule pour le statut
             const statusCell = document.createElement('td');
             if (result.status === 'success') {
-                statusCell.innerHTML = '<span class="badge bg-success">Succès</span>';
+                statusCell.innerHTML = '<span class="badge -subtle text-primary-emphasis">Succès</span>';
             } else {
-                statusCell.innerHTML = '<span class="badge bg-danger">Erreur</span>';
+                statusCell.innerHTML = '<span class="badge -subtle text-primary-emphasis">Erreur</span>';
             }
             row.appendChild(statusCell);
 
