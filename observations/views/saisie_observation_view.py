@@ -290,9 +290,15 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
         # Préparer les données POST
         post_data = request.POST.copy()
         # Ne définir l'observateur que s'il n'est pas fourni dans le formulaire (pour les nouvelles fiches uniquement)
-        if not post_data.get('observateur') and not fiche_id:
-            # Pour une nouvelle fiche, utiliser l'utilisateur courant comme valeur par défaut
-            post_data['observateur'] = request.user.id
+        if not post_data.get('observateur'):
+            if (
+                fiche_instance
+                and hasattr(fiche_instance, 'observateur')
+                and fiche_instance.observateur
+            ):
+                post_data['observateur'] = fiche_instance.observateur.id
+            else:
+                post_data['observateur'] = request.user.id
 
         # Si le champ coordonnees est vide, donner une valeur par défaut
         if not post_data.get('coordonnees'):

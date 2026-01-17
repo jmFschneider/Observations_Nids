@@ -4,6 +4,7 @@ import logging
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render
 
 from observations.filters import FicheObservationFilter  # Import the filter
@@ -44,7 +45,7 @@ def liste_fiches_observations(request):
             'observateur', 'espece', 'localisation', 'etat_correction'
         )
         .all()
-        .order_by('date_creation')
+        .order_by('-date_creation')
     )
 
     fiche_filter = FicheObservationFilter(request.GET, queryset=fiches_queryset)
@@ -60,57 +61,48 @@ def liste_fiches_observations(request):
     }
     return render(request, 'liste_fiches_observations.html', context)
 
+
 def get_statistics_context():
     """
     Prépare les données statistiques pour la page de statistiques.
-    
+
     Retourne un dictionnaire contenant diverses statistiques sur les fiches d'observation.
     """
-    from django.db.models import Count, Q
-    from observations.models import FicheObservation
-    
+
     # Total de fiches
     total_fiches = FicheObservation.objects.count()
-    
+
     # Fiches en cours de saisie (statut 'nouveau' ou 'en_edition')
-    fiches_EnCourSaisie = FicheObservation.objects.filter(
+    fiches_en_cour_saisie = FicheObservation.objects.filter(
         Q(etat_correction__statut='nouveau') | Q(etat_correction__statut='en_edition')
     ).count()
-    
-    # Fiches en cours de correction assignées (statut 'en_cours' avec reviewer)
-    fiches_en_cours_qs = FicheObservation.objects.filter(
-        etat_correction__statut='en_cours'
-    )
-    fiches_EnCourCorrection = fiches_en_cours_qs.filter(
+
+    # Fiches en cours de correction (statut 'en_cours')
+    fiches_en_cours_qs = FicheObservation.objects.filter(etat_correction__statut='en_cours')
+    fiches_en_cours_correction = fiches_en_cours_qs.filter(
         etat_correction__en_correction_par__isnull=False
     ).count()
-    fiches_EnAttenteCorrection = (
-        fiches_en_cours_qs.count() - fiches_EnCourCorrection
-    )
-    
+    fiches_en_attente_correction = fiches_en_cours_qs.count() - fiches_en_cours_correction
+
     # Fiches validées (statut 'valide')
-    fiches_valides = FicheObservation.objects.filter(
-        etat_correction__statut='valide'
-    ).count()
-    
+    fiches_valides = FicheObservation.objects.filter(etat_correction__statut='valide').count()
+
     # Nombre d'espèces distinctes observées
     nb_especes = FicheObservation.objects.values('espece').distinct().count()
-    
+
     # Nombre d'observateurs distincts
     nb_observateurs = FicheObservation.objects.values('observateur').distinct().count()
-    
+
     # Top 4 espèces les plus fréquentes
     top_especes = (
-        FicheObservation.objects
-        .values('espece__nom')
+        FicheObservation.objects.values('espece__nom')
         .annotate(count=Count('espece'))
         .order_by('-count')[:4]
     )
-    
+
     # Fiches par année pour graphique
     fiches_par_annee_qs = (
-        FicheObservation.objects
-        .values('annee')
+        FicheObservation.objects.values('annee')
         .annotate(count=Count('num_fiche'))
         .order_by('annee')
     )
@@ -120,9 +112,9 @@ def get_statistics_context():
 
     return {
         'total_fiches': total_fiches,
-        'fiches_EnCourSaisie': fiches_EnCourSaisie,
-        'fiches_EnCourCorrection': fiches_EnCourCorrection,
-        'fiches_EnAttenteCorrection': fiches_EnAttenteCorrection,
+        'fiches_en_cour_saisie': fiches_en_cour_saisie,
+        'fiches_en_cours_correction': fiches_en_cours_correction,
+        'fiches_en_attente_correction': fiches_en_attente_correction,
         'fiches_valides': fiches_valides,
         'nb_especes': nb_especes,
         'nb_observateurs': nb_observateurs,

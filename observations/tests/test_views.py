@@ -497,11 +497,10 @@ class TestPermissions:
         )
         response = client.get(url)
 
-        # Devrait être redirigé
-        assert response.status_code == 302
-        assert response.url == reverse(
-            'observations:fiche_observation', kwargs={'fiche_id': fiche_observation.num_fiche}
-        )
+        # Devrait voir la fiche en lecture seule
+        assert response.status_code == 200
+        assert response.context.get('read_only') is True
+        assert 'fiche_form' in response.context
 
     def test_fiche_inexistante(self, authenticated_client):
         """Test d'accès à une fiche qui n'existe pas."""

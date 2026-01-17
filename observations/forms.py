@@ -57,16 +57,20 @@ class FicheObservationForm(forms.ModelForm):
         self.user = user
 
         # Configurer le queryset des observateurs (utilisateurs actifs et validés)
-        self.fields["observateur"].queryset = Utilisateur.objects.filter(
-            is_active=True, est_valide=True
-        ).order_by('first_name', 'last_name')
+        observateur_queryset = Utilisateur.objects.filter(is_active=True, est_valide=True)
+        if self.instance.pk and self.instance.observateur:
+            observateur_queryset = observateur_queryset | Utilisateur.objects.filter(
+                pk=self.instance.observateur.pk
+            )
+        if user and user.pk:
+            observateur_queryset = observateur_queryset | Utilisateur.objects.filter(pk=user.pk)
+        self.fields["observateur"].queryset = observateur_queryset.order_by(
+            'first_name', 'last_name'
+        )
 
         # Définir la valeur initiale si c'est une nouvelle instance
-        if user:
-            if not self.instance.pk:  # Nouvelle instance
-                self.fields["observateur"].initial = user
-            elif not self.instance.observateur:  # Instance existante sans observateur
-                self.fields["observateur"].initial = user
+        if user and (not self.instance.pk or not self.instance.observateur):  # Nouvelle instance
+            self.fields["observateur"].initial = user
 
     def save(self, commit=True):
         """Sauvegarder avec la valeur du formulaire pour l'observateur."""

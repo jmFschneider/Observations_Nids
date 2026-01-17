@@ -346,6 +346,12 @@ class EtatCorrection(models.Model):
     def __str__(self):
         return f"État correction Fiche {self.fiche.num_fiche} - {self.get_statut_display()}"
 
+    def save(self, *args, **kwargs):
+        # Calculer automatiquement le pourcentage avant la sauvegarde
+        if not kwargs.pop('skip_auto_calculation', False):
+            self.calculer_pourcentage_completion()
+        super().save(*args, **kwargs)
+
     @property
     def statut_libelle(self):
         if self.statut == 'en_cours':
@@ -365,12 +371,6 @@ class EtatCorrection(models.Model):
         if self.statut == 'valide':
             return 'badge-success'
         return 'badge-secondary'
-
-    def save(self, *args, **kwargs):
-        # Calculer automatiquement le pourcentage avant la sauvegarde
-        if not kwargs.pop('skip_auto_calculation', False):
-            self.calculer_pourcentage_completion()
-        super().save(*args, **kwargs)
 
     def calculer_pourcentage_completion(self):
         """Calcule automatiquement le pourcentage de completion basé sur les données de la fiche"""

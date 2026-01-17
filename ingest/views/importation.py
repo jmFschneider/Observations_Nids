@@ -13,7 +13,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from ingest.importation_service import ImportationService
-from ingest.models import ImportationEnCours, TranscriptionBrute
+from ingest.models import ImportationEnCours
 from ingest.tasks import process_json_batch_task
 
 from .auth import peut_transcrire

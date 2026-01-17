@@ -4,11 +4,9 @@ Tâches Celery pour l'importation batch de fichiers JSON.
 """
 
 import logging
-import os
 
 from celery import shared_task
 from celery.result import AsyncResult
-from django.conf import settings
 from django.utils import timezone
 
 from ingest.importation_service import ImportationService
