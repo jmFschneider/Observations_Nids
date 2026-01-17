@@ -3,35 +3,43 @@
 
 {% block content %}
 <main class="container-fluid py-4">
-    <div class="row g-3">
-        <div class="col-12 col-md-3">
-            <div class="card -subtle text-primary-emphasis-subtle text-primary-emphasis h-100 border-primary-subtle">
+    <div class="row row-cols-1 row-cols-md-5 g-3">
+        <div class="col">
+            <div class="card bg-primary-subtle text-primary-emphasis h-100 border-primary-subtle">
                 <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <p class="card-title mb-1">Total des fiches</p>
+                    <p class="card-title mb-1">Nombre total de fiches</p>
                     <h2 class="card-text fw-bold">{{ total_fiches }}</h2>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-3">
-            <div class="card -subtle text-primary-emphasis-subtle text-success-emphasis h-100 border-success-subtle">
+        <div class="col">
+            <div class="card bg-success-subtle text-success-emphasis h-100 border-success-subtle">
                 <div class="card-body text-center d-flex flex-column justify-content-center">
                     <p class="card-title mb-1">Fiches validées</p>
                     <h2 class="card-text fw-bold">{{ fiches_valides }}</h2>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-3">
-            <div class="card -subtle text-primary-emphasis-subtle text-warning-emphasis h-100 border-warning-subtle">
+        <div class="col">
+            <div class="card bg-warning-subtle text-warning-emphasis h-100 border-warning-subtle">
                 <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <p class="card-title mb-1">Fiches en cours</p>
+                    <p class="card-title mb-1">Fiches en cours de correction</p>
                     <h2 class="card-text fw-bold">{{ fiches_EnCourCorrection }}</h2>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col">
+            <div class="card bg-warning text-dark h-100 border-warning">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <p class="card-title mb-1">Fiches en attente de correction</p>
+                    <h2 class="card-text fw-bold">{{ fiches_EnAttenteCorrection }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col">
             <div class="card -subtle text-secondary-emphasis h-100 border-secondary-subtle">
                 <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <p class="card-title mb-1">Fiches en attente</p>
+                    <p class="card-title mb-1">Fiches en cours de sasie</p>
                     <h2 class="card-text fw-bold">{{ fiches_EnCourSaisie }}</h2>
                 </div>
             </div>

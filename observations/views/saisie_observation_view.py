@@ -27,11 +27,28 @@ from observations.models import FicheObservation, Observation, Remarque
 logger = logging.getLogger('observations')
 
 
+def disable_form_fields(form):
+    for field in form.fields.values():
+        field.disabled = True
+
+
+def disable_formset_fields(formset):
+    for form in formset.forms:
+        disable_form_fields(form)
+
+
 def handle_remarques_update(request, fiche_instance, remarqueformset):
     """
     Traite uniquement la mise à jour des remarques via AJAX.
     """
     try:
+        if request.user != fiche_instance.observateur:
+            return JsonResponse(
+                {
+                    'status': 'forbidden',
+                    'message': "Vous n'êtes pas autorisé à modifier les remarques de cette fiche.",
+                }
+            )
         with transaction.atomic():
             # Créer le formset avec les données POST
             remarque_formset = remarqueformset(request.POST, instance=fiche_instance)
@@ -163,10 +180,12 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
     remarques = []
 
     # Récupérer les données existantes si on est en mode modification
+    read_only = False
     if fiche_id:
         try:
             fiche_instance = FicheObservation.objects.get(pk=fiche_id)
             user = cast(Utilisateur, request.user)
+            read_only = user != fiche_instance.observateur
 
             # Vérifier les permissions pour les fiches en cours de saisie
             redirect_response = None
@@ -205,18 +224,11 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
                         )
                 # Si la fiche est en cours de saisie (nouveau ou en_edition),
                 # seul l'auteur ou un administrateur peut l'éditer
-                elif (
-                    etat.statut in ['nouveau', 'en_edition']
-                    and user != fiche_instance.observateur
-                    and user.role != "administrateur"
-                ):
-                    messages.error(
+                elif etat.statut in ['nouveau', 'en_edition'] and read_only:
+                    messages.info(
                         request,
-                        f"Vous n'êtes pas autorisé à modifier cette fiche. "
-                        f"Seul l'auteur ({fiche_instance.observateur.username}) peut continuer la saisie.",
-                    )
-                    redirect_response = redirect(
-                        'observations:fiche_observation', fiche_id=fiche_id
+                        f"Vous consultez cette fiche en lecture seule. "
+                        f"Seul l'auteur ({fiche_instance.observateur.username}) peut la modifier.",
                     )
 
             if redirect_response:
@@ -274,7 +286,7 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
     ):
         return handle_get_remarques(request, fiche_instance)
 
-    if request.method == "POST":
+    if request.method == "POST" and not read_only:
         # Préparer les données POST
         post_data = request.POST.copy()
         # Ne définir l'observateur que s'il n'est pas fourni dans le formulaire (pour les nouvelles fiches uniquement)
@@ -646,7 +658,12 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
             for error in validation_errors:
                 messages.error(request, error)
 
-    else:  # GET request
+    else:  # GET request ou POST en lecture seule
+        if request.method == "POST" and read_only:
+            messages.error(
+                request,
+                "Vous n'êtes pas autorisé à enregistrer les modifications de cette fiche.",
+            )
         fiche_form = FicheObservationForm(instance=fiche_instance, user=request.user)
         localisation_form = LocalisationForm(instance=localisation_instance)
         resume_form = ResumeObservationForm(instance=resume_instance)
@@ -661,6 +678,15 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
         observation_formset = observationformset(instance=fiche_instance)
         remarque_formset = remarqueformset(instance=fiche_instance)
 
+    if read_only:
+        disable_form_fields(fiche_form)
+        disable_form_fields(localisation_form)
+        disable_form_fields(resume_form)
+        disable_form_fields(nid_form)
+        disable_form_fields(causes_echec_form)
+        disable_formset_fields(observation_formset)
+        disable_formset_fields(remarque_formset)
+
     context = {
         'fiche_form': fiche_form,
         'localisation_form': localisation_form,
@@ -670,6 +696,7 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
         'observation_formset': observation_formset,
         'remarque_formset': remarque_formset,
         'remarques': remarques,
+        'read_only': read_only,
     }
 
     return render(request, 'saisie/saisie_observation.html', context)

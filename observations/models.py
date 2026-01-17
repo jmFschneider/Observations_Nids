@@ -346,6 +346,26 @@ class EtatCorrection(models.Model):
     def __str__(self):
         return f"État correction Fiche {self.fiche.num_fiche} - {self.get_statut_display()}"
 
+    @property
+    def statut_libelle(self):
+        if self.statut == 'en_cours':
+            if self.en_correction_par_id:
+                return "En cours de correction"
+            return "En attente de correction"
+        if self.statut == 'en_edition':
+            return "En cours de saisie"
+        return self.get_statut_display()
+
+    @property
+    def statut_badge_class(self):
+        if self.statut == 'en_cours':
+            return 'badge-info' if self.en_correction_par_id else 'badge-warning'
+        if self.statut in ['nouveau', 'en_edition']:
+            return 'badge-info'
+        if self.statut == 'valide':
+            return 'badge-success'
+        return 'badge-secondary'
+
     def save(self, *args, **kwargs):
         # Calculer automatiquement le pourcentage avant la sauvegarde
         if not kwargs.pop('skip_auto_calculation', False):

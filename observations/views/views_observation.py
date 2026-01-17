@@ -77,10 +77,16 @@ def get_statistics_context():
         Q(etat_correction__statut='nouveau') | Q(etat_correction__statut='en_edition')
     ).count()
     
-    # Fiches en cours de correction (statut 'en_cours')
-    fiches_EnCourCorrection = FicheObservation.objects.filter(
+    # Fiches en cours de correction assignées (statut 'en_cours' avec reviewer)
+    fiches_en_cours_qs = FicheObservation.objects.filter(
         etat_correction__statut='en_cours'
+    )
+    fiches_EnCourCorrection = fiches_en_cours_qs.filter(
+        etat_correction__en_correction_par__isnull=False
     ).count()
+    fiches_EnAttenteCorrection = (
+        fiches_en_cours_qs.count() - fiches_EnCourCorrection
+    )
     
     # Fiches validées (statut 'valide')
     fiches_valides = FicheObservation.objects.filter(
@@ -116,6 +122,7 @@ def get_statistics_context():
         'total_fiches': total_fiches,
         'fiches_EnCourSaisie': fiches_EnCourSaisie,
         'fiches_EnCourCorrection': fiches_EnCourCorrection,
+        'fiches_EnAttenteCorrection': fiches_EnAttenteCorrection,
         'fiches_valides': fiches_valides,
         'nb_especes': nb_especes,
         'nb_observateurs': nb_observateurs,
