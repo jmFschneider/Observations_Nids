@@ -27,7 +27,7 @@
                             <table class="table">
                                 <tr>
                                     <th width="200">Espèces totales</th>
-                                    <td><span class="badge bg-primary">{{ stats.total }}</span></td>
+                                    <td><span class="badge bg-body-tertiary">{{ stats.total }}</span></td>
                                 </tr>
                                 <tr>
                                     <th>Familles</th>
@@ -145,7 +145,7 @@
                                     <td><strong>{{ espece.nom }}</strong></td>
                                     <td>
                                         {% if espece.code_gonm %}
-                                        <span class="badge bg-secondary">{{ espece.code_gonm }}</span>
+                                        <span class="badge bg-body-tertiary">{{ espece.code_gonm }}</span>
                                         {% else %}
                                         <span class="text-muted">-</span>
                                         {% endif %}

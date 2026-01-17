@@ -22,7 +22,7 @@
 <p>Nombre d'observations : {{ observations_count }}</p>
 
 <div class="card mb-4">
-    <div class="card-header bg-primary text-white">
+    <div class="card-header bg-body-tertiary text-white">
         <h3>Observations</h3>
     </div>
     <div class="card-body">
@@ -34,7 +34,7 @@
 </div>
 
 <div class="card mb-4">
-    <div class="card-header bg-secondary text-white">
+    <div class="card-header bg-body-tertiary text-white">
         <h3>Mes Images</h3>
     </div>
     <div class="card-body">
@@ -69,7 +69,7 @@
                     <td>{{ fiche.espece.nom }}</td>
                     <td>{{ fiche.annee }}</td>
                     <td>
-                        <span class="badge {% if fiche.etat_correction.statut == 'nouveau' %}bg-secondary{% elif fiche.etat_correction.statut == 'en_edition' %}bg-warning{% endif %}">
+                        <span class="badge {% if fiche.etat_correction.statut == 'nouveau' %}bg-body-tertiary{% elif fiche.etat_correction.statut == 'en_edition' %}bg-warning{% endif %}">
                             {{ fiche.etat_correction.get_statut_display }}
                         </span>
                     </td>

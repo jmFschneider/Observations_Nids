@@ -1,7 +1,13 @@
 /* === Styles généraux === */
+:root {
+    --surface-bg: #f8f9fa;
+    --card-bg: #ffffff;
+    --border-subtle: #dee2e6;
+}
+
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: var(--surface-bg);
     /* Normalize.css gère les marges et paddings de base */
 }
 
@@ -33,7 +39,7 @@ table {
 
 th,
 td {
-    border: 2px solid #000; /* Bordures noires de 2px */
+    border: 1px solid var(--border-subtle); /* Bordure douce */
     padding: 8px; /* Espacement intérieur des cellules */
     text-align: left; /* Alignement du texte à gauche */
 }
@@ -46,8 +52,8 @@ th {
 
 /* === Titres des sections === */
 .section-title {
-    background-color: #e0e0e0; /* Fond gris */
-    border: 2px solid #000; /* Bordure noire */
+    background-color: var(--surface-bg); /* Fond pastel unifié */
+    border: 1px solid var(--border-subtle); /* Bordure douce */
     padding: 8px; /* Espacement intérieur */
     font-weight: bold; /* Texte en gras */
     text-align: center; /* Texte centré */
@@ -59,8 +65,8 @@ th {
 }
 
 .section-content {
-    background: #fff; /* Fond blanc */
-    border: 2px solid #000; /* Bordure noire */
+    background: var(--card-bg); /* Fond carte doux */
+    border: 1px solid var(--border-subtle); /* Bordure légère */
     padding: 10px; /* Espacement intérieur */
     max-height: 80px; /* Hauteur minimale */
     display: flex;
@@ -72,10 +78,10 @@ th {
 textarea {
     width: 100%; /* Prend toute la largeur du conteneur */
     padding: 8px; /* Espacement intérieur */
-    border: 2px solid #000; /* Bordure noire */
+    border: 1px solid var(--border-subtle); /* Bordure douce */
     border-radius: 4px; /* Bords arrondis */
     resize: vertical; /* Autorise le redimensionnement vertical */
-    background: white; /* Fond blanc */
+    background: var(--card-bg); /* Fond pastel */
     min-height: 80px; /* Hauteur minimale */
 }
 
@@ -131,14 +137,14 @@ button:hover {
 .submit-container button {
     padding: 10px 20px; /* Espacement intérieur */
     font-size: 16px; /* Taille de police */
-    background-color: #4CAF50; /* Fond vert */
-    color: white; /* Texte blanc */
-    border: none; /* Pas de bordure */
+    background-color: var(--surface-bg);
+    color: #212529;
+    border: 1px solid var(--border-subtle);
     cursor: pointer; /* Curseur "lien" au survol */
 }
 
 .submit-container button:hover {
-    background-color: #45a049; /* Fond vert plus foncé au survol */
+    background-color: #e9ecef;
 }
 
 /* === Styles pour les tableaux imbriqués (si nécessaire) === */
@@ -162,14 +168,14 @@ button:hover {
 /* Style des cellules du tableau */
 .resume-container th,
 .resume-container td {
-    border: 2px solid #000;
+    border: 1px solid var(--border-subtle);
     padding: 8px;
     text-align: center;
 }
 
 /* Style des en-têtes du tableau */
 .resume-container th {
-    background-color: #e0e0e0;
+    background-color: var(--surface-bg);
     font-weight: bold;
 }
 
@@ -185,18 +191,18 @@ button:hover {
     width: 50%;
     display: flex;
     flex-direction: column;
-    background: #fff;
-    border: 2px solid #000;
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
     padding: 15px;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Titres des sections */
 .causes-container h3 {
-    background-color: #e0e0e0;
+    background-color: var(--surface-bg);
     padding: 8px;
     text-align: center;
-    border-bottom: 2px solid #000;
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 /* Contenu des sections */
@@ -209,8 +215,8 @@ button:hover {
     width: 50%;
     display: flex;
     flex-direction: column;
-    background: #fff;
-    border: 2px solid #000;
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
     padding: 0; /* Supprimer le padding pour éviter l'espace autour de la table */
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
 }
@@ -225,21 +231,21 @@ button:hover {
 /* Style des cellules du tableau */
 .remarques-container th,
 .remarques-container td {
-    border: 2px solid #000; /* Utilise la même bordure que le container */
+    border: 1px solid var(--border-subtle); /* Utilise la bordure douce */
     padding: 8px;
     text-align: left;
 }
 
 /* Style des en-têtes du tableau */
 .remarques-container th {
-    background-color: #e0e0e0;
+    background-color: var(--surface-bg);
     font-weight: bold;
     text-align: center;
 }
 
 /* Suppression de la bordure du bas du titre pour fusion avec la table */
 .remarques-container h3 {
-    background-color: #e0e0e0;
+    background-color: var(--surface-bg);
     padding: 8px;
     text-align: center;
     border-bottom: none; /* Évite une séparation visuelle avec la table */
@@ -281,33 +287,13 @@ th {
     color: #555;
 }
 
-/* === Navbar === */
-.navbar {
-    display: flex;
-    justify-content: center;
-    background-color: #007bff;
-    padding: 10px 0;
-}
-
-.navbar a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 20px;
-    font-weight: bold;
-}
-
-.navbar a:hover {
-    background-color: #0056b3;
-    border-radius: 5px;
-}
-
 /* === Contenu principal === */
 /* REMARQUE : Le layout principal est maintenant géré par #content dans sidebar.css */
 /* Ces styles s'appliquent au conteneur interne .content-inner */
 .content-inner {
     max-width: 1400px;
     margin: 0 auto;
-    background: white;
+    background: var(--card-bg);
     padding: 20px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
@@ -318,7 +304,7 @@ main {
     padding: 20px;
     max-width: 1400px;
     margin: auto;
-    background: white;
+    background: var(--card-bg);
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
 }
@@ -380,13 +366,13 @@ main {
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    background-color: #f8f9fa;
+    background-color: var(--surface-bg);
     /* Couleur de fond optionnelle */
 }
 
 .navbar a {
     text-decoration: none;
-    color: #007bff;
+    color: #343a40;
     margin-right: 15px;
 }
 

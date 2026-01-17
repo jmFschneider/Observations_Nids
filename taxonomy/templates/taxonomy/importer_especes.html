@@ -16,7 +16,7 @@
             <!-- Statistiques -->
             <div class="row mb-4">
                 <div class="col-md-3">
-                    <div class="card bg-primary text-white">
+                    <div class="card bg-body-tertiary text-white">
                         <div class="card-body">
                             <h5><i class="fas fa-list"></i> Espèces totales</h5>
                             <h2>{{ stats.total_especes }}</h2>
@@ -72,7 +72,7 @@
                         </div>
                         <div class="col-md-6">
                             <h5>Commande</h5>
-                            <div class="bg-dark text-light p-3 rounded">
+                            <div class="bg-body-tertiary text-light p-3 rounded">
                                 <code>python manage.py charger_lof</code>
                             </div>
                             <p class="mt-2 text-muted small">
@@ -119,7 +119,7 @@
                         </div>
                         <div class="col-md-6">
                             <h5>Commande</h5>
-                            <div class="bg-dark text-light p-3 rounded">
+                            <div class="bg-body-tertiary text-light p-3 rounded">
                                 <code>python manage.py charger_taxref --file /chemin/vers/TAXREFv17.txt</code>
                             </div>
                         </div>
@@ -173,7 +173,7 @@
                                         {% elif "TaxRef" in espece.commentaire %}
                                         <span class="badge bg-info">TaxRef</span>
                                         {% else %}
-                                        <span class="badge bg-secondary">Manuel</span>
+                                        <span class="badge bg-body-tertiary">Manuel</span>
                                         {% endif %}
                                     </td>
                                 </tr>
