@@ -9,7 +9,7 @@
 | Catégorie | Progression | Statut |
 |-----------|-------------|--------|
 | Applications Django | 9/9 | ✅ Terminé |
-| Guides transverses | 2/5 | 🔵 En cours |
+| Guides transverses | 5/5 | ✅ Terminé |
 | Documentation générale | 2/2 | ✅ Terminé |
 
 ---
@@ -85,22 +85,25 @@
   - 📌 Matrice de permissions, cas d'usage
   - 📄 Fichier : `guides/permissions.md`
 
-- [ ] **ocr_gemini.md** - Intégration OCR Gemini
+- [x] **ocr_gemini.md** - Intégration OCR Gemini ✅
   - 📝 Pipeline de transcription des fiches papier
   - 🔗 Implique : `ocr`, `ingest`, `observations`
   - 📌 Configuration API, prompts, évaluation qualité
+  - 📄 Fichier : `guides/ocr_gemini.md`
 
 ### 🚀 Déploiement
 
-- [ ] **deploiement_linux_windows.md** - Déploiement natif
+- [x] **deploiement_linux_windows.md** - Déploiement natif ✅
   - 📝 Installation sur Linux (Ubuntu/Debian) et Windows
-  - 📌 Prérequis, Python, PostgreSQL, Redis, Celery
+  - 📌 Prérequis, Python, MariaDB, Redis, Celery
   - 📌 Configuration Nginx/Apache, systemd/services Windows
+  - 📄 Fichier : `deploiement/deploiement_linux_windows.md`
 
-- [ ] **deploiement_docker.md** - Déploiement avec Docker
+- [x] **deploiement_docker.md** - Déploiement avec Docker ✅
   - 📝 Installation via Docker Compose
   - 📌 Images, volumes, réseaux, variables d'environnement
   - 📌 Production vs développement, mise à jour
+  - 📄 Fichier : `deploiement/deploiement_docker.md`
 
 ---
 
