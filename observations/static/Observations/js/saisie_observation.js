@@ -554,6 +554,34 @@ document.addEventListener('DOMContentLoaded', function() {
         // Événement de saisie
         communeInput.addEventListener('input', function() {
             const query = this.value.trim();
+
+            // Si le champ est vidé, réinitialiser l'état et les champs liés
+            if (!query || query.length === 0) {
+                if (selectedCommune) {
+                    const departementInput = document.getElementById('id_departement');
+                    const latInput = document.getElementById('id_latitude');
+                    const lonInput = document.getElementById('id_longitude');
+                    const altitudeInput = document.getElementById('id_altitude');
+
+                    if (departementInput) {
+                        departementInput.value = '';
+                    }
+                    if (latInput) {
+                        latInput.value = '';
+                    }
+                    if (lonInput) {
+                        lonInput.value = '';
+                    }
+                    if (altitudeInput) {
+                        altitudeInput.value = '';
+                    }
+                }
+
+                selectedCommune = null;
+                communeResultsDiv.style.display = 'none';
+                return;
+            }
+
             rechercherCommunes(query);
         });
 
