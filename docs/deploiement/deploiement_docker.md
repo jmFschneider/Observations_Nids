@@ -287,6 +287,12 @@ docker compose up -d
 
 # Appliquer les migrations
 docker compose exec web python manage.py migrate
+
+# Collecter les fichiers statiques
+docker compose exec web python manage.py collectstatic --noinput
+
+# Redémarrer le service web
+docker compose restart web
 ```
 
 ### Mise à Jour avec Sauvegarde
@@ -304,11 +310,63 @@ docker compose down
 docker compose build
 docker compose up -d
 docker compose exec web python manage.py migrate
+docker compose exec web python manage.py collectstatic --noinput
+docker compose restart web
 
 # 4. Vérifier
 docker compose ps
 curl http://localhost:8010/health/
 ```
+
+---
+
+## 📦 Configuration WhiteNoise (Fichiers Statiques)
+
+Le projet utilise **WhiteNoise** pour servir les fichiers statiques directement depuis Gunicorn, sans nécessiter de configuration Nginx spécifique.
+
+### Avantages
+
+- ✅ **Simplification** : Plus besoin de configurer Nginx pour `/static/`
+- ✅ **Compression** : Compression automatique (Gzip + Brotli)
+- ✅ **Cache optimal** : Headers de cache perpétuel avec hash dans les noms de fichiers
+- ✅ **Performance** : Équivalent à un serveur de fichiers statiques dédié
+
+### Installation et Configuration
+
+WhiteNoise est déjà configuré dans le projet :
+
+1. **Middleware** : `whitenoise.middleware.WhiteNoiseMiddleware` activé dans `settings.py`
+2. **Storage** : `CompressedManifestStaticFilesStorage` pour compression et hachage
+3. **Dépendances** : `whitenoise` inclus dans `requirements-prod.txt`
+
+### Collecte des Fichiers Statiques
+
+```bash
+# Collecter tous les fichiers statiques avec compression WhiteNoise
+docker compose exec web python manage.py collectstatic --noinput
+
+# Redémarrer le service web pour appliquer les changements
+docker compose restart web
+```
+
+Cette commande va :
+- Copier tous les fichiers statiques vers `staticfiles/`
+- Créer des versions compressées (`.gz` et `.br`)
+- Générer un manifest avec les noms hashés pour le cache
+
+### Mise à Jour après Modifications CSS/JS
+
+Après toute modification de fichiers statiques :
+
+```bash
+# Collecter les nouveaux fichiers statiques
+docker compose exec web python manage.py collectstatic --noinput --clear
+
+# Redémarrer Gunicorn
+docker compose restart web
+```
+
+L'option `--clear` supprime les anciens fichiers avant de collecter les nouveaux.
 
 ---
 
@@ -324,12 +382,15 @@ docker compose exec web mkdocs build -f docs/mkdocs.yml
 
 # 2. Collecter les fichiers statiques (inclut la doc)
 docker compose exec web python manage.py collectstatic --noinput
+
+# 3. Redémarrer le service web
+docker compose restart web
 ```
 
 ### Commande Combinée
 
 ```bash
-docker compose exec web bash -c "mkdocs build -f docs/mkdocs.yml && python manage.py collectstatic --noinput"
+docker compose exec web bash -c "mkdocs build -f docs/mkdocs.yml && python manage.py collectstatic --noinput" && docker compose restart web
 ```
 
 ### Accès à la Documentation
@@ -441,9 +502,14 @@ CSRF_TRUSTED_ORIGINS='["http://localhost:8010"]'
 ### Fichiers statiques manquants
 
 ```bash
+# Collecter les fichiers statiques avec WhiteNoise
 docker compose exec web python manage.py collectstatic --noinput
-docker compose restart nginx
+
+# Redémarrer le service web (Gunicorn)
+docker compose restart web
 ```
+
+**Note** : Depuis la configuration WhiteNoise, les fichiers statiques sont servis directement par Gunicorn. Le redémarrage de Nginx n'est plus nécessaire pour les fichiers statiques.
 
 ### Celery ne traite pas les tâches
 

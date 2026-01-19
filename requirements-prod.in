@@ -5,3 +5,6 @@
 
 # WSGI server for production
 gunicorn
+
+# Static files serving for production
+whitenoise
