@@ -1,0 +1,22 @@
+# Environnements
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Django
+staticfiles/
+media/
+*.log
+
+# Node / frontend
+node_modules/
+
+# Git
+.git/
+
+# Divers
+.env
+.cache/
+site-user/
+htmlcov/

@@ -134,23 +134,47 @@ observations_nids/
 
 ## 📚 Documentation
 
+### Guide Utilisateur
+
 | Document | Description |
 |----------|-------------|
-| [Architecture](./architecture.md) | Architecture technique du projet |
-| [Applications](./applications/) | Documentation des 9 applications Django |
-| [Plan Directeur](./docs_todo.md) | État d'avancement de la documentation |
+| [Saisie d'observations](./guides/utilisateur/saisie_observation.md) | Guide complet de la page de saisie |
 
-### Applications Documentées
+### Architecture & Applications
 
-- [observations](./applications/observations.md) - Fiches d'observation
-- [taxonomy](./applications/taxonomy.md) - Espèces et codes GONM
-- [geo](./applications/geo.md) - Communes et géolocalisation
-- [accounts](./applications/accounts.md) - Utilisateurs et rôles
-- [review](./applications/review.md) - Validation
-- [audit](./applications/audit.md) - Historique
-- [ingest](./applications/ingest.md) - Import JSON
-- [ocr](./applications/ocr.md) - Transcription OCR
-- [core](./applications/core.md) - Utilitaires
+| Document | Description |
+|----------|-------------|
+| [Architecture](./guides/architecture.md) | Architecture technique du projet |
+| [observations](./applications/observations.md) | Fiches d'observation (application principale) |
+| [taxonomy](./applications/taxonomy.md) | Espèces et codes GONM |
+| [geo](./applications/geo.md) | Communes et géolocalisation |
+| [accounts](./applications/accounts.md) | Utilisateurs et rôles |
+| [review](./applications/review.md) | Validation des fiches |
+| [audit](./applications/audit.md) | Historique des modifications |
+| [ingest](./applications/ingest.md) | Import JSON |
+| [ocr](./applications/ocr.md) | Transcription OCR |
+| [core](./applications/core.md) | Utilitaires partagés |
+
+### Guides Techniques
+
+| Document | Description |
+|----------|-------------|
+| [Workflow d'une fiche](./guides/workflow_fiche.md) | Cycle de vie complet d'une fiche |
+| [Permissions](./guides/permissions.md) | Rôles et droits par fonctionnalité |
+| [OCR Gemini](./guides/ocr_gemini.md) | Pipeline de transcription |
+
+### Déploiement
+
+| Document | Description |
+|----------|-------------|
+| [Linux et Windows](./deploiement/deploiement_linux_windows.md) | Installation native |
+| [Docker](./deploiement/deploiement_docker.md) | Déploiement containerisé |
+
+### Projet
+
+| Document | Description |
+|----------|-------------|
+| [Plan Directeur](./projet/docs_todo.md) | État d'avancement de la documentation |
 
 ---
 

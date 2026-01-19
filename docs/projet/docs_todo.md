@@ -201,3 +201,6 @@ Pour les liens vers des sections non encore documentées :
 | 2026-01-18 | Documentation `architecture.md` | Claude |
 | 2026-01-18 | Guide `workflow_fiche.md` | Claude |
 | 2026-01-18 | Guide `permissions.md` | Claude |
+| 2026-01-19 | Guide `ocr_gemini.md` | Claude |
+| 2026-01-19 | Guide `deploiement_linux_windows.md` | Claude |
+| 2026-01-19 | Guide `deploiement_docker.md` | Claude |

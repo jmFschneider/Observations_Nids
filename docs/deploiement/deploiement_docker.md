@@ -312,6 +312,60 @@ curl http://localhost:8010/health/
 
 ---
 
+## 📚 Déploiement de la Documentation
+
+La documentation MkDocs doit être compilée puis collectée avec les fichiers statiques Django.
+
+### Compilation et Déploiement
+
+```bash
+# 1. Compiler la documentation MkDocs
+docker compose exec web mkdocs build -f docs/mkdocs.yml
+
+# 2. Collecter les fichiers statiques (inclut la doc)
+docker compose exec web python manage.py collectstatic --noinput
+```
+
+### Commande Combinée
+
+```bash
+docker compose exec web bash -c "mkdocs build -f docs/mkdocs.yml && python manage.py collectstatic --noinput"
+```
+
+### Accès à la Documentation
+
+| Environnement | URL |
+|---------------|-----|
+| Local (dev) | http://127.0.0.1:8001/ (serveur MkDocs) |
+| Pilote | https://pilote.observation-nids.meteo-poelley50.fr/static/docs/index.html |
+| Production | https://votre-domaine.com/static/docs/index.html |
+
+### Lien dans l'Application
+
+Le menu latéral contient un lien "Aide" qui redirige automatiquement :
+- **En développement** : vers le serveur MkDocs (port 8001)
+- **En production** : vers `/static/docs/index.html`
+
+Pour forcer l'utilisation des fichiers statiques en développement :
+```bash
+# Dans .env
+MKDOCS_USE_STATIC=True
+```
+
+### Mise à Jour de la Documentation
+
+Après modification des fichiers `.md` :
+
+```bash
+# Recompiler et redéployer
+docker compose exec web bash -c "mkdocs build -f docs/mkdocs.yml && python manage.py collectstatic --noinput"
+
+# Redémarrer nginx pour vider le cache (optionnel)
+docker compose restart nginx
+```
+
+---
+
 ## 🔒 SSL/HTTPS
 
 ### Configuration Nginx pour SSL
