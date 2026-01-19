@@ -18,14 +18,21 @@
     <!-- Navigation entre les différentes pages de stats -->
     <ul class="nav nav-pills mb-4" role="tablist">
         <li class="nav-item" role="presentation">
-            <a class="nav-link {% if request.resolver_match.url_name == 'stats_dashboard' %}active{% endif %}" 
-               href="{% url 'observations:stats_dashboard' %}"
-               aria-current="{% if request.resolver_match.url_name == 'stats_dashboard' %}page{% endif %}">
-                <i class="fas fa-tachometer-alt"></i> Vue Globale
+            <a class="nav-link {% if request.resolver_match.url_name == 'stats_general' %}active{% endif %}"
+               href="{% url 'observations:stats_general' %}"
+               aria-current="{% if request.resolver_match.url_name == 'stats_general' %}page{% endif %}">
+                <i class="fas fa-chart-bar"></i> Vue Générale
             </a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link {% if request.resolver_match.url_name == 'stats_corrections' %}active{% endif %}" 
+            <a class="nav-link {% if request.resolver_match.url_name == 'stats_suivi' %}active{% endif %}"
+               href="{% url 'observations:stats_suivi' %}"
+               aria-current="{% if request.resolver_match.url_name == 'stats_suivi' %}page{% endif %}">
+                <i class="fas fa-tachometer-alt"></i> Suivi Global
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link {% if request.resolver_match.url_name == 'stats_corrections' %}active{% endif %}"
                href="{% url 'observations:stats_corrections' %}"
                aria-current="{% if request.resolver_match.url_name == 'stats_corrections' %}page{% endif %}">
                 <i class="fas fa-users"></i> Suivi Corrections

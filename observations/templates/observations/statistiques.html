@@ -1,120 +1,120 @@
-{% extends "base.html" %}
-{% block title %}Statistiques{% endblock %}
+{% extends "observations/stats/base_stats.html" %}
 
-{% block content %}
-<main class="container-fluid py-4">
-    <div class="row row-cols-1 row-cols-md-5 g-3">
-        <div class="col">
-            <div class="card bg-primary-subtle text-primary-emphasis h-100 border-primary-subtle">
-                <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <p class="card-title mb-1">Nombre total de fiches</p>
-                    <h2 class="card-text fw-bold">{{ total_fiches }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card bg-success-subtle text-success-emphasis h-100 border-success-subtle">
-                <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <p class="card-title mb-1">Fiches validées</p>
-                    <h2 class="card-text fw-bold">{{ fiches_valides }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card bg-warning-subtle text-warning-emphasis h-100 border-warning-subtle">
-                <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <p class="card-title mb-1">Fiches en cours de correction</p>
-                    <h2 class="card-text fw-bold">{{ fiches_en_cours_correction }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card bg-warning text-dark h-100 border-warning">
-                <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <p class="card-title mb-1">Fiches en attente de correction</p>
-                    <h2 class="card-text fw-bold">{{ fiches_en_attente_correction }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card bg-info-subtle text-info-emphasis h-100 border-info-subtle">
-                <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <p class="card-title mb-1">Fiches en cours de sasie</p>
-                    <h2 class="card-text fw-bold">{{ fiches_en_cour_saisie }}</h2>
-                </div>
+{% block stats_title %}Vue Générale{% endblock %}
+{% block stats_page_title %}Vue Générale{% endblock %}
+
+{% block stats_content %}
+<div class="row row-cols-1 row-cols-md-5 g-3">
+    <div class="col">
+        <div class="card bg-primary-subtle text-primary-emphasis h-100 border-primary-subtle">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <p class="card-title mb-1">Nombre total de fiches</p>
+                <h2 class="card-text fw-bold">{{ total_fiches }}</h2>
             </div>
         </div>
     </div>
+    <div class="col">
+        <div class="card bg-success-subtle text-success-emphasis h-100 border-success-subtle">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <p class="card-title mb-1">Fiches validées</p>
+                <h2 class="card-text fw-bold">{{ fiches_valides }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-warning-subtle text-warning-emphasis h-100 border-warning-subtle">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <p class="card-title mb-1">Fiches en cours de correction</p>
+                <h2 class="card-text fw-bold">{{ fiches_en_cours_correction }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-warning text-dark h-100 border-warning">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <p class="card-title mb-1">Fiches en attente de correction</p>
+                <h2 class="card-text fw-bold">{{ fiches_en_attente_correction }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-info-subtle text-info-emphasis h-100 border-info-subtle">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <p class="card-title mb-1">Fiches en cours de saisie</p>
+                <h2 class="card-text fw-bold">{{ fiches_en_cour_saisie }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <div class="row g-3 mt-4">
-        <div class="col-12 col-lg-6">
-            <div class="row g-3">
-                <div class="col-12">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <p class="card-title text-muted mb-1">Espèces suivies</p>
-                            <h3 class="card-text">{{ nb_especes }}</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <p class="card-title text-muted mb-1">Observateurs actifs</p>
-                            <h3 class="card-text">{{ nb_observateurs }}</h3>
-                        </div>
+<div class="row g-3 mt-4">
+    <div class="col-12 col-lg-6">
+        <div class="row g-3">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <p class="card-title text-muted mb-1">Espèces suivies</p>
+                        <h3 class="card-text">{{ nb_especes }}</h3>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-12 col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <p class="card-title text-muted mb-0">Top 4 espèces</p>
-                        <span class="badge  text-dark">{{ top_especes|length }}</span>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-sm mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Espèce</th>
-                                    <th class="text-end">Occurrences</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for espece in top_especes %}
-                                <tr>
-                                    <td>{{ espece.espece__nom }}</td>
-                                    <td class="text-end">{{ espece.count }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="2" class="text-center text-muted">Aucune donnée</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <p class="card-title text-muted mb-1">Observateurs actifs</p>
+                        <h3 class="card-text">{{ nb_observateurs }}</h3>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">Répartition par année</h5>
-                        <small class="text-muted"></small>
-                    </div>
-                    <canvas id="chartAnnees" width="400" height="120"></canvas>
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <p class="card-title text-muted mb-0">Top 4 espèces</p>
+                    <span class="badge text-dark">{{ top_especes|length }}</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Espèce</th>
+                                <th class="text-end">Occurrences</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for espece in top_especes %}
+                            <tr>
+                                <td>{{ espece.espece__nom }}</td>
+                                <td class="text-end">{{ espece.count }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-center text-muted">Aucune donnée</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-</main>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Répartition par année</h5>
+                    <small class="text-muted"></small>
+                </div>
+                <canvas id="chartAnnees" width="400" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -158,5 +158,4 @@
         });
     });
 </script>
-
 {% endblock %}

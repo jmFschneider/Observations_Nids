@@ -67,8 +67,8 @@ urlpatterns = [
     path('observations/liste/', liste_fiches_observations, name='liste_fiches_observations'),
     path('observations/<int:fiche_id>/', fiche_observation_view, name='fiche_observation'),
     # Routes de statistiques
-    path('statistiques/', statistiques_view, name='statistiques'),  # Page publique des stats
-    path('statistiques/dashboard/', StatsDashboardView.as_view(), name='stats_dashboard'),
+    path('statistiques/general/', statistiques_view, name='stats_general'),
+    path('statistiques/suivi/', StatsDashboardView.as_view(), name='stats_suivi'),
     path('statistiques/corrections/', StatsCorrecteursView.as_view(), name='stats_corrections'),
     #    path('observations/nouvelle/', saisie_observation, name='saisie_observation'),
     #    path('observations/sauvegarde/', traiter_saisie_observation, name='traiter_saisie_observation'),
