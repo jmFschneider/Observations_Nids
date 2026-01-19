@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, render
 
 from observations.filters import FicheObservationFilter  # Import the filter
 from observations.models import FicheObservation
+from observations.stats import get_stats_page_statistiques
 
 logger = logging.getLogger('observations')
 
@@ -68,8 +69,6 @@ def get_statistics_context():
 
     Note: Cette fonction utilise maintenant le module observations.stats pour les calculs.
     """
-    from observations.stats import get_stats_page_statistiques
-
     return get_stats_page_statistiques()
 
 

@@ -7,7 +7,9 @@ d'observation, les utilisateurs et l'activité de l'application.
 
 from datetime import timedelta
 
-from django.db.models import Avg, Count, ExpressionWrapper, F, fields
+import json
+
+from django.db.models import Avg, Count, ExpressionWrapper, F, Q, fields
 from django.utils import timezone
 
 from audit.models import HistoriqueModification
@@ -254,4 +256,76 @@ def get_stats_tableau_bord():
     return {
         'volume': StatsVolume.get_stats_volume_completes(),
         'performance': StatsPerformance.get_stats_performance_completes(),
+    }
+
+
+def get_stats_page_statistiques():
+    """
+    Prépare les données statistiques pour la page de statistiques publique.
+
+    Retourne un dictionnaire contenant diverses statistiques sur les fiches d'observation,
+    formaté pour le template observations/statistiques.html.
+
+    Returns:
+        dict: Dictionnaire contenant toutes les statistiques pour la page
+    """
+    # Total de fiches
+    total_fiches = FicheObservation.objects.count()
+
+    # Fiches en cours de saisie (statut 'nouveau' ou 'en_edition')
+    fiches_en_cour_saisie = FicheObservation.objects.filter(
+        Q(etat_correction__statut='nouveau') | Q(etat_correction__statut='en_edition')
+    ).count()
+
+    # Fiches en attente de correction (statut 'nouveau')
+    fiches_en_attente_correction = FicheObservation.objects.filter(
+        etat_correction__statut='nouveau'
+    ).count()
+
+    # Fiches en cours de correction (statut 'en_cours')
+    fiches_en_cours_correction = FicheObservation.objects.filter(
+        etat_correction__statut='en_cours'
+    ).count()
+
+    # Fiches validées (statut 'valide')
+    fiches_valides = FicheObservation.objects.filter(
+        etat_correction__statut='valide'
+    ).count()
+
+    # Nombre d'espèces distinctes observées
+    nb_especes = FicheObservation.objects.values('espece').distinct().count()
+
+    # Nombre d'observateurs distincts
+    nb_observateurs = FicheObservation.objects.values('observateur').distinct().count()
+
+    # Top 4 espèces les plus fréquentes
+    top_especes = (
+        FicheObservation.objects
+        .values('espece__nom')
+        .annotate(count=Count('espece'))
+        .order_by('-count')[:4]
+    )
+
+    # Fiches par année pour graphique
+    fiches_par_annee_qs = (
+        FicheObservation.objects
+        .values('annee')
+        .annotate(count=Count('num_fiche'))
+        .order_by('annee')
+    )
+    fiches_par_annee = list(fiches_par_annee_qs)
+    chart_labels = json.dumps([item['annee'] for item in fiches_par_annee])
+    chart_data = json.dumps([item['count'] for item in fiches_par_annee])
+
+    return {
+        'total_fiches': total_fiches,
+        'fiches_en_cour_saisie': fiches_en_cour_saisie,
+        'fiches_en_attente_correction': fiches_en_attente_correction,
+        'fiches_en_cours_correction': fiches_en_cours_correction,
+        'fiches_valides': fiches_valides,
+        'nb_especes': nb_especes,
+        'nb_observateurs': nb_observateurs,
+        'top_especes': top_especes,
+        'chart_labels': chart_labels,
+        'chart_data': chart_data,
     }
