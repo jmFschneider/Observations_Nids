@@ -391,6 +391,6 @@ GEMINI_API_KEY=AIza...
 
 ## 🔗 Voir Aussi
 
-- [README](./README.md) - Présentation du projet
-- [Applications](./applications/) - Documentation détaillée
-- [Plan Directeur](./docs_todo.md) - État de la documentation
+- [README](../README.md) - Présentation du projet
+- [Applications](../applications/) - Documentation détaillée
+- [Plan Directeur](../projet/docs_todo.md) - État de la documentation

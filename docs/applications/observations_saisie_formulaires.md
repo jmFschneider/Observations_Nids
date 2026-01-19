@@ -10,9 +10,9 @@ Ce document décrit les trois fonctionnalités clés de saisie :
 
 | Fonctionnalité | Description |
 |----------------|-------------|
-| [Correction de l'Observateur](#-correction-de-lobservateur) | Gestion des noms OCR mal transcrits |
-| [Sélection d'Espèce](#-sélection-despèce) | Recherche intelligente avec autocomplétion |
-| [Sélection de Commune](#-sélection-de-commune) | Autocomplétion avec géolocalisation |
+| [Correction de l'Observateur](#correction-de-lobservateur) | Gestion des noms OCR mal transcrits |
+| [Sélection d'Espèce](#selection-despece) | Recherche intelligente avec autocomplétion |
+| [Sélection de Commune](#selection-de-commune) | Autocomplétion avec géolocalisation |
 
 ---
 

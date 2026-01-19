@@ -561,5 +561,5 @@ tail -f /var/www/html/Observations_Nids/logs/django_debug.log
 ## 🔗 Voir Aussi
 
 - [🐳 Déploiement Docker](./deploiement_docker.md) - Alternative containerisée
-- [🏗️ Architecture](../architecture.md) - Vue d'ensemble technique
+- [🏗️ Architecture](../guides/architecture.md) - Vue d'ensemble technique
 - [🔐 Permissions](../guides/permissions.md) - Gestion des accès

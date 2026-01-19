@@ -78,7 +78,7 @@ Les utilisateurs avec `est_transcription=True` sont créés automatiquement lors
 - Rôle : `observateur`
 - Statut : `is_active=True`, `est_valide=True`
 
-📖 **Voir le guide** : [Correction de l'observateur](./observations_saisie_formulaires.md#-correction-de-lobservateur)
+📖 **Voir le guide** : [Correction de l'observateur](./observations_saisie_formulaires.md#correction-de-lobservateur)
 
 !!! warning "Nettoyage des comptes OCR"
     Ces comptes doivent être fusionnés ou supprimés après correction. Un compte OCR sans fiche associée peut être supprimé.
@@ -244,4 +244,4 @@ stateDiagram-v2
 ## 🔗 Voir Aussi
 
 - [📦 Application Observations](./observations.md) - Utilisation des utilisateurs
-- [📝 Guide de Saisie](./observations_saisie_formulaires.md#-correction-de-lobservateur) - Gestion des observateurs OCR
+- [📝 Guide de Saisie](./observations_saisie_formulaires.md#correction-de-lobservateur) - Gestion des observateurs OCR

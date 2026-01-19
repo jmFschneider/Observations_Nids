@@ -196,7 +196,7 @@ Si `lat` et `lon` sont fournis (et différents de 0,0) :
 - Exclusion des communes > 10 km
 - Tri par distance croissante
 
-📖 **Voir le guide** : [Sélection de commune](./observations_saisie_formulaires.md#-sélection-de-commune)
+📖 **Voir le guide** : [Sélection de commune](./observations_saisie_formulaires.md#selection-de-commune)
 
 ---
 
@@ -252,4 +252,4 @@ Via l'endpoint `/geo/geocoder/` (POST) :
 ## 🔗 Voir Aussi
 
 - [📦 Application Observations](./observations.md) - Utilisation des localisations
-- [📝 Guide de Saisie](./observations_saisie_formulaires.md#-sélection-de-commune) - Autocomplétion communes
+- [📝 Guide de Saisie](./observations_saisie_formulaires.md#selection-de-commune) - Autocomplétion communes

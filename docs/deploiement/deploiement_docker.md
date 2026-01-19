@@ -523,5 +523,5 @@ curl http://localhost:8010/health/
 ## 🔗 Voir Aussi
 
 - [🖥️ Déploiement Linux/Windows](./deploiement_linux_windows.md) - Installation native
-- [🏗️ Architecture](../architecture.md) - Vue d'ensemble technique
+- [🏗️ Architecture](../guides/architecture.md) - Vue d'ensemble technique
 - [🤖 OCR Gemini](../guides/ocr_gemini.md) - Configuration transcription

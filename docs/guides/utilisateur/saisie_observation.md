@@ -3,12 +3,12 @@
 ## Table des matières
 
 1. [Introduction](#introduction)
-2. [Accès à la page](#accès-à-la-page)
-3. [Création d'une nouvelle fiche](#création-dune-nouvelle-fiche)
+2. [Accès à la page](#acces-a-la-page)
+3. [Création d'une nouvelle fiche](#creation-dune-nouvelle-fiche)
 4. [Modification d'une fiche existante](#modification-dune-fiche-existante)
-5. [Description détaillée des sections](#description-détaillée-des-sections)
+5. [Description détaillée des sections](#description-detaillee-des-sections)
 6. [Workflow de sauvegarde](#workflow-de-sauvegarde)
-7. [Calcul du pourcentage de complétion](#calcul-du-pourcentage-de-complétion)
+7. [Calcul du pourcentage de complétion](#calcul-du-pourcentage-de-completion)
 8. [Soumission pour validation](#soumission-pour-validation)
 9. [Correction de transcriptions](#correction-de-transcriptions)
 10. [Permissions et restrictions](#permissions-et-restrictions)

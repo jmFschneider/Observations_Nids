@@ -134,7 +134,7 @@ erDiagram
 
 L'espèce est sélectionnée dans le formulaire de saisie via une **autocomplétion intelligente**.
 
-📖 **Voir le guide** : [Sélection d'espèce avec autocomplétion](./observations_saisie_formulaires.md#-sélection-despèce)
+📖 **Voir le guide** : [Sélection d'espèce avec autocomplétion](./observations_saisie_formulaires.md#selection-despece)
 
 **Fonctionnement** :
 - Recherche sur le nom français, anglais ou scientifique
@@ -169,4 +169,4 @@ L'espèce est sélectionnée dans le formulaire de saisie via une **autocomplét
 ## 🔗 Voir Aussi
 
 - [📦 Application Observations](./observations.md) - Utilisation des espèces
-- [📝 Guide de Saisie](./observations_saisie_formulaires.md#-sélection-despèce) - Autocomplétion espèces
+- [📝 Guide de Saisie](./observations_saisie_formulaires.md#selection-despece) - Autocomplétion espèces

@@ -32,9 +32,9 @@
 **Relations** :
 
 - 🔗 `observateur` → [📦 Application Accounts](./accounts.md)
-  - 📖 [Correction de l'observateur OCR](./observations_saisie_formulaires.md#-correction-de-lobservateur)
+  - 📖 [Correction de l'observateur OCR](./observations_saisie_formulaires.md#correction-de-lobservateur)
 - 🔗 `espece` → [📦 Application Taxonomy](./taxonomy.md)
-  - 📖 [Sélection d'espèce avec autocomplétion](./observations_saisie_formulaires.md#-sélection-despèce)
+  - 📖 [Sélection d'espèce avec autocomplétion](./observations_saisie_formulaires.md#selection-despece)
 
 **Comportement automatique** :
 
@@ -273,9 +273,9 @@ Ces fonctionnalités avancées sont documentées dans le guide annexe :
 
 | Fonctionnalité | Description |
 |----------------|-------------|
-| [👤 Correction de l'Observateur](./observations_saisie_formulaires.md#-correction-de-lobservateur) | Gestion des noms OCR mal transcrits, suggestions, fusion |
-| [🐦 Sélection d'Espèce](./observations_saisie_formulaires.md#-sélection-despèce) | Recherche intelligente avec autocomplétion |
-| [🏘️ Sélection de Commune](./observations_saisie_formulaires.md#-sélection-de-commune) | Autocomplétion avec remplissage automatique |
+| [👤 Correction de l'Observateur](./observations_saisie_formulaires.md#correction-de-lobservateur) | Gestion des noms OCR mal transcrits, suggestions, fusion |
+| [🐦 Sélection d'Espèce](./observations_saisie_formulaires.md#selection-despece) | Recherche intelligente avec autocomplétion |
+| [🏘️ Sélection de Commune](./observations_saisie_formulaires.md#selection-de-commune) | Autocomplétion avec remplissage automatique |
 
 ---
 
