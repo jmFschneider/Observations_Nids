@@ -67,9 +67,6 @@ test_scans/
 /*.csv
 
 # MkDocs
-site/
-site-user/
-docs/docs/todo/
 
 # Archives de fichiers orphelins
 .archived_orphans/

@@ -1,0 +1,2963 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation du projet Observations Nids - Gestion des fiches d'observation de nidification">
+      
+      
+        <meta name="author" content="GONM">
+      
+      
+      
+        <link rel="prev" href="../permissions/">
+      
+      
+        <link rel="next" href="../../deploiement/deploiement_linux_windows/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>OCR Gemini - Observations Nids - Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#integration-ocr-gemini" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href="../.." title="Observations Nids - Documentation" class="md-header__button md-logo" aria-label="Observations Nids - Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Observations Nids - Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              OCR Gemini
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green"  aria-label="Mode sombre"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Mode sombre" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="light-green"  aria-label="Mode clair"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Mode clair" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Accueil
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../utilisateur/saisie_observation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Guide Utilisateur
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architecture/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../workflow_fiche/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Guides Techniques
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../deploiement/deploiement_linux_windows/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Déploiement
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../projet/docs_todo/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Projet
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Observations Nids - Documentation" class="md-nav__button md-logo" aria-label="Observations Nids - Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Observations Nids - Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide Utilisateur
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide Utilisateur
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utilisateur/saisie_observation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Saisie d'observations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vue d'ensemble
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Applications Django
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Applications Django
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/observations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/observations_saisie_formulaires/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Formulaires de saisie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/taxonomy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Taxonomy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/geo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/accounts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accounts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/ingest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ingest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/ocr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides Techniques
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides Techniques
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow_fiche/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow d'une fiche
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR Gemini
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR Gemini
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vue-densemble" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Vue d'Ensemble
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚙️ Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="⚙️ Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cle-api-gemini" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clé API Gemini
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modeles-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modèles Disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompts-de-transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📝 Prompts de Transcription
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📝 Prompts de Transcription">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prompt-standard-fiches-modernes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt Standard (Fiches Modernes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompt-anciennes-fiches-1970-1980" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt Anciennes Fiches (1970-1980)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#selection-automatique-du-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sélection Automatique du Prompt
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pipeline-de-transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Pipeline de Transcription
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔄 Pipeline de Transcription">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etape-1-selection-des-repertoires" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 1 : Sélection des Répertoires
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-2-lancement-du-batch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 2 : Lancement du Batch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-3-traitement-par-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 3 : Traitement par Image
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gestion-des-erreurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚡ Gestion des Erreurs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="⚡ Gestion des Erreurs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#retry-avec-backoff-exponentiel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retry avec Backoff Exponentiel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#types-derreurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Types d'Erreurs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rate Limiting
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation-et-correction-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Validation et Correction JSON
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📊 Validation et Correction JSON">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#structure-attendue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure Attendue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation-automatique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation Automatique
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correction-automatique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correction Automatique
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stockage-des-resultats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💾 Stockage des Résultats
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="💾 Stockage des Résultats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modele-transcriptionocr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modèle TranscriptionOCR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metriques-de-qualite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métriques de Qualité
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#organisation-des-fichiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Organisation des Fichiers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interface-utilisateur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🖥️ Interface Utilisateur
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🖥️ Interface Utilisateur">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#urls-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URLs Disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#suivi-de-progression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suivi de Progression
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#administration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 Administration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔧 Administration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#django-admin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Django Admin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actions-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions Disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#points-dattention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Points d'Attention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📈 Performance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#voir-aussi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔗 Voir Aussi
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Déploiement
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Déploiement
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deploiement/deploiement_linux_windows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linux et Windows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deploiement/deploiement_docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projet
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Projet
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projet/docs_todo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan directeur
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projet/fichiers_cles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index des fichiers clés
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projet/strategie/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stratégie documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projet/template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vue-densemble" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Vue d'Ensemble
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚙️ Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="⚙️ Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cle-api-gemini" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clé API Gemini
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modeles-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modèles Disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompts-de-transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📝 Prompts de Transcription
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📝 Prompts de Transcription">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prompt-standard-fiches-modernes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt Standard (Fiches Modernes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompt-anciennes-fiches-1970-1980" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt Anciennes Fiches (1970-1980)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#selection-automatique-du-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sélection Automatique du Prompt
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pipeline-de-transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Pipeline de Transcription
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔄 Pipeline de Transcription">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etape-1-selection-des-repertoires" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 1 : Sélection des Répertoires
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-2-lancement-du-batch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 2 : Lancement du Batch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-3-traitement-par-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 3 : Traitement par Image
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gestion-des-erreurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚡ Gestion des Erreurs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="⚡ Gestion des Erreurs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#retry-avec-backoff-exponentiel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retry avec Backoff Exponentiel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#types-derreurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Types d'Erreurs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rate Limiting
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation-et-correction-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Validation et Correction JSON
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📊 Validation et Correction JSON">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#structure-attendue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure Attendue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation-automatique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation Automatique
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correction-automatique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correction Automatique
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stockage-des-resultats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💾 Stockage des Résultats
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="💾 Stockage des Résultats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modele-transcriptionocr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modèle TranscriptionOCR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metriques-de-qualite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métriques de Qualité
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#organisation-des-fichiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Organisation des Fichiers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interface-utilisateur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🖥️ Interface Utilisateur
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🖥️ Interface Utilisateur">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#urls-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URLs Disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#suivi-de-progression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suivi de Progression
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#administration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 Administration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔧 Administration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#django-admin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Django Admin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actions-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions Disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#points-dattention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Points d'Attention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📈 Performance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#voir-aussi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔗 Voir Aussi
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="integration-ocr-gemini">🤖 Intégration OCR Gemini<a class="headerlink" href="#integration-ocr-gemini" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Résumé</strong> : Pipeline de transcription des fiches papier via l'API Google Gemini.</p>
+</blockquote>
+<hr />
+<h2 id="vue-densemble">🎯 Vue d'Ensemble<a class="headerlink" href="#vue-densemble" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+    subgraph Input["📤 Entrée"]
+        A[Image JPEG]
+    end
+
+    subgraph Process["⚙️ Traitement"]
+        B[Celery Task]
+        C[API Gemini]
+        D[Validation JSON]
+    end
+
+    subgraph Output["📥 Sortie"]
+        E[JSON structuré]
+        F[TranscriptionOCR]
+    end
+
+    A --&gt; B
+    B --&gt; C
+    C --&gt; D
+    D --&gt; E
+    E --&gt; F</code></pre>
+<table>
+<thead>
+<tr>
+<th>Composant</th>
+<th>Technologie</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API OCR</td>
+<td>Google Gemini</td>
+<td>Transcription image → texte</td>
+</tr>
+<tr>
+<td>Broker</td>
+<td>Redis</td>
+<td>File d'attente des tâches</td>
+</tr>
+<tr>
+<td>Worker</td>
+<td>Celery</td>
+<td>Exécution asynchrone</td>
+</tr>
+<tr>
+<td>Stockage</td>
+<td>MariaDB</td>
+<td>Résultats et métadonnées</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="configuration">⚙️ Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<h3 id="cle-api-gemini">Clé API Gemini<a class="headerlink" href="#cle-api-gemini" title="Permanent link">&para;</a></h3>
+<p><strong>Fichier</strong> : <code>.env</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">GEMINI_API_KEY</span><span class="o">=</span>AIzaSy...votre_cle_api
+</code></pre></div>
+<p><strong>Chargement</strong> : <code>observations_nids/config.py</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Settings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">GEMINI_API_KEY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;gemini_api_key&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="modeles-disponibles">Modèles Disponibles<a class="headerlink" href="#modeles-disponibles" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Modèle</th>
+<th>Identifiant API</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gemini 3 Flash</td>
+<td><code>gemini-3-flash-preview</code></td>
+<td>Rapide, usage général</td>
+</tr>
+<tr>
+<td>Gemini 3 Pro</td>
+<td><code>gemini-3-pro-preview</code></td>
+<td>Haute qualité</td>
+</tr>
+<tr>
+<td>Gemini 2.5 Pro</td>
+<td><code>gemini-2.5-pro</code></td>
+<td>Équilibré</td>
+</tr>
+<tr>
+<td>Gemini 2.5 Flash Lite</td>
+<td><code>gemini-2.5-flash-lite</code></td>
+<td>Économique</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="prompts-de-transcription">📝 Prompts de Transcription<a class="headerlink" href="#prompts-de-transcription" title="Permanent link">&para;</a></h2>
+<h3 id="prompt-standard-fiches-modernes">Prompt Standard (Fiches Modernes)<a class="headerlink" href="#prompt-standard-fiches-modernes" title="Permanent link">&para;</a></h3>
+<p><strong>Fichier</strong> : <code>observations/json_rep/prompt_gemini_transcription.txt</code></p>
+<p><strong>Sections extraites</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Champs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>informations_generales</code></td>
+<td>n_fiche, observateur, n_espece, espece, annee</td>
+</tr>
+<tr>
+<td><code>nid</code></td>
+<td>nid_prec_t_meme_c_ple, haut_nid, h_c_vert, nid</td>
+</tr>
+<tr>
+<td><code>localisation</code></td>
+<td>IGN_50000, commune, dep_t, coordonnees, altitude, paysage</td>
+</tr>
+<tr>
+<td><code>tableau_donnees</code></td>
+<td>Jour, Mois, Heure, Nombre_oeuf, Nombre_pou, age, observations</td>
+</tr>
+<tr>
+<td><code>tableau_donnees_2</code></td>
+<td>1er_o_pondu, 1er_p_eclos, 1er_p_volant, nombre_oeufs, nombre_poussins</td>
+</tr>
+<tr>
+<td><code>causes_echec</code></td>
+<td>causes_d_echec</td>
+</tr>
+<tr>
+<td><code>remarque</code></td>
+<td>Texte libre</td>
+</tr>
+</tbody>
+</table>
+<h3 id="prompt-anciennes-fiches-1970-1980">Prompt Anciennes Fiches (1970-1980)<a class="headerlink" href="#prompt-anciennes-fiches-1970-1980" title="Permanent link">&para;</a></h3>
+<p><strong>Fichier</strong> : <code>observations/json_rep/prompt_gemini_transcription_Ancienne_Fiche.txt</code></p>
+<p><strong>Particularités</strong> :
+- Année écrite verticalement en marge
+- Cases à cocher pour succès/échec
+- Normalisation des années (ex: "77" → "1977")
+- Métadonnées de confiance OCR</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">&quot;evaluation_ocr&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;indice_confiance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Elevé | Moyen | Faible&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;zones_douteuses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Description des zones illisibles&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">&quot;commentaire_qualite_scan&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;État du document&quot;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="selection-automatique-du-prompt">Sélection Automatique du Prompt<a class="headerlink" href="#selection-automatique-du-prompt" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_charger_prompt_selon_type_fiche</span><span class="p">(</span><span class="n">chemin_relatif</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="k">if</span> <span class="s2">&quot;ancien&quot;</span> <span class="ow">in</span> <span class="n">chemin_relatif</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>        <span class="k">return</span> <span class="n">PROMPT_ANCIENNE_FICHE</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="k">return</span> <span class="n">PROMPT_STANDARD</span>
+</code></pre></div>
+<hr />
+<h2 id="pipeline-de-transcription">🔄 Pipeline de Transcription<a class="headerlink" href="#pipeline-de-transcription" title="Permanent link">&para;</a></h2>
+<h3 id="etape-1-selection-des-repertoires">Étape 1 : Sélection des Répertoires<a class="headerlink" href="#etape-1-selection-des-repertoires" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>sequenceDiagram
+    participant U as Utilisateur
+    participant V as Vue Django
+    participant FS as Système Fichiers
+
+    U-&gt;&gt;V: GET /ocr/selection-repertoire/
+    V-&gt;&gt;FS: Liste media/
+    FS--&gt;&gt;V: Arborescence
+    V--&gt;&gt;U: Interface de sélection
+    U-&gt;&gt;V: Sélectionne répertoires + modèles</code></pre>
+<h3 id="etape-2-lancement-du-batch">Étape 2 : Lancement du Batch<a class="headerlink" href="#etape-2-lancement-du-batch" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>sequenceDiagram
+    participant U as Utilisateur
+    participant V as Vue Django
+    participant R as Redis
+    participant C as Celery
+
+    U-&gt;&gt;V: POST /ocr/lancer-batch/
+    V-&gt;&gt;R: Crée tâche async
+    R--&gt;&gt;V: task_id
+    V--&gt;&gt;U: Redirect vers progression
+    C-&gt;&gt;R: Récupère tâche
+    C-&gt;&gt;C: Traitement...</code></pre>
+<h3 id="etape-3-traitement-par-image">Étape 3 : Traitement par Image<a class="headerlink" href="#etape-3-traitement-par-image" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart TB
+    A[Image JPEG] --&gt; B{Rate Limiter}
+    B --&gt;|OK| C[Appel API Gemini]
+    B --&gt;|Attente| B
+    C --&gt; D{Timeout ?}
+    D --&gt;|Non| E[Réponse texte]
+    D --&gt;|Oui, retry| C
+    D --&gt;|Oui, échec| F[Log erreur]
+    E --&gt; G[Nettoyage Markdown]
+    G --&gt; H[Parse JSON]
+    H --&gt; I{Valide ?}
+    I --&gt;|Oui| J[Sauvegarde]
+    I --&gt;|Non| K[Correction auto]
+    K --&gt; J
+    J --&gt; L[TranscriptionOCR]</code></pre>
+<hr />
+<h2 id="gestion-des-erreurs">⚡ Gestion des Erreurs<a class="headerlink" href="#gestion-des-erreurs" title="Permanent link">&para;</a></h2>
+<h3 id="retry-avec-backoff-exponentiel">Retry avec Backoff Exponentiel<a class="headerlink" href="#retry-avec-backoff-exponentiel" title="Permanent link">&para;</a></h3>
+<p><strong>Fichier</strong> : <code>ocr/tasks.py</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@retry_with_backoff</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">initial_delay</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">max_delay</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">call_gemini_api_with_timeout</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">image_path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">):</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="o">...</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Tentative</th>
+<th>Délai avant retry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>2 secondes</td>
+</tr>
+<tr>
+<td>2</td>
+<td>4 secondes</td>
+</tr>
+<tr>
+<td>3</td>
+<td>8 secondes</td>
+</tr>
+<tr>
+<td>4</td>
+<td>16 secondes (max)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="types-derreurs">Types d'Erreurs<a class="headerlink" href="#types-derreurs" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Traitement</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Timeout (120s)</td>
+<td>3 retries</td>
+<td><code>timeout</code> si échec</td>
+</tr>
+<tr>
+<td>JSON invalide</td>
+<td>Correction auto</td>
+<td><code>_raw.json</code> + <code>_result.json</code></td>
+</tr>
+<tr>
+<td>Erreur API</td>
+<td>Log + continue</td>
+<td><code>error</code> avec détails</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rate-limiting">Rate Limiting<a class="headerlink" href="#rate-limiting" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">RateLimiter</span><span class="p">:</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests_per_minute</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">min_interval</span> <span class="o">=</span> <span class="mf">60.0</span> <span class="o">/</span> <span class="n">requests_per_minute</span>  <span class="c1"># 1 seconde</span>
+</code></pre></div>
+<ul>
+<li><strong>Limite API</strong> : 60 requêtes/minute</li>
+<li><strong>Intervalle minimum</strong> : 1 seconde entre requêtes</li>
+</ul>
+<hr />
+<h2 id="validation-et-correction-json">📊 Validation et Correction JSON<a class="headerlink" href="#validation-et-correction-json" title="Permanent link">&para;</a></h2>
+<h3 id="structure-attendue">Structure Attendue<a class="headerlink" href="#structure-attendue" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;informations_generales&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">&quot;nid&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">&quot;localisation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nt">&quot;tableau_donnees&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">],</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nt">&quot;tableau_donnees_2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="nt">&quot;causes_echec&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="nt">&quot;remarque&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="validation-automatique">Validation Automatique<a class="headerlink" href="#validation-automatique" title="Permanent link">&para;</a></h3>
+<p><strong>Fichier</strong> : <code>observations/json_rep/json_sanitizer.py</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_json_structure</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Retourne liste d&#39;erreurs (vide si valide)&quot;&quot;&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="c1"># Vérifie 7 sections obligatoires</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="n">required_keys</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        <span class="s1">&#39;informations_generales&#39;</span><span class="p">,</span> <span class="s1">&#39;nid&#39;</span><span class="p">,</span> <span class="s1">&#39;localisation&#39;</span><span class="p">,</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="s1">&#39;tableau_donnees&#39;</span><span class="p">,</span> <span class="s1">&#39;tableau_donnees_2&#39;</span><span class="p">,</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>        <span class="s1">&#39;causes_echec&#39;</span><span class="p">,</span> <span class="s1">&#39;remarque&#39;</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="p">]</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required_keys</span><span class="p">:</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Section manquante: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>    <span class="k">return</span> <span class="n">errors</span>
+</code></pre></div>
+<h3 id="correction-automatique">Correction Automatique<a class="headerlink" href="#correction-automatique" title="Permanent link">&para;</a></h3>
+<p>Si le JSON est invalide, <code>corriger_json()</code> :
+- Normalise les noms de champs
+- Complète les sections manquantes
+- Corrige les types de données
+- Sauvegarde version brute (<code>_raw.json</code>) et corrigée (<code>_result.json</code>)</p>
+<hr />
+<h2 id="stockage-des-resultats">💾 Stockage des Résultats<a class="headerlink" href="#stockage-des-resultats" title="Permanent link">&para;</a></h2>
+<h3 id="modele-transcriptionocr">Modèle TranscriptionOCR<a class="headerlink" href="#modele-transcriptionocr" title="Permanent link">&para;</a></h3>
+<p><strong>Fichier</strong> : <code>ocr/models.py</code></p>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fiche</code></td>
+<td>FK</td>
+<td>Fiche liée (si trouvée)</td>
+</tr>
+<tr>
+<td><code>chemin_json</code></td>
+<td>CharField</td>
+<td>Chemin vers résultat JSON</td>
+</tr>
+<tr>
+<td><code>chemin_image</code></td>
+<td>CharField</td>
+<td>Chemin vers image source</td>
+</tr>
+<tr>
+<td><code>modele_ocr</code></td>
+<td>CharField</td>
+<td>Modèle utilisé</td>
+</tr>
+<tr>
+<td><code>type_image</code></td>
+<td>CharField</td>
+<td><code>brute</code> ou <code>optimisee</code></td>
+</tr>
+<tr>
+<td><code>temps_traitement_secondes</code></td>
+<td>Float</td>
+<td>Durée du traitement</td>
+</tr>
+<tr>
+<td><code>statut_evaluation</code></td>
+<td>CharField</td>
+<td>État de l'évaluation qualité</td>
+</tr>
+</tbody>
+</table>
+<h3 id="metriques-de-qualite">Métriques de Qualité<a class="headerlink" href="#metriques-de-qualite" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Métrique</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>score_global</code></td>
+<td>Score 0-100%</td>
+</tr>
+<tr>
+<td><code>nombre_champs_corrects</code></td>
+<td>Champs sans erreur</td>
+</tr>
+<tr>
+<td><code>nombre_erreurs_dates</code></td>
+<td>Erreurs sur les dates</td>
+</tr>
+<tr>
+<td><code>nombre_erreurs_nombres</code></td>
+<td>Erreurs numériques</td>
+</tr>
+<tr>
+<td><code>nombre_erreurs_especes</code></td>
+<td>Erreurs taxonomiques</td>
+</tr>
+<tr>
+<td><code>details_comparaison</code></td>
+<td>JSON du diff champ par champ</td>
+</tr>
+</tbody>
+</table>
+<h3 id="organisation-des-fichiers">Organisation des Fichiers<a class="headerlink" href="#organisation-des-fichiers" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>media/
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>└── transcription_results/
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    └── Ancienne_fiche/
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>        └── Sans_traitement/
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>            ├── gemini_3_flash/
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>            │   ├── fiche_001_result.json
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>            │   └── fiche_001_raw.json
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>            └── gemini_2.5_pro/
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>                └── fiche_001_result.json
+</code></pre></div>
+<hr />
+<h2 id="interface-utilisateur">🖥️ Interface Utilisateur<a class="headerlink" href="#interface-utilisateur" title="Permanent link">&para;</a></h2>
+<h3 id="urls-disponibles">URLs Disponibles<a class="headerlink" href="#urls-disponibles" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Fonction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/ocr/selection-repertoire/</code></td>
+<td>Navigation et sélection</td>
+</tr>
+<tr>
+<td><code>/ocr/analyser-correspondances/</code></td>
+<td>Vérifier fiches existantes</td>
+</tr>
+<tr>
+<td><code>/ocr/lancer-batch/</code></td>
+<td>Démarrer transcription</td>
+</tr>
+<tr>
+<td><code>/ocr/progression/&lt;task_id&gt;/</code></td>
+<td>Suivi en temps réel</td>
+</tr>
+<tr>
+<td><code>/ocr/resultats/&lt;task_id&gt;/</code></td>
+<td>Résultats finaux</td>
+</tr>
+</tbody>
+</table>
+<h3 id="suivi-de-progression">Suivi de Progression<a class="headerlink" href="#suivi-de-progression" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>sequenceDiagram
+    participant U as Utilisateur
+    participant V as Vue
+    participant R as Redis
+    participant C as Celery
+
+    loop Polling AJAX
+        U-&gt;&gt;V: GET /ocr/check-progress/
+        V-&gt;&gt;R: AsyncResult(task_id)
+        R--&gt;&gt;V: {progress, current_file, logs}
+        V--&gt;&gt;U: JSON mise à jour
+    end</code></pre>
+<p><strong>Informations affichées</strong> :
+- Pourcentage global
+- Fichier en cours
+- 150 derniers logs (limité pour Redis)
+- Erreurs éventuelles</p>
+<hr />
+<h2 id="administration">🔧 Administration<a class="headerlink" href="#administration" title="Permanent link">&para;</a></h2>
+<h3 id="django-admin">Django Admin<a class="headerlink" href="#django-admin" title="Permanent link">&para;</a></h3>
+<p><strong>URL</strong> : <code>/admin/ocr/transcriptionocr/</code></p>
+<p><strong>Fonctionnalités</strong> :
+- Code couleur des scores (vert ≥90%, jaune ≥75%, orange ≥50%, rouge &lt;50%)
+- Filtres par modèle, type d'image, statut
+- Actions groupées pour évaluation
+- Recherche par numéro de fiche</p>
+<h3 id="actions-disponibles">Actions Disponibles<a class="headerlink" href="#actions-disponibles" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Marquer comme évaluée</td>
+<td>Change statut à <code>evaluee</code></td>
+</tr>
+<tr>
+<td>Réinitialiser évaluation</td>
+<td>Remet à <code>non_evaluee</code></td>
+</tr>
+<tr>
+<td>Exporter JSON</td>
+<td>Télécharge les résultats</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="points-dattention">⚠️ Points d'Attention<a class="headerlink" href="#points-dattention" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Clé API</p>
+<p>Ne jamais commiter la clé API Gemini. Utiliser <code>.env</code> et <code>.gitignore</code>.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Rate Limiting</p>
+<p>L'API Gemini limite à 60 requêtes/minute. Le rate limiter gère automatiquement les délais.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Fichiers volumineux</p>
+<p>Les images JPEG doivent être &lt; 20 Mo pour l'API Gemini. Utiliser la préparation d'images si nécessaire.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">Coûts API</p>
+<p>Surveiller la consommation API. Les modèles "Pro" coûtent plus cher que "Flash".</p>
+</div>
+<hr />
+<h2 id="performance">📈 Performance<a class="headerlink" href="#performance" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paramètre</th>
+<th>Valeur</th>
+<th>Configurable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Timeout par image</td>
+<td>120 secondes</td>
+<td>Oui</td>
+</tr>
+<tr>
+<td>Retries max</td>
+<td>3</td>
+<td>Oui</td>
+</tr>
+<tr>
+<td>Rate limit</td>
+<td>60 req/min</td>
+<td>Non (limite API)</td>
+</tr>
+<tr>
+<td>Logs en mémoire</td>
+<td>150 entrées</td>
+<td>Oui</td>
+</tr>
+<tr>
+<td>Workers Celery</td>
+<td>2</td>
+<td>Oui</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="voir-aussi">🔗 Voir Aussi<a class="headerlink" href="#voir-aussi" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../applications/ocr/">📦 Application OCR</a> - Modèles et vues</li>
+<li><a href="../../applications/ingest/">📦 Application Ingest</a> - Import des JSON</li>
+<li><a href="../workflow_fiche/">🔄 Workflow Fiche</a> - Intégration au workflow</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/gonm" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

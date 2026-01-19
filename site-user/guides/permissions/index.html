@@ -1,0 +1,2892 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation du projet Observations Nids - Gestion des fiches d'observation de nidification">
+      
+      
+        <meta name="author" content="GONM">
+      
+      
+      
+        <link rel="prev" href="../workflow_fiche/">
+      
+      
+        <link rel="next" href="../ocr_gemini/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Permissions - Observations Nids - Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#systeme-de-permissions" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href="../.." title="Observations Nids - Documentation" class="md-header__button md-logo" aria-label="Observations Nids - Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Observations Nids - Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Permissions
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green"  aria-label="Mode sombre"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Mode sombre" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="light-green"  aria-label="Mode clair"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Mode clair" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Accueil
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../utilisateur/saisie_observation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Guide Utilisateur
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architecture/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../workflow_fiche/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Guides Techniques
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../deploiement/deploiement_linux_windows/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Déploiement
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../projet/docs_todo/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Projet
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Observations Nids - Documentation" class="md-nav__button md-logo" aria-label="Observations Nids - Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Observations Nids - Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide Utilisateur
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide Utilisateur
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utilisateur/saisie_observation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Saisie d'observations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vue d'ensemble
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Applications Django
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Applications Django
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/observations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/observations_saisie_formulaires/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Formulaires de saisie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/taxonomy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Taxonomy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/geo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/accounts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accounts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/ingest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ingest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/ocr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../applications/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides Techniques
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides Techniques
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow_fiche/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow d'une fiche
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Permissions
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vue-densemble" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Vue d'Ensemble
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roles-utilisateur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👥 Rôles Utilisateur
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="👥 Rôles Utilisateur">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Définition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hierarchie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hiérarchie
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matrice-de-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📋 Matrice de Permissions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📋 Matrice de Permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gestion-des-fiches" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestion des Fiches
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gestion-des-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestion des Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transcription-import-avec-flag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transcription &amp; Import (avec flag)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gestion-des-utilisateurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestion des Utilisateurs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#referentiels-avec-flag-is_staff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Référentiels (avec flag is_staff)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flags-speciaux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚩 Flags Spéciaux
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚩 Flags Spéciaux">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#est_transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        est_transcription
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#is_staff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_staff
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protection-des-vues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔒 Protection des Vues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔒 Protection des Vues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#decorateurs-utilises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Décorateurs Utilisés
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemples-de-protection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples de Protection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#permissions-dans-les-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎨 Permissions dans les Templates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🎨 Permissions dans les Templates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#menu-navigation-basehtml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Menu Navigation (base.html)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cycle-de-vie-dun-compte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👤 Cycle de Vie d'un Compte
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="👤 Cycle de Vie d&#39;un Compte">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etats-du-compte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        États du Compte
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-dinscription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow d'Inscription
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verrouillage-des-fiches" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔓 Verrouillage des Fiches
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔓 Verrouillage des Fiches">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#regles-de-verrouillage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Règles de Verrouillage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#liberation-de-verrou" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Libération de Verrou
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#points-dattention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Points d'Attention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resume-par-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Résumé par Rôle
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📊 Résumé par Rôle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#observateur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observateur
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reviewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reviewer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#administrateur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Administrateur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#voir-aussi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔗 Voir Aussi
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ocr_gemini/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR Gemini
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Déploiement
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Déploiement
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deploiement/deploiement_linux_windows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linux et Windows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deploiement/deploiement_docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projet
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Projet
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projet/docs_todo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan directeur
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projet/fichiers_cles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index des fichiers clés
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projet/strategie/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stratégie documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projet/template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vue-densemble" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Vue d'Ensemble
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roles-utilisateur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👥 Rôles Utilisateur
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="👥 Rôles Utilisateur">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Définition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hierarchie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hiérarchie
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matrice-de-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📋 Matrice de Permissions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📋 Matrice de Permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gestion-des-fiches" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestion des Fiches
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gestion-des-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestion des Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transcription-import-avec-flag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transcription &amp; Import (avec flag)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gestion-des-utilisateurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestion des Utilisateurs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#referentiels-avec-flag-is_staff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Référentiels (avec flag is_staff)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flags-speciaux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚩 Flags Spéciaux
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚩 Flags Spéciaux">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#est_transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        est_transcription
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#is_staff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_staff
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protection-des-vues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔒 Protection des Vues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔒 Protection des Vues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#decorateurs-utilises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Décorateurs Utilisés
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemples-de-protection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples de Protection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#permissions-dans-les-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎨 Permissions dans les Templates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🎨 Permissions dans les Templates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#menu-navigation-basehtml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Menu Navigation (base.html)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cycle-de-vie-dun-compte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👤 Cycle de Vie d'un Compte
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="👤 Cycle de Vie d&#39;un Compte">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etats-du-compte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        États du Compte
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-dinscription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow d'Inscription
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verrouillage-des-fiches" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔓 Verrouillage des Fiches
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔓 Verrouillage des Fiches">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#regles-de-verrouillage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Règles de Verrouillage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#liberation-de-verrou" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Libération de Verrou
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#points-dattention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Points d'Attention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resume-par-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Résumé par Rôle
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📊 Résumé par Rôle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#observateur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observateur
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reviewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reviewer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#administrateur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Administrateur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#voir-aussi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔗 Voir Aussi
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="systeme-de-permissions">🔐 Système de Permissions<a class="headerlink" href="#systeme-de-permissions" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Résumé</strong> : Rôles utilisateurs, droits par fonctionnalité et matrice de permissions.</p>
+</blockquote>
+<hr />
+<h2 id="vue-densemble">🎯 Vue d'Ensemble<a class="headerlink" href="#vue-densemble" title="Permanent link">&para;</a></h2>
+<p>Le système de permissions repose sur <strong>3 rôles</strong> et <strong>2 flags</strong> additionnels :</p>
+<pre class="mermaid"><code>flowchart TB
+    subgraph Roles["🎭 Rôles"]
+        Admin[Administrateur]
+        Reviewer[Reviewer]
+        Observateur[Observateur]
+    end
+
+    subgraph Flags["🚩 Flags"]
+        Transcription[est_transcription]
+        Staff[is_staff]
+    end
+
+    Admin --&gt;|inclut| Reviewer
+    Reviewer --&gt;|inclut| Observateur
+
+    Admin -.-&gt;|auto| Transcription
+    Admin -.-&gt;|peut avoir| Staff</code></pre>
+<hr />
+<h2 id="roles-utilisateur">👥 Rôles Utilisateur<a class="headerlink" href="#roles-utilisateur" title="Permanent link">&para;</a></h2>
+<h3 id="definition">Définition<a class="headerlink" href="#definition" title="Permanent link">&para;</a></h3>
+<p><strong>Fichier</strong> : <code>core/constants.py</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ROLE_CHOICES</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="p">(</span><span class="s1">&#39;observateur&#39;</span><span class="p">,</span> <span class="s1">&#39;Observateur&#39;</span><span class="p">),</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="p">(</span><span class="s1">&#39;reviewer&#39;</span><span class="p">,</span> <span class="s1">&#39;Reviewer&#39;</span><span class="p">),</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="p">(</span><span class="s1">&#39;administrateur&#39;</span><span class="p">,</span> <span class="s1">&#39;Administrateur&#39;</span><span class="p">),</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">]</span>
+</code></pre></div>
+<h3 id="hierarchie">Hiérarchie<a class="headerlink" href="#hierarchie" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Rôle</th>
+<th>Niveau</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Observateur</strong></td>
+<td>Base</td>
+<td>Saisie de ses propres fiches</td>
+</tr>
+<tr>
+<td><strong>Reviewer</strong></td>
+<td>Intermédiaire</td>
+<td>Correction des fiches soumises</td>
+</tr>
+<tr>
+<td><strong>Administrateur</strong></td>
+<td>Complet</td>
+<td>Gestion globale + tous droits</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="matrice-de-permissions">📋 Matrice de Permissions<a class="headerlink" href="#matrice-de-permissions" title="Permanent link">&para;</a></h2>
+<h3 id="gestion-des-fiches">Gestion des Fiches<a class="headerlink" href="#gestion-des-fiches" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th style="text-align: center;">Observateur</th>
+<th style="text-align: center;">Reviewer</th>
+<th style="text-align: center;">Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Créer une fiche</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Modifier sa fiche (en_edition)</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Voir ses fiches</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Voir toutes les fiches</td>
+<td style="text-align: center;">👁️ lecture</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Soumettre pour correction</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Corriger une fiche (en_cours)</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Valider une fiche</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Libérer son verrou</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Libérer tout verrou</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="gestion-des-images">Gestion des Images<a class="headerlink" href="#gestion-des-images" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th style="text-align: center;">Observateur</th>
+<th style="text-align: center;">Reviewer</th>
+<th style="text-align: center;">Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uploader une image</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Voir ses images</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Voir toutes les images</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="transcription-import-avec-flag">Transcription &amp; Import (avec flag)<a class="headerlink" href="#transcription-import-avec-flag" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th style="text-align: center;">Observateur</th>
+<th style="text-align: center;">Reviewer</th>
+<th style="text-align: center;">Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Accès menu Transcription</td>
+<td style="text-align: center;">❌*</td>
+<td style="text-align: center;">❌*</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Préparer des images</td>
+<td style="text-align: center;">❌*</td>
+<td style="text-align: center;">❌*</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Lancer transcription OCR</td>
+<td style="text-align: center;">❌*</td>
+<td style="text-align: center;">❌*</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Importer JSON</td>
+<td style="text-align: center;">❌*</td>
+<td style="text-align: center;">❌*</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Finaliser importations</td>
+<td style="text-align: center;">❌*</td>
+<td style="text-align: center;">❌*</td>
+<td style="text-align: center;">✅</td>
+</tr>
+</tbody>
+</table>
+<p><em>* Sauf si <code>est_transcription = True</code></em></p>
+<h3 id="gestion-des-utilisateurs">Gestion des Utilisateurs<a class="headerlink" href="#gestion-des-utilisateurs" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th style="text-align: center;">Observateur</th>
+<th style="text-align: center;">Reviewer</th>
+<th style="text-align: center;">Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Voir liste utilisateurs</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Créer un utilisateur</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Modifier un utilisateur</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Valider un compte</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Refuser un compte</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Désactiver un utilisateur</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Promouvoir administrateur</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">🔒 superuser</td>
+</tr>
+</tbody>
+</table>
+<h3 id="referentiels-avec-flag-is_staff">Référentiels (avec flag is_staff)<a class="headerlink" href="#referentiels-avec-flag-is_staff" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th style="text-align: center;">Observateur</th>
+<th style="text-align: center;">Reviewer</th>
+<th style="text-align: center;">Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gérer les espèces</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅*</td>
+</tr>
+<tr>
+<td>Gérer les communes</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅*</td>
+</tr>
+</tbody>
+</table>
+<p><em>* Requiert également <code>is_staff = True</code></em></p>
+<hr />
+<h2 id="flags-speciaux">🚩 Flags Spéciaux<a class="headerlink" href="#flags-speciaux" title="Permanent link">&para;</a></h2>
+<h3 id="est_transcription"><code>est_transcription</code><a class="headerlink" href="#est_transcription" title="Permanent link">&para;</a></h3>
+<p><strong>Objectif</strong> : Accorder l'accès transcription/import indépendamment du rôle.</p>
+<p><strong>Vérification</strong> :
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">peut_transcrire</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span> <span class="ow">and</span> <span class="p">(</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="n">user</span><span class="o">.</span><span class="n">est_transcription</span> <span class="ow">or</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;administrateur&#39;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Usage</strong> :
+- Peut être accordé à n'importe quel rôle
+- Configuré lors de la validation du compte
+- Donne accès à tout le workflow d'import</p>
+<p><strong>Menus débloqués</strong> :
+- Préparer des images
+- Transcription OCR
+- Import JSON
+- Gestion des importations</p>
+<h3 id="is_staff"><code>is_staff</code><a class="headerlink" href="#is_staff" title="Permanent link">&para;</a></h3>
+<p><strong>Objectif</strong> : Accès à la gestion des données référentielles.</p>
+<p><strong>Menus débloqués</strong> :
+- Gestion des espèces (taxonomy)
+- Gestion des communes (geo)</p>
+<hr />
+<h2 id="protection-des-vues">🔒 Protection des Vues<a class="headerlink" href="#protection-des-vues" title="Permanent link">&para;</a></h2>
+<h3 id="decorateurs-utilises">Décorateurs Utilisés<a class="headerlink" href="#decorateurs-utilises" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Décorateur</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@login_required</code></td>
+<td>Authentification obligatoire</td>
+</tr>
+<tr>
+<td><code>@user_passes_test(est_admin)</code></td>
+<td>Rôle administrateur requis</td>
+</tr>
+<tr>
+<td><code>@user_passes_test(peut_transcrire)</code></td>
+<td>Flag transcription ou admin</td>
+</tr>
+<tr>
+<td><code>@transcription_required</code></td>
+<td>Décorateur custom équivalent</td>
+</tr>
+</tbody>
+</table>
+<h3 id="exemples-de-protection">Exemples de Protection<a class="headerlink" href="#exemples-de-protection" title="Permanent link">&para;</a></h3>
+<p><strong>Vue Admin uniquement</strong> :
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@login_required</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">est_admin</span><span class="p">)</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">liste_utilisateurs</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="o">...</span>
+</code></pre></div></p>
+<p><strong>Vue Transcription</strong> :
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@login_required</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">peut_transcrire</span><span class="p">)</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">importer_json</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="o">...</span>
+</code></pre></div></p>
+<p><strong>Vue authentifiée</strong> :
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@login_required</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">upload_image_source</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="o">...</span>
+</code></pre></div></p>
+<hr />
+<h2 id="permissions-dans-les-templates">🎨 Permissions dans les Templates<a class="headerlink" href="#permissions-dans-les-templates" title="Permanent link">&para;</a></h2>
+<h3 id="menu-navigation-basehtml">Menu Navigation (base.html)<a class="headerlink" href="#menu-navigation-basehtml" title="Permanent link">&para;</a></h3>
+<p><strong>Section Transcription</strong> :
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>{% if user.est_transcription or user.role == &#39;administrateur&#39; %}
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="cm">&lt;!-- Menu Transcription visible --&gt;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>{% endif %}
+</code></pre></div></p>
+<p><strong>Section Administration</strong> :
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>{% if user.role == &#39;administrateur&#39; %}
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="cm">&lt;!-- Menu Admin visible --&gt;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>{% endif %}
+</code></pre></div></p>
+<p><strong>Section Référentiels</strong> :
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>{% if user.is_staff %}
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="cm">&lt;!-- Menu Référentiels visible --&gt;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>{% endif %}
+</code></pre></div></p>
+<hr />
+<h2 id="cycle-de-vie-dun-compte">👤 Cycle de Vie d'un Compte<a class="headerlink" href="#cycle-de-vie-dun-compte" title="Permanent link">&para;</a></h2>
+<h3 id="etats-du-compte">États du Compte<a class="headerlink" href="#etats-du-compte" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; EnAttente : Inscription publique
+    EnAttente --&gt; Valide : Admin valide
+    EnAttente --&gt; Refuse : Admin refuse
+    Valide --&gt; Desactive : Admin désactive
+    Desactive --&gt; Valide : Admin réactive</code></pre>
+<table>
+<thead>
+<tr>
+<th>État</th>
+<th style="text-align: center;"><code>is_active</code></th>
+<th style="text-align: center;"><code>est_valide</code></th>
+<th style="text-align: center;"><code>est_refuse</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>En attente</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+</tr>
+<tr>
+<td>Validé</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">❌</td>
+</tr>
+<tr>
+<td>Refusé</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>Désactivé</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">❌</td>
+</tr>
+</tbody>
+</table>
+<h3 id="workflow-dinscription">Workflow d'Inscription<a class="headerlink" href="#workflow-dinscription" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>sequenceDiagram
+    participant U as Utilisateur
+    participant D as Django
+    participant A as Administrateur
+    participant E as Email
+
+    U-&gt;&gt;D: Inscription publique
+    D-&gt;&gt;D: Crée compte (inactif)
+    D-&gt;&gt;E: Notifie tous les admins
+    A-&gt;&gt;D: Consulte demandes
+
+    alt Validation
+        A-&gt;&gt;D: Valide le compte
+        D-&gt;&gt;D: is_active = True, est_valide = True
+        D-&gt;&gt;E: Email de bienvenue
+        U-&gt;&gt;D: Peut se connecter
+    else Refus
+        A-&gt;&gt;D: Refuse le compte
+        D-&gt;&gt;D: est_refuse = True
+        D-&gt;&gt;E: Email de refus
+    end</code></pre>
+<hr />
+<h2 id="verrouillage-des-fiches">🔓 Verrouillage des Fiches<a class="headerlink" href="#verrouillage-des-fiches" title="Permanent link">&para;</a></h2>
+<h3 id="regles-de-verrouillage">Règles de Verrouillage<a class="headerlink" href="#regles-de-verrouillage" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th style="text-align: center;">Observateur</th>
+<th style="text-align: center;">Reviewer</th>
+<th style="text-align: center;">Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fiche verrouillée par autre</td>
+<td style="text-align: center;">👁️ lecture</td>
+<td style="text-align: center;">👁️ lecture</td>
+<td style="text-align: center;">⚠️ peut forcer</td>
+</tr>
+<tr>
+<td>Fiche verrouillée par soi</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;">✏️ édition</td>
+<td style="text-align: center;">✏️ édition</td>
+</tr>
+<tr>
+<td>Fiche non verrouillée</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;">✏️ verrouille</td>
+<td style="text-align: center;">✏️ verrouille</td>
+</tr>
+</tbody>
+</table>
+<h3 id="liberation-de-verrou">Libération de Verrou<a class="headerlink" href="#liberation-de-verrou" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Qui</th>
+<th>Peut libérer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reviewer</td>
+<td>Son propre verrou</td>
+</tr>
+<tr>
+<td>Administrateur</td>
+<td>N'importe quel verrou</td>
+</tr>
+<tr>
+<td>Système</td>
+<td>Verrous expirés (auto)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="points-dattention">⚠️ Points d'Attention<a class="headerlink" href="#points-dattention" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Rôle vs Flags</p>
+<p>Les flags <code>est_transcription</code> et <code>is_staff</code> sont <strong>indépendants</strong> du rôle. Un observateur avec <code>est_transcription=True</code> a accès à l'import.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Superuser</p>
+<p>La promotion administrateur nécessite d'être <code>superuser</code>. C'est la seule action avec cette restriction.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Validation obligatoire</p>
+<p>Tous les comptes créés via inscription publique nécessitent une validation admin avant de pouvoir se connecter.</p>
+</div>
+<hr />
+<h2 id="resume-par-role">📊 Résumé par Rôle<a class="headerlink" href="#resume-par-role" title="Permanent link">&para;</a></h2>
+<h3 id="observateur">Observateur<a class="headerlink" href="#observateur" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✅ Créer et modifier ses fiches</li>
+<li>✅ Uploader des images</li>
+<li>✅ Consulter ses données</li>
+<li>❌ Corriger les fiches d'autres</li>
+<li>❌ Valider des fiches</li>
+<li>❌ Gérer les utilisateurs</li>
+</ul>
+<h3 id="reviewer">Reviewer<a class="headerlink" href="#reviewer" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✅ Tout ce que peut l'observateur</li>
+<li>✅ Corriger les fiches soumises</li>
+<li>✅ Valider les fiches</li>
+<li>✅ Gérer ses verrous</li>
+<li>❌ Créer des fiches</li>
+<li>❌ Gérer les utilisateurs</li>
+</ul>
+<h3 id="administrateur">Administrateur<a class="headerlink" href="#administrateur" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✅ Tous les droits</li>
+<li>✅ Gestion des utilisateurs</li>
+<li>✅ Import/Transcription (auto)</li>
+<li>✅ Libérer tout verrou</li>
+<li>✅ Django Admin</li>
+<li>🔒 Promouvoir admin (si superuser)</li>
+</ul>
+<hr />
+<h2 id="voir-aussi">🔗 Voir Aussi<a class="headerlink" href="#voir-aussi" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../applications/accounts/">📦 Application Accounts</a> - Modèle Utilisateur</li>
+<li><a href="../workflow_fiche/">🔄 Workflow Fiche</a> - Cycle de vie des fiches</li>
+<li><a href="../../applications/review/">📦 Application Review</a> - Système de validation</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/gonm" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

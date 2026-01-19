@@ -1,0 +1,5198 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation du projet Observations Nids - Gestion des fiches d'observation de nidification">
+      
+      
+        <meta name="author" content="GONM">
+      
+      
+      
+        <link rel="prev" href="../../..">
+      
+      
+        <link rel="next" href="../../architecture/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Saisie d'observations - Observations Nids - Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#guide-dutilisation-page-de-saisiemodification-dobservations" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href="../../.." title="Observations Nids - Documentation" class="md-header__button md-logo" aria-label="Observations Nids - Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Observations Nids - Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Saisie d'observations
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green"  aria-label="Mode sombre"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Mode sombre" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="light-green"  aria-label="Mode clair"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Mode clair" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Accueil
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Guide Utilisateur
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../workflow_fiche/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Guides Techniques
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../deploiement/deploiement_linux_windows/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Déploiement
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../projet/docs_todo/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Projet
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Observations Nids - Documentation" class="md-nav__button md-logo" aria-label="Observations Nids - Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Observations Nids - Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide Utilisateur
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide Utilisateur
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Saisie d'observations
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Saisie d'observations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-des-matieres" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table des matières
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acces-a-la-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accès à la page
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Accès à la page">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#creation-dune-nouvelle-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Création d'une nouvelle observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modification-dune-observation-existante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modification d'une observation existante
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creation-dune-nouvelle-fiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Création d'une nouvelle fiche
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Création d&#39;une nouvelle fiche">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etapes-pour-creer-une-fiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étapes pour créer une fiche
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations-importantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations importantes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modification-dune-fiche-existante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modification d'une fiche existante
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modification d&#39;une fiche existante">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#acces-et-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accès et permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-de-modification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow de modification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#description-detaillee-des-sections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Description détaillée des sections
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Description détaillée des sections">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-informations-generales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Informations générales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-localisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Localisation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Localisation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tableau-de-localisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tableau de localisation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#descriptions-textuelles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Descriptions textuelles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-description-du-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Description du Nid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Observations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Observations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#structure-du-tableau" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure du tableau
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gestion-de-lheure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestion de l'heure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ajout-dobservations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ajout d'observations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#suppression-dobservations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suppression d'observations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-resume-des-observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Résumé des Observations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Résumé des Observations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dates-des-evenements-jourmois-uniquement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dates des événements (jour/mois uniquement)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compteurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compteurs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-causes-dechec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Causes d'échec
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-remarques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Remarques
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Remarques">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gestion-des-remarques-dans-le-modal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestion des remarques dans le modal
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-de-sauvegarde" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow de sauvegarde
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow de sauvegarde">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vue-densemble" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vue d'ensemble
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etapes-de-sauvegarde-post" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étapes de sauvegarde (POST)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#points-importants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Points importants
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calcul-du-pourcentage-de-completion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calcul du pourcentage de complétion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Calcul du pourcentage de complétion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vue-densemble_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vue d'ensemble
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methode-de-calcul" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Méthode de calcul
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#les-8-criteres-de-completion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Les 8 critères de complétion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detail-des-validations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Détail des validations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Détail des validations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#critere-1-observateur-renseigne" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 1 : Observateur renseigné
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-2-espece-renseignee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 2 : Espèce renseignée
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-3-localisation-complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 3 : Localisation complète
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-4-au-moins-une-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 4 : Au moins une observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-5-donnees-dufs-dans-le-resume" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 5 : Données d'œufs dans le résumé
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-6-details-du-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 6 : Détails du nid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-7-hauteur-du-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 7 : Hauteur du nid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-8-image-associee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 8 : Image associée
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemples-de-calculs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples de calculs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Exemples de calculs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exemple-1-fiche-minimale-nouvelle-saisie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple 1 : Fiche minimale (nouvelle saisie)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemple-2-fiche-bien-completee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple 2 : Fiche bien complétée
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemple-3-fiche-issue-de-transcription-complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple 3 : Fiche issue de transcription complète
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#declenchement-du-calcul" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Déclenchement du calcul
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changement-automatique-de-statut" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changement automatique de statut
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#affichage-du-pourcentage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Affichage du pourcentage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conseils-pour-augmenter-le-pourcentage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conseils pour augmenter le pourcentage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#soumission-pour-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Soumission pour validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Soumission pour validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concept" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concept
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#processus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Processus
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statuts-de-correction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Statuts de correction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommandations-avant-soumission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommandations avant soumission
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#correction-de-transcriptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correction de transcriptions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Correction de transcriptions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contexte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contexte
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#distinction-entre-nouvelle-fiche-et-correction-de-transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distinction entre nouvelle fiche et correction de transcription
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-de-correction-de-transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow de correction de transcription
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreurs-courantes-de-transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreurs courantes de transcription
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#permissions-et-restrictions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permissions et restrictions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Permissions et restrictions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#permissions-par-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permissions par rôle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restrictions-dacces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restrictions d'accès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#champs-en-lecture-seule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Champs en lecture seule
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#historique-des-modifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Historique des modifications
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Historique des modifications">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concept_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concept
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#acces-a-lhistorique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accès à l'historique
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#informations-enregistrees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Informations enregistrées
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#types-devenements-enregistres" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Types d'événements enregistrés
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consultation-de-lhistorique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consultation de l'historique
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#annexes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Annexes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Annexes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#raccourcis-clavier-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raccourcis clavier disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#messages-derreur-courants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Messages d'erreur courants
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bonnes-pratiques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bonnes pratiques
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fichiers-de-code-concernes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fichiers de code concernés
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resume-visuel-du-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Résumé visuel du workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vue d'ensemble
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Applications Django
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Applications Django
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../applications/observations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../applications/observations_saisie_formulaires/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Formulaires de saisie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../applications/taxonomy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Taxonomy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../applications/geo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../applications/accounts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accounts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../applications/review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../applications/audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../applications/ingest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ingest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../applications/ocr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../applications/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides Techniques
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides Techniques
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflow_fiche/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow d'une fiche
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ocr_gemini/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR Gemini
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Déploiement
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Déploiement
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../deploiement/deploiement_linux_windows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linux et Windows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../deploiement/deploiement_docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projet
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Projet
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../projet/docs_todo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan directeur
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../projet/fichiers_cles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index des fichiers clés
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../projet/strategie/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stratégie documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../projet/template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-des-matieres" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table des matières
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acces-a-la-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accès à la page
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Accès à la page">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#creation-dune-nouvelle-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Création d'une nouvelle observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modification-dune-observation-existante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modification d'une observation existante
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creation-dune-nouvelle-fiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Création d'une nouvelle fiche
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Création d&#39;une nouvelle fiche">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etapes-pour-creer-une-fiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étapes pour créer une fiche
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations-importantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations importantes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modification-dune-fiche-existante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modification d'une fiche existante
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modification d&#39;une fiche existante">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#acces-et-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accès et permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-de-modification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow de modification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#description-detaillee-des-sections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Description détaillée des sections
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Description détaillée des sections">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-informations-generales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Informations générales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-localisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Localisation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Localisation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tableau-de-localisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tableau de localisation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#descriptions-textuelles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Descriptions textuelles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-description-du-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Description du Nid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Observations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Observations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#structure-du-tableau" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure du tableau
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gestion-de-lheure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestion de l'heure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ajout-dobservations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ajout d'observations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#suppression-dobservations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suppression d'observations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-resume-des-observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Résumé des Observations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Résumé des Observations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dates-des-evenements-jourmois-uniquement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dates des événements (jour/mois uniquement)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compteurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compteurs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-causes-dechec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Causes d'échec
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-remarques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Remarques
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Remarques">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gestion-des-remarques-dans-le-modal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gestion des remarques dans le modal
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-de-sauvegarde" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow de sauvegarde
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow de sauvegarde">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vue-densemble" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vue d'ensemble
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etapes-de-sauvegarde-post" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étapes de sauvegarde (POST)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#points-importants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Points importants
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calcul-du-pourcentage-de-completion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calcul du pourcentage de complétion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Calcul du pourcentage de complétion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vue-densemble_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vue d'ensemble
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methode-de-calcul" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Méthode de calcul
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#les-8-criteres-de-completion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Les 8 critères de complétion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detail-des-validations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Détail des validations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Détail des validations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#critere-1-observateur-renseigne" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 1 : Observateur renseigné
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-2-espece-renseignee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 2 : Espèce renseignée
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-3-localisation-complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 3 : Localisation complète
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-4-au-moins-une-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 4 : Au moins une observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-5-donnees-dufs-dans-le-resume" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 5 : Données d'œufs dans le résumé
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-6-details-du-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 6 : Détails du nid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-7-hauteur-du-nid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 7 : Hauteur du nid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critere-8-image-associee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critère 8 : Image associée
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemples-de-calculs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples de calculs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Exemples de calculs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exemple-1-fiche-minimale-nouvelle-saisie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple 1 : Fiche minimale (nouvelle saisie)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemple-2-fiche-bien-completee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple 2 : Fiche bien complétée
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemple-3-fiche-issue-de-transcription-complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple 3 : Fiche issue de transcription complète
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#declenchement-du-calcul" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Déclenchement du calcul
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changement-automatique-de-statut" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changement automatique de statut
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#affichage-du-pourcentage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Affichage du pourcentage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conseils-pour-augmenter-le-pourcentage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conseils pour augmenter le pourcentage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#soumission-pour-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Soumission pour validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Soumission pour validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concept" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concept
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#processus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Processus
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statuts-de-correction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Statuts de correction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommandations-avant-soumission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommandations avant soumission
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#correction-de-transcriptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correction de transcriptions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Correction de transcriptions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contexte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contexte
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#distinction-entre-nouvelle-fiche-et-correction-de-transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distinction entre nouvelle fiche et correction de transcription
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-de-correction-de-transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow de correction de transcription
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreurs-courantes-de-transcription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreurs courantes de transcription
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#permissions-et-restrictions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permissions et restrictions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Permissions et restrictions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#permissions-par-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permissions par rôle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restrictions-dacces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restrictions d'accès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#champs-en-lecture-seule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Champs en lecture seule
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#historique-des-modifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Historique des modifications
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Historique des modifications">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concept_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concept
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#acces-a-lhistorique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accès à l'historique
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#informations-enregistrees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Informations enregistrées
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#types-devenements-enregistres" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Types d'événements enregistrés
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consultation-de-lhistorique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consultation de l'historique
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#annexes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Annexes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Annexes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#raccourcis-clavier-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raccourcis clavier disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#messages-derreur-courants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Messages d'erreur courants
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bonnes-pratiques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bonnes pratiques
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fichiers-de-code-concernes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fichiers de code concernés
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resume-visuel-du-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Résumé visuel du workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="guide-dutilisation-page-de-saisiemodification-dobservations">Guide d'utilisation - Page de Saisie/Modification d'Observations<a class="headerlink" href="#guide-dutilisation-page-de-saisiemodification-dobservations" title="Permanent link">&para;</a></h1>
+<h2 id="table-des-matieres">Table des matières<a class="headerlink" href="#table-des-matieres" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#acces-a-la-page">Accès à la page</a></li>
+<li><a href="#creation-dune-nouvelle-fiche">Création d'une nouvelle fiche</a></li>
+<li><a href="#modification-dune-fiche-existante">Modification d'une fiche existante</a></li>
+<li><a href="#description-detaillee-des-sections">Description détaillée des sections</a></li>
+<li><a href="#workflow-de-sauvegarde">Workflow de sauvegarde</a></li>
+<li><a href="#calcul-du-pourcentage-de-completion">Calcul du pourcentage de complétion</a></li>
+<li><a href="#soumission-pour-validation">Soumission pour validation</a></li>
+<li><a href="#correction-de-transcriptions">Correction de transcriptions</a></li>
+<li><a href="#permissions-et-restrictions">Permissions et restrictions</a></li>
+<li><a href="#historique-des-modifications">Historique des modifications</a></li>
+</ol>
+<hr />
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
+<p>La page de saisie/modification d'observations permet de créer de nouvelles fiches d'observation ou de modifier des fiches existantes. Cette page centralise toutes les informations relatives à une observation de nid :
+- Informations générales (observateur, espèce, année)
+- Localisation géographique
+- Description du nid
+- Observations successives
+- Résumé des observations
+- Causes d'échec éventuelles
+- Remarques</p>
+<p><strong>URLs concernées :</strong>
+- Création : <code>http://127.0.0.1:8000/observations/</code>
+- Modification : <code>http://127.0.0.1:8000/observations/modifier/{num_fiche}/</code>
+- Exemple : <code>http://127.0.0.1:8000/observations/modifier/27/</code></p>
+<hr />
+<h2 id="acces-a-la-page">Accès à la page<a class="headerlink" href="#acces-a-la-page" title="Permanent link">&para;</a></h2>
+<h3 id="creation-dune-nouvelle-observation">Création d'une nouvelle observation<a class="headerlink" href="#creation-dune-nouvelle-observation" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Accédez à <code>http://127.0.0.1:8000/observations/</code></li>
+<li>La page affiche le titre "Saisie d'une nouvelle observation"</li>
+<li>Le numéro de fiche est indiqué comme "À définir" (il sera attribué automatiquement lors de la première sauvegarde)</li>
+</ol>
+<h3 id="modification-dune-observation-existante">Modification d'une observation existante<a class="headerlink" href="#modification-dune-observation-existante" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Accédez à <code>http://127.0.0.1:8000/observations/modifier/{num_fiche}/</code></li>
+<li>La page affiche le titre "Edition d'une observation"</li>
+<li>Le numéro de fiche est affiché dans le tableau d'informations générales</li>
+<li>Des liens supplémentaires apparaissent dans l'en-tête :</li>
+<li><strong>"Voir l'image"</strong> : Ouvre l'image scannée de la fiche papier (si disponible)</li>
+<li><strong>"Voir JSON"</strong> : Affiche le fichier JSON de transcription automatique (si disponible)</li>
+</ol>
+<hr />
+<h2 id="creation-dune-nouvelle-fiche">Création d'une nouvelle fiche<a class="headerlink" href="#creation-dune-nouvelle-fiche" title="Permanent link">&para;</a></h2>
+<h3 id="etapes-pour-creer-une-fiche">Étapes pour créer une fiche<a class="headerlink" href="#etapes-pour-creer-une-fiche" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Accéder à la page de création</strong></li>
+<li>
+<p>URL : <code>http://127.0.0.1:8000/observations/</code></p>
+</li>
+<li>
+<p><strong>Remplir les informations obligatoires</strong></p>
+</li>
+<li><strong>Espèce</strong> : Sélectionner dans la liste déroulante avec recherche</li>
+<li>
+<p><strong>Au moins une observation</strong> : Date et heure minimum</p>
+</li>
+<li>
+<p><strong>Remplir les autres sections</strong> (facultatif)</p>
+</li>
+<li>Localisation</li>
+<li>Description du nid</li>
+<li>Résumé des observations</li>
+<li>Causes d'échec</li>
+<li>
+<p>Remarques</p>
+</li>
+<li>
+<p><strong>Enregistrer la fiche</strong></p>
+</li>
+<li>Cliquer sur le bouton "Enregistrer"</li>
+<li>Un numéro de fiche est automatiquement attribué</li>
+<li>Vous êtes redirigé vers la page de modification (<code>/observations/modifier/{num_fiche}/</code>)</li>
+</ol>
+<h3 id="limitations-importantes">Limitations importantes<a class="headerlink" href="#limitations-importantes" title="Permanent link">&para;</a></h3>
+<p><strong>❌ VOUS NE POUVEZ PAS :</strong>
+- Enregistrer une fiche sans l'avoir créée d'abord
+- Une fiche doit être créée en une seule fois avec au minimum :
+  - Une espèce sélectionnée
+  - Toutes les informations de base valides</p>
+<p><strong>✅ VOUS POUVEZ :</strong>
+- Créer une fiche minimale et la compléter ensuite
+- Modifier une fiche autant de fois que nécessaire avant soumission
+- Ajouter/supprimer des observations après création</p>
+<hr />
+<h2 id="modification-dune-fiche-existante">Modification d'une fiche existante<a class="headerlink" href="#modification-dune-fiche-existante" title="Permanent link">&para;</a></h2>
+<h3 id="acces-et-permissions">Accès et permissions<a class="headerlink" href="#acces-et-permissions" title="Permanent link">&para;</a></h3>
+<p>Une fiche peut être modifiée tant qu'elle est dans les statuts suivants :
+- <strong>"nouveau"</strong> : Fiche nouvellement créée
+- <strong>"en_edition"</strong> : Fiche en cours d'édition</p>
+<p><strong>Restrictions :</strong>
+- Seul l'<strong>auteur</strong> (observateur) ou un <strong>administrateur</strong> peut modifier une fiche en statut "nouveau" ou "en_edition"
+- Une fois soumise pour correction (statut "en_cours"), la fiche devient <strong>lecture seule</strong> pour l'observateur
+- Les reviewers et administrateurs peuvent modifier les fiches en cours de correction</p>
+<h3 id="workflow-de-modification">Workflow de modification<a class="headerlink" href="#workflow-de-modification" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Accéder à la fiche</strong> : <code>http://127.0.0.1:8000/observations/modifier/{num_fiche}/</code></li>
+<li><strong>Modifier les champs souhaités</strong></li>
+<li><strong>Enregistrer</strong> : Cliquer sur "Enregistrer"</li>
+<li><strong>Résultat</strong> :</li>
+<li>La fiche est mise à jour</li>
+<li>Un historique des modifications est créé automatiquement</li>
+<li>Vous restez sur la page de modification</li>
+</ol>
+<hr />
+<h2 id="description-detaillee-des-sections">Description détaillée des sections<a class="headerlink" href="#description-detaillee-des-sections" title="Permanent link">&para;</a></h2>
+<h3 id="1-informations-generales">1. Informations générales<a class="headerlink" href="#1-informations-generales" title="Permanent link">&para;</a></h3>
+<p><strong>Emplacement :</strong> Première section de la page (en-tête bleu)</p>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Type</th>
+<th>Obligatoire</th>
+<th>Éditable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>N° Fiche</strong></td>
+<td>Auto</td>
+<td>Oui</td>
+<td>❌ Non</td>
+<td>Numéro automatique attribué à la création</td>
+</tr>
+<tr>
+<td><strong>Observateur</strong></td>
+<td>Caché</td>
+<td>Oui</td>
+<td>❌ Non*</td>
+<td>Utilisateur connecté (modifiable par admin/reviewer)</td>
+</tr>
+<tr>
+<td><strong>Espèce</strong></td>
+<td>Liste déroulante</td>
+<td>Oui</td>
+<td>✅ Oui</td>
+<td>Espèce observée (recherche par nom)</td>
+</tr>
+<tr>
+<td><strong>Année</strong></td>
+<td>Nombre</td>
+<td>Oui</td>
+<td>✅ Oui</td>
+<td>Année de l'observation (auto-rempli à la création)</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note :</em> Le champ observateur n'est modifiable que pour les administrateurs et reviewers.</p>
+<p><strong>Recherche d'espèce :</strong>
+- Tapez dans le champ pour rechercher
+- Délai de 800ms entre les frappes (debounce)
+- Navigation au clavier (↑↓, Entrée, Échap)
+- Surlignage des termes recherchés</p>
+<hr />
+<h3 id="2-localisation">2. Localisation<a class="headerlink" href="#2-localisation" title="Permanent link">&para;</a></h3>
+<p><strong>Emplacement :</strong> Deuxième section (en-tête vert)</p>
+<h4 id="tableau-de-localisation">Tableau de localisation<a class="headerlink" href="#tableau-de-localisation" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Type</th>
+<th>Obligatoire</th>
+<th>Éditable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Commune</strong></td>
+<td>Texte avec autocomplétion</td>
+<td>Non</td>
+<td>✅ Oui</td>
+<td>Commune de l'observation</td>
+</tr>
+<tr>
+<td><strong>Département</strong></td>
+<td>Texte</td>
+<td>Non</td>
+<td>❌ Non*</td>
+<td>Auto-rempli via l'autocomplétion commune</td>
+</tr>
+<tr>
+<td><strong>Lieu-dit</strong></td>
+<td>Texte</td>
+<td>Non</td>
+<td>✅ Oui</td>
+<td>Nom du lieu précis</td>
+</tr>
+<tr>
+<td><strong>Altitude</strong></td>
+<td>Nombre</td>
+<td>Non</td>
+<td>✅ Oui</td>
+<td>Altitude en mètres</td>
+</tr>
+<tr>
+<td><strong>Latitude</strong></td>
+<td>Décimal</td>
+<td>Non</td>
+<td>✅ Oui</td>
+<td>Coordonnée GPS</td>
+</tr>
+<tr>
+<td><strong>Longitude</strong></td>
+<td>Décimal</td>
+<td>Non</td>
+<td>✅ Oui</td>
+<td>Coordonnée GPS</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note :</em> Le département est en lecture seule mais se remplit automatiquement.</p>
+<p><strong>Fonctionnalité d'autocomplétion de commune :</strong>
+- Tapez au moins 2 caractères pour lancer la recherche
+- Délai de 300ms entre les frappes
+- Recherche via l'API Nominatim (OpenStreetMap)
+- <strong>Auto-remplissage</strong> : Lorsque vous sélectionnez une commune, les champs suivants sont remplis automatiquement (uniquement s'ils sont vides) :
+  - Département
+  - Latitude
+  - Longitude
+  - Altitude
+- <strong>Respect des valeurs existantes</strong> : Si ces champs contiennent déjà des valeurs, elles ne sont PAS écrasées
+- Navigation au clavier (↑↓, Entrée, Échap)</p>
+<p><strong>Bouton "Ma position" (GPS) :</strong>
+- Cliquer sur le bouton demande l'autorisation de géolocalisation
+- Remplit automatiquement latitude et longitude
+- Déclenche ensuite une recherche de commune basée sur ces coordonnées
+- Gestion des erreurs : permission refusée, position indisponible, timeout</p>
+<h4 id="descriptions-textuelles">Descriptions textuelles<a class="headerlink" href="#descriptions-textuelles" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Type</th>
+<th>Obligatoire</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paysage (200 à 500m)</strong></td>
+<td>Textarea</td>
+<td>Non</td>
+<td>Description du paysage environnant dans un rayon de 200 à 500 mètres</td>
+</tr>
+<tr>
+<td><strong>Alentours (20 à 50m)</strong></td>
+<td>Textarea</td>
+<td>Non</td>
+<td>Description des alentours immédiats dans un rayon de 20 à 50 mètres</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="3-description-du-nid">3. Description du Nid<a class="headerlink" href="#3-description-du-nid" title="Permanent link">&para;</a></h3>
+<p><strong>Emplacement :</strong> Troisième section (en-tête cyan)</p>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Type</th>
+<th>Obligatoire</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Utilisé par le même couple</strong></td>
+<td>Case à cocher</td>
+<td>Non</td>
+<td>Indique si le nid était utilisé précédemment par le même couple</td>
+</tr>
+<tr>
+<td><strong>Hauteur du nid (cm)</strong></td>
+<td>Nombre</td>
+<td>Non</td>
+<td>Hauteur du nid en centimètres (valeur par défaut : 0)</td>
+</tr>
+<tr>
+<td><strong>Hauteur du couvert (cm)</strong></td>
+<td>Nombre</td>
+<td>Non</td>
+<td>Hauteur du couvert végétal en centimètres (valeur par défaut : 0)</td>
+</tr>
+<tr>
+<td><strong>Détails du Nid</strong></td>
+<td>Textarea</td>
+<td>Non</td>
+<td>Description détaillée du nid et de sa structure</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Valeurs par défaut :</strong>
+- Les hauteurs sont initialisées à 0
+- La case "Utilisé par le même couple" est décochée par défaut</p>
+<hr />
+<h3 id="4-observations">4. Observations<a class="headerlink" href="#4-observations" title="Permanent link">&para;</a></h3>
+<p><strong>Emplacement :</strong> Quatrième section (en-tête jaune)</p>
+<p>Cette section permet de gérer <strong>plusieurs observations</strong> successives pour une même fiche. Chaque observation représente une visite sur le terrain à une date donnée.</p>
+<h4 id="structure-du-tableau">Structure du tableau<a class="headerlink" href="#structure-du-tableau" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Type</th>
+<th>Obligatoire</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Date</strong></td>
+<td>Date et heure</td>
+<td>Oui</td>
+<td>Date et heure de l'observation (format : datetime-local)</td>
+</tr>
+<tr>
+<td><strong>Heure connue</strong></td>
+<td>Case à cocher</td>
+<td>Non</td>
+<td>Indique si l'heure exacte est connue</td>
+</tr>
+<tr>
+<td><strong>Nombre d'œufs</strong></td>
+<td>Nombre</td>
+<td>Non</td>
+<td>Nombre d'œufs observés (défaut : 0)</td>
+</tr>
+<tr>
+<td><strong>Nombre de poussins</strong></td>
+<td>Nombre</td>
+<td>Non</td>
+<td>Nombre de poussins observés (défaut : 0)</td>
+</tr>
+<tr>
+<td><strong>Observations</strong></td>
+<td>Textarea</td>
+<td>Non</td>
+<td>Notes et remarques de l'observation</td>
+</tr>
+<tr>
+<td><strong>Actions</strong></td>
+<td>Boutons</td>
+<td>-</td>
+<td>Bouton "Supprimer" pour marquer une observation à supprimer</td>
+</tr>
+</tbody>
+</table>
+<h4 id="gestion-de-lheure">Gestion de l'heure<a class="headerlink" href="#gestion-de-lheure" title="Permanent link">&para;</a></h4>
+<p><strong>Comportement de la case "Heure connue" :</strong>
+- <strong>Si cochée</strong> : L'heure saisie est conservée
+- <strong>Si décochée</strong> : L'heure est automatiquement mise à 00:00:00
+- <strong>Détection automatique</strong> : Si vous modifiez manuellement l'heure à une valeur différente de 00:00, la case se coche automatiquement</p>
+<p><strong>Format de la date :</strong>
+- Format : <code>JJ/MM/AAAA HH:MM</code>
+- Widget HTML5 : <code>datetime-local</code> pour une saisie facile</p>
+<h4 id="ajout-dobservations">Ajout d'observations<a class="headerlink" href="#ajout-dobservations" title="Permanent link">&para;</a></h4>
+<p><strong>Méthode 1 : Lors de la création/modification de la fiche</strong>
+- Les lignes d'observation sont affichées dans le tableau
+- Si la fiche existe déjà, les observations existantes sont pré-remplies
+- Vous pouvez modifier les observations existantes directement dans le tableau</p>
+<p><strong>Méthode 2 : Ajouter une observation individuelle</strong>
+- <strong>URL</strong> : <code>http://127.0.0.1:8000/observations/ajouter/{num_fiche}/</code>
+- Cette vue permet d'ajouter une seule observation à une fiche existante
+- Après ajout, redirection vers la page de modification</p>
+<p><strong>Note importante :</strong> Pour une nouvelle fiche, au moins une observation doit être créée lors de la première sauvegarde.</p>
+<h4 id="suppression-dobservations">Suppression d'observations<a class="headerlink" href="#suppression-dobservations" title="Permanent link">&para;</a></h4>
+<p><strong>Processus de suppression :</strong></p>
+<ol>
+<li><strong>Marquer pour suppression</strong></li>
+<li>Cliquer sur le bouton "Supprimer" d'une observation</li>
+<li>La ligne devient grisée, barrée et en opacité réduite</li>
+<li>Les champs de la ligne sont désactivés (non éditables)</li>
+<li>
+<p>Un champ caché <code>DELETE</code> est marqué pour le formset Django</p>
+</li>
+<li>
+<p><strong>Bannière de confirmation</strong></p>
+</li>
+<li>Une bannière jaune apparaît en haut du tableau</li>
+<li>Affiche le nombre d'observations marquées pour suppression</li>
+<li>Exemple : "<strong>Attention :</strong> 2 observation(s) seront supprimée(s) lors de la validation."</li>
+<li>
+<p>Bouton "Annuler toutes les suppressions" pour annuler toutes les marques</p>
+</li>
+<li>
+<p><strong>Restauration d'une observation</strong></p>
+</li>
+<li>Cliquer sur le bouton "Restaurer" (qui remplace "Supprimer")</li>
+<li>La ligne redevient normale</li>
+<li>
+<p>Les champs sont réactivés</p>
+</li>
+<li>
+<p><strong>Confirmation de soumission</strong></p>
+</li>
+<li>Si des observations sont marquées pour suppression, une confirmation JavaScript s'affiche avant la soumission du formulaire</li>
+<li>
+<p>Message : "Vous avez marqué X observation(s) pour suppression. Êtes-vous sûr de vouloir continuer ?"</p>
+</li>
+<li>
+<p><strong>Suppression effective</strong></p>
+</li>
+<li>Les observations ne sont <strong>réellement supprimées</strong> que lors de l'enregistrement de la fiche (clic sur "Enregistrer")</li>
+<li>Une entrée est créée dans l'historique des modifications</li>
+<li>La suppression est définitive et ne peut pas être annulée après enregistrement</li>
+</ol>
+<p><strong>Impact sur la sauvegarde :</strong>
+- Les suppressions d'observations marquées sont traitées lors de la sauvegarde globale du formulaire
+- Si vous modifiez d'autres champs sans enregistrer, puis supprimez une observation et enregistrez, <strong>TOUTES les modifications sont sauvegardées ensemble</strong> (champs + suppressions)
+- Si vous fermez la page sans enregistrer, <strong>AUCUNE modification n'est conservée</strong> (ni les changements de champs, ni les suppressions)</p>
+<hr />
+<h3 id="5-resume-des-observations">5. Résumé des Observations<a class="headerlink" href="#5-resume-des-observations" title="Permanent link">&para;</a></h3>
+<p><strong>Emplacement :</strong> Cinquième section (en-tête violet)</p>
+<p>Cette section résume les événements clés du cycle de reproduction observé.</p>
+<h4 id="dates-des-evenements-jourmois-uniquement">Dates des événements (jour/mois uniquement)<a class="headerlink" href="#dates-des-evenements-jourmois-uniquement" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Type</th>
+<th>Obligatoire</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Premier œuf pondu (Jour)</strong></td>
+<td>Nombre (1-31)</td>
+<td>Non*</td>
+<td>Jour du mois du premier œuf</td>
+</tr>
+<tr>
+<td><strong>Premier œuf pondu (Mois)</strong></td>
+<td>Nombre (1-12)</td>
+<td>Non*</td>
+<td>Mois du premier œuf</td>
+</tr>
+<tr>
+<td><strong>Premier poussin éclos (Jour)</strong></td>
+<td>Nombre (1-31)</td>
+<td>Non*</td>
+<td>Jour du mois du premier poussin</td>
+</tr>
+<tr>
+<td><strong>Premier poussin éclos (Mois)</strong></td>
+<td>Nombre (1-12)</td>
+<td>Non*</td>
+<td>Mois du premier poussin</td>
+</tr>
+<tr>
+<td><strong>Premier poussin volant (Jour)</strong></td>
+<td>Nombre (1-31)</td>
+<td>Non*</td>
+<td>Jour du mois du premier poussin volant</td>
+</tr>
+<tr>
+<td><strong>Premier poussin volant (Mois)</strong></td>
+<td>Nombre (1-12)</td>
+<td>Non*</td>
+<td>Mois du premier poussin volant</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note :</em> <strong>Contrainte jour/mois</strong> : Pour chaque événement, si vous renseignez le jour, vous <strong>devez</strong> renseigner le mois, et inversement. Les deux doivent être remplis ensemble ou laissés vides ensemble.</p>
+<h4 id="compteurs">Compteurs<a class="headerlink" href="#compteurs" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Type</th>
+<th>Obligatoire</th>
+<th>Description</th>
+<th>Valeur par défaut</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Nombre d'œufs pondus</strong></td>
+<td>Nombre</td>
+<td>Non</td>
+<td>Total d'œufs pondus</td>
+<td>NULL (= "Non observé")</td>
+</tr>
+<tr>
+<td><strong>Nombre d'œufs éclos</strong></td>
+<td>Nombre</td>
+<td>Non</td>
+<td>Total d'œufs ayant éclos</td>
+<td>NULL (= "Non observé")</td>
+</tr>
+<tr>
+<td><strong>Nombre d'œufs non éclos</strong></td>
+<td>Nombre</td>
+<td>Non</td>
+<td>Total d'œufs n'ayant pas éclos</td>
+<td>NULL (= "Non observé")</td>
+</tr>
+<tr>
+<td><strong>Nombre de poussins</strong></td>
+<td>Nombre</td>
+<td>Non</td>
+<td>Total de poussins observés</td>
+<td>NULL (= "Non observé")</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Valeurs spéciales :</strong>
+- <strong>NULL (vide)</strong> : Indique "Non observé"
+- <strong>0</strong> : Indique une observation avec 0 (zéro confirmé)
+- Placeholder dans le formulaire : "Non observé"</p>
+<p><strong>Contraintes de cohérence (validation en base de données) :</strong>
+- <code>nombre_oeufs_eclos ≤ nombre_oeufs_pondus</code> (si les deux sont renseignés)
+- <code>nombre_oeufs_non_eclos ≤ nombre_oeufs_pondus</code> (si les deux sont renseignés)
+- <code>nombre_poussins ≤ nombre_oeufs_eclos</code> (si les deux sont renseignés)</p>
+<hr />
+<h3 id="6-causes-dechec">6. Causes d'échec<a class="headerlink" href="#6-causes-dechec" title="Permanent link">&para;</a></h3>
+<p><strong>Emplacement :</strong> Sixième section (en-tête rouge)</p>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Type</th>
+<th>Obligatoire</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Description</strong></td>
+<td>Textarea</td>
+<td>Non</td>
+<td>Description des causes d'échec de la reproduction (prédation, abandon, météo, etc.)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Utilisation :</strong>
+- Laisser vide si l'observation est un succès
+- Remplir uniquement en cas d'échec de la reproduction
+- Décrire les causes identifiées ou suspectées</p>
+<hr />
+<h3 id="7-remarques">7. Remarques<a class="headerlink" href="#7-remarques" title="Permanent link">&para;</a></h3>
+<p><strong>Emplacement :</strong> Section accessible via un <strong>modal</strong> (popup)</p>
+<p><strong>Accès :</strong>
+- Bouton "Gérer les remarques" en bas du formulaire
+- Ouvre une fenêtre modale</p>
+<p><strong>Fonctionnalité AJAX :</strong>
+- Les remarques sont gérées <strong>indépendamment</strong> du reste du formulaire
+- Chargement des remarques via requête AJAX : <code>GET /observations/modifier/{fiche_id}/?get_remarques=1</code>
+- Sauvegarde via requête AJAX : <code>POST /observations/modifier/{fiche_id}/</code> avec <code>action=update_remarques</code></p>
+<h4 id="gestion-des-remarques-dans-le-modal">Gestion des remarques dans le modal<a class="headerlink" href="#gestion-des-remarques-dans-le-modal" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Consulter</strong></td>
+<td>Liste des remarques existantes avec leur date de création</td>
+</tr>
+<tr>
+<td><strong>Ajouter</strong></td>
+<td>Cliquer sur "Ajouter une remarque", saisir le texte, enregistrer</td>
+</tr>
+<tr>
+<td><strong>Supprimer</strong></td>
+<td>Cocher la case "Supprimer" à côté d'une remarque</td>
+</tr>
+<tr>
+<td><strong>Enregistrer</strong></td>
+<td>Bouton "Enregistrer" dans le modal</td>
+</tr>
+<tr>
+<td><strong>Annuler</strong></td>
+<td>Bouton "Annuler" ou fermer le modal (pas de modification)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Comportement spécifique :</strong>
+- Les remarques sont sauvegardées <strong>immédiatement</strong> lors du clic sur "Enregistrer" dans le modal
+- La page se recharge automatiquement après sauvegarde réussie
+- Les remarques sont <strong>indépendantes</strong> des autres modifications du formulaire principal</p>
+<p><strong>Impact de la sauvegarde séparée :</strong>
+- Vous pouvez modifier les remarques et enregistrer uniquement ces modifications sans toucher au reste de la fiche
+- Si vous modifiez d'autres champs du formulaire principal sans enregistrer, puis enregistrez des remarques dans le modal, <strong>seules les remarques sont sauvegardées</strong>
+- Les modifications non enregistrées du formulaire principal seront perdues lors du rechargement de la page après sauvegarde des remarques</p>
+<hr />
+<h2 id="workflow-de-sauvegarde">Workflow de sauvegarde<a class="headerlink" href="#workflow-de-sauvegarde" title="Permanent link">&para;</a></h2>
+<h3 id="vue-densemble">Vue d'ensemble<a class="headerlink" href="#vue-densemble" title="Permanent link">&para;</a></h3>
+<p>Le système utilise une <strong>transaction atomique</strong> pour garantir la cohérence des données : soit toutes les modifications sont sauvegardées, soit aucune.</p>
+<h3 id="etapes-de-sauvegarde-post">Étapes de sauvegarde (POST)<a class="headerlink" href="#etapes-de-sauvegarde-post" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Validation des formulaires</strong></li>
+<li>Fiche principale (espèce, année)</li>
+<li>Localisation</li>
+<li>Nid</li>
+<li>Résumé des observations</li>
+<li>Causes d'échec</li>
+<li>Formset d'observations</li>
+<li>
+<p>Formset de remarques</p>
+</li>
+<li>
+<p><strong>Si validation réussie :</strong></p>
+</li>
+</ol>
+<p><strong>a. Sauvegarde de la fiche principale</strong>
+   - Si nouvelle fiche (<code>fiche_id=None</code>) :
+     - Création de l'objet <code>FicheObservation</code>
+     - Attribution automatique d'un <code>num_fiche</code>
+     - Création automatique des objets liés :
+       - <code>Localisation</code> (avec valeurs par défaut)
+       - <code>Nid</code> (avec valeurs par défaut)
+       - <code>ResumeObservation</code> (avec NULL pour les compteurs)
+       - <code>CausesEchec</code> (vide)
+       - <code>EtatCorrection</code> (statut = "nouveau", pourcentage = 0%)
+   - Si modification (<code>fiche_id</code> existe) :
+     - Mise à jour de l'objet <code>FicheObservation</code> existant</p>
+<p><strong>b. Sauvegarde des objets liés</strong>
+   - <strong>Localisation</strong> : Mise à jour ou création
+   - <strong>Nid</strong> : Mise à jour ou création
+   - <strong>Résumé</strong> : Mise à jour ou création
+   - <strong>Causes d'échec</strong> : Mise à jour ou création</p>
+<p><strong>c. Sauvegarde des observations</strong>
+   - Traitement du formset d'observations
+   - <strong>Nouvelles observations</strong> : Création avec enregistrement dans l'historique
+   - <strong>Observations modifiées</strong> : Mise à jour avec enregistrement des champs modifiés
+   - <strong>Observations supprimées</strong> : Suppression définitive avec enregistrement dans l'historique</p>
+<p><strong>d. Sauvegarde des remarques</strong>
+   - Traitement du formset de remarques (sauf si sauvegarde via modal)
+   - <strong>Nouvelles remarques</strong> : Création avec enregistrement dans l'historique
+   - <strong>Remarques supprimées</strong> : Suppression définitive avec enregistrement dans l'historique</p>
+<p><strong>e. Mise à jour de l'année des observations</strong>
+   - Si le champ <code>annee</code> de la fiche a été modifié
+   - Mise à jour automatique de toutes les observations liées</p>
+<p><strong>f. Enregistrement de l'historique</strong>
+   - Pour chaque champ modifié, une entrée est créée dans <code>HistoriqueModification</code>
+   - Contient : nom du champ, ancienne valeur, nouvelle valeur, catégorie, utilisateur, date</p>
+<ol>
+<li><strong>Si validation échoue :</strong></li>
+<li>Aucune modification n'est sauvegardée (transaction atomique)</li>
+<li>Affichage des messages d'erreur pour chaque formulaire invalide</li>
+<li>
+<p>Le formulaire est ré-affiché avec les valeurs saisies et les erreurs</p>
+</li>
+<li>
+<p><strong>Redirection</strong></p>
+</li>
+<li>Succès : Redirection vers <code>http://127.0.0.1:8000/observations/modifier/{num_fiche}/</code></li>
+<li>Message de succès : "Fiche d'observation sauvegardée avec succès!"</li>
+<li>Échec : Reste sur la page avec les messages d'erreur</li>
+</ol>
+<h3 id="points-importants">Points importants<a class="headerlink" href="#points-importants" title="Permanent link">&para;</a></h3>
+<p><strong>Cohérence des données :</strong>
+- Toutes les modifications sont sauvegardées dans une <strong>transaction atomique</strong>
+- Si une erreur survient, <strong>toutes</strong> les modifications sont annulées (rollback)</p>
+<p><strong>Modifications non sauvegardées :</strong>
+- Si vous modifiez des champs mais ne cliquez pas sur "Enregistrer", les modifications sont <strong>perdues</strong>
+- Exception : Les remarques sauvegardées via le modal sont enregistrées immédiatement</p>
+<p><strong>Impact des suppressions :</strong>
+- Les observations/remarques marquées pour suppression ne sont supprimées que lors de l'enregistrement
+- Si vous avez des modifications en attente ET des suppressions marquées :
+  - Enregistrement : <strong>Tout est sauvegardé</strong> (modifications + suppressions)
+  - Abandon : <strong>Rien n'est sauvegardé</strong> (modifications ni suppressions)</p>
+<p><strong>Rechargement de la page :</strong>
+- Après sauvegarde, la page est rechargée avec les nouvelles données
+- Tous les formulaires sont réinitialisés avec les valeurs sauvegardées en base</p>
+<hr />
+<h2 id="calcul-du-pourcentage-de-completion">Calcul du pourcentage de complétion<a class="headerlink" href="#calcul-du-pourcentage-de-completion" title="Permanent link">&para;</a></h2>
+<h3 id="vue-densemble_1">Vue d'ensemble<a class="headerlink" href="#vue-densemble_1" title="Permanent link">&para;</a></h3>
+<p>Le système calcule automatiquement un <strong>pourcentage de complétion</strong> pour chaque fiche afin d'évaluer la qualité et l'exhaustivité des données saisies. Ce pourcentage est utilisé notamment lors de la soumission pour validation.</p>
+<h3 id="methode-de-calcul">Méthode de calcul<a class="headerlink" href="#methode-de-calcul" title="Permanent link">&para;</a></h3>
+<p>Le pourcentage de complétion est basé sur <strong>8 critères</strong> pondérés de manière égale. Chaque critère validé rapporte <strong>1 point</strong>.</p>
+<p><strong>Formule :</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Pourcentage de complétion = (score / 8) × 100
+</code></pre></div></p>
+<p>Où <code>score</code> est le nombre de critères validés (entre 0 et 8).</p>
+<h3 id="les-8-criteres-de-completion">Les 8 critères de complétion<a class="headerlink" href="#les-8-criteres-de-completion" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Critère</th>
+<th>Description</th>
+<th>Condition de validation</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td><strong>Observateur renseigné</strong></td>
+<td>L'observateur de la fiche est défini</td>
+<td><code>fiche.observateur</code> n'est pas NULL</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Espèce renseignée</strong></td>
+<td>L'espèce observée est définie</td>
+<td><code>fiche.espece</code> n'est pas NULL</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>Localisation complète</strong></td>
+<td>Commune et département sont renseignés</td>
+<td><code>localisation.commune</code> non vide ET <code>localisation.departement</code> ≠ '00'</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>Au moins une observation</strong></td>
+<td>Au moins une observation avec date existe</td>
+<td><code>fiche.observations.exists()</code> = True</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><strong>Données d'œufs dans le résumé</strong></td>
+<td>Le nombre d'œufs pondus est renseigné</td>
+<td><code>resume.nombre_oeufs_pondus</code> n'est pas NULL ET &gt; 0</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td><strong>Détails du nid</strong></td>
+<td>Description textuelle du nid fournie</td>
+<td><code>nid.details_nid</code> non vide ET ≠ "Aucun détail"</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td><strong>Hauteur du nid</strong></td>
+<td>Hauteur du nid renseignée</td>
+<td><code>nid.hauteur_nid</code> n'est pas NULL ET &gt; 0</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>8</strong></td>
+<td><strong>Image associée</strong></td>
+<td>Une image de la fiche est disponible</td>
+<td><code>fiche.chemin_image</code> non vide</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="detail-des-validations">Détail des validations<a class="headerlink" href="#detail-des-validations" title="Permanent link">&para;</a></h3>
+<h4 id="critere-1-observateur-renseigne">Critère 1 : Observateur renseigné<a class="headerlink" href="#critere-1-observateur-renseigne" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="o">.</span><span class="n">observateur</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">score</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div>
+- <strong>Validation</strong> : L'observateur est automatiquement défini lors de la création (utilisateur connecté)
+- <strong>Impact</strong> : Ce critère est presque toujours validé (sauf cas exceptionnels)</p>
+<h4 id="critere-2-espece-renseignee">Critère 2 : Espèce renseignée<a class="headerlink" href="#critere-2-espece-renseignee" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="o">.</span><span class="n">espece</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">score</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div>
+- <strong>Validation</strong> : Une espèce doit être sélectionnée dans la liste déroulante
+- <strong>Impact</strong> : Champ obligatoire pour la création, donc généralement validé</p>
+<h4 id="critere-3-localisation-complete">Critère 3 : Localisation complète<a class="headerlink" href="#critere-3-localisation-complete" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="p">,</span> <span class="s1">&#39;localisation&#39;</span><span class="p">):</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="o">.</span><span class="n">localisation</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="k">if</span> <span class="p">(</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        <span class="n">loc</span><span class="o">.</span><span class="n">commune</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="ow">and</span> <span class="n">loc</span><span class="o">.</span><span class="n">commune</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># Vérifier que la commune n&#39;est pas vide</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="ow">and</span> <span class="n">loc</span><span class="o">.</span><span class="n">departement</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="ow">and</span> <span class="n">loc</span><span class="o">.</span><span class="n">departement</span> <span class="o">!=</span> <span class="s1">&#39;00&#39;</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="p">):</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="n">score</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div>
+- <strong>Validation</strong> :
+  - Le champ <code>commune</code> doit être rempli (pas uniquement des espaces)
+  - Le champ <code>département</code> doit être différent de '00' (valeur par défaut)
+- <strong>Conseils</strong> :
+  - Utiliser l'autocomplétion de commune pour remplir automatiquement le département
+  - Le département se remplit automatiquement lors de la sélection d'une commune</p>
+<h4 id="critere-4-au-moins-une-observation">Critère 4 : Au moins une observation<a class="headerlink" href="#critere-4-au-moins-une-observation" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="o">.</span><span class="n">observations</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">score</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div>
+- <strong>Validation</strong> : Au moins une ligne dans le tableau des observations doit exister
+- <strong>Impact</strong> : Les observations sont le cœur de la fiche, ce critère est essentiel</p>
+<h4 id="critere-5-donnees-dufs-dans-le-resume">Critère 5 : Données d'œufs dans le résumé<a class="headerlink" href="#critere-5-donnees-dufs-dans-le-resume" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="p">,</span> <span class="s1">&#39;resume&#39;</span><span class="p">):</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">resume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="o">.</span><span class="n">resume</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="k">if</span> <span class="n">resume</span><span class="o">.</span><span class="n">nombre_oeufs_pondus</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">resume</span><span class="o">.</span><span class="n">nombre_oeufs_pondus</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="n">score</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div>
+- <strong>Validation</strong> :
+  - Le champ <code>nombre_oeufs_pondus</code> ne doit pas être NULL (non observé)
+  - ET la valeur doit être strictement supérieure à 0
+- <strong>Note</strong> : Si aucun œuf n'a été pondu (valeur = 0), ce critère n'est PAS validé
+- <strong>Conseils</strong> : Remplir le champ "Nombre d'œufs pondus" dans la section "Résumé des Observations"</p>
+<h4 id="critere-6-details-du-nid">Critère 6 : Détails du nid<a class="headerlink" href="#critere-6-details-du-nid" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="p">,</span> <span class="s1">&#39;nid&#39;</span><span class="p">):</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">nid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="o">.</span><span class="n">nid</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="k">if</span> <span class="n">nid</span><span class="o">.</span><span class="n">details_nid</span> <span class="ow">and</span> <span class="n">nid</span><span class="o">.</span><span class="n">details_nid</span> <span class="o">!=</span> <span class="s1">&#39;Aucun détail&#39;</span><span class="p">:</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>        <span class="n">score</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div>
+- <strong>Validation</strong> :
+  - Le champ <code>details_nid</code> ne doit pas être vide
+  - ET ne doit pas contenir la chaîne "Aucun détail" (valeur par défaut à éviter)
+- <strong>Conseils</strong> : Décrire la structure, les matériaux, l'emplacement du nid dans la section "Description du Nid"</p>
+<h4 id="critere-7-hauteur-du-nid">Critère 7 : Hauteur du nid<a class="headerlink" href="#critere-7-hauteur-du-nid" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="p">,</span> <span class="s1">&#39;nid&#39;</span><span class="p">):</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">nid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="o">.</span><span class="n">nid</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="k">if</span> <span class="n">nid</span><span class="o">.</span><span class="n">hauteur_nid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nid</span><span class="o">.</span><span class="n">hauteur_nid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        <span class="n">score</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div>
+- <strong>Validation</strong> :
+  - Le champ <code>hauteur_nid</code> ne doit pas être NULL
+  - ET la valeur doit être strictement supérieure à 0
+- <strong>Note</strong> : La valeur par défaut est 0, qui ne valide PAS le critère
+- <strong>Conseils</strong> : Renseigner la hauteur du nid en centimètres dans la section "Description du Nid"</p>
+<h4 id="critere-8-image-associee">Critère 8 : Image associée<a class="headerlink" href="#critere-8-image-associee" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiche</span><span class="o">.</span><span class="n">chemin_image</span><span class="p">:</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="n">score</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div>
+- <strong>Validation</strong> : Le champ <code>chemin_image</code> doit contenir un chemin vers une image
+- <strong>Impact</strong> : Ce critère est automatiquement validé pour les fiches issues de transcriptions
+- <strong>Note</strong> : Pour les saisies manuelles, ce critère n'est généralement pas validé (sauf si une image a été téléversée)</p>
+<h3 id="exemples-de-calculs">Exemples de calculs<a class="headerlink" href="#exemples-de-calculs" title="Permanent link">&para;</a></h3>
+<h4 id="exemple-1-fiche-minimale-nouvelle-saisie">Exemple 1 : Fiche minimale (nouvelle saisie)<a class="headerlink" href="#exemple-1-fiche-minimale-nouvelle-saisie" title="Permanent link">&para;</a></h4>
+<ul>
+<li>✅ Observateur renseigné</li>
+<li>✅ Espèce renseignée</li>
+<li>❌ Localisation incomplète (département = '00')</li>
+<li>✅ 1 observation créée</li>
+<li>❌ Pas de données d'œufs</li>
+<li>❌ Détails du nid vides</li>
+<li>❌ Hauteur du nid = 0</li>
+<li>❌ Pas d'image</li>
+</ul>
+<p><strong>Score : 3/8 = 37.5% → arrondi à 37%</strong></p>
+<h4 id="exemple-2-fiche-bien-completee">Exemple 2 : Fiche bien complétée<a class="headerlink" href="#exemple-2-fiche-bien-completee" title="Permanent link">&para;</a></h4>
+<ul>
+<li>✅ Observateur renseigné</li>
+<li>✅ Espèce renseignée</li>
+<li>✅ Localisation complète (commune + département)</li>
+<li>✅ 3 observations créées</li>
+<li>✅ Nombre d'œufs pondus = 5</li>
+<li>✅ Détails du nid = "Nid en coupe, matériaux : herbes sèches..."</li>
+<li>✅ Hauteur du nid = 150 cm</li>
+<li>❌ Pas d'image</li>
+</ul>
+<p><strong>Score : 7/8 = 87.5% → arrondi à 87%</strong></p>
+<h4 id="exemple-3-fiche-issue-de-transcription-complete">Exemple 3 : Fiche issue de transcription complète<a class="headerlink" href="#exemple-3-fiche-issue-de-transcription-complete" title="Permanent link">&para;</a></h4>
+<ul>
+<li>✅ Observateur renseigné</li>
+<li>✅ Espèce renseignée</li>
+<li>✅ Localisation complète</li>
+<li>✅ 5 observations</li>
+<li>✅ Nombre d'œufs pondus = 4</li>
+<li>✅ Détails du nid renseignés</li>
+<li>✅ Hauteur du nid = 200 cm</li>
+<li>✅ Image de la fiche papier</li>
+</ul>
+<p><strong>Score : 8/8 = 100%</strong></p>
+<h3 id="declenchement-du-calcul">Déclenchement du calcul<a class="headerlink" href="#declenchement-du-calcul" title="Permanent link">&para;</a></h3>
+<p>Le pourcentage de complétion est <strong>calculé automatiquement</strong> dans les cas suivants :</p>
+<ol>
+<li><strong>Lors de la sauvegarde de l'état de correction</strong></li>
+<li>Méthode <code>EtatCorrection.save()</code> (sauf si <code>skip_auto_calculation=True</code>)</li>
+<li>
+<p>Appelée après chaque modification de fiche</p>
+</li>
+<li>
+<p><strong>Lors de la soumission pour correction</strong></p>
+</li>
+<li>Méthode <code>soumettre_pour_correction()</code> dans la vue</li>
+<li>
+<p>Calcul explicite via <code>etat_correction.calculer_pourcentage_completion()</code></p>
+</li>
+<li>
+<p><strong>Lors de la mise à jour de la fiche</strong></p>
+</li>
+<li>Méthode <code>FicheObservation.mettre_a_jour_etat_correction()</code></li>
+</ol>
+<h3 id="changement-automatique-de-statut">Changement automatique de statut<a class="headerlink" href="#changement-automatique-de-statut" title="Permanent link">&para;</a></h3>
+<p>Le calcul du pourcentage déclenche également un <strong>changement automatique de statut</strong> :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Passer en &quot;en_edition&quot; si la fiche est en cours de saisie par l&#39;observateur</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">if</span> <span class="n">pourcentage</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">statut</span> <span class="o">==</span> <span class="s1">&#39;nouveau&#39;</span><span class="p">:</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">statut</span> <span class="o">=</span> <span class="s1">&#39;en_edition&#39;</span>
+</code></pre></div>
+<p><strong>Comportement :</strong>
+- Si le pourcentage passe de 0% à une valeur &gt; 0%
+- ET que le statut actuel est <strong>"nouveau"</strong>
+- Alors le statut passe automatiquement à <strong>"en_edition"</strong></p>
+<p><strong>Impact :</strong>
+- Indique que la fiche a commencé à être éditée
+- La fiche reste modifiable par l'observateur
+- Le statut ne change PAS si déjà en "en_cours" ou "valide"</p>
+<h3 id="affichage-du-pourcentage">Affichage du pourcentage<a class="headerlink" href="#affichage-du-pourcentage" title="Permanent link">&para;</a></h3>
+<p>Le pourcentage de complétion est affiché :
+- Dans le message de confirmation lors de la soumission pour correction
+- Exemple : "Fiche #27 soumise pour correction. Complétion : 75%"
+- Dans l'interface d'administration ou de gestion des fiches (selon configuration)</p>
+<h3 id="conseils-pour-augmenter-le-pourcentage">Conseils pour augmenter le pourcentage<a class="headerlink" href="#conseils-pour-augmenter-le-pourcentage" title="Permanent link">&para;</a></h3>
+<p>Pour obtenir une fiche bien complétée (≥ 75%) :</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Impact</th>
+<th>Priorité</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sélectionner une espèce</td>
+<td>+12.5%</td>
+<td>⭐⭐⭐ Obligatoire</td>
+</tr>
+<tr>
+<td>Renseigner la commune (avec autocomplétion)</td>
+<td>+12.5%</td>
+<td>⭐⭐⭐ Très important</td>
+</tr>
+<tr>
+<td>Ajouter au moins 1 observation</td>
+<td>+12.5%</td>
+<td>⭐⭐⭐ Obligatoire</td>
+</tr>
+<tr>
+<td>Remplir "Nombre d'œufs pondus" (&gt; 0)</td>
+<td>+12.5%</td>
+<td>⭐⭐ Important</td>
+</tr>
+<tr>
+<td>Renseigner "Détails du nid"</td>
+<td>+12.5%</td>
+<td>⭐⭐ Important</td>
+</tr>
+<tr>
+<td>Renseigner "Hauteur du nid" (&gt; 0)</td>
+<td>+12.5%</td>
+<td>⭐ Recommandé</td>
+</tr>
+<tr>
+<td>Associer une image (transcription)</td>
+<td>+12.5%</td>
+<td>⭐ Automatique pour transcriptions</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note :</strong> L'observateur est automatiquement renseigné (+12.5% gratuit).</p>
+<hr />
+<h2 id="soumission-pour-validation">Soumission pour validation<a class="headerlink" href="#soumission-pour-validation" title="Permanent link">&para;</a></h2>
+<h3 id="concept">Concept<a class="headerlink" href="#concept" title="Permanent link">&para;</a></h3>
+<p>Lorsqu'une fiche est complète (ou suffisamment avancée), l'observateur peut la <strong>soumettre pour validation</strong>. Cela change le statut de la fiche et la rend accessible aux reviewers pour correction/validation.</p>
+<h3 id="processus">Processus<a class="headerlink" href="#processus" title="Permanent link">&para;</a></h3>
+<p><strong>1. Prérequis</strong>
+- La fiche doit être en statut <strong>"nouveau"</strong> ou <strong>"en_edition"</strong>
+- Vous devez être l'<strong>auteur</strong> de la fiche (ou administrateur)</p>
+<p><strong>2. Bouton de soumission</strong>
+- Affiché en bas du formulaire de modification
+- Libellé : "Soumettre pour correction" ou similaire</p>
+<p><strong>3. Action de soumission</strong>
+- <strong>URL</strong> : <code>http://127.0.0.1:8000/observations/soumettre/{num_fiche}/</code>
+- <strong>Méthode</strong> : POST</p>
+<p><strong>4. Traitement</strong>
+- Calcul du <strong>pourcentage de complétion</strong> de la fiche (voir section dédiée ci-dessus)
+- Changement du statut de <code>nouveau</code> ou <code>en_edition</code> vers <strong><code>en_cours</code></strong>
+- Sauvegarde de l'état de correction</p>
+<p><strong>5. Conséquences</strong>
+- La fiche devient <strong>lecture seule</strong> pour l'observateur
+- Les reviewers et administrateurs peuvent désormais la corriger/valider
+- Message de succès : "Fiche #{num_fiche} soumise pour correction. Complétion : {pourcentage}%"
+- Redirection vers la vue de détail (lecture seule) : <code>http://127.0.0.1:8000/observations/{num_fiche}/</code></p>
+<p><strong>6. Affichage du pourcentage</strong>
+- Le pourcentage de complétion est calculé et affiché dans le message de confirmation
+- Exemple : "Fiche #27 soumise pour correction. Complétion : 87%"
+- Permet à l'observateur de savoir si la fiche est bien complétée</p>
+<h3 id="statuts-de-correction">Statuts de correction<a class="headerlink" href="#statuts-de-correction" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Statut</th>
+<th>Description</th>
+<th>Éditable par observateur</th>
+<th>Pourcentage calculé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>nouveau</strong></td>
+<td>Fiche nouvellement créée</td>
+<td>✅ Oui</td>
+<td>0%</td>
+</tr>
+<tr>
+<td><strong>en_edition</strong></td>
+<td>Fiche en cours d'édition</td>
+<td>✅ Oui</td>
+<td>&gt; 0%</td>
+</tr>
+<tr>
+<td><strong>en_cours</strong></td>
+<td>Soumise pour correction</td>
+<td>❌ Non</td>
+<td>Variable</td>
+</tr>
+<tr>
+<td><strong>valide</strong></td>
+<td>Validée par un reviewer</td>
+<td>❌ Non</td>
+<td>Variable</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note :</strong> Les administrateurs et reviewers peuvent modifier les fiches quel que soit leur statut.</p>
+<h3 id="recommandations-avant-soumission">Recommandations avant soumission<a class="headerlink" href="#recommandations-avant-soumission" title="Permanent link">&para;</a></h3>
+<p>Il est conseillé de soumettre une fiche lorsque son pourcentage de complétion est :
+- <strong>≥ 75%</strong> : Fiche bien complétée, prête pour review
+- <strong>50-74%</strong> : Fiche correcte mais peut être améliorée
+- <strong>&lt; 50%</strong> : Fiche incomplète, compléter avant soumission</p>
+<hr />
+<h2 id="correction-de-transcriptions">Correction de transcriptions<a class="headerlink" href="#correction-de-transcriptions" title="Permanent link">&para;</a></h2>
+<h3 id="contexte">Contexte<a class="headerlink" href="#contexte" title="Permanent link">&para;</a></h3>
+<p>Certaines fiches proviennent de la transcription automatique de fiches papier scannées. Ces fiches contiennent :
+- Un fichier image (scan de la fiche papier)
+- Un fichier JSON (résultat de la transcription automatique)
+- Le champ <code>transcription</code> est défini à <code>True</code></p>
+<h3 id="distinction-entre-nouvelle-fiche-et-correction-de-transcription">Distinction entre nouvelle fiche et correction de transcription<a class="headerlink" href="#distinction-entre-nouvelle-fiche-et-correction-de-transcription" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Nouvelle fiche</th>
+<th>Correction de transcription</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Origine</strong></td>
+<td>Saisie manuelle par l'utilisateur</td>
+<td>Import depuis image scannée + OCR/IA</td>
+</tr>
+<tr>
+<td><strong>Champ <code>transcription</code></strong></td>
+<td><code>False</code></td>
+<td><code>True</code></td>
+</tr>
+<tr>
+<td><strong>Image disponible</strong></td>
+<td>Non</td>
+<td>Oui (lien "Voir l'image" dans l'en-tête)</td>
+</tr>
+<tr>
+<td><strong>JSON disponible</strong></td>
+<td>Non</td>
+<td>Oui (lien "Voir JSON" dans l'en-tête)</td>
+</tr>
+<tr>
+<td><strong>Champs pré-remplis</strong></td>
+<td>Vides (sauf valeurs par défaut)</td>
+<td>Pré-remplis avec les données de la transcription</td>
+</tr>
+<tr>
+<td><strong>Objectif</strong></td>
+<td>Créer une nouvelle observation</td>
+<td>Corriger/valider les données transcrites automatiquement</td>
+</tr>
+<tr>
+<td><strong>Pourcentage initial</strong></td>
+<td>Généralement bas (37-50%)</td>
+<td>Généralement élevé (75-100%) grâce à l'image</td>
+</tr>
+</tbody>
+</table>
+<h3 id="workflow-de-correction-de-transcription">Workflow de correction de transcription<a class="headerlink" href="#workflow-de-correction-de-transcription" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Accès à la fiche transcrite</strong></li>
+<li>Liste des fiches en attente de correction</li>
+<li>
+<p>Clic sur "Modifier" pour ouvrir la fiche</p>
+</li>
+<li>
+<p><strong>Consultation de l'image</strong></p>
+</li>
+<li>Cliquer sur "Voir l'image" dans l'en-tête</li>
+<li>
+<p>Compare les données transcrites avec l'image originale</p>
+</li>
+<li>
+<p><strong>Correction des champs</strong></p>
+</li>
+<li>Parcourir chaque section</li>
+<li>Corriger les erreurs de transcription</li>
+<li>
+<p>Compléter les champs manquants ou mal transcrits</p>
+</li>
+<li>
+<p><strong>Vérifications importantes</strong></p>
+</li>
+<li><strong>Espèce</strong> : Vérifier que l'espèce est correcte</li>
+<li><strong>Dates</strong> : Vérifier le format et la cohérence des dates</li>
+<li><strong>Nombres</strong> : Vérifier les compteurs (œufs, poussins)</li>
+<li><strong>Localisation</strong> : Vérifier commune, coordonnées</li>
+<li>
+<p><strong>Observations</strong> : Relire les notes transcrites</p>
+</li>
+<li>
+<p><strong>Enregistrement</strong></p>
+</li>
+<li>Sauvegarder les corrections</li>
+<li>
+<p>Historique des modifications enregistré</p>
+</li>
+<li>
+<p><strong>Soumission pour validation</strong></p>
+</li>
+<li>Une fois la correction terminée, soumettre la fiche pour validation</li>
+<li>Passage au statut "en_cours"</li>
+<li>Affichage du pourcentage de complétion (généralement élevé pour les transcriptions)</li>
+</ol>
+<h3 id="erreurs-courantes-de-transcription">Erreurs courantes de transcription<a class="headerlink" href="#erreurs-courantes-de-transcription" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Confusion de caractères</strong> : O/0, I/1, S/5, etc.</li>
+<li><strong>Dates mal formatées</strong> : Mauvais ordre jour/mois/année</li>
+<li><strong>Nombres mal lus</strong> : Écriture manuscrite peu lisible</li>
+<li><strong>Noms d'espèces</strong> : Noms scientifiques complexes</li>
+<li><strong>Coordonnées GPS</strong> : Décimales mal placées</li>
+</ul>
+<p><strong>Conseil :</strong> Toujours comparer avec l'image originale pour chaque donnée critique.</p>
+<hr />
+<h2 id="permissions-et-restrictions">Permissions et restrictions<a class="headerlink" href="#permissions-et-restrictions" title="Permanent link">&para;</a></h2>
+<h3 id="permissions-par-role">Permissions par rôle<a class="headerlink" href="#permissions-par-role" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Observateur (auteur)</th>
+<th>Observateur (autre)</th>
+<th>Reviewer</th>
+<th>Administrateur</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Créer une fiche</strong></td>
+<td>✅ Oui</td>
+<td>✅ Oui</td>
+<td>✅ Oui</td>
+<td>✅ Oui</td>
+</tr>
+<tr>
+<td><strong>Modifier sa fiche (nouveau/en_edition)</strong></td>
+<td>✅ Oui</td>
+<td>❌ Non</td>
+<td>✅ Oui</td>
+<td>✅ Oui</td>
+</tr>
+<tr>
+<td><strong>Modifier fiche autre auteur (nouveau/en_edition)</strong></td>
+<td>❌ Non</td>
+<td>❌ Non</td>
+<td>✅ Oui</td>
+<td>✅ Oui</td>
+</tr>
+<tr>
+<td><strong>Modifier fiche (en_cours)</strong></td>
+<td>❌ Non</td>
+<td>❌ Non</td>
+<td>✅ Oui</td>
+<td>✅ Oui</td>
+</tr>
+<tr>
+<td><strong>Modifier fiche (valide)</strong></td>
+<td>❌ Non</td>
+<td>❌ Non</td>
+<td>✅ Oui</td>
+<td>✅ Oui</td>
+</tr>
+<tr>
+<td><strong>Soumettre sa fiche</strong></td>
+<td>✅ Oui</td>
+<td>❌ Non</td>
+<td>✅ Oui</td>
+<td>✅ Oui</td>
+</tr>
+<tr>
+<td><strong>Valider une fiche</strong></td>
+<td>❌ Non</td>
+<td>❌ Non</td>
+<td>✅ Oui</td>
+<td>✅ Oui</td>
+</tr>
+<tr>
+<td><strong>Voir l'historique</strong></td>
+<td>✅ Oui</td>
+<td>✅ Oui*</td>
+<td>✅ Oui</td>
+<td>✅ Oui</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note :</em> L'historique peut être visible par tous selon la configuration.</p>
+<h3 id="restrictions-dacces">Restrictions d'accès<a class="headerlink" href="#restrictions-dacces" title="Permanent link">&para;</a></h3>
+<p><strong>Tentative de modification d'une fiche non autorisée :</strong>
+- Message d'erreur : "Vous n'êtes pas autorisé à modifier cette fiche. Seul l'auteur ({username}) peut continuer la saisie."
+- Redirection vers la vue de détail (lecture seule)</p>
+<p><strong>Fiche en cours de correction :</strong>
+- L'observateur ne peut plus modifier la fiche après soumission
+- Redirection vers la vue de détail si tentative d'accès à la page de modification</p>
+<h3 id="champs-en-lecture-seule">Champs en lecture seule<a class="headerlink" href="#champs-en-lecture-seule" title="Permanent link">&para;</a></h3>
+<p>Certains champs sont toujours en lecture seule ou le deviennent selon le contexte :</p>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Lecture seule</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>N° Fiche</strong></td>
+<td>✅ Toujours</td>
+<td>Généré automatiquement</td>
+</tr>
+<tr>
+<td><strong>Observateur</strong></td>
+<td>✅ Presque toujours</td>
+<td>Modifiable uniquement par admin/reviewer</td>
+</tr>
+<tr>
+<td><strong>Département</strong></td>
+<td>✅ Toujours</td>
+<td>Auto-rempli via autocomplétion commune</td>
+</tr>
+<tr>
+<td><strong>Date de création</strong></td>
+<td>✅ Toujours</td>
+<td>Timestamp automatique</td>
+</tr>
+<tr>
+<td><strong>Date des remarques</strong></td>
+<td>✅ Toujours</td>
+<td>Timestamp automatique</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="historique-des-modifications">Historique des modifications<a class="headerlink" href="#historique-des-modifications" title="Permanent link">&para;</a></h2>
+<h3 id="concept_1">Concept<a class="headerlink" href="#concept_1" title="Permanent link">&para;</a></h3>
+<p>Toutes les modifications apportées à une fiche sont enregistrées dans un <strong>historique de modifications</strong> (<code>HistoriqueModification</code>). Cela permet de tracer qui a modifié quoi et quand.</p>
+<h3 id="acces-a-lhistorique">Accès à l'historique<a class="headerlink" href="#acces-a-lhistorique" title="Permanent link">&para;</a></h3>
+<p><strong>URL :</strong> <code>http://127.0.0.1:8000/observations/historique/{num_fiche}/</code></p>
+<p><strong>Bouton :</strong> "Voir l'historique" dans la page de modification</p>
+<h3 id="informations-enregistrees">Informations enregistrées<a class="headerlink" href="#informations-enregistrees" title="Permanent link">&para;</a></h3>
+<p>Pour chaque modification, l'historique contient :</p>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fiche</strong></td>
+<td>Numéro de la fiche modifiée</td>
+</tr>
+<tr>
+<td><strong>Champ modifié</strong></td>
+<td>Nom du champ (ex: "commune", "nombre_oeufs", etc.)</td>
+</tr>
+<tr>
+<td><strong>Ancienne valeur</strong></td>
+<td>Valeur avant modification</td>
+</tr>
+<tr>
+<td><strong>Nouvelle valeur</strong></td>
+<td>Valeur après modification</td>
+</tr>
+<tr>
+<td><strong>Catégorie</strong></td>
+<td>Type de modification (fiche, localisation, observation, remarque, nid, causes_echec, resume_observation)</td>
+</tr>
+<tr>
+<td><strong>Modifié par</strong></td>
+<td>Utilisateur ayant effectué la modification</td>
+</tr>
+<tr>
+<td><strong>Date de modification</strong></td>
+<td>Horodatage de la modification</td>
+</tr>
+</tbody>
+</table>
+<h3 id="types-devenements-enregistres">Types d'événements enregistrés<a class="headerlink" href="#types-devenements-enregistres" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Modification de champ</strong></li>
+<li>Changement de valeur d'un champ existant</li>
+<li>
+<p>Exemple : "commune" modifiée de "Paris" à "Lyon"</p>
+</li>
+<li>
+<p><strong>Ajout d'observation</strong></p>
+</li>
+<li>Création d'une nouvelle observation</li>
+<li>
+<p>Enregistre tous les champs de la nouvelle observation</p>
+</li>
+<li>
+<p><strong>Suppression d'observation</strong></p>
+</li>
+<li>Suppression d'une observation existante</li>
+<li>Champ : <code>observation_supprimee</code></li>
+<li>Ancienne valeur : Détails de l'observation supprimée</li>
+<li>
+<p>Nouvelle valeur : vide</p>
+</li>
+<li>
+<p><strong>Ajout de remarque</strong></p>
+</li>
+<li>Création d'une nouvelle remarque</li>
+<li>Champ : <code>remarque_ajoutee</code></li>
+<li>
+<p>Nouvelle valeur : Texte de la remarque</p>
+</li>
+<li>
+<p><strong>Suppression de remarque</strong></p>
+</li>
+<li>Suppression d'une remarque existante</li>
+<li>Champ : <code>remarque_supprimee</code></li>
+<li>Ancienne valeur : Texte de la remarque</li>
+<li>
+<p>Nouvelle valeur : vide</p>
+</li>
+<li>
+<p><strong>Modification de l'année de la fiche</strong></p>
+</li>
+<li>Changement de l'année de la fiche</li>
+<li>Entraîne une mise à jour automatique de l'année de toutes les observations liées</li>
+</ol>
+<h3 id="consultation-de-lhistorique">Consultation de l'historique<a class="headerlink" href="#consultation-de-lhistorique" title="Permanent link">&para;</a></h3>
+<p><strong>Page d'historique :</strong>
+- Liste chronologique (du plus récent au plus ancien)
+- Groupement par modification (toutes les modifications d'une même sauvegarde)
+- Affichage de l'utilisateur et de la date pour chaque groupe
+- Détail de chaque champ modifié avec ancienne et nouvelle valeur</p>
+<p><strong>Utilité :</strong>
+- Audit des modifications
+- Résolution de conflits
+- Traçabilité des corrections
+- Analyse de l'activité des utilisateurs</p>
+<hr />
+<h2 id="annexes">Annexes<a class="headerlink" href="#annexes" title="Permanent link">&para;</a></h2>
+<h3 id="raccourcis-clavier-disponibles">Raccourcis clavier disponibles<a class="headerlink" href="#raccourcis-clavier-disponibles" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Raccourci</th>
+<th>Contexte</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Navigation dans les suggestions</td>
+<td>↑ / ↓</td>
+<td>Autocomplétion commune ou espèce</td>
+</tr>
+<tr>
+<td>Sélectionner une suggestion</td>
+<td>Entrée</td>
+<td>Autocomplétion commune ou espèce</td>
+</tr>
+<tr>
+<td>Fermer les suggestions</td>
+<td>Échap</td>
+<td>Autocomplétion commune ou espèce</td>
+</tr>
+</tbody>
+</table>
+<h3 id="messages-derreur-courants">Messages d'erreur courants<a class="headerlink" href="#messages-derreur-courants" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Message</th>
+<th>Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Ce champ est obligatoire."</td>
+<td>Champ requis non rempli</td>
+<td>Remplir le champ obligatoire (ex: date_observation)</td>
+</tr>
+<tr>
+<td>"Vous n'êtes pas autorisé à modifier cette fiche."</td>
+<td>Tentative de modification d'une fiche d'un autre auteur</td>
+<td>Seul l'auteur ou un admin peut modifier</td>
+</tr>
+<tr>
+<td>"Erreurs dans les informations de localisation"</td>
+<td>Coordonnées invalides ou autre erreur de validation</td>
+<td>Vérifier les valeurs saisies (latitude, longitude, altitude)</td>
+</tr>
+<tr>
+<td>"Une erreur est survenue lors de la sauvegarde"</td>
+<td>Erreur serveur ou base de données</td>
+<td>Vérifier les logs, contacter l'administrateur</td>
+</tr>
+<tr>
+<td>Constraint violation (base de données)</td>
+<td>Violation de contrainte (ex: jour sans mois, nombre d'éclos &gt; nombre pondus)</td>
+<td>Vérifier la cohérence des données saisies</td>
+</tr>
+</tbody>
+</table>
+<h3 id="bonnes-pratiques">Bonnes pratiques<a class="headerlink" href="#bonnes-pratiques" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Saisie de nouvelles fiches</strong></li>
+<li>Remplir au minimum l'espèce et une observation avant d'enregistrer</li>
+<li>Compléter progressivement les différentes sections</li>
+<li>Enregistrer régulièrement pour éviter les pertes de données</li>
+<li>
+<p>Viser un pourcentage de complétion ≥ 75% avant soumission</p>
+</li>
+<li>
+<p><strong>Modification de fiches</strong></p>
+</li>
+<li>Toujours consulter l'image originale (si disponible) avant de modifier une transcription</li>
+<li>Vérifier la cohérence des données (dates, compteurs)</li>
+<li>
+<p>Enregistrer après chaque bloc de modifications pour éviter les pertes</p>
+</li>
+<li>
+<p><strong>Utilisation des observations</strong></p>
+</li>
+<li>Créer une observation par visite sur le terrain</li>
+<li>Renseigner la date et l'heure précises</li>
+<li>
+<p>Décocher "Heure connue" si l'heure est incertaine</p>
+</li>
+<li>
+<p><strong>Soumission pour validation</strong></p>
+</li>
+<li>Vérifier que toutes les sections importantes sont remplies</li>
+<li>Consulter le pourcentage de complétion</li>
+<li>
+<p>Ne soumettre que lorsque la fiche est prête pour review (≥ 75% recommandé)</p>
+</li>
+<li>
+<p><strong>Remarques</strong></p>
+</li>
+<li>Utiliser les remarques pour des commentaires généraux sur la fiche</li>
+<li>Ne pas confondre avec le champ "Observations" (observations de terrain)</li>
+<li>
+<p>Les remarques sont horodatées automatiquement</p>
+</li>
+<li>
+<p><strong>Augmentation du pourcentage de complétion</strong></p>
+</li>
+<li>Utiliser l'autocomplétion pour la commune (remplit automatiquement le département)</li>
+<li>Remplir systématiquement "Nombre d'œufs pondus" dans le résumé</li>
+<li>Ajouter une description dans "Détails du nid"</li>
+<li>Renseigner la hauteur du nid (en cm)</li>
+</ol>
+<h3 id="fichiers-de-code-concernes">Fichiers de code concernés<a class="headerlink" href="#fichiers-de-code-concernes" title="Permanent link">&para;</a></h3>
+<p>Pour les développeurs ou pour aller plus loin :</p>
+<table>
+<thead>
+<tr>
+<th>Fichier</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>observations/views/saisie_observation_view.py</code></td>
+<td>Vue principale (lignes 150-597)</td>
+</tr>
+<tr>
+<td><code>observations/forms.py</code></td>
+<td>Définition des formulaires</td>
+</tr>
+<tr>
+<td><code>observations/models.py</code></td>
+<td>Modèles de données (FicheObservation, Observation, EtatCorrection, etc.) - Lignes 311-370 pour <code>calculer_pourcentage_completion()</code></td>
+</tr>
+<tr>
+<td><code>observations/templates/saisie/saisie_observation_optimise.html</code></td>
+<td>Template HTML de la page</td>
+</tr>
+<tr>
+<td><code>observations/static/Observations/js/saisie_observation.js</code></td>
+<td>JavaScript client (autocomplétion, GPS, gestion des suppressions)</td>
+</tr>
+<tr>
+<td><code>observations/urls.py</code></td>
+<td>Configuration des URLs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="resume-visuel-du-workflow">Résumé visuel du workflow<a class="headerlink" href="#resume-visuel-du-workflow" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>┌─────────────────────────────────────────────────────────────────┐
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>│                   CRÉATION D&#39;UNE NOUVELLE FICHE                 │
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>└─────────────────────────────────────────────────────────────────┘
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>                              │
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>                              ▼
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>                  /observations/ (GET)
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>                              │
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>                              ▼
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>              ┌───────────────────────────────┐
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>              │  Formulaire vide avec         │
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>              │  valeurs par défaut           │
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>              │  - Observateur = user         │
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>              │  - Année = année courante     │
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>              │  - Statut = &quot;nouveau&quot;         │
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>              │  - Pourcentage = 0%           │
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>              └───────────────────────────────┘
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>                              │
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>                              ▼
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>                   Remplir les champs
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>                   (espèce, observations, etc.)
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>                              │
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>                              ▼
+<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>                     Clic sur &quot;Enregistrer&quot;
+<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>                              │
+<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>                              ▼
+<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a>                  /observations/ (POST)
+<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a>                              │
+<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a>                    ┌─────────┴─────────┐
+<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a>                    │                   │
+<a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a>            Validation OK          Validation KO
+<a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a>                    │                   │
+<a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a>                    ▼                   ▼
+<a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a>         Transaction atomique      Affichage erreurs
+<a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a>         ─────────────────────      Reste sur la page
+<a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a>         1. Créer FicheObservation
+<a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a>         2. Créer objets liés
+<a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a>            - Localisation
+<a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a>            - Nid
+<a id="__codelineno-10-39" name="__codelineno-10-39" href="#__codelineno-10-39"></a>            - ResumeObservation
+<a id="__codelineno-10-40" name="__codelineno-10-40" href="#__codelineno-10-40"></a>            - CausesEchec
+<a id="__codelineno-10-41" name="__codelineno-10-41" href="#__codelineno-10-41"></a>            - EtatCorrection (statut=nouveau, %=0)
+<a id="__codelineno-10-42" name="__codelineno-10-42" href="#__codelineno-10-42"></a>         3. Sauvegarder observations
+<a id="__codelineno-10-43" name="__codelineno-10-43" href="#__codelineno-10-43"></a>         4. Sauvegarder remarques
+<a id="__codelineno-10-44" name="__codelineno-10-44" href="#__codelineno-10-44"></a>         5. Calculer % complétion
+<a id="__codelineno-10-45" name="__codelineno-10-45" href="#__codelineno-10-45"></a>            → Si % &gt; 0 : statut passe en &quot;en_edition&quot;
+<a id="__codelineno-10-46" name="__codelineno-10-46" href="#__codelineno-10-46"></a>         6. Enregistrer historique
+<a id="__codelineno-10-47" name="__codelineno-10-47" href="#__codelineno-10-47"></a>                    │
+<a id="__codelineno-10-48" name="__codelineno-10-48" href="#__codelineno-10-48"></a>                    ▼
+<a id="__codelineno-10-49" name="__codelineno-10-49" href="#__codelineno-10-49"></a>          Redirection vers
+<a id="__codelineno-10-50" name="__codelineno-10-50" href="#__codelineno-10-50"></a>          /observations/modifier/{num_fiche}/
+<a id="__codelineno-10-51" name="__codelineno-10-51" href="#__codelineno-10-51"></a>          (fiche créée, num_fiche attribué)
+<a id="__codelineno-10-52" name="__codelineno-10-52" href="#__codelineno-10-52"></a>                    │
+<a id="__codelineno-10-53" name="__codelineno-10-53" href="#__codelineno-10-53"></a>                    ▼
+<a id="__codelineno-10-54" name="__codelineno-10-54" href="#__codelineno-10-54"></a>┌───────────────────────────────────────────────────────────────────┐
+<a id="__codelineno-10-55" name="__codelineno-10-55" href="#__codelineno-10-55"></a>│              MODIFICATION DE LA FICHE EXISTANTE                   │
+<a id="__codelineno-10-56" name="__codelineno-10-56" href="#__codelineno-10-56"></a>└───────────────────────────────────────────────────────────────────┘
+<a id="__codelineno-10-57" name="__codelineno-10-57" href="#__codelineno-10-57"></a>                    │
+<a id="__codelineno-10-58" name="__codelineno-10-58" href="#__codelineno-10-58"></a>                    ▼
+<a id="__codelineno-10-59" name="__codelineno-10-59" href="#__codelineno-10-59"></a>    /observations/modifier/{num_fiche}/ (GET)
+<a id="__codelineno-10-60" name="__codelineno-10-60" href="#__codelineno-10-60"></a>                    │
+<a id="__codelineno-10-61" name="__codelineno-10-61" href="#__codelineno-10-61"></a>          ┌─────────┴─────────┐
+<a id="__codelineno-10-62" name="__codelineno-10-62" href="#__codelineno-10-62"></a>          │                   │
+<a id="__codelineno-10-63" name="__codelineno-10-63" href="#__codelineno-10-63"></a>    Vérification          Fiche non trouvée
+<a id="__codelineno-10-64" name="__codelineno-10-64" href="#__codelineno-10-64"></a>    permissions           ou pas autorisé
+<a id="__codelineno-10-65" name="__codelineno-10-65" href="#__codelineno-10-65"></a>          │                   │
+<a id="__codelineno-10-66" name="__codelineno-10-66" href="#__codelineno-10-66"></a>    Autorisé                  ▼
+<a id="__codelineno-10-67" name="__codelineno-10-67" href="#__codelineno-10-67"></a>          │              Page d&#39;erreur
+<a id="__codelineno-10-68" name="__codelineno-10-68" href="#__codelineno-10-68"></a>          ▼              ou redirection
+<a id="__codelineno-10-69" name="__codelineno-10-69" href="#__codelineno-10-69"></a>┌─────────────────────────┐
+<a id="__codelineno-10-70" name="__codelineno-10-70" href="#__codelineno-10-70"></a>│ Formulaire pré-rempli   │
+<a id="__codelineno-10-71" name="__codelineno-10-71" href="#__codelineno-10-71"></a>│ avec données existantes │
+<a id="__codelineno-10-72" name="__codelineno-10-72" href="#__codelineno-10-72"></a>│ - Fiche                 │
+<a id="__codelineno-10-73" name="__codelineno-10-73" href="#__codelineno-10-73"></a>│ - Localisation          │
+<a id="__codelineno-10-74" name="__codelineno-10-74" href="#__codelineno-10-74"></a>│ - Nid                   │
+<a id="__codelineno-10-75" name="__codelineno-10-75" href="#__codelineno-10-75"></a>│ - Observations          │
+<a id="__codelineno-10-76" name="__codelineno-10-76" href="#__codelineno-10-76"></a>│ - Résumé                │
+<a id="__codelineno-10-77" name="__codelineno-10-77" href="#__codelineno-10-77"></a>│ - Causes d&#39;échec        │
+<a id="__codelineno-10-78" name="__codelineno-10-78" href="#__codelineno-10-78"></a>│ - Remarques             │
+<a id="__codelineno-10-79" name="__codelineno-10-79" href="#__codelineno-10-79"></a>│ + Pourcentage actuel    │
+<a id="__codelineno-10-80" name="__codelineno-10-80" href="#__codelineno-10-80"></a>└─────────────────────────┘
+<a id="__codelineno-10-81" name="__codelineno-10-81" href="#__codelineno-10-81"></a>          │
+<a id="__codelineno-10-82" name="__codelineno-10-82" href="#__codelineno-10-82"></a>          ▼
+<a id="__codelineno-10-83" name="__codelineno-10-83" href="#__codelineno-10-83"></a>   Modifier les champs
+<a id="__codelineno-10-84" name="__codelineno-10-84" href="#__codelineno-10-84"></a>   (ajouter/supprimer observations, etc.)
+<a id="__codelineno-10-85" name="__codelineno-10-85" href="#__codelineno-10-85"></a>          │
+<a id="__codelineno-10-86" name="__codelineno-10-86" href="#__codelineno-10-86"></a>          ▼
+<a id="__codelineno-10-87" name="__codelineno-10-87" href="#__codelineno-10-87"></a>   Clic sur &quot;Enregistrer&quot;
+<a id="__codelineno-10-88" name="__codelineno-10-88" href="#__codelineno-10-88"></a>          │
+<a id="__codelineno-10-89" name="__codelineno-10-89" href="#__codelineno-10-89"></a>          ▼
+<a id="__codelineno-10-90" name="__codelineno-10-90" href="#__codelineno-10-90"></a>   /observations/modifier/{num_fiche}/ (POST)
+<a id="__codelineno-10-91" name="__codelineno-10-91" href="#__codelineno-10-91"></a>          │
+<a id="__codelineno-10-92" name="__codelineno-10-92" href="#__codelineno-10-92"></a>    ┌─────┴─────┐
+<a id="__codelineno-10-93" name="__codelineno-10-93" href="#__codelineno-10-93"></a>    │           │
+<a id="__codelineno-10-94" name="__codelineno-10-94" href="#__codelineno-10-94"></a>Validation   Validation
+<a id="__codelineno-10-95" name="__codelineno-10-95" href="#__codelineno-10-95"></a>   OK           KO
+<a id="__codelineno-10-96" name="__codelineno-10-96" href="#__codelineno-10-96"></a>    │           │
+<a id="__codelineno-10-97" name="__codelineno-10-97" href="#__codelineno-10-97"></a>    ▼           ▼
+<a id="__codelineno-10-98" name="__codelineno-10-98" href="#__codelineno-10-98"></a>Transaction  Affichage
+<a id="__codelineno-10-99" name="__codelineno-10-99" href="#__codelineno-10-99"></a>atomique     erreurs
+<a id="__codelineno-10-100" name="__codelineno-10-100" href="#__codelineno-10-100"></a>─────────
+<a id="__codelineno-10-101" name="__codelineno-10-101" href="#__codelineno-10-101"></a>1. Récupérer état avant modification
+<a id="__codelineno-10-102" name="__codelineno-10-102" href="#__codelineno-10-102"></a>2. Mettre à jour FicheObservation
+<a id="__codelineno-10-103" name="__codelineno-10-103" href="#__codelineno-10-103"></a>3. Mettre à jour objets liés
+<a id="__codelineno-10-104" name="__codelineno-10-104" href="#__codelineno-10-104"></a>4. Sauvegarder observations
+<a id="__codelineno-10-105" name="__codelineno-10-105" href="#__codelineno-10-105"></a>   - Nouvelles : créer
+<a id="__codelineno-10-106" name="__codelineno-10-106" href="#__codelineno-10-106"></a>   - Modifiées : mettre à jour
+<a id="__codelineno-10-107" name="__codelineno-10-107" href="#__codelineno-10-107"></a>   - Supprimées : supprimer
+<a id="__codelineno-10-108" name="__codelineno-10-108" href="#__codelineno-10-108"></a>5. Sauvegarder remarques
+<a id="__codelineno-10-109" name="__codelineno-10-109" href="#__codelineno-10-109"></a>6. Calculer nouveau % complétion
+<a id="__codelineno-10-110" name="__codelineno-10-110" href="#__codelineno-10-110"></a>   → Mise à jour statut si nécessaire
+<a id="__codelineno-10-111" name="__codelineno-10-111" href="#__codelineno-10-111"></a>7. Enregistrer historique (diff)
+<a id="__codelineno-10-112" name="__codelineno-10-112" href="#__codelineno-10-112"></a>8. Mettre à jour année observations
+<a id="__codelineno-10-113" name="__codelineno-10-113" href="#__codelineno-10-113"></a>    │
+<a id="__codelineno-10-114" name="__codelineno-10-114" href="#__codelineno-10-114"></a>    ▼
+<a id="__codelineno-10-115" name="__codelineno-10-115" href="#__codelineno-10-115"></a>Redirection vers
+<a id="__codelineno-10-116" name="__codelineno-10-116" href="#__codelineno-10-116"></a>/observations/modifier/{num_fiche}/
+<a id="__codelineno-10-117" name="__codelineno-10-117" href="#__codelineno-10-117"></a>(modifications sauvegardées, nouveau % affiché)
+<a id="__codelineno-10-118" name="__codelineno-10-118" href="#__codelineno-10-118"></a>    │
+<a id="__codelineno-10-119" name="__codelineno-10-119" href="#__codelineno-10-119"></a>    ▼
+<a id="__codelineno-10-120" name="__codelineno-10-120" href="#__codelineno-10-120"></a>┌───────────────────────────────────────────────────────────────┐
+<a id="__codelineno-10-121" name="__codelineno-10-121" href="#__codelineno-10-121"></a>│             SOUMISSION POUR VALIDATION (optionnel)            │
+<a id="__codelineno-10-122" name="__codelineno-10-122" href="#__codelineno-10-122"></a>└───────────────────────────────────────────────────────────────┘
+<a id="__codelineno-10-123" name="__codelineno-10-123" href="#__codelineno-10-123"></a>    │
+<a id="__codelineno-10-124" name="__codelineno-10-124" href="#__codelineno-10-124"></a>    ▼
+<a id="__codelineno-10-125" name="__codelineno-10-125" href="#__codelineno-10-125"></a>Clic sur &quot;Soumettre pour correction&quot;
+<a id="__codelineno-10-126" name="__codelineno-10-126" href="#__codelineno-10-126"></a>    │
+<a id="__codelineno-10-127" name="__codelineno-10-127" href="#__codelineno-10-127"></a>    ▼
+<a id="__codelineno-10-128" name="__codelineno-10-128" href="#__codelineno-10-128"></a>/observations/soumettre/{num_fiche}/ (POST)
+<a id="__codelineno-10-129" name="__codelineno-10-129" href="#__codelineno-10-129"></a>    │
+<a id="__codelineno-10-130" name="__codelineno-10-130" href="#__codelineno-10-130"></a>    ▼
+<a id="__codelineno-10-131" name="__codelineno-10-131" href="#__codelineno-10-131"></a>Vérifications :
+<a id="__codelineno-10-132" name="__codelineno-10-132" href="#__codelineno-10-132"></a>- Auteur ou admin ?
+<a id="__codelineno-10-133" name="__codelineno-10-133" href="#__codelineno-10-133"></a>- Statut = &quot;nouveau&quot; ou &quot;en_edition&quot; ?
+<a id="__codelineno-10-134" name="__codelineno-10-134" href="#__codelineno-10-134"></a>    │
+<a id="__codelineno-10-135" name="__codelineno-10-135" href="#__codelineno-10-135"></a>    ▼
+<a id="__codelineno-10-136" name="__codelineno-10-136" href="#__codelineno-10-136"></a>Calcul pourcentage complétion
+<a id="__codelineno-10-137" name="__codelineno-10-137" href="#__codelineno-10-137"></a>(score/8 × 100)
+<a id="__codelineno-10-138" name="__codelineno-10-138" href="#__codelineno-10-138"></a>    │
+<a id="__codelineno-10-139" name="__codelineno-10-139" href="#__codelineno-10-139"></a>    ▼
+<a id="__codelineno-10-140" name="__codelineno-10-140" href="#__codelineno-10-140"></a>Statut ← &quot;en_cours&quot;
+<a id="__codelineno-10-141" name="__codelineno-10-141" href="#__codelineno-10-141"></a>    │
+<a id="__codelineno-10-142" name="__codelineno-10-142" href="#__codelineno-10-142"></a>    ▼
+<a id="__codelineno-10-143" name="__codelineno-10-143" href="#__codelineno-10-143"></a>Message : &quot;Fiche soumise. Complétion : XX%&quot;
+<a id="__codelineno-10-144" name="__codelineno-10-144" href="#__codelineno-10-144"></a>    │
+<a id="__codelineno-10-145" name="__codelineno-10-145" href="#__codelineno-10-145"></a>    ▼
+<a id="__codelineno-10-146" name="__codelineno-10-146" href="#__codelineno-10-146"></a>Redirection vers
+<a id="__codelineno-10-147" name="__codelineno-10-147" href="#__codelineno-10-147"></a>/observations/{num_fiche}/ (lecture seule)
+<a id="__codelineno-10-148" name="__codelineno-10-148" href="#__codelineno-10-148"></a>    │
+<a id="__codelineno-10-149" name="__codelineno-10-149" href="#__codelineno-10-149"></a>    ▼
+<a id="__codelineno-10-150" name="__codelineno-10-150" href="#__codelineno-10-150"></a>┌───────────────────────────────────────────────────────────────┐
+<a id="__codelineno-10-151" name="__codelineno-10-151" href="#__codelineno-10-151"></a>│  FICHE EN COURS DE CORRECTION/VALIDATION                      │
+<a id="__codelineno-10-152" name="__codelineno-10-152" href="#__codelineno-10-152"></a>│  (lecture seule pour l&#39;observateur)                           │
+<a id="__codelineno-10-153" name="__codelineno-10-153" href="#__codelineno-10-153"></a>│  (éditable par reviewers/admins)                              │
+<a id="__codelineno-10-154" name="__codelineno-10-154" href="#__codelineno-10-154"></a>└───────────────────────────────────────────────────────────────┘
+</code></pre></div>
+<hr />
+<p><strong>Fin du guide d'utilisation</strong></p>
+<p>Pour toute question ou problème, consultez l'historique des modifications ou contactez un administrateur.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/gonm" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
