@@ -8,3 +8,6 @@ gunicorn
 
 # Static files serving for production
 whitenoise
+
+# Content Security Policy middleware
+django-csp

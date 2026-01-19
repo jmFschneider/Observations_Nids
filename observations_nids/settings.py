@@ -42,6 +42,30 @@ CSRF_TRUSTED_ORIGINS = settings.CSRF_TRUSTED_ORIGINS
 # This allows Django to recognize HTTPS when behind Apache/Nginx reverse proxy
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Content Security Policy (CSP) Configuration
+# Permet l'utilisation de CDN externes pour Bootstrap, Chart.js, Font Awesome
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = (
+    "'self'",
+    "'unsafe-inline'",  # Nécessaire pour les scripts inline dans les templates
+    "https://cdn.jsdelivr.net",  # Bootstrap et Chart.js
+)
+CSP_STYLE_SRC = (
+    "'self'",
+    "'unsafe-inline'",  # Nécessaire pour les styles inline
+    "https://cdn.jsdelivr.net",  # Bootstrap
+    "https://cdnjs.cloudflare.com",  # Font Awesome
+)
+CSP_FONT_SRC = (
+    "'self'",
+    "https://cdnjs.cloudflare.com",  # Font Awesome fonts
+)
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",  # Images inline en base64
+)
+CSP_CONNECT_SRC = ("'self'",)
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = settings.SECRET_KEY
 
@@ -116,6 +140,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise juste après SecurityMiddleware
+    'csp.middleware.CSPMiddleware',  # Content Security Policy
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

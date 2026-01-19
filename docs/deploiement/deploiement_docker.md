@@ -320,24 +320,40 @@ curl http://localhost:8010/health/
 
 ---
 
-## 📦 Configuration WhiteNoise (Fichiers Statiques)
+## 📦 Configuration WhiteNoise & CSP
 
-Le projet utilise **WhiteNoise** pour servir les fichiers statiques directement depuis Gunicorn, sans nécessiter de configuration Nginx spécifique.
+### WhiteNoise (Fichiers Statiques)
 
-### Avantages
+Le projet utilise **WhiteNoise** pour servir les fichiers statiques directement depuis Gunicorn.
 
+**Avantages** :
 - ✅ **Simplification** : Plus besoin de configurer Nginx pour `/static/`
 - ✅ **Compression** : Compression automatique (Gzip + Brotli)
 - ✅ **Cache optimal** : Headers de cache perpétuel avec hash dans les noms de fichiers
 - ✅ **Performance** : Équivalent à un serveur de fichiers statiques dédié
 
-### Installation et Configuration
-
-WhiteNoise est déjà configuré dans le projet :
-
+**Configuration** :
 1. **Middleware** : `whitenoise.middleware.WhiteNoiseMiddleware` activé dans `settings.py`
 2. **Storage** : `CompressedManifestStaticFilesStorage` pour compression et hachage
 3. **Dépendances** : `whitenoise` inclus dans `requirements-prod.txt`
+
+### Content Security Policy (CSP)
+
+Le projet utilise **django-csp** pour gérer la politique de sécurité du contenu.
+
+**Configuration dans `settings.py`** :
+```python
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net")
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com")
+CSP_FONT_SRC = ("'self'", "https://cdnjs.cloudflare.com")
+CSP_IMG_SRC = ("'self'", "data:")
+```
+
+Cette configuration autorise :
+- **Bootstrap** et **Chart.js** depuis `cdn.jsdelivr.net`
+- **Font Awesome** depuis `cdnjs.cloudflare.com`
+- Scripts et styles inline nécessaires au fonctionnement
 
 ### Collecte des Fichiers Statiques
 
