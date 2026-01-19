@@ -40,6 +40,10 @@ from .views.views_observation import (
     liste_fiches_observations,
     statistiques_view,
 )
+from .views.views_stats import (
+    StatsCorrecteursView,
+    StatsDashboardView,
+)
 
 app_name = 'observations'
 
@@ -62,7 +66,10 @@ urlpatterns = [
     path('observations/', saisie_observation, name='observations_list'),
     path('observations/liste/', liste_fiches_observations, name='liste_fiches_observations'),
     path('observations/<int:fiche_id>/', fiche_observation_view, name='fiche_observation'),
-    path('statistiques/', statistiques_view, name='statistiques'),
+    # Routes de statistiques
+    path('statistiques/', statistiques_view, name='statistiques'),  # Page publique des stats
+    path('statistiques/dashboard/', StatsDashboardView.as_view(), name='stats_dashboard'),
+    path('statistiques/correcteurs/', StatsCorrecteursView.as_view(), name='stats_correcteurs'),
     #    path('observations/nouvelle/', saisie_observation, name='saisie_observation'),
     #    path('observations/sauvegarde/', traiter_saisie_observation, name='traiter_saisie_observation'),
     path('observations/modifier/<int:fiche_id>/', saisie_observation, name='modifier_observation'),
