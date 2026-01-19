@@ -10,7 +10,9 @@ import logging
 import os
 import threading
 import time
+from collections.abc import Callable
 from functools import wraps
+from typing import Any, ParamSpec, TypeVar
 
 from celery import shared_task
 from celery.result import AsyncResult
@@ -31,7 +33,15 @@ logger = logging.getLogger('ocr')
 # ========================================
 
 
-def retry_with_backoff(max_retries=3, initial_delay=2, max_delay=16):
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def retry_with_backoff(
+    max_retries: int = 3,
+    initial_delay: int = 2,
+    max_delay: int = 16,
+) -> Callable[[Callable[P, R]], Callable[P, R]]:
     """
     Décorateur pour retry avec exponential backoff.
 
@@ -51,9 +61,9 @@ def retry_with_backoff(max_retries=3, initial_delay=2, max_delay=16):
             # Code qui peut échouer
     """
 
-    def decorator(func):
+    def decorator(func: Callable[P, R]) -> Callable[P, R]:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             delay = initial_delay
             last_error: Exception | None = None
 
@@ -85,7 +95,13 @@ def retry_with_backoff(max_retries=3, initial_delay=2, max_delay=16):
 
 
 @retry_with_backoff(max_retries=3, initial_delay=2)
-def call_gemini_api_with_timeout(client, model_name, prompt, image_path, timeout=120):
+def call_gemini_api_with_timeout(
+    client: Any,
+    model_name: str,
+    prompt: str,
+    image_path: str,
+    timeout: int = 120,
+) -> str:
     """
     Appel API Gemini avec timeout et retry automatique.
 

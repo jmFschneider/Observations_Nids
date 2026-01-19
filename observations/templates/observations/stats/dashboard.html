@@ -1,0 +1,251 @@
+{% extends "observations/stats/base_stats.html" %}
+
+{% block stats_title %}Dashboard Global - Statistiques{% endblock %}
+
+{% block stats_page_title %}Dashboard Global{% endblock %}
+
+{% block stats_content %}
+
+<!-- Section Volume -->
+<div class="mb-4">
+    <h2 class="h4 mb-3">
+        <i class="fas fa-database text-primary"></i> Statistiques de Volume
+    </h2>
+    <div class="row g-3">
+        <!-- Total Fiches -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-primary h-100">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i class="fas fa-file-alt fa-2x text-primary"></i>
+                    </div>
+                    <h6 class="card-title text-muted text-uppercase small">Total Fiches</h6>
+                    <h2 class="display-4 fw-bold text-primary mb-0">{{ stats_volume.total_fiches }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- En Attente -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-warning h-100">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                    </div>
+                    <h6 class="card-title text-muted text-uppercase small">En Attente</h6>
+                    <h2 class="display-4 fw-bold text-warning mb-0">{{ stats_volume.fiches_en_cours_saisie }}</h2>
+                    <small class="text-muted">Saisie en cours</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- En Cours -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-info h-100">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i class="fas fa-hourglass-half fa-2x text-info"></i>
+                    </div>
+                    <h6 class="card-title text-muted text-uppercase small">En Correction</h6>
+                    <h2 class="display-4 fw-bold text-info mb-0">{{ stats_volume.fiches_en_cours_correction }}</h2>
+                    <small class="text-muted">Avec correcteur</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Validées -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-success h-100">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                    </div>
+                    <h6 class="card-title text-muted text-uppercase small">Validées</h6>
+                    <h2 class="display-4 fw-bold text-success mb-0">{{ stats_volume.fiches_validees }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section Performance -->
+<div class="mb-4">
+    <h2 class="h4 mb-3">
+        <i class="fas fa-tachometer-alt text-success"></i> Statistiques de Performance
+    </h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="row g-4">
+                <!-- Taux de Validation -->
+                <div class="col-md-4">
+                    <div class="text-center p-3 border-end">
+                        <div class="mb-2">
+                            <i class="fas fa-percentage fa-2x text-success"></i>
+                        </div>
+                        <h6 class="text-muted text-uppercase small mb-2">Taux de Validation</h6>
+                        <h2 class="display-5 fw-bold text-success mb-2">
+                            {{ stats_performance.taux_validation_pourcent }}%
+                        </h2>
+                        <p class="text-muted mb-0 small">
+                            <span class="fw-bold">{{ stats_performance.fiches_validees }}</span> / 
+                            {{ stats_performance.total_fiches }} fiches
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Temps Moyen de Validation -->
+                <div class="col-md-4">
+                    <div class="text-center p-3 border-end">
+                        <div class="mb-2">
+                            <i class="fas fa-clock fa-2x text-primary"></i>
+                        </div>
+                        <h6 class="text-muted text-uppercase small mb-2">Temps Moyen Validation</h6>
+                        <h2 class="display-5 fw-bold text-primary mb-2">
+                            {% if stats_performance.temps_moyen_validation_jours %}
+                                {{ stats_performance.temps_moyen_validation_jours|floatformat:1 }}
+                                <small class="fs-4">jours</small>
+                            {% else %}
+                                <small class="fs-4">N/A</small>
+                            {% endif %}
+                        </h2>
+                        <p class="text-muted mb-0 small">
+                            Création <i class="fas fa-arrow-right"></i> Validation
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Validations Mois Courant -->
+                <div class="col-md-4">
+                    <div class="text-center p-3">
+                        <div class="mb-2">
+                            <i class="fas fa-calendar-check fa-2x text-info"></i>
+                        </div>
+                        <h6 class="text-muted text-uppercase small mb-2">Validations ce Mois</h6>
+                        <h2 class="display-5 fw-bold text-info mb-2">
+                            {{ stats_performance.validations_mois_courant }}
+                        </h2>
+                        <p class="text-muted mb-0 small">
+                            Mois en cours
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Détails supplémentaires -->
+<div class="row g-3">
+    <!-- Détails Volume -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle text-primary"></i> Détails Volume
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-binoculars text-muted me-2"></i>
+                            Observations terrain
+                        </span>
+                        <span class="badge bg-primary rounded-pill fw-bold">
+                            {{ stats_volume.total_observations }}
+                        </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-calendar-day text-muted me-2"></i>
+                            Fiches récentes (30j)
+                        </span>
+                        <span class="badge bg-info rounded-pill fw-bold">
+                            {{ stats_volume.fiches_recentes_30j }}
+                        </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-dove text-muted me-2"></i>
+                            Espèces observées
+                        </span>
+                        <span class="badge bg-success rounded-pill fw-bold">
+                            {{ stats_volume.nb_especes }}
+                        </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-users text-muted me-2"></i>
+                            Observateurs actifs
+                        </span>
+                        <span class="badge bg-secondary rounded-pill fw-bold">
+                            {{ stats_volume.nb_observateurs }}
+                        </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-tasks text-muted me-2"></i>
+                            Completion moyenne
+                        </span>
+                        <span class="badge bg-warning rounded-pill fw-bold">
+                            {{ stats_volume.completion_moyenne|floatformat:1 }}%
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activité Récente -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line text-success"></i> Activité Récente
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-edit text-muted me-2"></i>
+                            Modifications (30 derniers jours)
+                        </span>
+                        <span class="badge bg-primary rounded-pill fw-bold">
+                            {{ stats_performance.modifications_30j }}
+                        </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-file-medical text-muted me-2"></i>
+                            Fiches nouvelles
+                        </span>
+                        <span class="badge bg-info rounded-pill fw-bold">
+                            {{ stats_volume.fiches_nouvelles }}
+                        </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-pen text-muted me-2"></i>
+                            Fiches en édition
+                        </span>
+                        <span class="badge bg-warning rounded-pill fw-bold">
+                            {{ stats_volume.fiches_en_edition }}
+                        </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-pause-circle text-muted me-2"></i>
+                            Fiches en attente correction
+                        </span>
+                        <span class="badge bg-secondary rounded-pill fw-bold">
+                            {{ stats_volume.fiches_en_attente_correction }}
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

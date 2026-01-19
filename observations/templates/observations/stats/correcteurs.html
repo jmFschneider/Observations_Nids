@@ -1,0 +1,263 @@
+{% extends "observations/stats/base_stats.html" %}
+
+{% block stats_title %}Suivi Correcteurs - Statistiques{% endblock %}
+
+{% block stats_page_title %}Suivi des Corrections{% endblock %}
+
+{% block stats_content %}
+
+<!-- Résumé KPI -->
+<div class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-primary h-100">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i class="fas fa-user-check fa-2x text-primary"></i>
+                    </div>
+                    <h6 class="card-title text-muted text-uppercase small">Correcteurs Actifs</h6>
+                    <h2 class="display-4 fw-bold text-primary mb-0">{{ correcteurs_actifs }}</h2>
+                    <small class="text-muted">Validés dans le système</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm border-warning h-100">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i class="fas fa-briefcase fa-2x text-warning"></i>
+                    </div>
+                    <h6 class="card-title text-muted text-uppercase small">Correcteurs Occupés</h6>
+                    <h2 class="display-4 fw-bold text-warning mb-0">{{ correcteurs_charges|length }}</h2>
+                    <small class="text-muted">Avec fiches en cours</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm border-success h-100">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i class="fas fa-medal fa-2x text-success"></i>
+                    </div>
+                    <h6 class="card-title text-muted text-uppercase small">Top Contributeurs</h6>
+                    <h2 class="display-4 fw-bold text-success mb-0">{{ top_correcteurs|length }}</h2>
+                    <small class="text-muted">Avec validations</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tableaux côte à côte -->
+<div class="row g-3 mb-4">
+    <!-- Tableau 1 : Charge de travail actuelle -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-warning bg-gradient text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-tasks"></i> Charge de Travail Actuelle
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if correcteurs_charges %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>
+                                    <i class="fas fa-user text-muted"></i> Correcteur
+                                </th>
+                                <th class="text-center">
+                                    <i class="fas fa-folder-open text-muted"></i> En Cours
+                                </th>
+                                <th class="text-center">Charge</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for correcteur in correcteurs_charges %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-warning text-dark me-2">
+                                            {{ correcteur.first_name|first }}{{ correcteur.last_name|first }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">
+                                                {{ correcteur.first_name }} {{ correcteur.last_name }}
+                                            </div>
+                                            {% if correcteur.role == 'administrateur' %}
+                                            <span class="badge bg-danger badge-sm">
+                                                <i class="fas fa-shield-alt"></i> Admin
+                                            </span>
+                                            {% else %}
+                                            <span class="badge bg-info badge-sm">
+                                                <i class="fas fa-user-edit"></i> Correcteur
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-warning text-dark fs-6 fw-bold">
+                                        {{ correcteur.nb_en_cours }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    {% if correcteur.nb_en_cours >= 10 %}
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-exclamation-triangle"></i> Élevée
+                                    </span>
+                                    {% elif correcteur.nb_en_cours >= 5 %}
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-exclamation-circle"></i> Moyenne
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check"></i> Faible
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted mb-0">Aucun correcteur avec charge en cours</p>
+                    <small class="text-muted">Toutes les fiches sont soit en attente, soit déjà validées</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau 2 : Top Contributeurs -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary bg-gradient text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-trophy"></i> Top Contributeurs
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if top_correcteurs %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-center" style="width: 50px;">
+                                    <i class="fas fa-ranking-star text-muted"></i>
+                                </th>
+                                <th>
+                                    <i class="fas fa-user text-muted"></i> Correcteur
+                                </th>
+                                <th class="text-center">
+                                    <i class="fas fa-check-double text-muted"></i> Validations
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for correcteur in top_correcteurs %}
+                            <tr>
+                                <td class="text-center">
+                                    {% if forloop.counter == 1 %}
+                                    <span class="badge bg-warning text-dark fs-5">
+                                        <i class="fas fa-trophy"></i>
+                                    </span>
+                                    {% elif forloop.counter == 2 %}
+                                    <span class="badge bg-secondary fs-6">
+                                        <i class="fas fa-medal"></i>
+                                    </span>
+                                    {% elif forloop.counter == 3 %}
+                                    <span class="badge bg-light text-dark fs-6">
+                                        <i class="fas fa-award"></i>
+                                    </span>
+                                    {% else %}
+                                    <span class="text-muted fw-bold">{{ forloop.counter }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-primary text-white me-2">
+                                            {{ correcteur.first_name|first }}{{ correcteur.last_name|first }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">
+                                                {{ correcteur.first_name }} {{ correcteur.last_name }}
+                                            </div>
+                                            {% if correcteur.role == 'administrateur' %}
+                                            <span class="badge bg-danger badge-sm">
+                                                <i class="fas fa-shield-alt"></i> Admin
+                                            </span>
+                                            {% else %}
+                                            <span class="badge bg-info badge-sm">
+                                                <i class="fas fa-user-edit"></i> Correcteur
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success fs-6 fw-bold">
+                                        {{ correcteur.nb_validations }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted mb-0">Aucune validation enregistrée</p>
+                    <small class="text-muted">Les statistiques apparaîtront dès qu'un correcteur valide une fiche</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Note informative -->
+<div class="alert alert-info border-info shadow-sm">
+    <div class="d-flex align-items-start">
+        <div class="me-3">
+            <i class="fas fa-info-circle fa-2x"></i>
+        </div>
+        <div>
+            <h6 class="alert-heading fw-bold mb-2">
+                <i class="fas fa-lightbulb"></i> Informations
+            </h6>
+            <p class="mb-0">
+                Cette page affiche les statistiques détaillées des correcteurs pour faciliter la gestion de la charge de travail. 
+                Des indicateurs supplémentaires (temps moyen par correcteur, performance, etc.) seront ajoutés dans les prochaines versions.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- CSS pour les avatars -->
+<style>
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.badge-sm {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+}
+</style>
+
+{% endblock %}

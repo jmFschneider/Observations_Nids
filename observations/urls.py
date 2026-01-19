@@ -69,7 +69,7 @@ urlpatterns = [
     # Routes de statistiques
     path('statistiques/', statistiques_view, name='statistiques'),  # Page publique des stats
     path('statistiques/dashboard/', StatsDashboardView.as_view(), name='stats_dashboard'),
-    path('statistiques/correcteurs/', StatsCorrecteursView.as_view(), name='stats_correcteurs'),
+    path('statistiques/corrections/', StatsCorrecteursView.as_view(), name='stats_corrections'),
     #    path('observations/nouvelle/', saisie_observation, name='saisie_observation'),
     #    path('observations/sauvegarde/', traiter_saisie_observation, name='traiter_saisie_observation'),
     path('observations/modifier/<int:fiche_id>/', saisie_observation, name='modifier_observation'),
