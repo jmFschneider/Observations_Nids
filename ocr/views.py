@@ -13,7 +13,7 @@ from typing import Any, cast
 from celery.result import AsyncResult
 from django.conf import settings
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -329,7 +329,7 @@ def lancer_transcription_batch(request):  # noqa: PLR0911
 
 
 @transcription_required
-def check_batch_progress(request):
+def check_batch_progress(request: HttpRequest) -> JsonResponse:
     """
     Endpoint AJAX pour vérifier la progression du traitement batch
     """

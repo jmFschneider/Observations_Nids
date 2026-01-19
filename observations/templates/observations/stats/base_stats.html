@@ -25,10 +25,10 @@
             </a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link {% if request.resolver_match.url_name == 'stats_correcteurs' %}active{% endif %}" 
-               href="{% url 'observations:stats_correcteurs' %}"
-               aria-current="{% if request.resolver_match.url_name == 'stats_correcteurs' %}page{% endif %}">
-                <i class="fas fa-users"></i> Suivi Correcteurs
+            <a class="nav-link {% if request.resolver_match.url_name == 'stats_corrections' %}active{% endif %}" 
+               href="{% url 'observations:stats_corrections' %}"
+               aria-current="{% if request.resolver_match.url_name == 'stats_corrections' %}page{% endif %}">
+                <i class="fas fa-users"></i> Suivi Corrections
             </a>
         </li>
         <li class="nav-item" role="presentation">

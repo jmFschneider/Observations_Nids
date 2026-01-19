@@ -18,13 +18,13 @@ class UtilisateurAdmin(UserAdmin):
     list_filter = ('role', 'est_valide', 'est_transcription', 'is_active')
     search_fields = ('username', 'email', 'first_name', 'last_name')
 
-    fieldsets = UserAdmin.fieldsets + (
+    fieldsets = tuple(UserAdmin.fieldsets or ()) + (
         ('Informations supplémentaires', {'fields': ('role', 'est_valide', 'est_transcription')}),
-    )  # type: ignore
+    )
 
-    add_fieldsets = UserAdmin.add_fieldsets + (
+    add_fieldsets = tuple(UserAdmin.add_fieldsets or ()) + (
         ('Informations supplémentaires', {'fields': ('role', 'est_valide', 'est_transcription')}),
-    )  # type: ignore
+    )
 
 
 admin.site.register(Utilisateur, UtilisateurAdmin)

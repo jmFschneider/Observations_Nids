@@ -6,8 +6,11 @@ statistiques réservés aux administrateurs et correcteurs.
 """
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import Count, Q
+from django.shortcuts import render
 from django.views.generic import TemplateView
 
+from accounts.models import Utilisateur
 from observations.stats import get_stats_tableau_bord
 
 
@@ -28,8 +31,6 @@ class StatsAccessMixin(UserPassesTestMixin):
         """
         Redirige vers une page d'accès refusé si l'utilisateur n'a pas la permission.
         """
-        from django.shortcuts import render
-
         return render(self.request, 'access_restricted.html', status=403)
 
 
@@ -77,12 +78,6 @@ class StatsCorrecteursView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
         Ajoute les statistiques détaillées des correcteurs au contexte.
         """
         context = super().get_context_data(**kwargs)
-
-        # TODO: Implémenter les stats des correcteurs (Phase suivante)
-        # Pour l'instant, on met des données de base
-        from django.db.models import Count, Q
-
-        from accounts.models import Utilisateur
 
         # Top correcteurs par nombre de validations
         top_correcteurs = (

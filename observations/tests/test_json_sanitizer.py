@@ -6,7 +6,7 @@ from observations.json_rep.json_sanitizer import corriger_json, validate_json_st
 class TestValidateJsonStructure:
     """Tests pour la fonction validate_json_structure()."""
 
-    def test_json_valide_complet(self):
+    def test_json_valide_complet(self) -> None:
         """Test avec un JSON valide et complet."""
         data: dict[str, dict[str, str] | list[dict[str, str]]] = {
             "informations_generales": {
@@ -45,7 +45,7 @@ class TestValidateJsonStructure:
         errors = validate_json_structure(data)
         assert errors == []
 
-    def test_json_cle_manquante_top_level(self):
+    def test_json_cle_manquante_top_level(self) -> None:
         """Test avec une clé principale manquante."""
         data: dict[str, dict[str, str] | list[dict[str, str]]] = {
             "informations_generales": {},
@@ -196,7 +196,7 @@ class TestCorrigerJson:
         assert corrected["informations_generales"]["n_fiche"] == "123"
         assert corrected["informations_generales"]["observateur"] == "Test"
 
-    def test_corriger_json_vide(self):
+    def test_corriger_json_vide(self) -> None:
         """Test avec un JSON vide."""
         data: dict[str, dict[str, str] | list[dict[str, str]]] = {}
         corrected = corriger_json(data)

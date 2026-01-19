@@ -92,6 +92,14 @@
                             <span class="link-text">Statistiques</span>
                         </a>
                     </li>
+                    {% if user.role == 'administrateur' or user.role == 'correcteur' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'observations:stats_dashboard' %}" data-title="Dashboard Stats">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span class="link-text">Dashboard Stats</span>
+                        </a>
+                    </li>
+                    {% endif %}
 
                     <!-- Section Mes Images -->
                     <li class="nav-item">
