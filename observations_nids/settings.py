@@ -139,8 +139,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise juste après SecurityMiddleware
-    'csp.middleware.CSPMiddleware',  # Content Security Policy
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -149,6 +147,22 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'observations.middleware.SessionExpiryMiddleware',
 ]
+
+# Ajouter WhiteNoise uniquement si le package est installé (production)
+try:
+    import whitenoise
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')  # Après SecurityMiddleware
+except ImportError:
+    pass  # WhiteNoise non installé en développement, Django servira les fichiers statiques
+
+# Ajouter CSP uniquement si le package est installé (production)
+try:
+    import csp
+    # Insérer après WhiteNoise si présent, sinon en position 1
+    whitenoise_index = next((i for i, m in enumerate(MIDDLEWARE) if 'whitenoise' in m.lower()), 0)
+    MIDDLEWARE.insert(whitenoise_index + 1, 'csp.middleware.CSPMiddleware')
+except ImportError:
+    pass  # CSP non installé en développement, on continue sans
 
 ROOT_URLCONF = 'observations_nids.urls'
 
@@ -243,14 +257,27 @@ STATICFILES_DIRS = [
 ]
 
 # WhiteNoise configuration for static files compression and caching
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+# Uniquement si WhiteNoise est installé (production)
+try:
+    import whitenoise
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+except ImportError:
+    # En développement sans WhiteNoise, utiliser le storage par défaut de Django
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.environ.get("DJANGO_MEDIA_ROOT", os.path.join(BASE_DIR, "media"))
