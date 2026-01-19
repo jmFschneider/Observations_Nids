@@ -5,9 +5,8 @@ Ce module fournit des fonctions pour calculer diverses statistiques sur les fich
 d'observation, les utilisateurs et l'activité de l'application.
 """
 
-from datetime import timedelta
-
 import json
+from datetime import timedelta
 
 from django.db.models import Avg, Count, ExpressionWrapper, F, Q, fields
 from django.utils import timezone
@@ -288,9 +287,7 @@ def get_stats_page_statistiques():
     ).count()
 
     # Fiches validées (statut 'valide')
-    fiches_valides = FicheObservation.objects.filter(
-        etat_correction__statut='valide'
-    ).count()
+    fiches_valides = FicheObservation.objects.filter(etat_correction__statut='valide').count()
 
     # Nombre d'espèces distinctes observées
     nb_especes = FicheObservation.objects.values('espece').distinct().count()
@@ -300,16 +297,14 @@ def get_stats_page_statistiques():
 
     # Top 4 espèces les plus fréquentes
     top_especes = (
-        FicheObservation.objects
-        .values('espece__nom')
+        FicheObservation.objects.values('espece__nom')
         .annotate(count=Count('espece'))
         .order_by('-count')[:4]
     )
 
     # Fiches par année pour graphique
     fiches_par_annee_qs = (
-        FicheObservation.objects
-        .values('annee')
+        FicheObservation.objects.values('annee')
         .annotate(count=Count('num_fiche'))
         .order_by('annee')
     )
