@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="mb-4">
+        <i class="fas fa-users"></i> {{ page_title }}
+    </h1>
+
+    <!-- Navigation des stats -->
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+            <a href="{% url 'observations:statistiques' %}" class="btn btn-outline-primary">
+                <i class="fas fa-chart-bar"></i> Stats Publiques
+            </a>
+            <a href="{% url 'observations:stats_dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="{% url 'observations:stats_correcteurs' %}" class="btn btn-primary">
+                <i class="fas fa-users"></i> Correcteurs
+            </a>
+        </div>
+    </div>
+
+    <!-- Résumé -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Correcteurs Actifs</h5>
+                    <h2 class="display-4">{{ correcteurs_actifs }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Correcteurs par Validations -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-trophy"></i> Top Correcteurs (Validations)</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_correcteurs %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Correcteur</th>
+                                <th class="text-end">Validations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for correcteur in top_correcteurs %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    {{ correcteur.first_name }} {{ correcteur.last_name }}
+                                    {% if correcteur.role == 'administrateur' %}
+                                    <span class="badge bg-danger">Admin</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end"><strong>{{ correcteur.nb_validations }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted text-center">Aucune validation enregistrée</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Correcteurs avec Charge en Cours -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-tasks"></i> Correcteurs avec Charge</h5>
+                </div>
+                <div class="card-body">
+                    {% if correcteurs_charges %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Correcteur</th>
+                                <th class="text-end">Fiches en Cours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for correcteur in correcteurs_charges %}
+                            <tr>
+                                <td>
+                                    {{ correcteur.first_name }} {{ correcteur.last_name }}
+                                    {% if correcteur.role == 'administrateur' %}
+                                    <span class="badge bg-danger">Admin</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end"><strong>{{ correcteur.nb_en_cours }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted text-center">Aucun correcteur avec charge en cours</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note -->
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> 
+        <strong>Note :</strong> Cette page affiche les statistiques détaillées des correcteurs. 
+        Des indicateurs supplémentaires seront ajoutés dans les prochaines versions.
+    </div>
+</div>
+{% endblock %}
