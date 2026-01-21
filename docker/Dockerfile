@@ -49,8 +49,8 @@ COPY --chown=django:django . .
 COPY docker/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Collecter les fichiers statiques (sera refait au démarrage si nécessaire)
-RUN python manage.py collectstatic --noinput || true
+# Collecter les fichiers statiques (sera fait au démarrage par docker-entrypoint.sh)
+# RUN python manage.py collectstatic --noinput || true
 
 # Changer les permissions
 RUN chown -R django:django /app
@@ -62,7 +62,7 @@ USER django
 EXPOSE 8000
 
 # Point d'entrée
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 # Commande par défaut (peut être overridée dans docker-compose)
 CMD ["gunicorn", "observations_nids.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4", "--timeout", "120"]

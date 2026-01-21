@@ -54,8 +54,8 @@ class Settings(BaseSettings):
     # Core Django settings
     SECRET_KEY: str
     DEBUG: bool = False
-    ALLOWED_HOSTS: list[str] = Field(default_factory=lambda: ["localhost", "127.0.0.1"])
-    CSRF_TRUSTED_ORIGINS: list[str] = Field(default_factory=list)
+    ALLOWED_HOSTS: str | list[str] = Field(default_factory=lambda: ["localhost", "127.0.0.1"])
+    CSRF_TRUSTED_ORIGINS: str | list[str] = Field(default_factory=list)
     ENVIRONMENT: str = "production"  # Valeurs possibles : production, pilote, development
 
     GEMINI_API_KEY: str | None = Field(default=None, alias="gemini_api_key")

@@ -62,6 +62,7 @@ services:
       dockerfile: docker/Dockerfile
     container_name: observations_web
     restart: unless-stopped
+    env_file: ../.env 
     command: gunicorn observations_nids.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 120 --access-logfile - --error-logfile -
     environment:
       - SECRET_KEY=${SECRET_KEY}

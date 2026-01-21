@@ -1,0 +1,28 @@
+# Override pour environnement de développement Windows 11
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.windows.yml up
+#
+# Ce fichier adapte les chemins hardcodés Linux (/opt/observations_nids_pilote/media)
+# pour utiliser le code source monté (..:/app) qui inclut le dossier media
+
+services:
+  # Application Django - remplacer le chemin media Linux par le volume partagé
+  web:
+    volumes:
+      - static_volume:/app/staticfiles
+      - ..:/app  # Le code source inclut déjà le dossier media
+      - ../logs:/app/logs
+
+  # Celery Worker - remplacer le chemin media Linux par le volume partagé
+  celery_worker:
+    volumes:
+      - ..:/app  # Le code source inclut déjà le dossier media
+      - ../logs:/app/logs
+
+  # Nginx - remplacer le chemin media Linux par le volume partagé
+  nginx:
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - static_volume:/app/staticfiles:ro
+      - ../media:/app/media:ro  # Pointer vers le dossier media du projet
+      - ./nginx/ssl:/etc/nginx/ssl:ro
