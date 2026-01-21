@@ -343,5 +343,28 @@
     </div>
 </div>
 
+<!-- Boutons d'action en bas de page -->
+<div class="form-buttons mt-4 mb-3" style="display: flex; gap: 10px; justify-content: flex-start;">
+    <!-- Bouton Modifier -->
+    {% if fiche.etat_correction.statut == 'valide' %}
+        <!-- Fiche validée - Bouton grisé et inactif -->
+        <button class="btn btn-secondary" disabled style="cursor: not-allowed;">
+            <i class="fas fa-lock"></i> Fiche validée - Non modifiable
+        </button>
+    {% else %}
+        <!-- Fiche modifiable -->
+        <a href="{% url 'observations:modifier_observation' fiche_id=fiche.num_fiche %}"
+           class="btn btn-primary">
+            <i class="fas fa-edit"></i> Modifier
+        </a>
+    {% endif %}
+
+    <!-- Bouton Historique -->
+    <a href="{% url 'observations:historique_modifications' fiche_id=fiche.num_fiche %}"
+       class="btn btn-info"
+       target="_blank">
+        <i class="fas fa-history"></i> Historique
+    </a>
+</div>
 
 {% endblock %}

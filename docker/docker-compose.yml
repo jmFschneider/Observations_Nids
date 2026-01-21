@@ -102,6 +102,8 @@ services:
       - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-False}
       # Logging
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # Debug toolbar
+      - USE_DEBUG_TOOLBAR=${USE_DEBUG_TOOLBAR:-False}
     volumes:
       - static_volume:/app/staticfiles
       - /opt/observations_nids_pilote/media:/app/media
@@ -155,6 +157,8 @@ services:
       - VERSION=${VERSION:-dev}
       # Logging
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # Debug toolbar
+      - USE_DEBUG_TOOLBAR=${USE_DEBUG_TOOLBAR:-False}
     volumes:
       - /opt/observations_nids_pilote/media:/app/media
       - ../logs:/app/logs
@@ -200,6 +204,8 @@ services:
       - VERSION=${VERSION:-dev}
       # Logging
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # Debug toolbar
+      - USE_DEBUG_TOOLBAR=${USE_DEBUG_TOOLBAR:-False}
     volumes:
       - ../logs:/app/logs
     depends_on:
@@ -228,6 +234,7 @@ services:
       - REDIS_PORT=6379
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - USE_DEBUG_TOOLBAR=${USE_DEBUG_TOOLBAR:-False}
     ports:
       - "5555:5555"
     depends_on:
