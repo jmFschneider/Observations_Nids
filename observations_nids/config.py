@@ -52,7 +52,8 @@ class Settings(BaseSettings):
     """
 
     # Core Django settings
-    SECRET_KEY: str
+    # SECRET_KEY has a default value for Docker build time, but should always be overridden in production
+    SECRET_KEY: str = "django-insecure-build-time-key-do-not-use-in-production"
     DEBUG: bool = False
     ALLOWED_HOSTS: list[str] = Field(default_factory=lambda: ["localhost", "127.0.0.1"])
     CSRF_TRUSTED_ORIGINS: list[str] = Field(default_factory=list)
@@ -60,7 +61,15 @@ class Settings(BaseSettings):
 
     GEMINI_API_KEY: str | None = Field(default=None, alias="gemini_api_key")
     celery: CelerySettings = Field(default_factory=CelerySettings)
-    DATABASE: DatabaseSettings
+    DATABASE: DatabaseSettings = Field(
+        default_factory=lambda: DatabaseSettings(
+            name=os.environ.get("DB_NAME", "NidsObservation"),
+            user=os.environ.get("DB_USER", "jms"),
+            password=os.environ.get("DB_PASSWORD", "pointeur"),
+            host=os.environ.get("DB_HOST", "db"),
+            port=os.environ.get("DB_PORT", "3306"),
+        )
+    )
 
     # Custom settings
     USE_DEBUG_TOOLBAR: bool = False
