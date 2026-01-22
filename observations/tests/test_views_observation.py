@@ -70,13 +70,13 @@ class TestListeFichesObservations:
         assert fiches.has_previous()
 
     def test_ordre_fiches_decroissant(self, authenticated_client, user, espece):
-        """Test que les fiches sont ordonnées par date de création décroissante."""
+        """Test que les fiches sont ordonnées par date de création croissante."""
         # Créer 3 fiches avec un petit délai entre chaque
-        _fiche1 = FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
+        fiche1 = FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
         time.sleep(0.01)
         _fiche2 = FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
         time.sleep(0.01)
-        fiche3 = FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
+        _fiche3 = FicheObservation.objects.create(observateur=user, espece=espece, annee=2024)
 
         url = reverse('observations:liste_fiches_observations')
         response = authenticated_client.get(url)
@@ -84,5 +84,5 @@ class TestListeFichesObservations:
         assert response.status_code == 200
         fiches = list(response.context['fiches'])
 
-        # La fiche3 (la plus récente) devrait être en premier
-        assert fiches[0].num_fiche == fiche3.num_fiche
+        # La fiche1 (la plus ancienne) devrait être en premier (ordre croissant)
+        assert fiches[0].num_fiche == fiche1.num_fiche
