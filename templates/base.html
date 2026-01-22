@@ -205,6 +205,19 @@
                             <span class="link-text">Support</span>
                         </a>
                     </li>
+                    <!-- Deconnexion -->
+                    <li class="nav-item">
+                        <div class="sidebar-divider"></div>
+                        <h6 class="sidebar-heading">Off Line</h6>
+                    </li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'observations:logout' %}" class="nav-link p-0" id="logout-form-sidebar"
+                              onclick="this.submit();" style="cursor: pointer;">
+                            {% csrf_token %}
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span class="link-text">Déconnexion</span>
+                        </form>
+                    </li>
                     {% endif %}
                 </ul>
             </div>
@@ -232,8 +245,8 @@
     </div>
 
     <script src="{% static 'Observations/js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static 'Observations/js/main.js' %}"></script>
-    <script src="{% static 'Observations/js/sidebar.js' %}"></script>
+    <script src="{% static 'Observations/js/main.js' %}?v=fixed20260121"></script>
+    <script src="{% static 'Observations/js/sidebar.js' %}?v=fixed20260121"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

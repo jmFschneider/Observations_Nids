@@ -10,6 +10,7 @@ from django.forms import inlineformset_factory
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 
 from accounts.models import Utilisateur
 from audit.models import HistoriqueModification
@@ -185,7 +186,12 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
         try:
             fiche_instance = FicheObservation.objects.get(pk=fiche_id)
             user = cast(Utilisateur, request.user)
-            read_only = user != fiche_instance.observateur
+            # Les administrateurs et reviewers peuvent toujours modifier (sauf si validée ou verrouillée)
+            # Les observateurs ne peuvent modifier que leurs propres fiches
+            read_only = user != fiche_instance.observateur and user.role not in [
+                'administrateur',
+                'reviewer',
+            ]
 
             # Vérifier les permissions pour les fiches en cours de saisie
             redirect_response = None
@@ -948,12 +954,30 @@ def valider_correction(request, fiche_id):
             # Calculer le pourcentage de complétion final
             pourcentage = etat_correction.calculer_pourcentage_completion()
 
-            # Forcer le statut à "valide" et sauvegarder
+            # Enregistrer dans l'historique avant la modification
+            ancien_statut = etat_correction.get_statut_display()
+
+            # Forcer le statut à "valide" et renseigner les champs de validation
             etat_correction.statut = 'valide'
             etat_correction.pourcentage_completion = pourcentage
+            etat_correction.validee_par = user
+            etat_correction.date_validation = timezone.now()
             etat_correction.save(skip_auto_calculation=True)
 
-            logger.info(f"Fiche {fiche_id} passée en statut 'valide', pourcentage: {pourcentage}%")
+            # Enregistrer la validation dans l'historique
+            HistoriqueModification.objects.create(
+                fiche=fiche,
+                champ_modifie='statut_validation',
+                ancienne_valeur=ancien_statut,
+                nouvelle_valeur=etat_correction.get_statut_display(),
+                modifie_par=user,
+                categorie='validation',
+            )
+
+            logger.info(
+                f"Fiche {fiche_id} passée en statut 'valide' par {user.username}, "
+                f"pourcentage: {pourcentage}%"
+            )
 
             messages.success(
                 request, f"Fiche #{fiche_id} validée avec succès. La correction est terminée."

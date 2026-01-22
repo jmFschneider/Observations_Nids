@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import importlib.util
 import logging
 import os
 from pathlib import Path
@@ -149,20 +150,14 @@ MIDDLEWARE = [
 ]
 
 # Ajouter WhiteNoise uniquement si le package est installé (production)
-try:
-    import whitenoise
+if importlib.util.find_spec('whitenoise') is not None:
     MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')  # Après SecurityMiddleware
-except ImportError:
-    pass  # WhiteNoise non installé en développement, Django servira les fichiers statiques
 
 # Ajouter CSP uniquement si le package est installé (production)
-try:
-    import csp
+if importlib.util.find_spec('csp') is not None:
     # Insérer après WhiteNoise si présent, sinon en position 1
     whitenoise_index = next((i for i, m in enumerate(MIDDLEWARE) if 'whitenoise' in m.lower()), 0)
     MIDDLEWARE.insert(whitenoise_index + 1, 'csp.middleware.CSPMiddleware')
-except ImportError:
-    pass  # CSP non installé en développement, on continue sans
 
 ROOT_URLCONF = 'observations_nids.urls'
 
@@ -258,8 +253,7 @@ STATICFILES_DIRS = [
 
 # WhiteNoise configuration for static files compression and caching
 # Uniquement si WhiteNoise est installé (production)
-try:
-    import whitenoise
+if importlib.util.find_spec('whitenoise') is not None:
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -268,7 +262,7 @@ try:
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
-except ImportError:
+else:
     # En développement sans WhiteNoise, utiliser le storage par défaut de Django
     STORAGES = {
         "default": {

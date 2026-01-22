@@ -22,11 +22,7 @@
                 {% for modif in modifications %}
                 <tr>
                     <td>{{ modif.date_modification|date:"d/m/Y H:i" }}</td>
-                    <td>
-                        {% for code, label in modif.CATEGORIES %}
-                            {% if code == modif.categorie %}{{ label }}{% endif %}
-                        {% endfor %}
-                    </td>
+                    <td>{{ modif.get_categorie_display }}</td>
                     <td>{{ modif.champ_modifie }}</td>
                     <td>{{ modif.ancienne_valeur }}</td>
                     <td>{{ modif.nouvelle_valeur }}</td>

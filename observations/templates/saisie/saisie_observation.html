@@ -1066,7 +1066,7 @@ function fermerModalRecherche() {
                         </button>
                     {% elif fiche_form.instance.etat_correction.statut == 'en_cours' %}
                         <button type="submit" class="btn btn-success" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" onclick="return confirm('Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.');">
-                            <i class="fas fa-check-circle"></i> Valider la correction
+                            <i class="fas fa-check-circle"></i> Valider la fiche
                         </button>
                     {% endif %}
                 {% endif %}
