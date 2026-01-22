@@ -147,14 +147,29 @@
         const navLinks = sidebar.querySelectorAll('.nav-link');
 
         navLinks.forEach(link => {
+            // Ignorer les éléments qui ne sont pas des liens <a>
+            if (link.tagName !== 'A') {
+                return;
+            }
+            
             // Retirer la classe active de tous les liens
             link.classList.remove('active');
 
             // Ajouter la classe active au lien correspondant
-            const linkPath = new URL(link.href).pathname;
-            if (currentPath === linkPath ||
-                (linkPath !== '/' && currentPath.startsWith(linkPath))) {
-                link.classList.add('active');
+            // Vérifier que le lien a un href valide
+            if (!link.href || link.href === '' || link.href === '#') {
+                return;
+            }
+
+            try {
+                const linkPath = new URL(link.href).pathname;
+                if (currentPath === linkPath ||
+                    (linkPath !== '/' && currentPath.startsWith(linkPath))) {
+                    link.classList.add('active');
+                }
+            } catch (e) {
+                // Ignorer silencieusement les liens avec des URLs invalides
+                console.warn('Invalid URL in sidebar link:', link.href);
             }
         });
 
@@ -220,3 +235,4 @@
     };
 
 })();
+
