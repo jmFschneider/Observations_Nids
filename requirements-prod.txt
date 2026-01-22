@@ -229,7 +229,7 @@ proto-plus==1.27.0
     # via
     #   -r requirements-base.in
     #   google-api-core
-protobuf==6.33.3
+protobuf==6.33.4
     # via
     #   -r requirements-base.in
     #   google-api-core
