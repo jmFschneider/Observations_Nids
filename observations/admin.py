@@ -6,6 +6,7 @@ from .models import (
     ConfigurationVerrouillage,
     EtatCorrection,
     FicheObservation,
+    HistoriqueVerrouillage,
     ImageSource,
     Nid,
     Observation,
@@ -151,6 +152,38 @@ class EtatCorrectionAdmin(admin.ModelAdmin):
             self.message_user(
                 request, "Aucune fiche n'était verrouillée parmi la sélection.", level='WARNING'
             )
+
+
+@admin.register(HistoriqueVerrouillage)
+class HistoriqueVerrouillageAdmin(admin.ModelAdmin):
+    list_display = (
+        "fiche",
+        "correcteur",
+        "date_debut",
+        "date_fin",
+        "motif_liberation",
+        "duree_affichage",
+    )
+    list_filter = ("motif_liberation", "date_debut", "date_fin")
+    search_fields = (
+        "fiche__num_fiche",
+        "correcteur__first_name",
+        "correcteur__last_name",
+    )
+    readonly_fields = ("date_debut", "date_fin", "duree_affichage")
+    ordering = ("-date_debut",)
+
+    def duree_affichage(self, obj):
+        """Affiche la durée de correction de manière lisible"""
+        if not obj.date_fin:
+            return "En cours"
+        duree = obj.date_fin - obj.date_debut
+        jours = duree.days
+        heures = duree.seconds // 3600
+        minutes = (duree.seconds % 3600) // 60
+        return f"{jours}j {heures}h {minutes}min"
+
+    duree_affichage.short_description = "Durée"
 
 
 admin.site.register(Nid)
