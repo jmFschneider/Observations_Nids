@@ -176,16 +176,19 @@ document.addEventListener('DOMContentLoaded', function() {
     cellsEtatCorrection.forEach(function(cell) {
         const statut = cell.dataset.statut;
         const enCorrectionPar = cell.dataset.enCorrectionPar;
+        const aEteVerrouille = cell.dataset.aEteVerrouille === 'true';
 
         if (statut === 'valide') {
-            cell.style.backgroundColor = 'rgba(40, 167, 69, 0.2)'; // vert
+            cell.style.backgroundColor = 'rgba(40, 167, 69, 0.2)'; // vert - validée
         } else if (statut === 'en_edition' || statut === 'nouveau') {
-            cell.style.backgroundColor = 'rgba(13, 110, 253, 0.16)'; // bleu clair
+            cell.style.backgroundColor = 'rgba(13, 110, 253, 0.16)'; // bleu clair - en édition
         } else if (statut === 'en_cours') {
             if (enCorrectionPar) {
-                cell.style.backgroundColor = 'rgba(255, 193, 7, 0.2)'; // jaune
+                cell.style.backgroundColor = 'rgba(255, 193, 7, 0.25)'; // jaune - verrouillée
+            } else if (aEteVerrouille) {
+                cell.style.backgroundColor = 'rgba(255, 159, 67, 0.35)'; // orange - libérée
             } else {
-                cell.style.backgroundColor = 'rgba(255, 159, 67, 0.2)'; // orange
+                cell.style.backgroundColor = 'rgba(108, 117, 125, 0.15)'; // gris clair - disponible
             }
         }
     });
@@ -289,21 +292,38 @@ document.addEventListener('DOMContentLoaded', function() {
                             </td>
                             <td class="etat-correction-cell"
                                 data-statut="{% if fiche.etat_correction %}{{ fiche.etat_correction.statut }}{% else %}nouveau{% endif %}"
-                                data-en-correction-par="{% if fiche.etat_correction and fiche.etat_correction.en_correction_par %}{{ fiche.etat_correction.en_correction_par.id }}{% endif %}">
+                                data-en-correction-par="{% if fiche.etat_correction and fiche.etat_correction.en_correction_par %}{{ fiche.etat_correction.en_correction_par.id }}{% endif %}"
+                                data-a-ete-verrouille="{% if fiche.etat_correction and fiche.etat_correction.a_ete_verrouille %}true{% else %}false{% endif %}">
                                 {% if fiche.etat_correction %}
-                                    <div class="d-flex align-items-center">
+                                    <div class="d-flex flex-column align-items-start">
                                         <span class="badge {{ fiche.etat_correction.statut_badge_class }}">
                                             {{ fiche.etat_correction.statut_libelle }}
                                         </span>
                                         {% if fiche.etat_correction.statut == 'en_cours' %}
                                             {% if fiche.etat_correction.est_verrouillee %}
-                                                <small class="text-secondary ml-2" style="color: #6c757d !important;">
+                                                {# CAS 1: VERROUILLÉE #}
+                                                <small class="text-secondary mt-1" style="color: #6c757d !important;">
                                                     <i class="fas fa-lock"></i>
                                                     {{ fiche.etat_correction.en_correction_par.first_name }} {{ fiche.etat_correction.en_correction_par.last_name }}
                                                 </small>
+                                            {% elif fiche.etat_correction.a_ete_verrouille %}
+                                                {# CAS 2: LIBÉRÉE #}
+                                                <small class="text-warning mt-1">
+                                                    <i class="fas fa-unlock"></i>
+                                                    Précédemment: {{ fiche.etat_correction.dernier_correcteur.first_name }} {{ fiche.etat_correction.dernier_correcteur.last_name }}
+                                                </small>
+                                                <small class="text-muted" style="font-size: 0.75rem;">
+                                                    (libérée le {{ fiche.etat_correction.date_dernier_deverrouillage|date:"d/m/Y" }})
+                                                </small>
+                                            {% else %}
+                                                {# CAS 3: DISPONIBLE #}
+                                                <small class="text-muted mt-1">
+                                                    <i class="fas fa-clock"></i>
+                                                    En attente d'un correcteur
+                                                </small>
                                             {% endif %}
                                         {% elif fiche.etat_correction.statut == 'valide' %}
-                                            <small class="text-success ml-2">
+                                            <small class="text-success mt-1">
                                                 <i class="fas fa-check-circle"></i>
                                                 {% if fiche.etat_correction.validee_par %}
                                                     par {{ fiche.etat_correction.validee_par.first_name }} {{ fiche.etat_correction.validee_par.last_name }}
@@ -358,7 +378,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="progress pagination-progress" style="height: 20px;" onclick="navigateToPageFromSlider()">
                             <div class="progress-bar" role="progressbar" 
                                  id="pagination-progress-bar"
-                                 style="width: {% if fiches.paginator.num_pages > 1 %}{% widthratio fiches.number|add:-1 fiches.paginator.num_pages|add:-1 100 %}{% else %}0{% endif %}%; height: 100%;"
+                                 data-progress-percent="{% if fiches.paginator.num_pages > 1 %}{% widthratio fiches.number|add:-1 fiches.paginator.num_pages|add:-1 100 %}{% else %}0{% endif %}"
+                                 style="height: 100%;"
                                  aria-valuenow="{{ fiches.number }}" 
                                  aria-valuemin="1" 
                                  aria-valuemax="{{ fiches.paginator.num_pages }}">
@@ -370,8 +391,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                    min="1" 
                                    max="{{ fiches.paginator.num_pages }}" 
                                    value="{{ fiches.number }}"
+                                   data-total-pages="{{ fiches.paginator.num_pages }}"
                                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;"
-                                   oninput="updatePaginationProgress(this.value, {{ fiches.paginator.num_pages }})"
+                                   oninput="updatePaginationProgress(this.value, Number(this.dataset.totalPages))"
                                    onchange="navigateToPage(this.value)">
                         </div>
                         <div class="d-flex justify-content-between mt-1">
@@ -444,6 +466,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterForm = document.getElementById('filter-form');
     const inputs = filterForm.querySelectorAll('input, select');
     let debounceTimeout;
+    const progressBar = document.getElementById('pagination-progress-bar');
+    const progressPercent = progressBar ? progressBar.dataset.progressPercent : null;
 
     function submitForm() {
         // Before submitting, remove the 'page' parameter to always go back to the first page on a new filter
@@ -465,6 +489,10 @@ document.addEventListener('DOMContentLoaded', function() {
             input.addEventListener('change', submitForm);
         }
     });
+
+    if (progressBar && progressPercent !== null) {
+        progressBar.style.width = `${progressPercent}%`;
+    }
 });
 
 // Fonctions pour la pagination avec curseur (Solution 4)

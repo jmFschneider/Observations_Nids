@@ -353,11 +353,40 @@ class EtatCorrection(models.Model):
         super().save(*args, **kwargs)
 
     @property
+    def a_ete_verrouille(self):
+        """
+        Indique si la fiche a déjà été verrouillée par le passé.
+        Retourne True si au moins un historique de verrouillage existe.
+        """
+        if self.en_correction_par:
+            return False  # Actuellement verrouillée, pas "libérée"
+        return self.fiche.historique_verrouillages.exists()
+
+    @property
+    def dernier_correcteur(self):
+        """
+        Retourne le dernier correcteur qui a travaillé sur la fiche.
+        """
+        dernier = self.fiche.historique_verrouillages.first()
+        return dernier.correcteur if dernier else None
+
+    @property
+    def date_dernier_deverrouillage(self):
+        """
+        Retourne la date du dernier déverrouillage.
+        """
+        dernier = self.fiche.historique_verrouillages.first()
+        return dernier.date_fin if dernier else None
+
+    @property
     def statut_libelle(self):
         if self.statut == 'en_cours':
-            if self.en_correction_par_id:
+            if self.est_verrouillee():
                 return "En cours de correction"
-            return "En attente de correction"
+            elif self.a_ete_verrouille:
+                return "Libérée"
+            else:
+                return "Disponible"
         if self.statut == 'en_edition':
             return "En cours de saisie"
         return self.get_statut_display()
@@ -365,7 +394,12 @@ class EtatCorrection(models.Model):
     @property
     def statut_badge_class(self):
         if self.statut == 'en_cours':
-            return 'badge-info' if self.en_correction_par_id else 'badge-warning'
+            if self.en_correction_par_id:
+                return 'badge-warning'  # Jaune - verrouillée
+            elif self.a_ete_verrouille:
+                return 'badge-danger'  # Rouge/orange - libérée
+            else:
+                return 'badge-secondary'  # Gris - disponible
         if self.statut in ['nouveau', 'en_edition']:
             return 'badge-info'
         if self.statut == 'valide':
@@ -435,6 +469,10 @@ class EtatCorrection(models.Model):
 
     def valider(self, utilisateur):
         """Marque la fiche comme validée par un utilisateur"""
+        # Libérer le verrou si nécessaire avant de valider
+        if self.en_correction_par:
+            self.liberer_verrou(motif='validation')
+
         self.statut = 'valide'
         self.validee_par = utilisateur
         self.date_validation = timezone.now()
@@ -458,20 +496,35 @@ class EtatCorrection(models.Model):
 
                 if temps_ecoule > duree_max:
                     # Déblocage automatique
-                    self.liberer_verrou()
+                    self.liberer_verrou(motif='timeout')
                     return False
         except ConfigurationVerrouillage.DoesNotExist:
             # Configuration par défaut : 5 jours
             duree_max = timedelta(days=5)
             temps_ecoule = timezone.now() - self.date_debut_correction
             if temps_ecoule > duree_max:
-                self.liberer_verrou()
+                self.liberer_verrou(motif='timeout')
                 return False
 
         return True
 
-    def liberer_verrou(self):
-        """Libère le verrou de correction de la fiche"""
+    def liberer_verrou(self, motif='manuel'):
+        """
+        Libère le verrou de correction de la fiche et enregistre dans l'historique.
+
+        Args:
+            motif: Motif de libération ('timeout', 'validation', 'manuel', 'changement_correcteur')
+        """
+        if self.en_correction_par and self.date_debut_correction:
+            # Enregistrer dans l'historique avant de libérer
+            HistoriqueVerrouillage.objects.create(
+                fiche=self.fiche,
+                correcteur=self.en_correction_par,
+                date_debut=self.date_debut_correction,
+                date_fin=timezone.now(),
+                motif_liberation=motif,
+            )
+
         self.en_correction_par = None
         self.date_debut_correction = None
         self.save(update_fields=['en_correction_par', 'date_debut_correction'])
@@ -528,6 +581,72 @@ class ConfigurationVerrouillage(models.Model):
         """Retourne l'instance unique de configuration (pattern Singleton)"""
         instance, created = cls.objects.get_or_create(pk=1)
         return instance
+
+
+class HistoriqueVerrouillage(models.Model):
+    """
+    Historique complet des verrouillages/déverrouillages d'une fiche.
+    Permet de tracer qui a travaillé sur une fiche et quand.
+    """
+
+    MOTIF_CHOICES = [
+        ('timeout', 'Timeout expiré'),
+        ('validation', 'Fiche validée'),
+        ('manuel', 'Déverrouillage manuel'),
+        ('changement_correcteur', 'Changement de correcteur'),
+    ]
+
+    fiche = models.ForeignKey(
+        FicheObservation,
+        on_delete=models.CASCADE,
+        related_name='historique_verrouillages',
+        verbose_name="Fiche",
+    )
+    correcteur = models.ForeignKey(
+        Utilisateur,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='historique_corrections',
+        verbose_name="Correcteur",
+    )
+    date_debut = models.DateTimeField(
+        verbose_name="Date début correction",
+        help_text="Date à laquelle le correcteur a verrouillé la fiche",
+    )
+    date_fin = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Date fin correction",
+        help_text="Date de libération du verrou (null = encore verrouillé)",
+    )
+    motif_liberation = models.CharField(
+        max_length=30,
+        choices=MOTIF_CHOICES,
+        null=True,
+        blank=True,
+        verbose_name="Motif de libération",
+    )
+
+    class Meta:
+        ordering = ['-date_debut']
+        verbose_name = "Historique de verrouillage"
+        verbose_name_plural = "Historiques de verrouillage"
+        indexes = [
+            models.Index(fields=['fiche', '-date_debut']),
+        ]
+
+    def __str__(self):
+        if self.date_fin:
+            duree = self.date_fin - self.date_debut
+            return f"Fiche #{self.fiche.num_fiche} - {self.correcteur} ({duree.days}j {duree.seconds//3600}h)"
+        return f"Fiche #{self.fiche.num_fiche} - {self.correcteur} (en cours)"
+
+    @property
+    def duree_correction(self):
+        """Calcule la durée de correction en secondes"""
+        if not self.date_fin:
+            return None
+        return (self.date_fin - self.date_debut).total_seconds()
 
 
 class ImageSource(models.Model):
