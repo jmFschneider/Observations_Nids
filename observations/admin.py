@@ -184,7 +184,6 @@ class HistoriqueVerrouillageAdmin(admin.ModelAdmin):
         minutes = (duree.seconds % 3600) // 60
         return f"{jours}j {heures}h {minutes}min"
 
-
 admin.site.register(Nid)
 admin.site.register(ResumeObservation)
 admin.site.register(CausesEchec)
