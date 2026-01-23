@@ -622,8 +622,8 @@ class HistoriqueVerrouillage(models.Model):
     motif_liberation = models.CharField(
         max_length=30,
         choices=MOTIF_CHOICES,
-        null=True,
         blank=True,
+        default="",
         verbose_name="Motif de libération",
     )
 
@@ -638,7 +638,7 @@ class HistoriqueVerrouillage(models.Model):
     def __str__(self):
         if self.date_fin:
             duree = self.date_fin - self.date_debut
-            return f"Fiche #{self.fiche.num_fiche} - {self.correcteur} ({duree.days}j {duree.seconds//3600}h)"
+            return f"Fiche #{self.fiche.num_fiche} - {self.correcteur} ({duree.days}j {duree.seconds // 3600}h)"
         return f"Fiche #{self.fiche.num_fiche} - {self.correcteur} (en cours)"
 
     @property

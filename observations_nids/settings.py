@@ -151,6 +151,7 @@ MIDDLEWARE = [
 # Ajouter WhiteNoise uniquement si le package est installé (production)
 try:
     import whitenoise
+
     MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')  # Après SecurityMiddleware
 except ImportError:
     pass  # WhiteNoise non installé en développement, Django servira les fichiers statiques
@@ -158,6 +159,7 @@ except ImportError:
 # Ajouter CSP uniquement si le package est installé (production)
 try:
     import csp
+
     # Insérer après WhiteNoise si présent, sinon en position 1
     whitenoise_index = next((i for i, m in enumerate(MIDDLEWARE) if 'whitenoise' in m.lower()), 0)
     MIDDLEWARE.insert(whitenoise_index + 1, 'csp.middleware.CSPMiddleware')
@@ -260,6 +262,7 @@ STATICFILES_DIRS = [
 # Uniquement si WhiteNoise est installé (production)
 try:
     import whitenoise
+
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
