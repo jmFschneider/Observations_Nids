@@ -188,10 +188,10 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
             user = cast(Utilisateur, request.user)
             # Les administrateurs et reviewers peuvent toujours modifier (sauf si validée ou verrouillée)
             # Les observateurs ne peuvent modifier que leurs propres fiches
-            read_only = (
-                user != fiche_instance.observateur
-                and user.role not in ['administrateur', 'reviewer']
-            )
+            read_only = user != fiche_instance.observateur and user.role not in [
+                'administrateur',
+                'reviewer',
+            ]
 
             # Vérifier les permissions pour les fiches en cours de saisie
             redirect_response = None
