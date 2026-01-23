@@ -173,6 +173,7 @@ class HistoriqueVerrouillageAdmin(admin.ModelAdmin):
     readonly_fields = ("date_debut", "date_fin", "duree_affichage")
     ordering = ("-date_debut",)
 
+    @admin.display(description="Durée")
     def duree_affichage(self, obj):
         """Affiche la durée de correction de manière lisible"""
         if not obj.date_fin:
@@ -182,8 +183,6 @@ class HistoriqueVerrouillageAdmin(admin.ModelAdmin):
         heures = duree.seconds // 3600
         minutes = (duree.seconds % 3600) // 60
         return f"{jours}j {heures}h {minutes}min"
-
-    duree_affichage.short_description = "Durée"
 
 
 admin.site.register(Nid)
