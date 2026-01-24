@@ -183,7 +183,7 @@ class ObservationForm(forms.ModelForm):
         input_time_formats=['%H:%M', '%H:%M:%S'],
         required=True,
     )
-    
+
     # Surcharger les champs nombre_oeufs et nombre_poussins pour accepter "5?"
     nombre_oeufs = forms.CharField(
         required=False,
@@ -195,9 +195,9 @@ class ObservationForm(forms.ModelForm):
                 'inputmode': 'numeric',
                 'autocomplete': 'off',
             }
-        )
+        ),
     )
-    
+
     nombre_poussins = forms.CharField(
         required=False,
         widget=forms.TextInput(
@@ -208,7 +208,7 @@ class ObservationForm(forms.ModelForm):
                 'inputmode': 'numeric',
                 'autocomplete': 'off',
             }
-        )
+        ),
     )
 
     class Meta:
@@ -246,60 +246,67 @@ class ObservationForm(forms.ModelForm):
             local_dt = timezone.localtime(self.instance.date_observation)
             # SplitDateTimeField expects a datetime object, Django will handle the split
             self.initial['date_observation'] = local_dt
-        
+
         # Restaurer le "?" pour les champs avec incertitude
         if self.instance.pk:
             if self.instance.nombre_oeufs is not None and self.instance.nombre_oeufs_incertain:
                 self.initial['nombre_oeufs'] = f"{self.instance.nombre_oeufs}?"
-            
-            if self.instance.nombre_poussins is not None and self.instance.nombre_poussins_incertain:
+
+            if (
+                self.instance.nombre_poussins is not None
+                and self.instance.nombre_poussins_incertain
+            ):
                 self.initial['nombre_poussins'] = f"{self.instance.nombre_poussins}?"
 
     def clean_nombre_oeufs(self):
         """Valide et nettoie le champ nombre_oeufs (accepte '5' ou '5?')"""
         value = self.cleaned_data.get('nombre_oeufs', '').strip()
-        
+
         if not value:
             return None
-        
+
         # Vérifier le pattern valide
         if not value.replace('?', '').isdigit():
             raise forms.ValidationError(
                 "Saisie invalide. Utilisez uniquement des chiffres, éventuellement suivis de '?' (ex: 5 ou 5?)"
             )
-        
+
         # Extraire le nombre
         nombre_str = value.rstrip('?')
         if not nombre_str:
             raise forms.ValidationError("Veuillez saisir un nombre (ex: 5 ou 5?)")
-        
+
         try:
             return int(nombre_str)
-        except ValueError:
-            raise forms.ValidationError("Valeur invalide. Utilisez un nombre entier (ex: 5 ou 5?)")
+        except ValueError as err:
+            raise forms.ValidationError(
+                "Valeur invalide. Utilisez un nombre entier (ex: 5 ou 5?)"
+            ) from err
 
     def clean_nombre_poussins(self):
         """Valide et nettoie le champ nombre_poussins (accepte '3' ou '3?')"""
         value = self.cleaned_data.get('nombre_poussins', '').strip()
-        
+
         if not value:
             return None
-        
+
         # Vérifier le pattern valide
         if not value.replace('?', '').isdigit():
             raise forms.ValidationError(
                 "Saisie invalide. Utilisez uniquement des chiffres, éventuellement suivis de '?' (ex: 3 ou 3?)"
             )
-        
+
         # Extraire le nombre
         nombre_str = value.rstrip('?')
         if not nombre_str:
             raise forms.ValidationError("Veuillez saisir un nombre (ex: 3 ou 3?)")
-        
+
         try:
             return int(nombre_str)
-        except ValueError:
-            raise forms.ValidationError("Valeur invalide. Utilisez un nombre entier (ex: 3 ou 3?)")
+        except ValueError as err:
+            raise forms.ValidationError(
+                "Valeur invalide. Utilisez un nombre entier (ex: 3 ou 3?)"
+            ) from err
 
     def clean(self):
         """
@@ -319,7 +326,7 @@ class ObservationForm(forms.ModelForm):
             cleaned_data['date_observation'] = date_observation.replace(
                 hour=0, minute=0, second=0, microsecond=0
             )
-        
+
         # Gérer les flags d'incertitude à partir des valeurs brutes
         # (car le JS met à jour le champ caché ET ajoute le "?")
         nombre_oeufs_raw = self.data.get('nombre_oeufs', '').strip()
@@ -327,7 +334,7 @@ class ObservationForm(forms.ModelForm):
             cleaned_data['nombre_oeufs_incertain'] = True
         elif 'nombre_oeufs_incertain' not in cleaned_data:
             cleaned_data['nombre_oeufs_incertain'] = False
-        
+
         nombre_poussins_raw = self.data.get('nombre_poussins', '').strip()
         if nombre_poussins_raw and nombre_poussins_raw.endswith('?'):
             cleaned_data['nombre_poussins_incertain'] = True
@@ -341,15 +348,17 @@ class ObservationForm(forms.ModelForm):
         Surcharge pour s'assurer que les flags d'incertitude sont bien sauvegardés
         """
         instance = super().save(commit=False)
-        
+
         # Forcer l'assignation des flags d'incertitude depuis cleaned_data
         if hasattr(self, 'cleaned_data'):
             instance.nombre_oeufs_incertain = self.cleaned_data.get('nombre_oeufs_incertain', False)
-            instance.nombre_poussins_incertain = self.cleaned_data.get('nombre_poussins_incertain', False)
-        
+            instance.nombre_poussins_incertain = self.cleaned_data.get(
+                'nombre_poussins_incertain', False
+            )
+
         if commit:
             instance.save()
-        
+
         return instance
 
 
