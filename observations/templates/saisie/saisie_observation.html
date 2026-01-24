@@ -69,6 +69,27 @@
     }
 }
 
+/* Style pour les champs avec incertitude */
+.nombre-input-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.incertitude-icon {
+    font-size: 1.1em;
+    cursor: help;
+    transition: transform 0.2s;
+}
+
+.incertitude-icon:hover {
+    transform: scale(1.2);
+}
+
+input.nombre-avec-incertitude {
+    width: 100px;
+}
+
 /* Styles pour les observations marquées pour suppression */
 .observation-row.marked-for-deletion {
     background-color: #f8f9fa;
@@ -124,7 +145,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'Observations/js/saisie_observation.js' %}?v=6.1"></script>
+<script src="{% static 'Observations/js/saisie_observation.js' %}?v=6.3"></script>
 <!-- Store fiche_id and chemin_json for JS access -->
 {% if fiche_form.instance.pk %}
 <div data-fiche-id="{{ fiche_form.instance.pk }}" data-chemin-json="{{ fiche_form.instance.chemin_json|default:'' }}" style="display: none;"></div>
@@ -666,11 +687,25 @@ function fermerModalRecherche() {
                                 </td>
                                 <td>
                                     {% if form.nombre_oeufs.errors %}<div class="error">{{ form.nombre_oeufs.errors }}</div>{% endif %}
-                                    {{ form.nombre_oeufs }}
+                                    <div class="nombre-input-container">
+                                        {{ form.nombre_oeufs }}
+                                        {{ form.nombre_oeufs_incertain }}
+                                        <i class="fas fa-question-circle incertitude-icon" 
+                                           style="display: none; color: #ffc107; margin-left: 5px;" 
+                                           title="Estimation incertaine"
+                                           data-field="nombre_oeufs"></i>
+                                    </div>
                                 </td>
                                 <td>
                                     {% if form.nombre_poussins.errors %}<div class="error">{{ form.nombre_poussins.errors }}</div>{% endif %}
-                                    {{ form.nombre_poussins }}
+                                    <div class="nombre-input-container">
+                                        {{ form.nombre_poussins }}
+                                        {{ form.nombre_poussins_incertain }}
+                                        <i class="fas fa-question-circle incertitude-icon" 
+                                           style="display: none; color: #ffc107; margin-left: 5px;" 
+                                           title="Estimation incertaine"
+                                           data-field="nombre_poussins"></i>
+                                    </div>
                                 </td>
                                 <td>
                                     {% if form.observations.errors %}<div class="error">{{ form.observations.errors }}</div>{% endif %}

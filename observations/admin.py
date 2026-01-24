@@ -29,8 +29,19 @@ class FicheObservationAdmin(admin.ModelAdmin):
 
 @admin.register(Observation)
 class ObservationAdmin(admin.ModelAdmin):
-    list_display = ("fiche", "date_observation", "nombre_oeufs", "nombre_poussins")
-    list_filter = ("date_observation",)
+    list_display = (
+        "fiche", 
+        "date_observation", 
+        "nombre_oeufs", 
+        "nombre_oeufs_incertain",
+        "nombre_poussins",
+        "nombre_poussins_incertain"
+    )
+    list_filter = (
+        "date_observation",
+        "nombre_oeufs_incertain",
+        "nombre_poussins_incertain"
+    )
     search_fields = ("fiche__num_fiche",)
 
 

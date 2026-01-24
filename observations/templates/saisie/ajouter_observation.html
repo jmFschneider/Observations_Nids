@@ -32,8 +32,8 @@
                                 {{ observation.date_observation|date:"d/m/Y" }}
                             {% endif %}
                         </td>
-                        <td>{{ observation.nombre_oeufs }}</td>
-                        <td>{{ observation.nombre_poussins }}</td>
+                        <td>{{ observation.nombre_oeufs }}{% if observation.nombre_oeufs_incertain %}<i class="fas fa-question-circle text-warning" title="Estimation incertaine" style="margin-left: 3px;"></i>{% endif %}</td>
+                        <td>{{ observation.nombre_poussins }}{% if observation.nombre_poussins_incertain %}<i class="fas fa-question-circle text-warning" title="Estimation incertaine" style="margin-left: 3px;"></i>{% endif %}</td>
                         <td>{{ observation.observations }}</td>
                     </tr>
                     {% endfor %}
@@ -71,7 +71,14 @@
 
             <div class="form-group">
                 <label for="{{ form.nombre_oeufs.id_for_label }}">{{ form.nombre_oeufs.label }}</label>
-                {{ form.nombre_oeufs }}
+                <div class="nombre-input-container">
+                    {{ form.nombre_oeufs }}
+                    {{ form.nombre_oeufs_incertain }}
+                    <i class="fas fa-question-circle incertitude-icon" 
+                       style="display: none; color: #ffc107; margin-left: 5px;" 
+                       title="Estimation incertaine"
+                       data-field="nombre_oeufs"></i>
+                </div>
                 {% if form.nombre_oeufs.errors %}
                     <div class="error">{{ form.nombre_oeufs.errors }}</div>
                 {% endif %}
@@ -79,7 +86,14 @@
 
             <div class="form-group">
                 <label for="{{ form.nombre_poussins.id_for_label }}">{{ form.nombre_poussins.label }}</label>
-                {{ form.nombre_poussins }}
+                <div class="nombre-input-container">
+                    {{ form.nombre_poussins }}
+                    {{ form.nombre_poussins_incertain }}
+                    <i class="fas fa-question-circle incertitude-icon" 
+                       style="display: none; color: #ffc107; margin-left: 5px;" 
+                       title="Estimation incertaine"
+                       data-field="nombre_poussins"></i>
+                </div>
                 {% if form.nombre_poussins.errors %}
                     <div class="error">{{ form.nombre_poussins.errors }}</div>
                 {% endif %}
@@ -183,7 +197,34 @@
 .observations-table th {
     background-color: #f2f2f2;
 }
+
+/* Style pour les champs avec incertitude */
+.nombre-input-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.incertitude-icon {
+    font-size: 1.1em;
+    cursor: help;
+    transition: transform 0.2s;
+}
+
+.incertitude-icon:hover {
+    transform: scale(1.2);
+}
+
+input.nombre-avec-incertitude {
+    width: auto !important;
+    max-width: 150px;
+}
 </style>
+
+<!-- Charger FontAwesome pour l'icône -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<script src="{% static 'Observations/js/saisie_observation.js' %}?v=6.3"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

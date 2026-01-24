@@ -61,6 +61,15 @@ observations_nids/
 - **Vues clés** : `views_home.py`, `views_observation.py`, `saisie_observation_view.py`
 - **Templates** : `home.html`, `fiche_observation.html`, `saisie/saisie_observation.html`
 - **JS important** : `saisie_observation.js` (formulaire dynamique)
+- **Fonctionnalité spéciale** : Notation d'incertitude "5?" pour les comptages
+
+#### Gestion de l'Incertitude
+Les observateurs peuvent marquer un comptage comme incertain en ajoutant "?" (ex: `5?`)
+- **Champs** : `nombre_oeufs_incertain`, `nombre_poussins_incertain` (BooleanField)
+- **Format** : Le nombre et le flag sont stockés séparément en BDD
+- **Saisie** : `ObservationForm` utilise un `CharField` qui parse "5?" → nombre=5, flag=True
+- **Affichage** : Icône jaune "?" affichée dynamiquement par JavaScript
+- **Migration** : `0016_add_incertitude_fields.py`
 
 ### accounts
 - **Modèle** : `Utilisateur` (extension de AbstractUser)

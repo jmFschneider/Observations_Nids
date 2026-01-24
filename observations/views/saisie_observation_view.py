@@ -719,6 +719,7 @@ def ajouter_observation(request, fiche_id):
     fiche = get_object_or_404(FicheObservation, pk=fiche_id)
     if request.method == 'POST':
         form = ObservationForm(request.POST)
+        
         if form.is_valid():
             observation = form.save(commit=False)
             observation.fiche = fiche

@@ -145,11 +145,21 @@ class Observation(models.Model):
         validators=[MinValueValidator(0)],
         help_text="Laisser vide si non observé",
     )
+    nombre_oeufs_incertain = models.BooleanField(
+        default=False,
+        verbose_name="Estimation incertaine (œufs)",
+        help_text="Cocher si le nombre d'œufs est une estimation approximative"
+    )
     nombre_poussins = models.IntegerField(
         blank=True,
         null=True,
         validators=[MinValueValidator(0)],
         help_text="Laisser vide si non observé",
+    )
+    nombre_poussins_incertain = models.BooleanField(
+        default=False,
+        verbose_name="Estimation incertaine (poussins)",
+        help_text="Cocher si le nombre de poussins est une estimation approximative"
     )
     observations = models.TextField(blank=True, default='')
 

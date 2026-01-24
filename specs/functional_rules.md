@@ -116,6 +116,35 @@ Des contraintes strictes (Check Constraints SQL) et validateurs Django garantiss
 *   **Observations** : Le nombre d'œufs et de poussins doit être ≥ 0 (Validator `MinValueValidator`).
 *   **Localisation** : Une fiche sans commune/département ne marque pas de points de complétude.
 
+### Gestion de l'Incertitude (Notation "5?")
+
+**Fonctionnalité** : Les observateurs peuvent marquer les comptages comme "incertains" en ajoutant un point d'interrogation, répliquant ainsi la notation papier traditionnelle.
+
+**Champs concernés** :
+*   `nombre_oeufs` / `nombre_oeufs_incertain` (dans `Observation`)
+*   `nombre_poussins` / `nombre_poussins_incertain` (dans `Observation`)
+
+**Architecture** :
+*   **Stockage** : Le nombre et le flag d'incertitude sont stockés séparément en base de données.
+    *   `nombre_oeufs` : `IntegerField` (ex: `5`)
+    *   `nombre_oeufs_incertain` : `BooleanField` (`True` si "5?", sinon `False`)
+*   **Saisie** : L'utilisateur tape `5?` dans un champ texte. Le formulaire Django parse automatiquement :
+    *   Extraction du nombre : `5`
+    *   Détection du `?` : `nombre_oeufs_incertain = True`
+*   **Affichage** :
+    *   **En édition** : Le champ affiche `5?` avec une icône "?" jaune.
+    *   **En lecture seule** : Affiche `5` suivi de l'icône "?" jaune si le flag est `True`.
+
+**Règles de Validation** :
+*   Format accepté : `\d+\??` (chiffres suivis optionnellement d'un "?")
+*   Exemples valides : `5`, `5?`, `12`, `12?`
+*   Exemples invalides : `?`, `5??`, `5a`, `a5`
+
+**Intérêt métier** :
+*   Traçabilité : Permet de distinguer les comptages certains des estimations.
+*   Requêtes SQL simples : `SELECT * FROM observation WHERE nombre_oeufs_incertain = TRUE`
+*   Cohérence papier/numérique : Fidélité au workflow terrain des ornithologues.
+
 ---
 
 ## 5. Processus OCR & Importation

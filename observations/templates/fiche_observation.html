@@ -229,8 +229,30 @@
 							<span class="observation-time {% if not observation.heure_connue %}time-unknown{% endif %}">{{ observation.date_observation|date:"H:i" }}</span>
 						</span>
 					</td>
-					<td>{{ observation.nombre_oeufs }}</td>
-					<td>{{ observation.nombre_poussins }}</td>
+					<td>
+						{% if observation.nombre_oeufs is not None %}
+							{{ observation.nombre_oeufs }}
+							{% if observation.nombre_oeufs_incertain %}
+								<i class="fas fa-question-circle text-warning" 
+								   title="Estimation incertaine" 
+								   style="margin-left: 3px;"></i>
+							{% endif %}
+						{% else %}
+							-
+						{% endif %}
+					</td>
+					<td>
+						{% if observation.nombre_poussins is not None %}
+							{{ observation.nombre_poussins }}
+							{% if observation.nombre_poussins_incertain %}
+								<i class="fas fa-question-circle text-warning" 
+								   title="Estimation incertaine" 
+								   style="margin-left: 3px;"></i>
+							{% endif %}
+						{% else %}
+							-
+						{% endif %}
+					</td>
 					<td>{{ observation.observations }}</td>
 				</tr>
 				{% empty %}
