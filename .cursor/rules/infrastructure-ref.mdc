@@ -1,0 +1,192 @@
+---
+globs:
+  - "docker/*"
+  - "docker/**/*"
+  - "Dockerfile"
+  - "docker-compose.yml"
+  - "docker-compose.*.yml"
+  - "deployment/**/*"
+  - "*.sh"
+---
+
+# Référence Infrastructure et Déploiement
+
+## ⚠️ RÈGLE IMPÉRATIVE
+
+**Avant de répondre à toute question sur l'infrastructure, le déploiement, Docker, ou la configuration système, tu DOIS obligatoirement lire le fichier suivant :**
+
+📄 **@specs/infrastructure.md**
+
+Ce fichier contient :
+- Architecture complète du projet (Dev, Production, Docker)
+- Configuration MySQL/MariaDB
+- Configuration Redis et Celery
+- Configuration Nginx et Apache
+- Procédures de déploiement
+- Scripts de maintenance
+- Troubleshooting
+
+## Quand Consulter ce Fichier
+
+**Tu DOIS lire `specs/infrastructure.md` avant de répondre si la question concerne :**
+
+### Infrastructure
+- Configuration Docker (`Dockerfile`, `docker-compose.yml`)
+- Variables d'environnement (`.env`, `.env.example`)
+- Réseau et ports (exposition, proxy)
+- Volumes et persistence des données
+
+### Base de Données
+- Configuration MySQL/MariaDB
+- Migrations et dumps
+- Permissions et utilisateurs
+- Backup et restauration
+
+### Services
+- Configuration Nginx/Apache
+- Configuration Celery Worker/Beat
+- Configuration Redis
+- Fichiers statiques (WhiteNoise)
+
+### Déploiement
+- Procédures de déploiement
+- Scripts shell (`deploy_*.sh`, `Start-*.ps1`)
+- Mise à jour de production
+- Rollback
+
+### Monitoring et Logs
+- Emplacement des logs
+- Configuration du logging
+- Monitoring des services
+- Debug en production
+
+## Exemple d'Usage
+
+### ❌ MAUVAIS - Répondre sans contexte
+
+**Question utilisateur :** "Comment configurer les ports Docker ?"
+
+**Mauvaise réponse :** "Modifie le `docker-compose.yml` et ajoute `ports: - "8000:8000"`"
+
+### ✅ BON - Consulter la doc avant de répondre
+
+**Question utilisateur :** "Comment configurer les ports Docker ?"
+
+**Bonne démarche :**
+1. Lire `@specs/infrastructure.md`
+2. Vérifier la section "Architecture Docker"
+3. Consulter les exemples de configuration
+4. Répondre avec le contexte du projet
+
+**Bonne réponse :** "D'après `specs/infrastructure.md`, le projet utilise déjà un mapping de ports spécifique :
+- Port 8000 pour Django (dev)
+- Port 80/443 pour Nginx (production)
+- Port 3306 pour MySQL
+- Port 6379 pour Redis
+
+Si tu veux modifier les ports, édite le fichier `docker-compose.yml` concerné (dev ou prod) et vérifie également les variables d'environnement dans `.env`."
+
+## Fichiers Clés à Vérifier
+
+Selon la question, consulter aussi ces fichiers (en plus de `specs/infrastructure.md`) :
+
+```
+# Docker
+docker/
+├── Dockerfile
+├── docker-compose.yml
+├── docker-compose.dev.yml
+├── docker-compose.prod.yml
+└── nginx/
+    ├── nginx.conf
+    └── default.conf
+
+# Déploiement
+deployment/
+├── deploy_celery.sh
+├── setup_celery_permissions.sh
+├── celery-worker.service
+└── celery-beat.service
+
+# Scripts
+scripts/
+├── deploy_pi.sh
+├── backup_db.sh
+└── restore_db.sh
+
+# Configuration
+.env.example
+observations_nids/settings.py
+observations_nids/config.py
+```
+
+## Principes de Base (Rappels Rapides)
+
+Ces principes sont détaillés dans `specs/infrastructure.md`, voici juste un rappel :
+
+### Environnements
+
+Le projet supporte **3 environnements** :
+1. **Development** : Local, SQLite ou MySQL, `runserver`, Celery solo
+2. **Pilote** : Pré-production, MySQL, Docker, tests avant prod
+3. **Production** : Raspberry Pi ou serveur, MariaDB, Docker, Nginx
+
+### Variables d'Environnement Critiques
+
+```bash
+# Environnement
+ENVIRONMENT=production  # development, pilote, production
+
+# Database
+DB_NAME=NidsObservation
+DB_USER=jms
+DB_PASSWORD=***
+DB_HOST=db
+DB_PORT=3306
+
+# Redis/Celery
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+CELERY_BROKER_URL=redis://redis:6379/0
+
+# Django
+SECRET_KEY=***
+DEBUG=False
+ALLOWED_HOSTS=["nids.example.com"]
+```
+
+### Ports Standards
+
+| Service       | Port Dev | Port Prod |
+|---------------|----------|-----------|
+| Django        | 8000     | 8000 (interne) |
+| Nginx         | -        | 80, 443   |
+| MySQL/MariaDB | 3306     | 3306      |
+| Redis         | 6379     | 6379      |
+
+### Commandes de Déploiement
+
+```bash
+# Développement (Windows)
+.\Start-DevStack.ps1
+
+# Production (Linux/Raspberry Pi)
+./deploy_pi.sh
+
+# Arrêt
+docker-compose down
+
+# Logs
+docker-compose logs -f web
+docker-compose logs -f celery_worker
+```
+
+## Consigne Finale
+
+**JE RÉPÈTE : Ne JAMAIS répondre à une question sur l'infrastructure sans avoir lu `@specs/infrastructure.md` au préalable.**
+
+Si le fichier n'existe pas ou est incomplet, le signaler à l'utilisateur et demander plus de contexte avant de proposer une solution.
+
+---
+
+**Note :** Ce fichier est une **référence**, pas une documentation exhaustive. La vraie documentation est dans `specs/infrastructure.md`.

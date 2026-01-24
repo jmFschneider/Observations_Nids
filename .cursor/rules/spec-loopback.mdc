@@ -1,0 +1,35 @@
+---
+globs:
+  - "**/*"
+---
+
+# 🔄 Workflow Loopback (Maintenance des Specs)
+
+## 🎯 OBJECTIF
+Garantir que la "Source de Vérité" (`specs/`) reste synchronisée avec le code réel à 100%.
+
+## 🛡️ RÈGLES CRITIQUES
+
+1.  **CONSULTATION PRÉALABLE** : Avant TOUTE modification structurelle (changement de modèle, nouvelle vue, ajout de service Docker), tu DOIS lire :
+    - `specs/infrastructure.md`
+    - `specs/functional_rules.md`
+
+2.  **DÉTECTION DE DÉRIVE** : Si tu constates que le code actuel contredit les spécifications (ex: une règle métier n'est plus appliquée comme décrit), tu DOIS le signaler immédiatement à l'utilisateur AVANT de modifier le code.
+
+3.  **MISE À JOUR AUTOMATIQUE** : Après avoir terminé une tâche qui modifie l'architecture ou les règles métier, tu DOIS systématiquement proposer de mettre à jour le fichier de spécification correspondant.
+
+## 📝 PROCESSUS DE MODIFICATION
+
+Lorsque tu modifies un modèle ou une infrastructure :
+1.  Effectue la modification du code.
+2.  Analyse l'impact sur les specs.
+3.  **PROPOSE** un `replace` ou un `write_file` pour le fichier `.md` concerné dans `specs/`.
+
+## ⚠️ ALERTE "LEGACY QUIRKS"
+Sois particulièrement vigilant sur les noms d'applications. 
+- **Code** : `observations`, `ingest`, `accounts`
+- **BDD** : `Observations`, `Importation`, `Administration`
+Si tu crées une nouvelle migration, assure-toi qu'elle ne casse pas ce mapping legacy documenté dans `specs/infrastructure.md`.
+
+---
+*Cette règle assure que le projet ne redevient jamais une "boîte noire".*

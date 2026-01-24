@@ -1,0 +1,445 @@
+---
+globs:
+  - "**/*.py"
+---
+# Python & Django Standards
+
+## ⚡ PERFORMANCE & ASYNC (RÈGLE D'OR)
+- **INTERDICTION** : Aucun traitement long (OCR, Import, Sleep) dans le cycle Requête/Réponse HTTP.
+- **SOLUTION** : Tout traitement > 500ms DOIT être délégué à Celery.
+- Si l'utilisateur demande un `sleep` ou un traitement lourd dans une vue : **REFUSER** et implémenter la tâche asynchrone.
+
+## ⚠️ BASE DE DONNÉES - LEGACY & DÉVIATIONS
+- **NE JAMAIS** proposer de renommer les applications dans la base de données pour "corriger" la casse.
+- **RÉALITÉ** : Les applications `observations`, `ingest` et `accounts` sont enregistrées respectivement comme `Observations`, `Importation` et `Administration` dans `django_migrations`.
+- **RÈGLE** : Accepter cette dette technique. Toute modification de ce mapping requiert une intervention manuelle complexe hors scope courant.
+
+# Règles Django Core
+
+## Type Hints Obligatoires
+
+Tous les fichiers Python doivent utiliser des type hints :
+
+```python
+from typing import Any
+from django.db.models import QuerySet
+
+def get_user_fiches(user: Utilisateur) -> QuerySet[FicheObservation]:
+    """Retourne les fiches d'un utilisateur."""
+    return FicheObservation.objects.filter(observateur=user)
+
+def process_data(data: dict[str, Any]) -> bool:
+    """Traite les données et retourne le statut."""
+    return True
+```
+
+**Règles strictes :**
+- Signature de fonction : toujours typée (args + return)
+- `dict[str, Any]` pour dictionnaires hétérogènes
+- `QuerySet[Model]` pour les querysets
+- `Model | None` pour les optionnels
+- Vérifier avec `mypy .` avant commit
+
+## Pydantic pour Settings
+
+La configuration utilise **Pydantic Settings**, jamais de variables d'environnement brutes :
+
+```python
+# ✅ BON - Utiliser get_settings()
+from observations_nids.config import get_settings
+
+settings = get_settings()
+SECRET_KEY = settings.SECRET_KEY
+
+# ❌ MAUVAIS - Ne pas utiliser os.environ directement
+import os
+SECRET_KEY = os.environ.get('SECRET_KEY')
+```
+
+## Modèles Django - Patterns Obligatoires
+
+### Relations et Index
+
+```python
+class FicheObservation(models.Model):
+    # Clé primaire personnalisée
+    num_fiche = models.AutoField(primary_key=True)
+    
+    # Foreign Key avec related_name et index
+    observateur = models.ForeignKey(
+        Utilisateur,
+        on_delete=models.CASCADE,
+        related_name="fiches",  # Toujours au pluriel
+        db_index=True           # Index sur les FK fréquemment requêtées
+    )
+    
+    # Champs avec valeurs par défaut explicites
+    transcription = models.BooleanField(default=False)
+    details = models.TextField(blank=True, default='')  # Jamais NULL pour texte
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['observateur', 'date_creation']),
+        ]
+```
+
+### Validation et Contraintes
+
+```python
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Q
+
+class ResumeObservation(models.Model):
+    nombre_oeufs_pondus = models.PositiveSmallIntegerField(
+        blank=True, 
+        null=True,  # NULL = non observé
+        validators=[MinValueValidator(0), MaxValueValidator(50)]
+    )
+    
+    class Meta:
+        constraints = [
+            # Nommer avec le pattern: <table>_<description>
+            models.CheckConstraint(
+                name="resume_eclos_le_pondus",
+                condition=Q(nombre_oeufs_eclos__lte=models.F("nombre_oeufs_pondus"))
+            ),
+        ]
+```
+
+### Création Automatique des Objets Liés
+
+```python
+from django.db import transaction
+
+class FicheObservation(models.Model):
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        
+        # Créer automatiquement les objets OneToOne
+        if is_new:
+            Localisation.objects.get_or_create(
+                fiche=self,
+                defaults={'commune': '', 'departement': '00'}
+            )
+            Nid.objects.get_or_create(fiche=self, defaults={})
+```
+
+## Optimisation ORM - Règles Strictes
+
+### Éviter le N+1
+
+```python
+# ❌ MAUVAIS - N+1 queries
+fiches = FicheObservation.objects.all()
+for fiche in fiches:
+    print(fiche.observateur.username)  # Query à chaque itération!
+    print(fiche.espece.nom)
+
+# ✅ BON - select_related pour ForeignKey
+fiches = FicheObservation.objects.select_related('observateur', 'espece')
+for fiche in fiches:
+    print(fiche.observateur.username)
+    print(fiche.espece.nom)
+
+# ✅ BON - prefetch_related pour ManyToMany / reverse FK
+utilisateurs = Utilisateur.objects.prefetch_related('fiches')
+for user in utilisateurs:
+    print(user.fiches.count())
+```
+
+### Queries Optimisées
+
+```python
+# ✅ Utiliser only() pour limiter les champs
+fiches = FicheObservation.objects.only('num_fiche', 'annee', 'observateur__username')
+
+# ✅ Utiliser values() pour les agrégations
+stats = FicheObservation.objects.values('espece').annotate(count=Count('id'))
+
+# ✅ exists() plutôt que count() > 0
+if FicheObservation.objects.filter(observateur=user).exists():
+    ...
+```
+
+## Vues Django - Conventions
+
+### Décorateurs Obligatoires
+
+```python
+import logging
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.http import require_POST, require_GET
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+
+logger = logging.getLogger(__name__)
+
+@login_required
+@user_passes_test(est_admin)
+@require_POST
+def valider_fiche(request, fiche_id):
+    fiche = get_object_or_404(FicheObservation, pk=fiche_id)
+    
+    # Logique métier
+    fiche.etat_correction.valider(request.user)
+    
+    # Logging + Message utilisateur
+    logger.info(f"Fiche {fiche_id} validée par {request.user.username}")
+    messages.success(request, "Fiche validée avec succès")
+    
+    return redirect('observations:detail_fiche', fiche_id=fiche_id)
+```
+
+### Vues AJAX - Format Standard
+
+```python
+from django.http import JsonResponse
+
+@login_required
+@require_POST
+def geocoder_commune(request):
+    try:
+        fiche_id = request.POST.get('fiche_id')
+        commune = request.POST.get('commune', '').strip()
+        
+        # Validation
+        if not fiche_id or not commune:
+            return JsonResponse(
+                {'success': False, 'message': 'Paramètres manquants'},
+                status=400
+            )
+        
+        # Traitement
+        fiche = get_object_or_404(FicheObservation, pk=fiche_id)
+        coords = geocoder.geocoder_commune(commune)
+        
+        # Succès
+        return JsonResponse({
+            'success': True,
+            'message': 'Géocodage réussi',
+            'coords': coords,
+        })
+        
+    except Exception as e:
+        logger.error(f"Erreur géocodage: {e}")
+        return JsonResponse(
+            {'success': False, 'message': str(e)},
+            status=500
+        )
+```
+
+## Formulaires Django
+
+### Formulaires ModelForm
+
+```python
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+
+class UtilisateurCreationForm(UserCreationForm):
+    class Meta:
+        model = Utilisateur
+        fields = ('username', 'email', 'first_name', 'last_name')
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.role = 'observateur'
+        user.est_valide = False
+        if commit:
+            user.save()
+        return user
+```
+
+### Validation Personnalisée
+
+```python
+class NouveauMotDePasseForm(forms.Form):
+    password1 = forms.CharField(widget=forms.PasswordInput)
+    password2 = forms.CharField(widget=forms.PasswordInput)
+    
+    def clean_password1(self):
+        """Validation par champ."""
+        password = self.cleaned_data.get('password1')
+        if len(password) < 8:
+            raise forms.ValidationError("Minimum 8 caractères.")
+        return password
+    
+    def clean(self):
+        """Validation croisée."""
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Les mots de passe ne correspondent pas.")
+        
+        return cleaned_data
+```
+
+## Logging - Standards
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)  # Ou 'observations' pour logger global
+
+# Niveaux appropriés
+logger.debug("Détails de débogage (dev uniquement)")
+logger.info(f"Fiche {fiche_id} créée par {user.username}")
+logger.warning(f"Tentative d'accès refusé: {user.username}")
+logger.error(f"Erreur traitement: {str(e)}")
+logger.exception("Exception avec stacktrace")  # Dans un except:
+```
+
+**Règles de logging :**
+- Toujours loguer les actions CRUD importantes (INFO)
+- Inclure le contexte : IDs, usernames, chemins
+- Ne jamais loguer de secrets (passwords, tokens, API keys)
+- Utiliser `logger.exception()` uniquement dans `except:`
+
+## Gestion des Erreurs
+
+### Hiérarchie d'Exceptions
+
+```python
+# core/exceptions.py
+class ObservationError(Exception):
+    """Exception de base."""
+    pass
+
+class ValidationError(ObservationError):
+    """Erreur de validation métier."""
+    pass
+
+class ImportationError(ObservationError):
+    """Erreur d'importation."""
+    pass
+```
+
+### Pattern de Gestion
+
+```python
+from core.exceptions import ValidationError
+
+@login_required
+def valider_fiche(request, fiche_id):
+    try:
+        fiche = get_object_or_404(FicheObservation, pk=fiche_id)
+        
+        # Validation métier
+        if not fiche.localisation.commune:
+            raise ValidationError("Commune obligatoire")
+        
+        fiche.etat_correction.valider(request.user)
+        messages.success(request, "Fiche validée")
+        
+    except ValidationError as e:
+        logger.warning(f"Validation refusée {fiche_id}: {e}")
+        messages.error(request, str(e))
+        
+    except Exception as e:
+        logger.exception(f"Erreur inattendue {fiche_id}")
+        messages.error(request, "Une erreur est survenue")
+    
+    return redirect('observations:detail_fiche', fiche_id=fiche_id)
+```
+
+## Naming Conventions
+
+### Python (PEP 8)
+
+```python
+# Classes : PascalCase
+class FicheObservation(models.Model):
+    pass
+
+# Fonctions/méthodes : snake_case
+def get_user_fiches(user: Utilisateur) -> QuerySet:
+    pass
+
+# Constantes : UPPER_SNAKE_CASE
+SESSION_COOKIE_AGE = 3600
+
+# Variables privées : _leading_underscore
+class MyClass:
+    def __init__(self):
+        self._internal_cache = {}
+```
+
+### Django Spécifique
+
+```python
+# related_name : pluriel snake_case
+observateur = models.ForeignKey(User, related_name="fiches")
+
+# Noms de tables : auto (app_model) ou explicit
+class Meta:
+    db_table = 'observations_fiche'  # Seulement si nécessaire
+
+# Contraintes : <table>_<description>
+constraints = [
+    models.CheckConstraint(
+        name="resume_eclos_le_pondus",
+        condition=Q(...)
+    )
+]
+```
+
+## Imports - Ordre Standard
+
+```python
+# 1. Standard library
+import logging
+import os
+from datetime import datetime
+from typing import Any
+
+# 2. Django
+from django.db import models
+from django.contrib.auth import get_user_model
+from django.shortcuts import render, redirect
+
+# 3. Third-party
+from celery import shared_task
+from pydantic import BaseModel
+
+# 4. Local apps
+from accounts.models import Utilisateur
+from core.constants import ROLE_CHOICES
+from observations.models import FicheObservation
+```
+
+## Anti-Patterns à Éviter
+
+```python
+# ❌ Ne JAMAIS utiliser os.environ directement
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
+# ❌ Ne JAMAIS ignorer les exceptions silencieusement
+try:
+    do_something()
+except:
+    pass
+
+# ❌ Ne JAMAIS faire de queries dans une boucle
+for fiche in fiches:
+    user = Utilisateur.objects.get(id=fiche.observateur_id)  # N+1!
+
+# ❌ Ne JAMAIS hardcoder des valeurs de configuration
+if settings.DEBUG:  # ✅ Bon
+    debug_mode = True
+if True:  # ❌ Mauvais
+    debug_mode = True
+```
+
+## Checklist Avant Commit
+
+- [ ] Type hints sur toutes les signatures
+- [ ] Logging des actions importantes
+- [ ] Gestion d'erreurs avec try/except
+- [ ] Pas de N+1 queries (select_related/prefetch_related)
+- [ ] Messages utilisateur avec django.contrib.messages
+- [ ] mypy passe sans erreurs
+- [ ] Tests écrits/mis à jour

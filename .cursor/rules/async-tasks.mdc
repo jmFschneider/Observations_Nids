@@ -1,0 +1,540 @@
+---
+globs:
+  - "**/*.py"
+---
+
+# Règles Celery et Tâches Asynchrones
+
+## Configuration Celery
+
+### Fichier Principal (`observations_nids/celery.py`)
+
+```python
+import os
+from celery import Celery
+
+# ✅ Variables d'environnement, pas de Pydantic ici
+# (évite les erreurs au build Docker)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'observations_nids.settings')
+
+app = Celery('observations_nids')
+
+# Configuration depuis environnement
+redis_host = os.environ.get('REDIS_HOST', '127.0.0.1')
+redis_port = os.environ.get('REDIS_PORT', '6379')
+broker_url = os.environ.get('CELERY_BROKER_URL', f'redis://{redis_host}:{redis_port}/0')
+
+app.conf.update(
+    broker_url=broker_url,
+    result_backend=broker_url,
+    task_serializer='json',
+    accept_content=['json'],
+    result_serializer='json',
+    timezone='Europe/Paris',
+    task_track_started=True,
+    task_time_limit=30 * 60,  # 30 minutes max
+    worker_hijack_root_logger=False,
+    # Robustesse
+    task_acks_late=True,
+    task_default_retry_delay=30,
+)
+
+# Windows : pool solo obligatoire
+if os.name == 'nt':
+    app.conf.worker_concurrency = 1
+    app.conf.worker_pool = 'solo'
+
+# Auto-découverte des tâches
+app.autodiscover_tasks()
+```
+
+**Règles strictes :**
+- Ne JAMAIS importer `get_settings()` dans `celery.py`
+- Utiliser `os.environ` directement (compatibilité build Docker)
+- Toujours spécifier `timezone='Europe/Paris'`
+- `task_track_started=True` pour le suivi en temps réel
+
+## Définition de Tâches
+
+### Pattern Standard
+
+```python
+import logging
+from celery import shared_task
+from django.conf import settings
+
+logger = logging.getLogger(__name__)
+
+@shared_task(bind=True, name='observations.process_images')
+def process_images_task(self, directory: str) -> dict:
+    """
+    Tâche Celery pour traiter des images.
+    
+    Args:
+        directory: Répertoire contenant les images
+    
+    Returns:
+        dict avec status, results, statistiques
+    """
+    logger.info(f"Début traitement {directory}")
+    
+    results = []
+    total_files = len(image_files)
+    
+    for index, img_file in enumerate(image_files):
+        # ✅ Mise à jour de l'état pour suivi temps réel
+        self.update_state(
+            state='PROGRESS',
+            meta={
+                'processed': index,
+                'total': total_files,
+                'current_file': img_file,
+                'percent': int((index / total_files) * 100),
+            }
+        )
+        
+        try:
+            result = process_single_image(img_file)
+            results.append({
+                'filename': img_file,
+                'status': 'success',
+                'data': result,
+            })
+        except Exception as e:
+            logger.error(f"Erreur traitement {img_file}: {e}")
+            results.append({
+                'filename': img_file,
+                'status': 'error',
+                'error': str(e),
+            })
+    
+    # ✅ Retour structuré
+    return {
+        'status': 'SUCCESS',
+        'results': results,
+        'processed': total_files,
+        'total': total_files,
+        'success_count': sum(1 for r in results if r['status'] == 'success'),
+    }
+```
+
+### Décorateur @shared_task - Options
+
+```python
+# Tâche simple
+@shared_task
+def simple_task(arg):
+    return process(arg)
+
+# Tâche avec bind=True (accès à self)
+@shared_task(bind=True)
+def task_with_retry(self, arg):
+    try:
+        return process(arg)
+    except Exception as exc:
+        # Retry automatique
+        raise self.retry(exc=exc, countdown=60, max_retries=3)
+
+# Tâche avec nom explicite (obligatoire pour éviter conflits)
+@shared_task(bind=True, name='observations.process_batch')
+def process_batch_task(self, batch_id):
+    pass
+
+# Tâche avec timeout et retry
+@shared_task(
+    bind=True,
+    max_retries=5,
+    soft_time_limit=600,  # 10 minutes
+    time_limit=660,       # 11 minutes (hard limit)
+)
+def long_running_task(self, data):
+    pass
+```
+
+**Options importantes :**
+- `bind=True` : Accès à `self` (pour `update_state`, `retry`)
+- `name=` : Nom explicite (évite conflits entre apps)
+- `max_retries=` : Nombre de tentatives
+- `soft_time_limit=` : Timeout soft (lance SoftTimeLimitExceeded)
+- `time_limit=` : Timeout hard (kill forcé)
+
+## Gestion des Erreurs
+
+### Pattern de Retry
+
+```python
+from celery.exceptions import Reject, Retry
+
+@shared_task(bind=True, max_retries=3)
+def unreliable_task(self, data_id):
+    try:
+        data = fetch_data(data_id)
+        result = process_data(data)
+        return {'status': 'success', 'result': result}
+        
+    except NetworkError as exc:
+        # Erreur temporaire → retry
+        logger.warning(f"Erreur réseau, retry dans 60s: {exc}")
+        raise self.retry(exc=exc, countdown=60)
+        
+    except ValidationError as exc:
+        # Erreur permanente → pas de retry, loguer et retourner erreur
+        logger.error(f"Données invalides {data_id}: {exc}")
+        return {'status': 'error', 'error': str(exc)}
+        
+    except Exception as exc:
+        # Erreur inconnue → retry avec backoff exponentiel
+        logger.exception(f"Erreur inattendue {data_id}")
+        raise self.retry(
+            exc=exc,
+            countdown=2 ** self.request.retries * 60,  # 1m, 2m, 4m, 8m...
+            max_retries=5
+        )
+```
+
+### Erreurs Permanentes (ne pas retry)
+
+```python
+from celery.exceptions import Reject
+
+@shared_task(bind=True)
+def strict_validation_task(self, data):
+    try:
+        validate_data(data)
+    except ValidationError as exc:
+        # ✅ Reject = erreur permanente, pas de retry
+        logger.error(f"Validation échouée: {exc}")
+        raise Reject(exc, requeue=False)
+```
+
+**Règles de retry :**
+- Erreur temporaire (réseau, timeout) → `self.retry()`
+- Erreur permanente (validation, not found) → Retourner dict d'erreur ou `Reject`
+- Toujours loguer AVANT le retry
+- Utiliser backoff exponentiel pour erreurs fréquentes
+
+## Suivi de Progression
+
+### Update State dans la Tâche
+
+```python
+@shared_task(bind=True, name='observations.import_batch')
+def import_batch_task(self, file_path):
+    """Importe un batch de données avec suivi progression."""
+    
+    records = load_records(file_path)
+    total = len(records)
+    imported = 0
+    errors = []
+    
+    for index, record in enumerate(records):
+        # ✅ Mise à jour régulière de l'état
+        if index % 10 == 0:  # Toutes les 10 itérations
+            self.update_state(
+                state='PROGRESS',
+                meta={
+                    'current': index,
+                    'total': total,
+                    'percent': int((index / total) * 100),
+                    'imported': imported,
+                    'errors_count': len(errors),
+                }
+            )
+        
+        try:
+            import_record(record)
+            imported += 1
+        except Exception as e:
+            logger.error(f"Erreur import ligne {index}: {e}")
+            errors.append({'line': index, 'error': str(e)})
+    
+    # État final
+    return {
+        'status': 'COMPLETED',
+        'total': total,
+        'imported': imported,
+        'errors': errors,
+        'success_rate': (imported / total * 100) if total > 0 else 0,
+    }
+```
+
+### Vérification Côté Vue
+
+```python
+from celery.result import AsyncResult
+from django.http import JsonResponse
+
+def check_task_status(request, task_id):
+    """API pour vérifier le statut d'une tâche."""
+    result = AsyncResult(task_id)
+    
+    if result.state == 'PENDING':
+        response = {
+            'state': result.state,
+            'status': 'En attente...',
+        }
+    elif result.state == 'PROGRESS':
+        # Récupérer les métadonnées de progression
+        response = {
+            'state': result.state,
+            'current': result.info.get('current', 0),
+            'total': result.info.get('total', 1),
+            'percent': result.info.get('percent', 0),
+            'status': f"{result.info.get('current', 0)}/{result.info.get('total', 0)}",
+        }
+    elif result.state == 'SUCCESS':
+        response = {
+            'state': result.state,
+            'result': result.result,
+            'status': 'Terminé',
+        }
+    elif result.state == 'FAILURE':
+        response = {
+            'state': result.state,
+            'status': str(result.info),  # Exception
+            'error': str(result.info),
+        }
+    else:
+        response = {
+            'state': result.state,
+            'status': 'État inconnu',
+        }
+    
+    return JsonResponse(response)
+```
+
+## Appel de Tâches
+
+### Exécution Asynchrone
+
+```python
+from observations.tasks import process_images_task
+
+# ✅ Exécution asynchrone
+task = process_images_task.delay(directory='/path/to/images')
+task_id = task.id
+
+# Stocker le task_id pour suivi ultérieur
+request.session['import_task_id'] = task_id
+
+# ✅ Exécution asynchrone avec arguments nommés
+task = process_images_task.apply_async(
+    args=[directory],
+    kwargs={'options': {'verbose': True}},
+    countdown=60,  # Démarrer dans 60s
+)
+
+# ✅ Exécution programmée
+from datetime import timedelta
+task = process_images_task.apply_async(
+    args=[directory],
+    eta=timezone.now() + timedelta(hours=2),  # Dans 2 heures
+)
+```
+
+### Exécution Synchrone (Tests Uniquement)
+
+```python
+# ⚠️ Exécution synchrone - UNIQUEMENT pour les tests
+# Bloque le thread courant jusqu'à la fin de la tâche
+result = process_images_task.apply(args=[directory])
+```
+
+## Ne JAMAIS Bloquer le Thread Principal
+
+### ❌ MAUVAIS - Attendre le résultat
+
+```python
+# Ne JAMAIS faire ça dans une vue Django
+def ma_vue(request):
+    task = long_task.delay(data)
+    result = task.get()  # ❌ Bloque le thread jusqu'à la fin!
+    return render(request, 'result.html', {'result': result})
+```
+
+### ✅ BON - Redirection et polling
+
+```python
+def lancer_import(request):
+    """Lance une importation asynchrone."""
+    if request.method == 'POST':
+        file_path = request.POST.get('file_path')
+        
+        # Lancer la tâche
+        task = import_batch_task.delay(file_path)
+        
+        # Stocker l'ID pour suivi
+        request.session['import_task_id'] = task.id
+        
+        # Rediriger vers page de suivi
+        return redirect('observations:import_progress', task_id=task.id)
+    
+    return render(request, 'import_form.html')
+
+def import_progress(request, task_id):
+    """Page de suivi de progression."""
+    return render(request, 'import_progress.html', {'task_id': task_id})
+```
+
+```django
+{# Template avec polling AJAX #}
+<div id="progress-container">
+    <div class="progress">
+        <div id="progress-bar" class="progress-bar" style="width: 0%">0%</div>
+    </div>
+    <p id="status-text">En cours...</p>
+</div>
+
+<script>
+const taskId = "{{ task_id }}";
+
+async function checkProgress() {
+    const response = await fetch(`/api/task-status/${taskId}/`);
+    const data = await response.json();
+    
+    if (data.state === 'PROGRESS') {
+        document.getElementById('progress-bar').style.width = data.percent + '%';
+        document.getElementById('progress-bar').textContent = data.percent + '%';
+        document.getElementById('status-text').textContent = data.status;
+        
+        // Continuer le polling
+        setTimeout(checkProgress, 1000);
+    } else if (data.state === 'SUCCESS') {
+        document.getElementById('progress-bar').className = 'progress-bar bg-success';
+        document.getElementById('status-text').textContent = 'Terminé !';
+        window.location.href = '/results/';
+    } else if (data.state === 'FAILURE') {
+        document.getElementById('progress-bar').className = 'progress-bar bg-danger';
+        document.getElementById('status-text').textContent = 'Erreur: ' + data.error;
+    }
+}
+
+// Démarrer le polling
+checkProgress();
+</script>
+```
+
+## Logging dans les Tâches
+
+```python
+import logging
+
+# ✅ Logger spécifique au module
+logger = logging.getLogger(__name__)
+
+@shared_task(bind=True, name='app.my_task')
+def my_task(self, data):
+    logger.info(f"Démarrage de my_task avec {len(data)} éléments")
+    
+    for item in data:
+        try:
+            process(item)
+            logger.debug(f"Item {item} traité avec succès")
+        except Exception as e:
+            # ✅ logger.exception dans except: inclut le stacktrace
+            logger.exception(f"Erreur traitement item {item}")
+    
+    logger.info("Tâche terminée")
+```
+
+**Règles de logging :**
+- `logger.info()` : Début/fin de tâche, étapes importantes
+- `logger.debug()` : Détails de traitement (dev)
+- `logger.warning()` : Erreurs non bloquantes
+- `logger.error()` : Erreurs à investiguer
+- `logger.exception()` : Dans `except:` uniquement (inclut stacktrace)
+
+## Tâches Périodiques (Celery Beat)
+
+```python
+# observations_nids/celery.py
+from celery.schedules import crontab
+
+app.conf.beat_schedule = {
+    'nettoyer-cache-quotidien': {
+        'task': 'observations.cleanup_cache',
+        'schedule': crontab(hour=3, minute=0),  # 3h du matin
+    },
+    'rappel-hebdomadaire': {
+        'task': 'accounts.send_weekly_reminder',
+        'schedule': crontab(day_of_week=1, hour=9, minute=0),  # Lundi 9h
+    },
+    'stats-toutes-les-heures': {
+        'task': 'observations.compute_stats',
+        'schedule': crontab(minute=0),  # Toutes les heures
+    },
+}
+```
+
+**Démarrer Celery Beat :**
+
+```bash
+# Worker standard
+celery -A observations_nids worker -l info
+
+# Beat scheduler (tâches périodiques)
+celery -A observations_nids beat -l info
+
+# Combiné (dev uniquement)
+celery -A observations_nids worker -B -l info
+```
+
+## Bonnes Pratiques
+
+### ✅ À FAIRE
+
+```python
+# 1. Nom explicite pour éviter conflits
+@shared_task(name='observations.my_specific_task')
+def my_task():
+    pass
+
+# 2. Type hints pour clarté
+@shared_task
+def process_data(data: dict[str, Any]) -> dict:
+    pass
+
+# 3. Retourner des dictionnaires sérialisables (JSON)
+@shared_task
+def compute():
+    return {'result': 42, 'status': 'success'}
+
+# 4. Logging abondant
+@shared_task
+def import_data(file_path):
+    logger.info(f"Import démarré: {file_path}")
+    # ...
+    logger.info(f"Import terminé: {count} enregistrements")
+```
+
+### ❌ À ÉVITER
+
+```python
+# 1. Ne pas utiliser task.get() dans les vues
+result = task.get()  # Bloque le thread!
+
+# 2. Ne pas retourner d'objets Django non sérialisables
+@shared_task
+def bad_task():
+    return FicheObservation.objects.first()  # ❌ Erreur sérialisation
+
+# 3. Ne pas importer settings avec Pydantic dans celery.py
+from observations_nids.config import get_settings  # ❌ Erreur au build Docker
+
+# 4. Ne pas oublier bind=True si vous utilisez self
+@shared_task  # ❌ Manque bind=True
+def retry_task(self):  # self sera None!
+    self.retry()
+```
+
+## Checklist Tâches Celery
+
+- [ ] `@shared_task` avec `name=` explicite
+- [ ] `bind=True` si utilisation de `self.update_state()` ou `self.retry()`
+- [ ] Type hints sur la signature
+- [ ] Logging INFO au début et à la fin
+- [ ] Gestion d'erreurs avec try/except
+- [ ] Retour de dictionnaire sérialisable JSON
+- [ ] `update_state()` pour tâches longues
+- [ ] Pas de `task.get()` dans les vues Django
+- [ ] Tests avec `.apply()` (exécution synchrone)
