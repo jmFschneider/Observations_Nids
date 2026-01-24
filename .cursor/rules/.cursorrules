@@ -32,23 +32,6 @@ Si l'utilisateur demande une action listée ci-dessous, vous devez **REFUSER** e
 
 ---
 
-## 🧠 Stratégie de Contexte & Fichiers
-Les règles techniques sont détaillées dans des fichiers `.mdc` spécifiques.
-**Vous devez consulter le fichier approprié selon le contexte de la demande :**
-
-| Contexte | Chemin du fichier de règles (relatif à la racine) |
-| :--- | :--- |
-| **Backend Python** | `.cursor/rules/django-core.mdc` |
-| **Frontend/Templates** | `.cursor/rules/frontend.mdc` |
-| **Async/Celery** | `.cursor/rules/async-tasks.mdc` |
-| **Infrastructure/Docker** | `.cursor/rules/infrastructure-ref.mdc` |
-
-## 📂 Documentation & Spécifications
-Si vous manquez de contexte fonctionnel ou technique, ne devinez pas. Référez-vous explicitement aux fichiers suivants :
-
-- **Architecture Générale** : `docs/architecture/` (ou le chemin précis)
-- **Infrastructure & Réseau** : `specs/infrastructure.md` (Source de vérité absolue pour les ports/hosts)
-- **Règles Métier** : `specs/functional_rules.md` (si ce fichier existe)
 
 ## 🧠 Stratégie de Contexte & Fichiers
 Appliquez intelligemment les règles des fichiers `.mdc` situés dans `.cursor/rules/` selon le contexte :
@@ -60,11 +43,15 @@ Appliquez intelligemment les règles des fichiers `.mdc` situés dans `.cursor/r
 | **Async/Celery** | `.cursor/rules/async-tasks.mdc` |
 | **Infrastructure/Docker** | `.cursor/rules/infrastructure-ref.mdc` |
 
+## 📂 Documentation & Spécifications
+Si vous manquez de contexte fonctionnel ou technique, ne devinez pas. Référez-vous explicitement aux fichiers suivants :
+
+- **Architecture Générale** : `/docs/architecture/GLOBAL_ARCHITECTURE.md` (ou le chemin précis)
+- **Infrastructure & Réseau** : `specs/infrastructure.md` (Source de vérité absolue pour les ports/hosts)
+- **Règles Métier** : `specs/functional_rules.md` (si ce fichier existe)
+
 ## 🛡️ Règles d'Or (Toujours actives)
 
 1.  **Cohérence avant tout** : Analysez les patterns existants avant de coder.
 2.  **Sécurité** : Pas de secrets exposés, pas de désactivation CSRF/SSL sans avertissement.
 3.  **Source de Vérité Infra** : Référence absolue = `@specs/infrastructure.md`. Ne devinez jamais la configuration réseau.
-
-## 📂 Documentation
-Si manque de contexte fonctionnel, se référer à `docs/` et `specs/`. Ne pas générer de documentation redondante.

@@ -286,10 +286,63 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Fetch API pour AJAX
+// Utilitaire pour CSRF token
+function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+```
+
+### Fetch API - Pattern Standard avec Gestion d'Erreurs
+
+**IMPORTANT** : Toujours utiliser le wrapper `fetcherRobuste` pour les appels AJAX. Ne jamais appeler `fetch()` directement.
+
+```javascript
+// ✅ Wrapper standard pour tous les appels fetch
+// À placer dans common.js et réutiliser partout
+async function fetcherRobuste(url, options = {}) {
+    try {
+        const response = await fetch(url, options);
+        
+        // 1. Vérifier le statut HTTP AVANT de parser
+        if (!response.ok) {
+            // Tenter de lire le message d'erreur si JSON
+            let errorMessage = `Erreur HTTP ${response.status}`;
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.message || errorMessage;
+            } catch {
+                // Si ce n'est pas du JSON (ex: page HTML d'erreur Django)
+                errorMessage = `${errorMessage}: ${response.statusText}`;
+            }
+            throw new Error(errorMessage);
+        }
+        
+        // 2. Parser le JSON seulement si OK
+        const data = await response.json();
+        return data;
+        
+    } catch (error) {
+        // 3. Distinguer les types d'erreurs
+        if (error instanceof TypeError) {
+            // Erreur réseau (pas de connexion, CORS, etc.)
+            console.error('Erreur réseau:', error);
+            throw new Error('Impossible de contacter le serveur. Vérifiez votre connexion.');
+        } else if (error instanceof SyntaxError) {
+            // Erreur de parsing JSON
+            console.error('Erreur parsing JSON:', error);
+            throw new Error('Réponse serveur invalide (JSON attendu).');
+        } else {
+            // Erreur HTTP ou autre
+            console.error('Erreur:', error);
+            throw error;
+        }
+    }
+}
+
+// ✅ Exemple d'utilisation - Géocodage
 async function geocoderCommune(ficheId, commune) {
     try {
-        const response = await fetch('/geo/geocoder/', {
+        const data = await fetcherRobuste('/geo/geocoder/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -301,24 +354,61 @@ async function geocoderCommune(ficheId, commune) {
             }),
         });
         
-        const data = await response.json();
-        
         if (data.success) {
-            console.log('Géocodage réussi:', data.coords);
             afficherCoordonnees(data.coords);
         } else {
-            console.error('Erreur:', data.message);
-            afficherErreur(data.message);
+            afficherErreur(data.message || 'Erreur inconnue');
         }
     } catch (error) {
-        console.error('Erreur réseau:', error);
-        afficherErreur('Erreur de connexion');
+        afficherErreur(error.message);
     }
 }
 
-// Utilitaire pour CSRF token
-function getCsrfToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+// ✅ Exemple d'utilisation - GET simple
+async function chargerFiche(numFiche) {
+    try {
+        const data = await fetcherRobuste(`/api/fiches/${numFiche}/`);
+        afficherFiche(data);
+    } catch (error) {
+        afficherErreur(`Impossible de charger la fiche: ${error.message}`);
+    }
+}
+```
+
+### Anti-Patterns Fetch - À ÉVITER
+
+```javascript
+// ❌ MAUVAIS - Appeler fetch() directement sans wrapper
+async function mauvaiseFonction() {
+    const response = await fetch('/api/data/');
+    const data = await response.json(); // Plante si erreur 500 avec HTML
+}
+
+// ❌ MAUVAIS - Parse JSON sans vérifier response.ok
+async function autreMauvaiseFonction() {
+    const response = await fetch('/api/data/');
+    const data = await response.json(); // Erreur si non-JSON
+    if (data.success) { ... }
+}
+
+// ❌ MAUVAIS - Catch générique sans message utilisateur
+async function encoreMauvais() {
+    try {
+        const response = await fetch('/api/data/');
+        const data = await response.json();
+    } catch (error) {
+        console.error(error); // L'utilisateur ne voit rien!
+    }
+}
+
+// ✅ BON - Toujours utiliser fetcherRobuste
+async function bonneFonction() {
+    try {
+        const data = await fetcherRobuste('/api/data/');
+        traiterDonnees(data);
+    } catch (error) {
+        afficherErreur(error.message);
+    }
 }
 ```
 

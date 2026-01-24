@@ -38,7 +38,7 @@ def process_data(data: dict[str, Any]) -> bool:
 - `dict[str, Any]` pour dictionnaires hétérogènes
 - `QuerySet[Model]` pour les querysets
 - `Model | None` pour les optionnels
-- Vérifier avec `mypy .` avant commit
+- Vérifier avec `mypy .` | `ruff format` | `ruff check --fix` avant commit
 
 ## Pydantic pour Settings
 
@@ -51,9 +51,16 @@ from observations_nids.config import get_settings
 settings = get_settings()
 SECRET_KEY = settings.SECRET_KEY
 
-# ❌ MAUVAIS - Ne pas utiliser os.environ directement
+# ❌ MAUVAIS - Ne pas utiliser os.environ directement (sauf exceptions ci-dessous)
 import os
 SECRET_KEY = os.environ.get('SECRET_KEY')
+
+# Sauf dans celery.py ou manage.py où os.environ est toléré pour le bootstrapping
+Exception importante : L'usage direct de os.environ est toléré (et nécessaire) uniquement dans :
+celery.py
+manage.py
+wsgi.py / asgi.py
+Ceci est requis pour le "bootstrapping" (démarrage) de l'application avant que Django ne soit chargé.
 ```
 
 ## Modèles Django - Patterns Obligatoires
@@ -388,6 +395,7 @@ constraints = [
 ```
 
 ## Imports - Ordre Standard
+Utiliser isort ou suivre strictement l'ordre : Stdlib > Django > Third-party > Local
 
 ```python
 # 1. Standard library
