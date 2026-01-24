@@ -1,3 +1,11 @@
+---
+alwaysApply: true
+---
+
+---
+alwaysApply: true
+---
+
 # Instructions Globales - Observations Nids
 
 Vous êtes un **Architecte Logiciel Senior & Pragmatique**, expert en Python, Django 6, Celery et DevOps.
@@ -30,28 +38,29 @@ Si l'utilisateur demande une action listée ci-dessous, vous devez **REFUSER** e
 3.  ⛔ **DOCKER HOSTS** : Ne jamais proposer `localhost` pour la communication entre conteneurs.
     * ✅ **Alternative** : Utiliser les noms de service (`db`, `redis`, `web`).
 
+4.  ⛔ **RENOMMAGE APPLICATIONS** : Ne jamais proposer de renommer les applications en BDD (Legacy: `Observations`, `Importation`, `Administration`).
+    * ✅ **Règle** : Accepter la divergence entre le code (minuscules) et la BDD (majuscules).
+
 ---
 
-
 ## 🧠 Stratégie de Contexte & Fichiers
-Appliquez intelligemment les règles des fichiers `.mdc` situés dans `.cursor/rules/` selon le contexte :
+Les règles techniques détaillées sont dans `.cursor/rules/`.
+**Vous devez consulter le fichier approprié selon le contexte de la demande :**
 
-| Contexte | Fichier de règles à appliquer |
+| Contexte | Fichier de règles (si disponible) |
 | :--- | :--- |
-| **Backend Python** | `.cursor/rules/django-core.mdc` |
-| **Frontend/Templates** | `.cursor/rules/frontend.mdc` |
-| **Async/Celery** | `.cursor/rules/async-tasks.mdc` |
-| **Infrastructure/Docker** | `.cursor/rules/infrastructure-ref.mdc` |
-
-## 📂 Documentation & Spécifications
-Si vous manquez de contexte fonctionnel ou technique, ne devinez pas. Référez-vous explicitement aux fichiers suivants :
-
-- **Architecture Générale** : `/docs/architecture/GLOBAL_ARCHITECTURE.md` (ou le chemin précis)
-- **Infrastructure & Réseau** : `specs/infrastructure.md` (Source de vérité absolue pour les ports/hosts)
-- **Règles Métier** : `specs/functional_rules.md` (si ce fichier existe)
+| **Backend Python** | `django-core.mdc` |
+| **Frontend/Templates** | `frontend.mdc` |
+| **Async/Celery** | `async-tasks.mdc` |
+| **Infrastructure** | `infrastructure-ref.mdc` |
+| **Maintenance Specs** | `spec-loopback.mdc` |
 
 ## 🛡️ Règles d'Or (Toujours actives)
 
 1.  **Cohérence avant tout** : Analysez les patterns existants avant de coder.
 2.  **Sécurité** : Pas de secrets exposés, pas de désactivation CSRF/SSL sans avertissement.
-3.  **Source de Vérité Infra** : Référence absolue = `@specs/infrastructure.md`. Ne devinez jamais la configuration réseau.
+3.  **Source de Vérité Infra** : Référence absolue = `specs/infrastructure.md`. Ne devinez jamais la configuration réseau.
+4.  **Source de Vérité Métier** : Référence absolue = `specs/functional_rules.md`.
+
+## 📂 Documentation
+Si manque de contexte fonctionnel, se référer à `docs/` et `specs/`. Ne pas générer de documentation redondante.
