@@ -1,5 +1,9 @@
 # CLAUDE.md - Référence Projet observations_nids
 
+> **Type de document** : Référence rapide pour développeurs  
+> **Public cible** : IA, nouveaux développeurs, interventions urgentes  
+> **Docs détaillées** : Voir `docs/` et `specs/` pour l'exhaustivité
+
 > Document de référence pour accélérer les futures interventions sur ce projet.
 
 ---
