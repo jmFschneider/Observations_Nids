@@ -27,7 +27,7 @@ google-auth
 google-auth-httplib2
 googleapis-common-protos
 proto-plus
-protobuf
+protobuf>=6.33.4
 grpcio
 grpcio-status
 pillow
