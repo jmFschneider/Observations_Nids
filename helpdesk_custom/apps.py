@@ -8,13 +8,8 @@ class HelpdeskCustomConfig(AppConfig):
 
     def ready(self):
         """
-        Surcharger la form_class de CreateTicketView au démarrage
-        pour utiliser notre formulaire personnalisé
+        Configuration au démarrage de l'application.
+        Le monkey-patching de CreateTicketView a été remplacé par une surcharge d'URL
+        dans observations_nids/urls.py pour plus de stabilité.
         """
-        # Import local pour éviter les imports circulaires au démarrage de Django
-        from helpdesk.views import staff  # noqa: PLC0415
-
-        from .forms import CustomTicketForm  # noqa: PLC0415
-
-        # Remplacer la form_class de CreateTicketView
-        staff.CreateTicketView.form_class = CustomTicketForm
+        pass
