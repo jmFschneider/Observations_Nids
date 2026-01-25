@@ -276,14 +276,17 @@ def get_stats_page_statistiques():
         Q(etat_correction__statut='nouveau') | Q(etat_correction__statut='en_edition')
     ).count()
 
-    # Fiches en attente de correction (statut 'nouveau')
+    # Fiches en attente de correction (statut 'en_cours' et non assignées)
     fiches_en_attente_correction = FicheObservation.objects.filter(
-        etat_correction__statut='nouveau'
+        etat_correction__statut='en_cours',
+        etat_correction__en_correction_par__isnull=True
     ).count()
 
-    # Fiches en cours de correction (statut 'en_cours')
+    # Fiches en cours de correction (assignées à un correcteur et non validées)
     fiches_en_cours_correction = FicheObservation.objects.filter(
-        etat_correction__statut='en_cours'
+        etat_correction__en_correction_par__isnull=False
+    ).exclude(
+        etat_correction__statut='valide'
     ).count()
 
     # Fiches validées (statut 'valide')
