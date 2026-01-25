@@ -11,57 +11,71 @@
     <h2 class="h4 mb-3">
         <i class="fas fa-database text-primary"></i> Statistiques de Volume
     </h2>
-    <div class="row g-3">
-        <!-- Total Fiches -->
-        <div class="col-md-3">
+    <div class="row row-cols-1 row-cols-md-5 g-3">
+        <!-- 1. Total Fiches -->
+        <div class="col">
             <div class="card shadow-sm border-primary h-100">
-                <div class="card-body text-center">
-                    <div class="mb-2">
+                <div class="card-body text-center p-2">
+                    <div class="mb-1">
                         <i class="fas fa-file-alt fa-2x text-primary"></i>
                     </div>
-                    <h6 class="card-title text-muted text-uppercase small">Total Fiches</h6>
-                    <h2 class="display-4 fw-bold text-primary mb-0">{{ stats_volume.total_fiches }}</h2>
+                    <h6 class="card-title text-muted text-uppercase" style="font-size: 0.7rem;">Total Fiches</h6>
+                    <h2 class="display-6 fw-bold text-primary mb-0">{{ stats_volume.total_fiches }}</h2>
                 </div>
             </div>
         </div>
 
-        <!-- En Attente -->
-        <div class="col-md-3">
-            <div class="card shadow-sm border-warning h-100">
-                <div class="card-body text-center">
-                    <div class="mb-2">
-                        <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
-                    </div>
-                    <h6 class="card-title text-muted text-uppercase small">En Attente</h6>
-                    <h2 class="display-4 fw-bold text-warning mb-0">{{ stats_volume.fiches_en_cours_saisie }}</h2>
-                    <small class="text-muted">Saisie en cours</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- En Cours -->
-        <div class="col-md-3">
-            <div class="card shadow-sm border-info h-100">
-                <div class="card-body text-center">
-                    <div class="mb-2">
-                        <i class="fas fa-hourglass-half fa-2x text-info"></i>
-                    </div>
-                    <h6 class="card-title text-muted text-uppercase small">En Correction</h6>
-                    <h2 class="display-4 fw-bold text-info mb-0">{{ stats_volume.fiches_en_cours_correction }}</h2>
-                    <small class="text-muted">Avec correcteur</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- Validées -->
-        <div class="col-md-3">
+        <!-- 2. Validées -->
+        <div class="col">
             <div class="card shadow-sm border-success h-100">
-                <div class="card-body text-center">
-                    <div class="mb-2">
+                <div class="card-body text-center p-2">
+                    <div class="mb-1">
                         <i class="fas fa-check-circle fa-2x text-success"></i>
                     </div>
-                    <h6 class="card-title text-muted text-uppercase small">Validées</h6>
-                    <h2 class="display-4 fw-bold text-success mb-0">{{ stats_volume.fiches_validees }}</h2>
+                    <h6 class="card-title text-muted text-uppercase" style="font-size: 0.7rem;">Validées</h6>
+                    <h2 class="display-6 fw-bold text-success mb-0">{{ stats_volume.fiches_validees }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. En Cours de Correction -->
+        <div class="col">
+            <div class="card shadow-sm border-danger h-100">
+                <div class="card-body text-center p-2">
+                    <div class="mb-1">
+                        <i class="fas fa-tools fa-2x text-danger"></i>
+                    </div>
+                    <h6 class="card-title text-muted text-uppercase" style="font-size: 0.7rem;">En Correction</h6>
+                    <h2 class="display-6 fw-bold text-danger mb-0">{{ stats_volume.fiches_en_correction }}</h2>
+                    <small class="text-muted" style="font-size: 0.65rem;">Assignées</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. En Attente de Correction -->
+        <div class="col">
+            <div class="card shadow-sm border-warning h-100">
+                <div class="card-body text-center p-2">
+                    <div class="mb-1">
+                        <i class="fas fa-pause-circle fa-2x text-warning"></i>
+                    </div>
+                    <h6 class="card-title text-muted text-uppercase" style="font-size: 0.7rem;">Attente Correction</h6>
+                    <h2 class="display-6 fw-bold text-warning mb-0">{{ stats_volume.fiches_en_attente_correction }}</h2>
+                    <small class="text-muted" style="font-size: 0.65rem;">Non assignées</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. En cours de saisie -->
+        <div class="col">
+            <div class="card shadow-sm border-info h-100">
+                <div class="card-body text-center p-2">
+                    <div class="mb-1">
+                        <i class="fas fa-pen fa-2x text-info"></i>
+                    </div>
+                    <h6 class="card-title text-muted text-uppercase" style="font-size: 0.7rem;">En Saisie</h6>
+                    <h2 class="display-6 fw-bold text-info mb-0">{{ stats_volume.fiches_nouvelles|add:stats_volume.fiches_en_edition }}</h2>
+                    <small class="text-muted" style="font-size: 0.65rem;">(Nouveau + Édition)</small>
                 </div>
             </div>
         </div>
@@ -84,7 +98,7 @@
                         </div>
                         <h6 class="text-muted text-uppercase small mb-2">Taux de Validation</h6>
                         <h2 class="display-5 fw-bold text-success mb-2">
-                            {{ stats_performance.taux_validation_pourcent }}%
+                            {{ stats_performance.taux_validation_pourcent|floatformat:0 }}%
                         </h2>
                         <p class="text-muted mb-0 small">
                             <span class="fw-bold">{{ stats_performance.fiches_validees }}</span> / 
@@ -102,7 +116,7 @@
                         <h6 class="text-muted text-uppercase small mb-2">Temps Moyen Validation</h6>
                         <h2 class="display-5 fw-bold text-primary mb-2">
                             {% if stats_performance.temps_moyen_validation_jours %}
-                                {{ stats_performance.temps_moyen_validation_jours|floatformat:1 }}
+                                {{ stats_performance.temps_moyen_validation_jours|floatformat:0 }}
                                 <small class="fs-4">jours</small>
                             {% else %}
                                 <small class="fs-4">N/A</small>

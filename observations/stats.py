@@ -42,7 +42,8 @@ class StatsVolume:
             dict: Dictionnaire avec les clés:
                 - nouvelles: nombre de fiches nouvelles
                 - en_edition: nombre de fiches en cours d'édition
-                - en_correction: nombre de fiches en cours de correction
+                - en_attente_correction: nombre de fiches en attente de correcteur
+                - en_correction: nombre de fiches en cours de correction (avec correcteur)
                 - validees: nombre de fiches validées
                 - stats_brutes: queryset avec la répartition complète
         """
@@ -55,13 +56,25 @@ class StatsVolume:
 
         en_edition = FicheObservation.objects.filter(etat_correction__statut='en_edition').count()
 
-        en_correction = FicheObservation.objects.filter(etat_correction__statut='en_cours').count()
+        # En attente : statut 'en_cours' mais pas de correcteur assigné
+        en_attente_correction = FicheObservation.objects.filter(
+            etat_correction__statut='en_cours',
+            etat_correction__en_correction_par__isnull=True
+        ).count()
+
+        # En correction : correcteur assigné et pas encore validée
+        en_correction = FicheObservation.objects.filter(
+            etat_correction__en_correction_par__isnull=False
+        ).exclude(
+            etat_correction__statut='valide'
+        ).count()
 
         validees = FicheObservation.objects.filter(etat_correction__statut='valide').count()
 
         return {
             'nouvelles': nouvelles,
             'en_edition': en_edition,
+            'en_attente_correction': en_attente_correction,
             'en_correction': en_correction,
             'validees': validees,
             'stats_brutes': list(stats_brutes),
@@ -122,6 +135,7 @@ class StatsVolume:
             'total_fiches': StatsVolume.get_total_fiches(),
             'fiches_nouvelles': fiches_statut['nouvelles'],
             'fiches_en_edition': fiches_statut['en_edition'],
+            'fiches_en_attente_correction': fiches_statut['en_attente_correction'],
             'fiches_en_correction': fiches_statut['en_correction'],
             'fiches_validees': fiches_statut['validees'],
             'fiches_recentes_30j': StatsVolume.get_fiches_recentes(30),
