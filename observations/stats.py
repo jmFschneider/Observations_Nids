@@ -58,16 +58,15 @@ class StatsVolume:
 
         # En attente : statut 'en_cours' mais pas de correcteur assigné
         en_attente_correction = FicheObservation.objects.filter(
-            etat_correction__statut='en_cours',
-            etat_correction__en_correction_par__isnull=True
+            etat_correction__statut='en_cours', etat_correction__en_correction_par__isnull=True
         ).count()
 
         # En correction : correcteur assigné et pas encore validée
-        en_correction = FicheObservation.objects.filter(
-            etat_correction__en_correction_par__isnull=False
-        ).exclude(
-            etat_correction__statut='valide'
-        ).count()
+        en_correction = (
+            FicheObservation.objects.filter(etat_correction__en_correction_par__isnull=False)
+            .exclude(etat_correction__statut='valide')
+            .count()
+        )
 
         validees = FicheObservation.objects.filter(etat_correction__statut='valide').count()
 
@@ -292,16 +291,15 @@ def get_stats_page_statistiques():
 
     # Fiches en attente de correction (statut 'en_cours' et non assignées)
     fiches_en_attente_correction = FicheObservation.objects.filter(
-        etat_correction__statut='en_cours',
-        etat_correction__en_correction_par__isnull=True
+        etat_correction__statut='en_cours', etat_correction__en_correction_par__isnull=True
     ).count()
 
     # Fiches en cours de correction (assignées à un correcteur et non validées)
-    fiches_en_cours_correction = FicheObservation.objects.filter(
-        etat_correction__en_correction_par__isnull=False
-    ).exclude(
-        etat_correction__statut='valide'
-    ).count()
+    fiches_en_cours_correction = (
+        FicheObservation.objects.filter(etat_correction__en_correction_par__isnull=False)
+        .exclude(etat_correction__statut='valide')
+        .count()
+    )
 
     # Fiches validées (statut 'valide')
     fiches_valides = FicheObservation.objects.filter(etat_correction__statut='valide').count()
