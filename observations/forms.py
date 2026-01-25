@@ -329,13 +329,16 @@ class ObservationForm(forms.ModelForm):
 
         # Gérer les flags d'incertitude à partir des valeurs brutes
         # (car le JS met à jour le champ caché ET ajoute le "?")
-        nombre_oeufs_raw = self.data.get('nombre_oeufs', '').strip()
+        # Utiliser add_prefix pour récupérer la bonne valeur dans un formset
+        nombre_oeufs_raw = self.data.get(self.add_prefix('nombre_oeufs'), '').strip()
         if nombre_oeufs_raw and nombre_oeufs_raw.endswith('?'):
             cleaned_data['nombre_oeufs_incertain'] = True
+        # Si le champ hidden a bien transmis la valeur, on la garde
+        # Sinon on met à False par défaut
         elif 'nombre_oeufs_incertain' not in cleaned_data:
             cleaned_data['nombre_oeufs_incertain'] = False
 
-        nombre_poussins_raw = self.data.get('nombre_poussins', '').strip()
+        nombre_poussins_raw = self.data.get(self.add_prefix('nombre_poussins'), '').strip()
         if nombre_poussins_raw and nombre_poussins_raw.endswith('?'):
             cleaned_data['nombre_poussins_incertain'] = True
         elif 'nombre_poussins_incertain' not in cleaned_data:

@@ -214,22 +214,22 @@
 		<table>
 			<thead>
 				<tr>
-					<th>Date et heure</th>
-					<th>Nombre d'œufs</th>
-					<th>Nombre de poussins</th>
+					<th style="text-align: center;">Date et heure</th>
+					<th style="text-align: center;">Nombre d'œufs</th>
+					<th style="text-align: center;">Nombre de poussins</th>
 					<th>Observations</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% for observation in observations %}
 				<tr>
-					<td>
-						<span class="observation-date-time">
+					<td style="text-align: center;">
+						<span class="observation-date-time" style="justify-content: center;">
 							<span class="observation-date">{{ observation.date_observation|date:"d/m/Y" }}</span>
 							<span class="observation-time {% if not observation.heure_connue %}time-unknown{% endif %}">{{ observation.date_observation|date:"H:i" }}</span>
 						</span>
 					</td>
-					<td>
+					<td style="text-align: center;">
 						{% if observation.nombre_oeufs is not None %}
 							{{ observation.nombre_oeufs }}
 							{% if observation.nombre_oeufs_incertain %}
@@ -241,7 +241,7 @@
 							-
 						{% endif %}
 					</td>
-					<td>
+					<td style="text-align: center;">
 						{% if observation.nombre_poussins is not None %}
 							{{ observation.nombre_poussins }}
 							{% if observation.nombre_poussins_incertain %}

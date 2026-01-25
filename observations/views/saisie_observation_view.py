@@ -43,7 +43,10 @@ def handle_remarques_update(request, fiche_instance, remarqueformset):
     Traite uniquement la mise à jour des remarques via AJAX.
     """
     try:
-        if request.user != fiche_instance.observateur:
+        if request.user != fiche_instance.observateur and request.user.role not in [
+            'administrateur',
+            'reviewer',
+        ]:
             return JsonResponse(
                 {
                     'status': 'forbidden',

@@ -145,7 +145,7 @@ input.nombre-avec-incertitude {
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'Observations/js/saisie_observation.js' %}?v=6.3"></script>
+<script type="module" src="{% static 'Observations/js/saisie_observation.js' %}?v=6.4"></script>
 <!-- Store fiche_id and chemin_json for JS access -->
 {% if fiche_form.instance.pk %}
 <div data-fiche-id="{{ fiche_form.instance.pk }}" data-chemin-json="{{ fiche_form.instance.chemin_json|default:'' }}" style="display: none;"></div>
@@ -659,12 +659,12 @@ function fermerModalRecherche() {
                 <table>
                     <thead>
                         <tr>
-                            <th>Date et heure</th>
+                            <th style="text-align: center;">Date et heure</th>
                             <th style="text-align: center;">Heure connue</th>
-                            <th>Nombre d'œufs</th>
-                            <th>Nombre de poussins</th>
+                            <th style="text-align: center;">Nombre d'œufs</th>
+                            <th style="text-align: center;">Nombre de poussins</th>
                             <th>Observations</th>
-                            <th>Actions</th>
+                            <th style="text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -675,9 +675,9 @@ function fermerModalRecherche() {
                                 <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk|default:'' }}">
                                 -->
                                 {{ form.id }}
-                                <td class="date-time-cell" data-observation-id="{{ form.instance.pk|default:'' }}">
+                                <td class="date-time-cell" data-observation-id="{{ form.instance.pk|default:'' }}" style="text-align: center;">
                                     {% if form.date_observation.errors %}<div class="error">{{ form.date_observation.errors }}</div>{% endif %}
-                                    <div class="date-time-container {% if form.instance.pk and not form.instance.heure_connue %}time-unknown{% endif %}">
+                                    <div class="date-time-container {% if form.instance.pk and not form.instance.heure_connue %}time-unknown{% endif %}" style="justify-content: center;">
                                         {{ form.date_observation }}
                                     </div>
                                 </td>
@@ -685,9 +685,9 @@ function fermerModalRecherche() {
                                     {{ form.heure_connue }}
                                     <label for="{{ form.heure_connue.id_for_label }}" style="margin-left: 5px; font-size: 0.9em; cursor: pointer;">Heure connue</label>
                                 </td>
-                                <td>
+                                <td style="text-align: center;">
                                     {% if form.nombre_oeufs.errors %}<div class="error">{{ form.nombre_oeufs.errors }}</div>{% endif %}
-                                    <div class="nombre-input-container">
+                                    <div class="nombre-input-container" style="justify-content: center;">
                                         {{ form.nombre_oeufs }}
                                         {{ form.nombre_oeufs_incertain }}
                                         <i class="fas fa-question-circle incertitude-icon" 
@@ -696,9 +696,9 @@ function fermerModalRecherche() {
                                            data-field="nombre_oeufs"></i>
                                     </div>
                                 </td>
-                                <td>
+                                <td style="text-align: center;">
                                     {% if form.nombre_poussins.errors %}<div class="error">{{ form.nombre_poussins.errors }}</div>{% endif %}
-                                    <div class="nombre-input-container">
+                                    <div class="nombre-input-container" style="justify-content: center;">
                                         {{ form.nombre_poussins }}
                                         {{ form.nombre_poussins_incertain }}
                                         <i class="fas fa-question-circle incertitude-icon" 
@@ -711,7 +711,7 @@ function fermerModalRecherche() {
                                     {% if form.observations.errors %}<div class="error">{{ form.observations.errors }}</div>{% endif %}
                                     {{ form.observations }}
                                 </td>
-                                <td>
+                                <td style="text-align: center;">
                                     <div style="display: none;">{{ form.DELETE }}</div>
                                     {% if form.instance.pk %}
                                         <button type="button" class="btn btn-sm btn-outline-danger delete-observation-btn" title="Marquer pour suppression">
@@ -1069,11 +1069,11 @@ function fermerModalRecherche() {
             <button type="submit" class="btn btn-primary" onclick="return confirm('Voulez-vous vraiment enregistrer les modifications ?');">Enregistrer</button>
             {% if fiche_form.instance.pk %}
                 {% if fiche_form.instance.etat_correction.statut == 'nouveau' or fiche_form.instance.etat_correction.statut == 'en_edition' %}
-                    <button type="submit" class="btn btn-success" formaction="{% url 'observations:soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" onclick="return confirm('Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.');">
+                    <button type="submit" class="btn btn-success" formaction="{% url 'observations:soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" data-confirm-message="Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.">
                         Soumettre pour correction
                     </button>
                 {% elif fiche_form.instance.etat_correction.statut == 'en_cours' %}
-                    <button type="submit" class="btn btn-success" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" onclick="return confirm('Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.');">
+                    <button type="submit" class="btn btn-success" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" data-confirm-message="Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.">
                         Valider la correction
                     </button>
                 {% endif %}
@@ -1081,9 +1081,9 @@ function fermerModalRecherche() {
         {% endif %}
         {% if fiche_form.instance.pk %}
             <a href="{% url 'observations:historique_modifications' fiche_id=fiche_form.instance.pk %}" class="btn btn-info" target="_blank">Historique</a>
-            <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary">Retour à la list</a>
+            <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary" data-check-changes="true">Retour à la list</a>
         {% else %}
-            <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary">Annuler</a>
+            <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary" data-check-changes="true">Annuler</a>
         {% endif %}
     </div>
 
@@ -1096,22 +1096,22 @@ function fermerModalRecherche() {
                 </button>
                 {% if fiche_form.instance.pk %}
                     {% if fiche_form.instance.etat_correction.statut == 'nouveau' or fiche_form.instance.etat_correction.statut == 'en_edition' %}
-                        <button type="submit" class="btn btn-success" formaction="{% url 'observations:soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" onclick="return confirm('Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.');">
+                        <button type="submit" class="btn btn-success" formaction="{% url 'observations:soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" data-confirm-message="Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.">
                             <i class="fas fa-paper-plane"></i> Soumettre pour correction
                         </button>
                     {% elif fiche_form.instance.etat_correction.statut == 'en_cours' %}
-                        <button type="submit" class="btn btn-success" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" onclick="return confirm('Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.');">
+                        <button type="submit" class="btn btn-success" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" data-confirm-message="Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.">
                             <i class="fas fa-check-circle"></i> Valider la fiche
                         </button>
                     {% endif %}
                 {% endif %}
             {% endif %}
             {% if fiche_form.instance.pk %}
-                <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary">
+                <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary" data-check-changes="true">
                     <i class="fas fa-arrow-left"></i> Retour
                 </a>
             {% else %}
-                <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary">
+                <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary" data-check-changes="true">
                     <i class="fas fa-times"></i> Annuler
                 </a>
             {% endif %}
