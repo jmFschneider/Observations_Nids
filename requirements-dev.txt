@@ -340,7 +340,7 @@ pymdown-extensions==10.20
     # via
     #   -r requirements-dev.in
     #   mkdocs-material
-pyparsing==3.3.1
+pyparsing==3.3.2
     # via
     #   -r requirements-base.in
     #   httplib2
