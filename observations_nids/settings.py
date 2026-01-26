@@ -76,6 +76,9 @@ DEBUG = settings.DEBUG
 # Environment identifier (production, pilote, development)
 ENVIRONMENT = settings.ENVIRONMENT
 
+# ✅ Clé API Gemini pour les services d'IA
+GEMINI_API_KEY = settings.GEMINI_API_KEY
+
 _local: ModuleType | None  # <- type déclaré une fois
 
 # Surcharge via settings_local.py (facultatif)

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gestion des retours - Observations Nids{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-comments text-primary me-2"></i> Retours utilisateurs
+        </h1>
+        <span class="badge bg-primary rounded-pill">{{ feedbacks.count }} message{{ feedbacks.count|pluralize }}</span>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 150px;">Date</th>
+                            <th>Utilisateur</th>
+                            <th>Message & Analyse IA</th>
+                            <th style="width: 120px;">Catégorie</th>
+                            <th style="width: 100px;">Urgence</th>
+                            <th style="width: 120px;">Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in feedbacks %}
+                        <tr>
+                            <td class="small text-muted">
+                                {{ f.created_at|date:"d/m/Y" }}<br>{{ f.created_at|date:"H:i" }}
+                            </td>
+                            <td>
+                                <strong>{{ f.user.username|default:"Anonyme" }}</strong>
+                                <br><small class="text-muted">{{ f.user.get_full_name }}</small>
+                            </td>
+                            <td>
+                                <div class="mb-2">{{ f.content|linebreaksbr }}</div>
+                                {% if f.ai_summary %}
+                                <div class="bg-light p-2 rounded small border-start border-primary border-4">
+                                    <i class="fas fa-robot text-primary me-1"></i> <strong>Résumé IA :</strong> {{ f.ai_summary }}
+                                    {% if f.sentiment %}<br><i class="fas fa-heart text-danger me-1"></i> <strong>Sentiment :</strong> {{ f.sentiment }}{% endif %}
+                                </div>
+                                {% endif %}
+                                <div class="mt-1 small">
+                                    <a href="{{ f.url_source }}" target="_blank" class="text-muted text-decoration-none">
+                                        <i class="fas fa-link me-1"></i> Page source
+                                    </a>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge {% if f.category == 'BUG' %}bg-danger{% elif f.category == 'IDEA' %}bg-success{% elif f.category == 'DATA' %}bg-warning text-dark{% elif f.category == 'QUESTION' %}bg-info{% else %}bg-secondary{% endif %} w-100">
+                                    {{ f.get_category_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    {% for i in "12345" %}
+                                        <i class="fas fa-circle {% if forloop.counter <= f.urgency %}text-primary{% else %}text-light{% endif %}" style="font-size: 0.5rem; margin: 0 1px;"></i>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="small fw-bold text-uppercase">{{ f.get_status_display }}</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-inbox fa-3x mb-3"></i>
+                                <p>Aucun retour pour le moment.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Note: Pour simplifier (KISS), nous n'avons pas créé de vue AJAX de mise à jour.
+    // Pour traiter un message, vous pouvez utiliser l'Admin Django ou nous pourrons 
+    // ajouter une vue simple plus tard si nécessaire.
+    console.log("Interface de gestion des feedbacks chargée.");
+</script>
+{% endblock %}

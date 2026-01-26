@@ -1,122 +1,50 @@
-# =======================$RedisCli     = "C:\Projets\Redis\redis-cli.exe"
 # =======================
-# Start-DevStack.ps1 (corrigé)
+# Start-DevStack.ps1 (Version 4 Zones - Couleurs Personnalisées)
 # =======================
 
-# === CONFIG À ADAPTER ===
+# === CONFIG ===
 $ProjectDir   = "C:\Projets\observations_nids"
 $VenvActivate = "$ProjectDir\.venv\Scripts\Activate.ps1"
-
-# Chemin complet vers redis-server.exe (ex: C:\Redis\redis-server.exe)
 $RedisExe     = "C:\Programmes non installes\Redis\redis-server.exe"
-# (Optionnel) Chemin vers redis-cli.exe si tu veux tester un PING spécifique
-$RedisCli     = "C:\Programmes non installes\Redis\redis-cli.exe"
-
-# Réseau / Ports
 $DjangoHost   = "127.0.0.1"
 $DjangoPort   = 8000
 $FlowerPort   = 5555
-
-# Nom du module Celery (projet)
 $CeleryApp    = "observations_nids"
 
-$script:PidFile = Join-Path $env:TEMP "nids-devstack.pids"
-# Réinitialiser le fichier PID à chaque démarrage
-Set-Content -Path $script:PidFile -Value "" -Encoding ASCII -Force
+Write-Host "=== Démarrage de la pile Dev (Zones Colorées) ===" -ForegroundColor Cyan
 
-
-# === FONCTIONS ===
-
-function Wait-PortReady {
-    param(
-        [string]$TargetHost = "127.0.0.1",
-        [int]$Port = 6379,
-        [int]$TimeoutSec = 20
-    )
-    $deadline = (Get-Date).AddSeconds($TimeoutSec)
-    Write-Host "Attente que ${TargetHost}:$Port soit joignable (timeout ${TimeoutSec}s) ..."
-    while ((Get-Date) -lt $deadline) {
-        $ok = Test-NetConnection -ComputerName $TargetHost -Port $Port -InformationLevel Quiet
-        if ($ok) { 
-            Write-Host " -> Port $Port OK." -ForegroundColor Green
-            return $true 
-        }
-        Start-Sleep -Seconds 1
-    }
-    Write-Warning " -> Port $Port non joignable après ${TimeoutSec}s."
-    return $false
-}
-
-function Start-Window {
-    param(
-        [Parameter(Mandatory=$true)][string]$Title,
-        [Parameter(Mandatory=$true)][string]$Command,
-        [string]$WorkingDirectory = $ProjectDir
-    )
-    $full = @"
-`$Host.UI.RawUI.WindowTitle = '$Title';
-if (Test-Path '$VenvActivate') { . '$VenvActivate' };
-$Command
+# Fonction pour encoder une commande PowerShell en Base64 avec couleur
+function Get-EncodedCmd {
+    param($Title, $Script, $Color)
+    $FullScript = @"
+`$Host.UI.RawUI.WindowTitle = '$Title'
+`$Host.UI.RawUI.ForegroundColor = '$Color'
+Clear-Host
+if (Test-Path '$VenvActivate') { . '$VenvActivate' }
+cd '$ProjectDir'
+$Script
 "@
-
-    # IMPORTANT: -PassThru pour récupérer l'objet Process et donc le PID
-    $proc = Start-Process -FilePath "powershell.exe" `
-        -ArgumentList "-NoLogo","-NoExit","-ExecutionPolicy","Bypass","-Command",$full `
-        -WorkingDirectory $WorkingDirectory -PassThru
-
-    # Enregistrer le PID pour l'arrêt
-    if ($script:PidFile) { Add-Content -Path $script:PidFile -Value $proc.Id }
-
-    return $proc
+    $Bytes = [System.Text.Encoding]::Unicode.GetBytes($FullScript)
+    return [Convert]::ToBase64String($Bytes)
 }
 
+# Préparation des commandes avec couleurs
+$E1 = Get-EncodedCmd "Nids: Django" "python manage.py runserver ${DjangoHost}:${DjangoPort}" "Green"
+$E2 = Get-EncodedCmd "Nids: Celery" "celery -A $CeleryApp worker --loglevel=info --pool=eventlet" "Cyan"
+$E3 = Get-EncodedCmd "Nids: Flower" "celery -A $CeleryApp flower --port=$FlowerPort" "Yellow"
+$E4 = Get-EncodedCmd "Nids: Redis" "if (-not (Get-Process 'redis-server' -ErrorAction SilentlyContinue)) { cd (Split-Path '$RedisExe'); & '$RedisExe' } else { Write-Host 'Redis OK' -ForegroundColor Green }" "White"
 
-# === DÉBUT ===
+# Construction de la commande pour Windows Terminal
+$WT_Args = "new-tab -d `"$ProjectDir`" powershell.exe -NoExit -EncodedCommand $E1 ; " +
+          "split-pane -V -d `"$ProjectDir`" powershell.exe -NoExit -EncodedCommand $E2 ; " +
+          "move-focus left ; " +
+          "split-pane -H -d `"$ProjectDir`" powershell.exe -NoExit -EncodedCommand $E3 ; " +
+          "move-focus right ; " +
+          "split-pane -H -d `"$ProjectDir`" powershell.exe -NoExit -EncodedCommand $E4"
 
-Write-Host "=== Démarrage pile dev : Redis -> Django -> Celery -> Flower ===" -ForegroundColor Cyan
+Write-Host "Lancement de Windows Terminal en couleurs..." -ForegroundColor Yellow
+Start-Process "wt.exe" -ArgumentList $WT_Args
 
-# 1) Redis
-if (-not (Test-Path $RedisExe)) {
-    Write-Error "redis-server introuvable : $RedisExe. Modifie `$RedisExe en haut du script."
-    exit 1
-}
-
-$redisRunning = Get-Process -Name "redis-server" -ErrorAction SilentlyContinue
-if ($redisRunning) {
-    Write-Host "[1/4] Redis déjà démarré (PID: $($redisRunning.Id))."
-} else {
-    Write-Host "[1/4] Démarrage Redis..."
-    Start-Process -FilePath $RedisExe -WorkingDirectory (Split-Path $RedisExe) | Out-Null
-    # Attends que le port 6379 réponde
-    Wait-PortReady -TargetHost "127.0.0.1" -Port 6379 -TimeoutSec 20 | Out-Null
-}
-
-# (Optionnel) Test PING via redis-cli si présent
-if (Test-Path $RedisCli) {
-    try {
-        $pong = & $RedisCli -h 127.0.0.1 -p 6379 ping 2>$null
-        if ($pong -ne "PONG") { Write-Warning "redis-cli ping n'a pas répondu PONG (réponse: '$pong')." }
-        else { Write-Host "redis-cli ping -> PONG" -ForegroundColor Green }
-    } catch { Write-Warning "redis-cli ping a échoué : $($_.Exception.Message)" }
-}
-
-# 2) Django
-Write-Host "[2/4] Démarrage Django (http://${DjangoHost}:$DjangoPort) ..."
-Start-Window -Title "Nids: Django" -Command "python manage.py runserver ${DjangoHost}:$DjangoPort"
-
-# 3) Celery worker
-Write-Host "[3/4] Démarrage Celery worker ..."
-Start-Window -Title "Nids: Celery worker" -Command "celery -A $CeleryApp worker --loglevel=info --pool=eventlet"
-
-# 4) Flower
-Write-Host "[4/4] Démarrage Flower (http://127.0.0.1:$FlowerPort) ..."
-Start-Window -Title "Nids: Flower" -Command "celery -A $CeleryApp flower --port=$FlowerPort --loglevel=info"
-
-# Optionnel : ouvrir Flower dans le navigateur
+# Ouvrir Flower
+Start-Sleep -Seconds 5
 Start-Process "http://127.0.0.1:$FlowerPort" | Out-Null
-
-Write-Host ""
-Write-Host "Tout est lancé :" -ForegroundColor Green
-Write-Host " - Django  : http://${DjangoHost}:$DjangoPort"
-Write-Host " - Flower  : http://127.0.0.1:$FlowerPort"
-Write-Host ""
