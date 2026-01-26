@@ -686,6 +686,7 @@ INSTALLED_APPS = [
     'ingest.apps.IngestConfig',              # Import JSON
     'audit.apps.AuditConfig',                # Historique
     'ocr.apps.OcrConfig',                    # Transcription OCR
+    'feedback.apps.FeedbackConfig',          # Retours utilisateurs IA
     
     # Dépendances tierces
     'bootstrap4form',
@@ -710,6 +711,7 @@ INSTALLED_APPS = [
 | **audit** | `HistoriqueModification` | Traçabilité des modifications |
 | **ingest** | `TranscriptionBrute`, `EspeceCandidate`, `ImportationEnCours` | Import de données JSON |
 | **ocr** | `TranscriptionOCR` | Transcription OCR via Gemini API |
+| **feedback** | `Feedback` | Retours utilisateurs et analyse IA Gemini |
 | **core** | `Constantes`, modèles abstraits | Utilitaires partagés |
 | **helpdesk** | Tickets, Queues | Système de tickets support |
 
