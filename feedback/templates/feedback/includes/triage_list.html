@@ -1,0 +1,71 @@
+{% for f in feedbacks %}
+<div class="card triage-card mb-3 {% if f.category == 'BUG' %}bug{% elif f.category == 'IDEA' %}idea{% elif f.category == 'DATA' %}data{% elif f.category == 'QUESTION' %}question{% endif %} shadow-sm">
+    <div class="card-body">
+        <div class="row">
+            <!-- Colonne gauche: Message -->
+            <div class="col-md-7 border-end">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="small text-muted"><i class="fas fa-user me-1"></i> {{ f.user.get_full_name }} ({{ f.user.username }})</span>
+                    <span class="small text-muted">{{ f.created_at|date:"d/m/Y H:i" }}</span>
+                </div>
+                <div class="mb-3">
+                    <strong>Message :</strong><br>
+                    {{ f.content|linebreaksbr }}
+                </div>
+                {% if f.ai_summary %}
+                <div class="p-2 bg-light rounded small mb-2">
+                    <i class="fas fa-robot text-primary me-1"></i> <strong>IA :</strong> {{ f.ai_summary }} 
+                    <span class="mx-2 text-muted">|</span> 
+                    <i class="fas fa-heart text-danger me-1"></i> {{ f.sentiment }}
+                </div>
+                {% endif %}
+                <div class="small">
+                    <a href="{{ f.url_source }}" target="_blank" class="text-muted"><i class="fas fa-link me-1"></i> Page d'origine</a>
+                </div>
+            </div>
+
+            <!-- Colonne droite: Actions -->
+            <div class="col-md-5">
+                <form class="triage-form" data-feedback-id="{{ f.id }}">
+                    {% csrf_token %}
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="small fw-bold">Statut</label>
+                            <select name="status" class="form-select form-select-sm">
+                                {% for code, label in f.STATUS %}
+                                    <option value="{{ code }}" {% if f.status == code %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="small fw-bold">Catégorie</label>
+                            <select name="category" class="form-select form-select-sm">
+                                {% for code, label in f.CATEGORIES %}
+                                    <option value="{{ code }}" {% if f.category == code %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="small fw-bold">Note / Réponse</label>
+                        <textarea name="admin_note" class="form-control form-control-sm" rows="2" placeholder="Saisissez votre décision ou réponse...">{{ f.admin_note }}</textarea>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input public-toggle" type="checkbox" id="public_{{ f.id }}" {% if f.is_public_response %}checked{% endif %}>
+                            <label class="form-check-label small" for="public_{{ f.id }}">Réponse publique</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fas fa-save me-1"></i> Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="text-center py-5 text-muted">
+    <p>Aucun message dans cette catégorie.</p>
+</div>
+{% endfor %}

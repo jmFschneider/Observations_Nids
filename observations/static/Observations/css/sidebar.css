@@ -145,6 +145,50 @@ body {
     margin-left: 0px !important;
 }
 
+/* Couleurs spécifiques par section */
+.section-admin .sidebar-heading {
+    color: #856404 !important; /* Orange foncé / Ambre */
+}
+
+.section-admin .nav-link {
+    color: #9c6b00 !important;
+    font-weight: 600;
+}
+
+.section-admin .nav-link i {
+    color: #856404;
+}
+
+.section-aide .sidebar-heading {
+    color: #004085 !important; /* Bleu marine foncé */
+}
+
+.section-aide .nav-link {
+    color: #0056b3 !important;
+    font-weight: 600;
+}
+
+.section-aide .nav-link i {
+    color: #004085;
+}
+
+/* Section désactivée (Grisée) */
+.section-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    filter: grayscale(100%);
+}
+
+.section-disabled .sidebar-heading,
+.section-disabled .nav-link,
+.section-disabled .nav-link i {
+    color: #6c757d !important; /* Gris explicite (Bootstrap muted) */
+}
+
+.section-disabled .nav-link {
+    cursor: not-allowed;
+}
+
 #sidebar.collapsed .sidebar-heading {
     opacity: 0;
     display: none;

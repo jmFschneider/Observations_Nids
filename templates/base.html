@@ -96,18 +96,18 @@
                     </li>
 
                     <!-- Section Mes Images -->
-                    <li class="nav-item">
+                    <li class="nav-item section-disabled">
                         <div class="sidebar-divider"></div>
                         <h6 class="sidebar-heading">Mes Images</h6>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'observations:upload_image_source' %}" data-title="Téléverser une image">
+                    <li class="nav-item section-disabled">
+                        <a class="nav-link disabled" href="#" data-title="Téléverser une image (Bientôt disponible)">
                             <i class="fas fa-upload"></i>
                             <span class="link-text">Téléverser une image</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'observations:mes_images_sources' %}" data-title="Mes images téléversées">
+                    <li class="nav-item section-disabled">
+                        <a class="nav-link disabled" href="#" data-title="Mes images téléversées (Bientôt disponible)">
                             <i class="fas fa-image"></i>
                             <span class="link-text">Mes images téléversées</span>
                         </a>
@@ -141,9 +141,15 @@
 
                     <!-- Section Administration -->
                     {% if user.role == 'administrateur' %}
-                    <li class="nav-item">
+                    <li class="nav-item section-admin">
                         <div class="sidebar-divider"></div>
                         <h6 class="sidebar-heading">Administration</h6>
+                    </li>
+                    <li class="nav-item section-admin">
+                        <a class="nav-link" href="{% url 'feedback:triage' %}" data-title="Gestion des retours">
+                            <i class="fas fa-tasks"></i>
+                            <span class="link-text">Gestion des retours</span>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'accounts:liste_utilisateurs' %}" data-title="Gestion des utilisateurs">
@@ -191,17 +197,17 @@
                     {% endif %}
 
                     <!-- Support -->
-                    <li class="nav-item">
+                    <li class="nav-item section-aide">
                         <div class="sidebar-divider"></div>
                         <h6 class="sidebar-heading">Aide</h6>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item section-aide">
                         <a class="nav-link" href="{% url 'observations:aide' %}" data-title="Aide" target="_blank">
                             <i class="fas fa-book"></i>
                             <span class="link-text">Aide</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item section-aide">
                         <a class="nav-link" href="{% url 'feedback:list' %}" data-title="Avis et suggestions">
                             <i class="fas fa-comments"></i>
                             <span class="link-text">Avis et suggestions</span>

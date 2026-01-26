@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Triage des retours - Observations Nids{% endblock %}
+
+{% block extra_css %}
+<style>
+    .triage-card { border-left: 5px solid #ccc; transition: all 0.2s; }
+    .triage-card.bug { border-left-color: #dc3545; }
+    .triage-card.idea { border-left-color: #198754; }
+    .triage-card.data { border-left-color: #ffc107; }
+    .triage-card.question { border-left-color: #0dcaf0; }
+    .triage-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="h3 mb-4"><i class="fas fa-tasks text-primary me-2"></i> Centre de Triage des Retours</h1>
+
+    <!-- Onglets de statut -->
+    <ul class="nav nav-pills mb-4" id="triageTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="new-tab" data-bs-toggle="pill" data-bs-target="#new" type="button">
+                📥 À traiter ({{ new_feedbacks.count }})
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="processing-tab" data-bs-toggle="pill" data-bs-target="#processing" type="button">
+                ⚙️ En cours ({{ processing_feedbacks.count }})
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="resolved-tab" data-bs-toggle="pill" data-bs-target="#resolved" type="button">
+                ✅ Terminés ({{ resolved_feedbacks.count }})
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- Panel: À traiter -->
+        <div class="tab-pane fade show active" id="new">
+            {% include "feedback/includes/triage_list.html" with feedbacks=new_feedbacks %}
+        </div>
+        <!-- Panel: En cours -->
+        <div class="tab-pane fade" id="processing">
+            {% include "feedback/includes/triage_list.html" with feedbacks=processing_feedbacks %}
+        </div>
+        <!-- Panel: Terminés -->
+        <div class="tab-pane fade" id="resolved">
+            {% include "feedback/includes/triage_list.html" with feedbacks=resolved_feedbacks %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const forms = document.querySelectorAll('.triage-form');
+        
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const feedbackId = this.dataset.feedbackId;
+                const btn = this.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+                const formData = new FormData(this);
+                formData.append('is_public_response', this.querySelector('.public-toggle').checked);
+
+                fetch(`/feedback/update/${feedbackId}/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        btn.classList.replace('btn-primary', 'btn-success');
+                        btn.innerHTML = '<i class="fas fa-check"></i> Enregistré';
+                        setTimeout(() => {
+                            btn.classList.replace('btn-success', 'btn-primary');
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                            // Optionnel: Recharger si le statut a changé pour déplacer la carte
+                        }, 1500);
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

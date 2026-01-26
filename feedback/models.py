@@ -41,6 +41,11 @@ class Feedback(models.Model):
     ai_summary = models.CharField(max_length=200, blank=True, verbose_name="Résumé IA")
 
     status = models.CharField(max_length=20, choices=STATUS, default="NEW", verbose_name="Statut")
+
+    # Champs de décision Administrateur
+    admin_note = models.TextField(blank=True, verbose_name="Note / Décision Administrateur")
+    is_public_response = models.BooleanField(default=False, verbose_name="Rendre la note publique")
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True)
 
