@@ -31,6 +31,7 @@ urlpatterns = [
     path('ingest/', include('ingest.urls')),
     path('geo/', include('geo.urls')),
     path('taxonomy/', include('taxonomy.urls')),
+    path('feedback/', include('feedback.urls')),
     # Surcharge de la vue de création de ticket pour utiliser le formulaire personnalisé
     path(
         'helpdesk/tickets/submit/',

@@ -1,0 +1,190 @@
+{% if user.is_authenticated %}
+<!-- Style personnalisé pour l'infobulle flash -->
+<style>
+    .feedback-toast {
+        width: max-content; /* S'adapte à la longueur du texte */
+        min-width: 650px;
+        border: 6px solid #007bff !important;
+        background-color: #f8fbff !important;
+        border-radius: 25px;
+        box-shadow: 0 20px 60px rgba(0,123,255,0.5) !important;
+    }
+        .feedback-toast .toast-body {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0056b3;
+            line-height: 1.4;
+            padding: 25px !important;
+            /* white-space: nowrap retiré pour permettre le <br> */
+        }
+        .feedback-toast .toast-header {
+            padding: 12px 25px 0 25px;
+        }
+        .feedback-toast .toast-header strong {
+            font-size: 1.2rem !important;
+        }
+        .feedback-btn-pulse {
+            animation: pulse-blue 2s infinite;
+        }
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7); }
+            70% { box-shadow: 0 0 0 25px rgba(0, 123, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
+        }
+    </style>
+    
+    <!-- Bouton flottant Feedback -->
+    <div id="feedback-widget" style="position: fixed; bottom: 30px; right: 30px; z-index: 1060;">
+        <button type="button" id="mainFeedbackBtn" class="btn btn-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center feedback-btn-pulse" 
+                style="width: 80px; height: 80px;" 
+                data-bs-toggle="modal" data-bs-target="#feedbackModal">
+            <i class="fas fa-comment-dots fa-3x"></i>
+        </button>
+    </div>
+    
+    <!-- Toast d'Onboarding - Positionné à mi-hauteur à droite -->
+    <div id="feedback-toast-container" style="position: fixed; top: 50%; right: 40px; transform: translateY(-50%); z-index: 1055;">
+        <div id="feedbackToast" class="toast feedback-toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header border-0 bg-transparent">
+                <strong class="me-auto" style="color: #007bff;">🌟 NOUVEAUTÉ !</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close" style="transform: scale(1.5);"></button>
+            </div>
+            <div class="toast-body">
+                <i class="fas fa-lightbulb me-3"></i> 
+                Besoin d'aide, une question, ou une suggestion&nbsp;?<br>
+                Ou vous avez simplement envie de donner votre avis&nbsp;?
+                <hr style="border-top: 3px solid #007bff; opacity: 0.2; margin: 20px 0;">
+                <span style="color: #003d80; white-space: nowrap;">Cliquez sur le bouton bleu en bas à droite pour nous écrire&nbsp;!</span>
+            </div>
+        </div>
+    </div>
+    
+
+<!-- Modale Feedback -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="feedbackModalLabel">
+                    <i class="fas fa-lightbulb me-2"></i> Une idée ? Un problème ?
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted small">Votre message sera analysé par notre assistant pour nous aider à améliorer l'application.</p>
+                <form id="feedbackForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="url_source" id="feedback_url_source">
+                    <div class="mb-3">
+                        <textarea class="form-control" name="content" id="feedbackContent" rows="4" 
+                                  placeholder="Dites-nous tout..." required minlength="5"></textarea>
+                    </div>
+                    <div id="feedbackResponse" class="alert d-none"></div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary" id="btnSubmitFeedback">
+                            <span id="feedbackSpinner" class="spinner-border spinner-border-sm d-none me-2"></span>
+                            Envoyer mon retour
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Feedback component initialized");
+    const feedbackModal = document.getElementById('feedbackModal');
+    const feedbackForm = document.getElementById('feedbackForm');
+    const feedbackUrlInput = document.getElementById('feedback_url_source');
+    const btnSubmit = document.getElementById('btnSubmitFeedback');
+    const spinner = document.getElementById('feedbackSpinner');
+    const responseDiv = document.getElementById('feedbackResponse');
+    const feedbackBtn = document.getElementById('mainFeedbackBtn');
+
+    // --- Logique d'Onboarding (Infobulle Toast GÉANTE) ---
+    if (!localStorage.getItem('feedback_onboarding_shown')) {
+        const toastEl = document.getElementById('feedbackToast');
+        const toast = new bootstrap.Toast(toastEl);
+
+        // Afficher après un court délai
+        setTimeout(() => {
+            toast.show();
+            
+            // Cacher automatiquement après 15 secondes
+            setTimeout(() => {
+                toast.hide();
+                feedbackBtn.classList.remove('feedback-btn-pulse');
+            }, 15000);
+        }, 1500);
+
+        // Marquer comme "vu" UNIQUEMENT au clic sur le bouton bleu
+        feedbackBtn.addEventListener('click', function() {
+            toast.hide();
+            feedbackBtn.classList.remove('feedback-btn-pulse');
+            localStorage.setItem('feedback_onboarding_shown', 'true');
+        }, { once: true });
+
+        // Nettoyage visuel si on ferme avec la croix ou par timeout
+        toastEl.addEventListener('hidden.bs.toast', () => {
+            feedbackBtn.classList.remove('feedback-btn-pulse');
+        });
+    }
+
+    // Mettre à jour l'URL source à l'ouverture de la modale
+    feedbackModal.addEventListener('show.bs.modal', function () {
+        feedbackUrlInput.value = window.location.href;
+        feedbackForm.reset();
+        responseDiv.classList.add('d-none');
+        btnSubmit.disabled = false;
+    });
+
+    // Envoi AJAX
+    feedbackForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        btnSubmit.disabled = true;
+        spinner.classList.remove('d-none');
+        responseDiv.classList.add('d-none');
+
+        const formData = new FormData(feedbackForm);
+
+        fetch("{% url 'feedback:submit' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            responseDiv.textContent = data.message;
+            responseDiv.classList.remove('d-none');
+            
+            if (data.status === 'success') {
+                responseDiv.classList.replace('alert-danger', 'alert-success');
+                responseDiv.classList.add('alert-success');
+                // Fermeture auto après 2 secondes
+                setTimeout(() => {
+                    const modalInstance = bootstrap.Modal.getInstance(feedbackModal);
+                    modalInstance.hide();
+                }, 2000);
+            } else {
+                responseDiv.classList.add('alert-danger');
+                btnSubmit.disabled = false;
+            }
+        })
+        .catch(error => {
+            spinner.classList.add('d-none');
+            btnSubmit.disabled = false;
+            responseDiv.textContent = "Une erreur est survenue lors de l'envoi.";
+            responseDiv.classList.remove('d-none', 'alert-success');
+            responseDiv.classList.add('alert-danger');
+            console.error('Error:', error);
+        });
+    });
+});
+</script>
+{% endif %}
