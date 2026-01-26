@@ -184,14 +184,14 @@ class ObservationForm(forms.ModelForm):
         required=True,
     )
 
-    # Surcharger les champs nombre_oeufs et nombre_poussins pour accepter "5?"
+    # Surcharger les champs nombre_oeufs et nombre_poussins pour accepter "5?" et "?"
     nombre_oeufs = forms.CharField(
         required=False,
         widget=forms.TextInput(
             attrs={
                 'type': 'text',
                 'class': 'clear-on-focus nombre-avec-incertitude',
-                'placeholder': 'Nombre d\'œufs (ex: 5 ou 5?)',
+                'placeholder': 'Nombre d\'œufs (ex: 5, 5? ou ?)',
                 'inputmode': 'numeric',
                 'autocomplete': 'off',
             }
@@ -204,7 +204,7 @@ class ObservationForm(forms.ModelForm):
             attrs={
                 'type': 'text',
                 'class': 'clear-on-focus nombre-avec-incertitude',
-                'placeholder': 'Nombre de poussins (ex: 3 ou 3?)',
+                'placeholder': 'Nombre de poussins (ex: 3, 3? ou ?)',
                 'inputmode': 'numeric',
                 'autocomplete': 'off',
             }
@@ -249,20 +249,25 @@ class ObservationForm(forms.ModelForm):
 
         # Restaurer le "?" pour les champs avec incertitude
         if self.instance.pk:
-            if self.instance.nombre_oeufs is not None and self.instance.nombre_oeufs_incertain:
-                self.initial['nombre_oeufs'] = f"{self.instance.nombre_oeufs}?"
+            if self.instance.nombre_oeufs_incertain:
+                if self.instance.nombre_oeufs is None:
+                    self.initial['nombre_oeufs'] = '?'
+                else:
+                    self.initial['nombre_oeufs'] = f"{self.instance.nombre_oeufs}?"
 
-            if (
-                self.instance.nombre_poussins is not None
-                and self.instance.nombre_poussins_incertain
-            ):
-                self.initial['nombre_poussins'] = f"{self.instance.nombre_poussins}?"
+            if self.instance.nombre_poussins_incertain:
+                if self.instance.nombre_poussins is None:
+                    self.initial['nombre_poussins'] = '?'
+                else:
+                    self.initial['nombre_poussins'] = f"{self.instance.nombre_poussins}?"
 
     def clean_nombre_oeufs(self):
-        """Valide et nettoie le champ nombre_oeufs (accepte '5' ou '5?')"""
+        """Valide et nettoie le champ nombre_oeufs (accepte '5', '5?' ou '?')"""
         value = self.cleaned_data.get('nombre_oeufs', '').strip()
 
         if not value:
+            return None
+        if value == '?':
             return None
 
         # Vérifier le pattern valide
@@ -284,10 +289,12 @@ class ObservationForm(forms.ModelForm):
             ) from err
 
     def clean_nombre_poussins(self):
-        """Valide et nettoie le champ nombre_poussins (accepte '3' ou '3?')"""
+        """Valide et nettoie le champ nombre_poussins (accepte '3', '3?' ou '?')"""
         value = self.cleaned_data.get('nombre_poussins', '').strip()
 
         if not value:
+            return None
+        if value == '?':
             return None
 
         # Vérifier le pattern valide

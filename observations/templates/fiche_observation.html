@@ -237,6 +237,11 @@
 								   title="Estimation incertaine" 
 								   style="margin-left: 3px;"></i>
 							{% endif %}
+						{% elif observation.nombre_oeufs_incertain %}
+							?
+							<i class="fas fa-question-circle text-warning" 
+							   title="Estimation incertaine" 
+							   style="margin-left: 3px;"></i>
 						{% else %}
 							-
 						{% endif %}
@@ -249,6 +254,11 @@
 								   title="Estimation incertaine" 
 								   style="margin-left: 3px;"></i>
 							{% endif %}
+						{% elif observation.nombre_poussins_incertain %}
+							?
+							<i class="fas fa-question-circle text-warning" 
+							   title="Estimation incertaine" 
+							   style="margin-left: 3px;"></i>
 						{% else %}
 							-
 						{% endif %}

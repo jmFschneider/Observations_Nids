@@ -1,6 +1,6 @@
 /**
  * Gestion de l'incertitude pour les champs numériques
- * Détecte la présence de "?" à la fin de la saisie (ex: "5?")
+ * Détecte la présence de "?" à la fin de la saisie (ex: "5?" ou "?")
  * et affiche une icône d'avertissement correspondante.
  */
 export default function initUncertaintyInput() {
@@ -23,8 +23,8 @@ export default function initUncertaintyInput() {
         
         if (!icon || !hiddenField) return;
         
-        // Validation : uniquement chiffres et optionnellement "?" à la fin
-        const validPattern = /^\d+\??$/;
+        // Validation : uniquement chiffres avec "?" optionnel, ou "?" seul
+        const validPattern = /^(?:\d+\??|\?)$/;
         const isEmpty = value === '';
         
         // Si la valeur n'est pas vide et n'est pas valide, la nettoyer
