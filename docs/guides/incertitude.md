@@ -1,6 +1,6 @@
 # Gestion de l'Incertitude des Comptages
 
-> Documentation technique de la fonctionnalité "Notation 5?" pour les champs numériques
+> Documentation technique de la fonctionnalité "Notation 5?" et "?" pour les champs numériques
 
 **Version** : 1.0.0  
 **Date** : Janvier 2026  
@@ -18,7 +18,7 @@ Cette fonctionnalité réplique cette notation dans l'interface web tout en main
 
 ## 🎯 Objectifs
 
-1. **UX fidèle au terrain** : Permettre la saisie intuitive de "5?" comme sur papier
+1. **UX fidèle au terrain** : Permettre la saisie intuitive de "5?" et "?" comme sur papier
 2. **Données propres** : Séparer la valeur numérique du flag d'incertitude
 3. **Requêtabilité** : Faciliter les analyses statistiques (filtrer les estimations incertaines)
 4. **Traçabilité** : Conserver l'information sur la fiabilité des données
@@ -48,8 +48,8 @@ nombre_poussins_incertain = models.BooleanField(
 ```
 
 **Stockage** :
-- `nombre_oeufs` : `IntegerField` → stocke uniquement le nombre (ex: `5`)
-- `nombre_oeufs_incertain` : `BooleanField` → `True` si notation "5?", sinon `False`
+- `nombre_oeufs` : `IntegerField` → stocke uniquement le nombre (ex: `5` ou `NULL` si saisie "?")
+- `nombre_oeufs_incertain` : `BooleanField` → `True` si notation "5?" ou "?", sinon `False`
 
 ### Formulaire Django
 
@@ -58,13 +58,13 @@ nombre_poussins_incertain = models.BooleanField(
 **Déclaration des champs** :
 
 ```python
-# Surcharge pour accepter la notation "5?"
+# Surcharge pour accepter la notation "5?" et "?"
 nombre_oeufs = forms.CharField(
     required=False,
     widget=forms.TextInput(attrs={
         'type': 'text',
         'class': 'nombre-avec-incertitude',
-        'placeholder': 'Nombre d\'œufs (ex: 5 ou 5?)',
+        'placeholder': 'Nombre d\'œufs (ex: 5, 5? ou ?)',
         'inputmode': 'numeric',
     })
 )
@@ -77,10 +77,12 @@ def clean_nombre_oeufs(self):
     value = self.cleaned_data.get('nombre_oeufs', '').strip()
     if not value:
         return None
+    if value == '?':
+        return None
     
     # Vérifier le format (chiffres + optionnel "?")
     if not value.replace('?', '').isdigit():
-        raise forms.ValidationError("Format invalide. Utilisez: 5 ou 5?")
+        raise forms.ValidationError("Format invalide. Utilisez: 5, 5? ou ?")
     
     # Extraire le nombre
     nombre_str = value.rstrip('?')
@@ -146,7 +148,11 @@ def save(self, commit=True):
 **Structure HTML (lecture)** :
 
 ```django
-{{ observation.nombre_oeufs }}
+{% if observation.nombre_oeufs is not None %}
+    {{ observation.nombre_oeufs }}
+{% elif observation.nombre_oeufs_incertain %}
+    ?
+{% endif %}
 {% if observation.nombre_oeufs_incertain %}
     <i class="fas fa-question-circle text-warning" 
        title="Estimation incertaine"></i>
@@ -169,7 +175,7 @@ def save(self, commit=True):
 
 2. **Nettoyage automatique** :
    - Supprime les caractères non valides
-   - Garde uniquement : chiffres + un seul "?" à la fin
+   - Garde uniquement : chiffres + un seul "?" à la fin, ou "?" seul
 
 3. **État initial** (`initOnPageLoad`) :
    - Détecte si le champ contient déjà "?" au chargement
@@ -188,7 +194,7 @@ function handleIncertitudeInput(event) {
     const hiddenField = container.querySelector('input[type="hidden"]');
     
     // Validation format
-    const validPattern = /^\d+\??$/;
+    const validPattern = /^(?:\d+\??|\?)$/;
     if (!validPattern.test(value) && value !== '') {
         // Nettoyer
         const cleaned = value.replace(/[^\d?]/g, '');

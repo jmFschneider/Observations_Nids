@@ -19,9 +19,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from helpdesk_custom.views import CustomCreateTicketView
 from observations_nids import settings
 from observations_nids.health import health_check
-from helpdesk_custom.views import CustomCreateTicketView
 
 urlpatterns = [
     path('health/', health_check, name='health_check'),
@@ -32,7 +32,11 @@ urlpatterns = [
     path('geo/', include('geo.urls')),
     path('taxonomy/', include('taxonomy.urls')),
     # Surcharge de la vue de création de ticket pour utiliser le formulaire personnalisé
-    path('helpdesk/tickets/submit/', CustomCreateTicketView.as_view(), name='helpdesk_submit_override'),
+    path(
+        'helpdesk/tickets/submit/',
+        CustomCreateTicketView.as_view(),
+        name='helpdesk_submit_override',
+    ),
     path('helpdesk/', include('helpdesk.urls')),
 ]
 
