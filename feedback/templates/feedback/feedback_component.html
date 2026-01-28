@@ -103,33 +103,56 @@ document.addEventListener('DOMContentLoaded', function() {
     const responseDiv = document.getElementById('feedbackResponse');
     const feedbackBtn = document.getElementById('mainFeedbackBtn');
 
-    // --- Logique d'Onboarding (Infobulle Toast GÉANTE) ---
+    // --- Gestion centralisée du statut "Vu" ---
+    const markAsSeen = () => {
+        localStorage.setItem('feedback_onboarding_shown', 'true');
+        feedbackBtn.classList.remove('feedback-btn-pulse');
+    };
+
+    // 1. Interaction avec le bouton bleu (Ouvre la vraie modale)
+    feedbackBtn.addEventListener('click', function() {
+        markAsSeen(); // On considère que c'est vu
+        
+        // Cacher le toast s'il est affiché
+        const toastEl = document.getElementById('feedbackToast');
+        if (toastEl && typeof bootstrap !== 'undefined') {
+             const toastInstance = bootstrap.Toast.getInstance(toastEl);
+             if (toastInstance) {
+                 toastInstance.hide();
+             }
+        }
+    });
+
+    // --- Logique d'Onboarding (Infobulle Toast) ---
     if (!localStorage.getItem('feedback_onboarding_shown')) {
         const toastEl = document.getElementById('feedbackToast');
-        const toast = new bootstrap.Toast(toastEl);
+        
+        // Vérification de sécurité pour bootstrap
+        if (toastEl && typeof bootstrap !== 'undefined') {
+            const toast = new bootstrap.Toast(toastEl);
 
-        // Afficher après un court délai
-        setTimeout(() => {
-            toast.show();
-            
-            // Cacher automatiquement après 15 secondes
+            // Affichage après délai initial
             setTimeout(() => {
+                toast.show();
+                
+                // 3. Fermeture automatique après 20 secondes (Timeout)
+                setTimeout(() => {
+                    toast.hide();
+                    markAsSeen(); // Considéré comme vu après affichage long
+                }, 20000);
+            }, 1500);
+
+            // 2. Interaction avec l'infobulle elle-même (Clic dessus)
+            toastEl.addEventListener('click', () => {
                 toast.hide();
-                feedbackBtn.classList.remove('feedback-btn-pulse');
-            }, 15000);
-        }, 1500);
+                markAsSeen();
+            });
 
-        // Marquer comme "vu" UNIQUEMENT au clic sur le bouton bleu
-        feedbackBtn.addEventListener('click', function() {
-            toast.hide();
-            feedbackBtn.classList.remove('feedback-btn-pulse');
-            localStorage.setItem('feedback_onboarding_shown', 'true');
-        }, { once: true });
-
-        // Nettoyage visuel si on ferme avec la croix ou par timeout
-        toastEl.addEventListener('hidden.bs.toast', () => {
-            feedbackBtn.classList.remove('feedback-btn-pulse');
-        });
+            // Gestion de la fermeture via la croix ou méthode hide()
+            toastEl.addEventListener('hidden.bs.toast', () => {
+                markAsSeen(); // Garantit que toute fermeture enregistre l'état
+            });
+        }
     }
 
     // Mettre à jour l'URL source à l'ouverture de la modale
