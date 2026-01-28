@@ -61,6 +61,7 @@ Les règles techniques détaillées sont dans `.cursor/rules/`.
 2.  **Sécurité** : Pas de secrets exposés, pas de désactivation CSRF/SSL sans avertissement.
 3.  **Source de Vérité Infra** : Référence absolue = `specs/infrastructure.md`. Ne devinez jamais la configuration réseau.
 4.  **Source de Vérité Métier** : Référence absolue = `specs/functional_rules.md`.
+5.  **Dépendances** : Ne jamais installer de dépendances (pip/npm/etc.) sans accord explicite de l’utilisateur.
 
 ## 📂 Documentation
 Si manque de contexte fonctionnel, se référer à `docs/` et `specs/`. Ne pas générer de documentation redondante.
