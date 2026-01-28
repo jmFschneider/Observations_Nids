@@ -21,36 +21,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    function openResizableImageWindow(imageUrl) {
-        const width = 800;
-        const height = 600;
-        const left = (screen.width - width) / 2;
-        const top = (screen.height - height) / 2;
-
-        const windowFeatures = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`;
-        const newWindow = window.open('', '_blank', windowFeatures);
-
-        if (newWindow) {
-            newWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Image de la fiche</title>
-                    <style>
-                        body { margin: 0; padding: 10px; background: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-                        img { max-width: 100%; height: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: white; }
-                    </style>
-                </head>
-                <body>
-                    <img src="${imageUrl}" alt="Image de la fiche">
-                </body>
-                </html>
-            `);
-            newWindow.document.close();
-        }
-    }
-</script>
 {% endblock %}
 
 
@@ -81,8 +51,8 @@
             {% endif %}
 
             {% if fiche.chemin_json %}
-                <a href="{{ MEDIA_URL }}{{ fiche.chemin_json }}"
-                   target="_blank"
+                <a href="javascript:void(0);"
+                   onclick="openFilePreviewWindow('{{ MEDIA_URL|escapejs }}{{ fiche.chemin_json|escapejs }}'); return false;"
                    class="btn-action btn-json">
                     <i class="fas fa-file-code"></i>
                     <span>Voir JSON</span>

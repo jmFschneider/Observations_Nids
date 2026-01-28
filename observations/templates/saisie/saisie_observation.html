@@ -440,8 +440,8 @@ function fermerModalRecherche() {
                 {% endif %}
 
                 {% if fiche_form.instance.chemin_json %}
-                    <a href="{{ MEDIA_URL }}{{ fiche_form.instance.chemin_json }}"
-                       target="_blank"
+                    <a href="javascript:void(0);"
+                       onclick="openFilePreviewWindow('{{ MEDIA_URL|escapejs }}{{ fiche_form.instance.chemin_json|escapejs }}'); return false;"
                        class="btn-action btn-json">
                         <i class="fas fa-file-code"></i>
                         <span>Voir JSON</span>
