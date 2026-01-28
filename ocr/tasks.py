@@ -825,7 +825,7 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
             chemin_image_attendu,
         )
         if not dry_run:
-            transcription_ocr, created = TranscriptionOCR.objects.get_or_create(
+            _transcription_ocr, created = TranscriptionOCR.objects.get_or_create(
                 fiche=None,
                 chemin_json=chemin_json_nettoye,
                 modele_ocr=metadata.get("modele_ocr", ""),
@@ -836,10 +836,10 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
                 },
             )
             if not created:
-                transcription_ocr.chemin_image = chemin_image_attendu
-                transcription_ocr.type_image = metadata.get("type_image", "")
-                transcription_ocr.statut_evaluation = "FICHE_INTROUVABLE"
-                transcription_ocr.save(
+                _transcription_ocr.chemin_image = chemin_image_attendu
+                _transcription_ocr.type_image = metadata.get("type_image", "")
+                _transcription_ocr.statut_evaluation = "FICHE_INTROUVABLE"
+                _transcription_ocr.save(
                     update_fields=["chemin_image", "type_image", "statut_evaluation"]
                 )
         return {"chemin_json": chemin_json, "statut": "ERREUR", "score_global": None}
@@ -851,7 +851,7 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
             chemin_image_attendu,
         )
         if not dry_run:
-            transcription_ocr, created = TranscriptionOCR.objects.get_or_create(
+            _transcription_ocr, created = TranscriptionOCR.objects.get_or_create(
                 fiche=None,
                 chemin_json=chemin_json_nettoye,
                 modele_ocr=metadata.get("modele_ocr", ""),
@@ -862,15 +862,23 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
                 },
             )
             if not created:
-                transcription_ocr.chemin_image = chemin_image_attendu
-                transcription_ocr.type_image = metadata.get("type_image", "")
-                transcription_ocr.statut_evaluation = "AMBIGU"
-                transcription_ocr.save(
+                _transcription_ocr.chemin_image = chemin_image_attendu
+                _transcription_ocr.type_image = metadata.get("type_image", "")
+                _transcription_ocr.statut_evaluation = "AMBIGU"
+                _transcription_ocr.save(
                     update_fields=["chemin_image", "type_image", "statut_evaluation"]
                 )
         return {"chemin_json": chemin_json, "statut": "AMBIGU", "score_global": None}
 
-    transcription_ocr = TranscriptionOCR.objects.filter(
+    if fiche is None:
+        logger.error(
+            "Fiche non instanciée pour %s (chemin_image=%s)",
+            chemin_json_nettoye,
+            chemin_image_attendu,
+        )
+        return {"chemin_json": chemin_json, "statut": "ERREUR", "score_global": None}
+
+    transcription_ocr: TranscriptionOCR | None = TranscriptionOCR.objects.filter(
         fiche=fiche,
         chemin_json=chemin_json_nettoye,
         modele_ocr=metadata.get("modele_ocr", ""),
