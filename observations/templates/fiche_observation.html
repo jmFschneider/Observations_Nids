@@ -17,6 +17,53 @@
             padding: 2px 5px;
             border-radius: 3px;
         }
+
+        /* === BARRE D'ACTIONS FLOTTANTE === */
+        .floating-action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+            border-top: 2px solid #dee2e6;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .floating-action-bar-content {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-start; /* Alignement à gauche comme demandé initialement, ou center ? Le précédent était start */
+            flex-wrap: wrap;
+        }
+        
+        /* Pour centrer le contenu si souhaité, changer justify-content ci-dessus */
+        
+        .floating-action-bar .btn {
+            white-space: nowrap;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .floating-action-bar {
+                padding: 10px;
+            }
+            .floating-action-bar .btn {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+        }
     </style>
 {% endblock %}
 
@@ -345,28 +392,34 @@
     </div>
 </div>
 
-<!-- Boutons d'action en bas de page -->
-<div class="form-buttons mt-4 mb-3" style="display: flex; gap: 10px; justify-content: flex-start;">
-    <!-- Bouton Modifier -->
-    {% if fiche.etat_correction.statut == 'valide' %}
-        <!-- Fiche validée - Bouton grisé et inactif -->
-        <button class="btn btn-secondary" disabled style="cursor: not-allowed;">
-            <i class="fas fa-lock"></i> Fiche validée - Non modifiable
-        </button>
-    {% else %}
-        <!-- Fiche modifiable -->
-        <a href="{% url 'observations:modifier_observation' fiche_id=fiche.num_fiche %}"
-           class="btn btn-primary">
-            <i class="fas fa-edit"></i> Modifier
-        </a>
-    {% endif %}
+<!-- Barre d'actions flottante -->
+<div class="floating-action-bar">
+    <div class="floating-action-bar-content">
+        <!-- Bouton Modifier ou Statut -->
+        {% if fiche.etat_correction.statut == 'valide' %}
+            <!-- Fiche validée - Bouton grisé et inactif -->
+            <button class="btn btn-secondary" disabled style="cursor: not-allowed;">
+                <i class="fas fa-lock"></i> Fiche validée - Non modifiable
+            </button>
+        {% else %}
+            <!-- Fiche modifiable -->
+            <a href="{% url 'observations:modifier_observation' fiche_id=fiche.num_fiche %}"
+               class="btn btn-primary">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+        {% endif %}
 
-    <!-- Bouton Historique -->
-    <a href="{% url 'observations:historique_modifications' fiche_id=fiche.num_fiche %}"
-       class="btn btn-info"
-       target="_blank">
-        <i class="fas fa-history"></i> Historique
-    </a>
+        <!-- Bouton Historique -->
+        <a href="{% url 'observations:historique_modifications' fiche_id=fiche.num_fiche %}"
+           class="btn btn-info"
+           target="_blank">
+            <i class="fas fa-history"></i> Historique
+        </a>
+        
+        <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary">
+             <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
 </div>
 
 {% endblock %}
