@@ -3,6 +3,9 @@ from datetime import date, datetime
 from difflib import SequenceMatcher
 from typing import Any
 
+from django.db.models.manager import BaseManager
+from django.db.models.query import QuerySet
+
 from observations.models import FicheObservation
 
 logger = logging.getLogger(__name__)
@@ -61,11 +64,7 @@ class OCRComparator:
             ),
         }
 
-        score_global = (
-            sum(stats["scores"]) / len(stats["scores"])
-            if stats["scores"]
-            else 0.0
-        )
+        score_global = sum(stats["scores"]) / len(stats["scores"]) if stats["scores"] else 0.0
 
         resultat = {
             "score_global": score_global,
@@ -102,8 +101,7 @@ class OCRComparator:
             "nid": self._extraire_modele(self._fiche.nid),
             "localisation": self._extraire_modele(self._fiche.localisation),
             "tableau_donnees": [
-                self._extraire_modele(observation)
-                for observation in self._fiche.observations.all()
+                self._extraire_modele(observation) for observation in self._fiche.observations.all()
             ],
             "resume": self._extraire_modele(self._fiche.resume),
             "remarque": getattr(self._fiche, "remarques", None),
@@ -182,19 +180,16 @@ class OCRComparator:
         return [comparaison]
 
     def _normaliser_valeur(self, valeur: Any, type_champ: str) -> Any:
-        if type_champ == "null":
+        if type_champ == "null" or valeur is None:
             return None
-        if valeur is None:
-            return None
-        if type_champ == "texte":
-            return self._normaliser_texte(valeur)
-        if type_champ == "nombre":
-            return self._normaliser_nombre(valeur)
-        if type_champ == "date":
-            return self._normaliser_date(valeur)
-        if type_champ == "booléen":
-            return self._normaliser_booleen(valeur)
-        return valeur
+        normaliseurs = {
+            "texte": self._normaliser_texte,
+            "nombre": self._normaliser_nombre,
+            "date": self._normaliser_date,
+            "booléen": self._normaliser_booleen,
+        }
+        normaliseur = normaliseurs.get(type_champ)
+        return normaliseur(valeur) if normaliseur else valeur
 
     def _normaliser_texte(self, valeur: Any) -> str | None:
         if valeur is None:
@@ -208,21 +203,17 @@ class OCRComparator:
             return None
         if isinstance(valeur, bool):
             return 1 if valeur else 0
-        if isinstance(valeur, int):
-            return valeur
-        if isinstance(valeur, float):
+        if isinstance(valeur, (int, float)):
             return valeur
         if isinstance(valeur, str):
             nettoye = valeur.strip().replace(",", ".")
             if not nettoye:
                 return None
-            try:
-                return int(nettoye)
-            except ValueError:
+            for caster in (int, float):
                 try:
-                    return float(nettoye)
+                    return caster(nettoye)
                 except ValueError:
-                    return None
+                    continue
         return None
 
     def _normaliser_date(self, valeur: Any) -> tuple[int, int] | None:
@@ -240,9 +231,7 @@ class OCRComparator:
             return self._normaliser_date_depuis_texte(valeur)
         return None
 
-    def _normaliser_date_depuis_jour_mois(
-        self, jour: Any, mois: Any
-    ) -> tuple[int, int] | None:
+    def _normaliser_date_depuis_jour_mois(self, jour: Any, mois: Any) -> tuple[int, int] | None:
         jour_norm = self._normaliser_nombre(jour)
         mois_norm = self._normaliser_nombre(mois)
         if isinstance(jour_norm, int) and isinstance(mois_norm, int):
@@ -308,17 +297,28 @@ class OCRComparator:
 
         return {
             "nom": nom,
-            "bdd": valeur_bdd,
-            "ocr": valeur_ocr,
+            "bdd": self._serialiser_valeur(valeur_bdd),
+            "ocr": self._serialiser_valeur(valeur_ocr),
             "type": type_champ,
             "match": match,
             "score": score,
             "statut": "OK" if match else "ERREUR",
         }
 
-    def _mettre_a_jour_stats(
-        self, comparaison: dict[str, Any], stats: dict[str, Any]
-    ) -> None:
+    def _serialiser_valeur(self, valeur: Any) -> Any:
+        if isinstance(valeur, (datetime, date)):
+            return valeur.isoformat()
+        if isinstance(valeur, (BaseManager, QuerySet)):
+            return str(valeur)
+        if isinstance(valeur, dict):
+            return {key: self._serialiser_valeur(item) for key, item in valeur.items()}
+        if isinstance(valeur, list):
+            return [self._serialiser_valeur(item) for item in valeur]
+        if isinstance(valeur, (set, tuple)):
+            return [self._serialiser_valeur(item) for item in valeur]
+        return valeur
+
+    def _mettre_a_jour_stats(self, comparaison: dict[str, Any], stats: dict[str, Any]) -> None:
         stats["nombre_champs_total"] += 1
         stats["scores"].append(comparaison["score"])
         if comparaison["match"]:
