@@ -192,6 +192,7 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.contrib.messages.context_processors.messages',
                 'observations_nids.context_processors.environment',
+                'feedback.context_processors.feedback_notifications',
             ],
         },
     },

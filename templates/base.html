@@ -208,9 +208,9 @@
                         </a>
                     </li>
                     <li class="nav-item section-aide">
-                        <a class="nav-link" href="{% url 'feedback:list' %}" data-title="Avis et suggestions">
+                        <a class="nav-link {% if has_waiting_feedback %}text-danger fw-bold{% endif %}" href="{% url 'feedback:list' %}" data-title="Avis et suggestions">
                             <i class="fas fa-comments"></i>
-                            <span class="link-text">Avis et suggestions</span>
+                            <span class="link-text">Avis et suggestions{% if has_waiting_feedback %} !{% endif %}</span>
                         </a>
                     </li>
                     <!-- Helpdesk désactivé au profit du nouveau système de feedback -->
