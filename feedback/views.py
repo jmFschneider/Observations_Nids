@@ -63,16 +63,19 @@ def feedback_detail(request, feedback_id):
                 # Si l'admin répond, on peut suggérer qu'on attend une réponse ou que c'est en cours
                 if feedback.status in ["NEW", "READ"]:
                     feedback.status = "IN_PROGRESS"
-            else:
-                # Si l'utilisateur répond et que c'était en attente, on repasse en cours
-                if feedback.status == "WAITING_USER":
-                    feedback.status = "IN_PROGRESS"
+            # Si l'utilisateur répond et que c'était en attente, on repasse en cours
+            elif feedback.status == "WAITING_USER":
+                feedback.status = "IN_PROGRESS"
 
             feedback.save()
             return redirect("feedback:detail", feedback_id=feedback.id)
 
     feedback_messages = feedback.messages.all().select_related("author")
-    return render(request, "feedback/feedback_detail.html", {"feedback": feedback, "feedback_messages": feedback_messages})
+    return render(
+        request,
+        "feedback/feedback_detail.html",
+        {"feedback": feedback, "feedback_messages": feedback_messages},
+    )
 
 
 @user_passes_test(is_admin)
@@ -82,9 +85,9 @@ def feedback_triage(request):
     new_feedbacks = Feedback.objects.filter(status__in=["NEW", "READ"]).order_by(
         "-urgency", "-last_activity"
     )
-    processing_feedbacks = Feedback.objects.filter(status__in=["IN_PROGRESS", "WAITING_USER"]).order_by(
-        "-last_activity"
-    )
+    processing_feedbacks = Feedback.objects.filter(
+        status__in=["IN_PROGRESS", "WAITING_USER"]
+    ).order_by("-last_activity")
     resolved_feedbacks = Feedback.objects.filter(status__in=["RESOLVED", "ARCHIVED"]).order_by(
         "-last_activity"
     )

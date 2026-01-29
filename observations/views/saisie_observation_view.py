@@ -995,9 +995,19 @@ def valider_correction(request, fiche_id):
                 f"La fiche n'est pas en cours de correction (statut actuel: '{etat_correction.get_statut_display()}')",
             )
 
-        # Rediriger vers la vue de détail (lecture seule)
-        logger.info(f"Redirection vers fiche_observation pour fiche {fiche_id}")
-        return redirect('observations:fiche_observation', fiche_id=fiche_id)
+        # Rediriger selon l'option choisie
+        redirect_option = request.POST.get('redirect_option', 'fiche')
+        if redirect_option == 'home':
+            logger.info(
+                f"Redirection vers accueil (Ma Page) après validation de la fiche {fiche_id}"
+            )
+            return redirect('observations:home')
+        elif redirect_option == 'liste':
+            logger.info(f"Redirection vers liste globale après validation de la fiche {fiche_id}")
+            return redirect('observations:liste_fiches_observations')
+        else:
+            logger.info(f"Redirection vers fiche_observation pour fiche {fiche_id}")
+            return redirect('observations:fiche_observation', fiche_id=fiche_id)
 
     logger.info(f"Méthode GET, redirection vers modifier_observation pour fiche {fiche_id}")
     return redirect('observations:modifier_observation', fiche_id=fiche_id)

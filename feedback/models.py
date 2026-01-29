@@ -44,7 +44,9 @@ class Feedback(models.Model):
     status = models.CharField(max_length=20, choices=STATUS, default="NEW", verbose_name="Statut")
 
     # Champs de décision Administrateur
-    admin_note = models.TextField(blank=True, verbose_name="Note / Décision Administrateur (Legacy)")
+    admin_note = models.TextField(
+        blank=True, verbose_name="Note / Décision Administrateur (Legacy)"
+    )
     is_public_response = models.BooleanField(default=False, verbose_name="Rendre la note publique")
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
