@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .models import Feedback
+from .models import Feedback, FeedbackMessage
 
 
 def is_admin(user):
@@ -36,8 +37,42 @@ def submit_feedback(request):
 @login_required
 def feedback_list(request):
     """Vue pour lister les feedbacks (Tous les utilisateurs connectés)"""
-    feedbacks = Feedback.objects.all().order_by("-created_at")
+    feedbacks = Feedback.objects.all().order_by("-last_activity")
     return render(request, "feedback/feedback_list.html", {"feedbacks": feedbacks})
+
+
+@login_required
+def feedback_detail(request, feedback_id):
+    """Vue pour voir le détail d'un feedback et discuter"""
+    feedback = get_object_or_404(Feedback, id=feedback_id)
+
+    # Seul l'auteur ou un admin peut voir le détail
+    if not is_admin(request.user) and feedback.user != request.user:
+        return redirect("feedback:list")
+
+    if request.method == "POST":
+        content = request.POST.get("content")
+        if content and len(content.strip()) >= 2:
+            FeedbackMessage.objects.create(feedback=feedback, author=request.user, content=content)
+
+            # Mise à jour de la dernière activité
+            feedback.last_activity = timezone.now()
+
+            # Changement de statut automatique selon qui répond
+            if is_admin(request.user):
+                # Si l'admin répond, on peut suggérer qu'on attend une réponse ou que c'est en cours
+                if feedback.status in ["NEW", "READ"]:
+                    feedback.status = "IN_PROGRESS"
+            else:
+                # Si l'utilisateur répond et que c'était en attente, on repasse en cours
+                if feedback.status == "WAITING_USER":
+                    feedback.status = "IN_PROGRESS"
+
+            feedback.save()
+            return redirect("feedback:detail", feedback_id=feedback.id)
+
+    feedback_messages = feedback.messages.all().select_related("author")
+    return render(request, "feedback/feedback_detail.html", {"feedback": feedback, "feedback_messages": feedback_messages})
 
 
 @user_passes_test(is_admin)
@@ -45,11 +80,13 @@ def feedback_triage(request):
     """Vue de gestion (triage) pour les administrateurs"""
     # On sépare les retours par statut pour faciliter le traitement
     new_feedbacks = Feedback.objects.filter(status__in=["NEW", "READ"]).order_by(
-        "-urgency", "-created_at"
+        "-urgency", "-last_activity"
     )
-    processing_feedbacks = Feedback.objects.filter(status="IN_PROGRESS").order_by("-created_at")
+    processing_feedbacks = Feedback.objects.filter(status__in=["IN_PROGRESS", "WAITING_USER"]).order_by(
+        "-last_activity"
+    )
     resolved_feedbacks = Feedback.objects.filter(status__in=["RESOLVED", "ARCHIVED"]).order_by(
-        "-created_at"
+        "-last_activity"
     )
 
     context = {
@@ -63,12 +100,11 @@ def feedback_triage(request):
 @user_passes_test(is_admin)
 @require_POST
 def update_feedback(request, feedback_id):
-    """Vue AJAX pour mettre à jour un feedback"""
+    """Vue AJAX pour mettre à jour un feedback (statut, catégorie)"""
     try:
         feedback = Feedback.objects.get(id=feedback_id)
         feedback.status = request.POST.get("status", feedback.status)
         feedback.category = request.POST.get("category", feedback.category)
-        feedback.admin_note = request.POST.get("admin_note", feedback.admin_note)
         feedback.is_public_response = request.POST.get("is_public_response") == "true"
         feedback.save()
         return JsonResponse({"status": "success"})

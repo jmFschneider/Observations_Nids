@@ -28,7 +28,7 @@
             <div class="col-md-5">
                 <form class="triage-form" data-feedback-id="{{ f.id }}">
                     {% csrf_token %}
-                    <div class="row g-2 mb-2">
+                    <div class="row g-2 mb-3">
                         <div class="col-6">
                             <label class="small fw-bold">Statut</label>
                             <select name="status" class="form-select form-select-sm">
@@ -46,17 +46,22 @@
                             </select>
                         </div>
                     </div>
-                    <div class="mb-2">
-                        <label class="small fw-bold">Note / Réponse</label>
-                        <textarea name="admin_note" class="form-control form-control-sm" rows="2" placeholder="Saisissez votre décision ou réponse...">{{ f.admin_note }}</textarea>
+                    
+                    <div class="d-grid gap-2 mb-3">
+                        <a href="{% url 'feedback:detail' f.id %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-comments me-2"></i> Ouvrir la conversation
+                            {% if f.messages.count > 0 %}
+                                <span class="badge bg-primary ms-1">{{ f.messages.count }}</span>
+                            {% endif %}
+                        </a>
                     </div>
+
                     <div class="d-flex justify-content-between align-items-center">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input public-toggle" type="checkbox" id="public_{{ f.id }}" {% if f.is_public_response %}checked{% endif %}>
-                            <label class="form-check-label small" for="public_{{ f.id }}">Réponse publique</label>
+                         <div class="small text-muted">
+                            <i class="far fa-clock me-1"></i> Maj: {{ f.last_activity|timesince }}
                         </div>
                         <button type="submit" class="btn btn-primary btn-sm">
-                            <i class="fas fa-save me-1"></i> Enregistrer
+                            <i class="fas fa-save me-1"></i> Sauvegarder
                         </button>
                     </div>
                 </form>
