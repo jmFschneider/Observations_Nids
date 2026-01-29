@@ -153,7 +153,46 @@ input.nombre-avec-incertitude {
 
 <!-- Script pour gérer la barre d'actions flottante -->
 <script>
-// La barre est désormais toujours affichée
+(function() {
+    const floatingBar = document.getElementById('floating-action-bar');
+    const originalButtons = document.getElementById('original-buttons');
+
+    if (!floatingBar || !originalButtons) return;
+
+    let ticking = false;
+
+    function updateFloatingBar() {
+        // Obtenir la position des boutons originaux
+        const rect = originalButtons.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+
+        // Si les boutons originaux sont visibles à l'écran (en bas), masquer la barre flottante
+        // On ajoute une marge de 100px pour une transition douce
+        if (rect.top < windowHeight + 100) {
+            floatingBar.classList.add('hidden');
+        } else {
+            floatingBar.classList.remove('hidden');
+        }
+
+        ticking = false;
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateFloatingBar);
+            ticking = true;
+        }
+    }
+
+    // Écouter le scroll avec throttling via requestAnimationFrame
+    window.addEventListener('scroll', requestTick, { passive: true });
+
+    // Vérifier au chargement de la page
+    updateFloatingBar();
+
+    // Re-vérifier après un petit délai (pour s'assurer que tout est chargé)
+    setTimeout(updateFloatingBar, 500);
+})();
 </script>
 
 <!-- Rouvrir la modale des remarques après sauvegarde si demandé -->
@@ -1025,7 +1064,28 @@ function fermerModalRecherche() {
 
 
     <!-- Boutons de formulaire (originaux en bas de page) -->
-    <!-- SUPPRIMÉ : Barre de boutons statique remplacée par la barre flottante -->
+    <div class="form-buttons" id="original-buttons">
+        {% if not read_only %}
+            <button type="submit" class="btn btn-primary" onclick="return confirm('Voulez-vous vraiment enregistrer les modifications ?');">Enregistrer</button>
+            {% if fiche_form.instance.pk %}
+                {% if fiche_form.instance.etat_correction.statut == 'nouveau' or fiche_form.instance.etat_correction.statut == 'en_edition' %}
+                    <button type="submit" class="btn btn-success" formaction="{% url 'observations:soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" data-confirm-message="Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.">
+                        Soumettre pour correction
+                    </button>
+                {% elif fiche_form.instance.etat_correction.statut == 'en_cours' %}
+                    <button type="submit" class="btn btn-success" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" data-confirm-message="Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.">
+                        Valider la correction
+                    </button>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% if fiche_form.instance.pk %}
+            <a href="{% url 'observations:historique_modifications' fiche_id=fiche_form.instance.pk %}" class="btn btn-info" target="_blank">Historique</a>
+            <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary" data-check-changes="true">Retour à la list</a>
+        {% else %}
+            <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary" data-check-changes="true">Annuler</a>
+        {% endif %}
+    </div>
 
     <!-- Barre d'actions flottante (sticky en bas d'écran) -->
     <div class="floating-action-bar" id="floating-action-bar">
@@ -1047,11 +1107,8 @@ function fermerModalRecherche() {
                 {% endif %}
             {% endif %}
             {% if fiche_form.instance.pk %}
-                <a href="{% url 'observations:historique_modifications' fiche_id=fiche_form.instance.pk %}" class="btn btn-info" target="_blank">
-                    <i class="fas fa-history"></i> Historique
-                </a>
                 <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary" data-check-changes="true">
-                    <i class="fas fa-arrow-left"></i> Retour
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
                 </a>
             {% else %}
                 <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary" data-check-changes="true">
