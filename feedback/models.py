@@ -15,6 +15,7 @@ class Feedback(models.Model):
         ("NEW", "Nouveau"),
         ("READ", "Lu"),
         ("IN_PROGRESS", "En cours"),
+        ("WAITING_USER", "En attente d'infos"),
         ("RESOLVED", "Résolu"),
         ("ARCHIVED", "Archivé"),
     ]
@@ -43,16 +44,40 @@ class Feedback(models.Model):
     status = models.CharField(max_length=20, choices=STATUS, default="NEW", verbose_name="Statut")
 
     # Champs de décision Administrateur
-    admin_note = models.TextField(blank=True, verbose_name="Note / Décision Administrateur")
+    admin_note = models.TextField(blank=True, verbose_name="Note / Décision Administrateur (Legacy)")
     is_public_response = models.BooleanField(default=False, verbose_name="Rendre la note publique")
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True)
+    last_activity = models.DateTimeField(auto_now_add=True, verbose_name="Dernière activité")
 
     class Meta:
         verbose_name = "Feedback"
         verbose_name_plural = "Feedbacks"
-        ordering = ["-created_at"]
+        ordering = ["-last_activity"]
 
     def __str__(self):
         return f"{self.category} - {self.user} ({self.created_at.strftime('%d/%m/%Y')})"
+
+
+class FeedbackMessage(models.Model):
+    feedback = models.ForeignKey(
+        Feedback, on_delete=models.CASCADE, related_name="messages", verbose_name="Feedback"
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Auteur",
+    )
+    content = models.TextField(verbose_name="Message")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+
+    class Meta:
+        verbose_name = "Message de feedback"
+        verbose_name_plural = "Messages de feedback"
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return f"Message de {self.author} sur {self.feedback}"
