@@ -3,19 +3,23 @@
 /* Ces règles doivent être en fin de fichier pour surcharger les !important précédents */
 
 /* Alerte Rouge (Action requise / En attente) */
-#sidebar .nav-link.text-danger {
+body #sidebar .nav-item .nav-link.text-danger,
+body #sidebar .section-aide .nav-link.text-danger {
     color: #dc3545 !important;
 }
-#sidebar .nav-link.text-danger i {
+body #sidebar .nav-item .nav-link.text-danger i,
+body #sidebar .section-aide .nav-link.text-danger i {
     color: #dc3545 !important;
     animation: pulse-red 2s infinite;
 }
 
 /* Alerte Verte (Activité récente) */
-#sidebar .nav-link.text-success {
+body #sidebar .nav-item .nav-link.text-success,
+body #sidebar .section-aide .nav-link.text-success {
     color: #198754 !important;
 }
-#sidebar .nav-link.text-success i {
+body #sidebar .nav-item .nav-link.text-success i,
+body #sidebar .section-aide .nav-link.text-success i {
     color: #198754 !important;
 }
 
