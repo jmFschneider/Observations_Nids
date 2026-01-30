@@ -1,6 +1,6 @@
 # observations/views/saisie_observation_view.py
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import cast
 
 from django.contrib import messages
@@ -309,9 +309,14 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
             else:
                 post_data['observateur'] = request.user.id
 
-        # Si le champ coordonnees est vide, donner une valeur par défaut
+        # Si le champ coordonnees est vide, essayer de le construire depuis lat/lon
         if not post_data.get('coordonnees'):
-            post_data['coordonnees'] = '0,0'
+            latitude = post_data.get('latitude')
+            longitude = post_data.get('longitude')
+            if latitude and longitude:
+                post_data['coordonnees'] = f"{latitude},{longitude}"
+            else:
+                post_data['coordonnees'] = '0,0'
 
         # Initialiser tous les formulaires avec les données POST
         fiche_form = FicheObservationForm(
@@ -831,23 +836,19 @@ def enregistrer_modifications_historique(
 
         # Comparaison spéciale pour les DateTimeField avec fuseau horaire
         if hasattr(ancienne_valeur, 'year') and hasattr(nouvelle_valeur, 'year'):
-            ancienne_dt = (
-                ancienne_valeur.year,
-                ancienne_valeur.month,
-                ancienne_valeur.day,
-                ancienne_valeur.hour,
-                ancienne_valeur.minute,
-                ancienne_valeur.second,
-            )
-            nouvelle_dt = (
-                nouvelle_valeur.year,
-                nouvelle_valeur.month,
-                nouvelle_valeur.day,
-                nouvelle_valeur.hour,
-                nouvelle_valeur.minute,
-                nouvelle_valeur.second,
-            )
-            valeurs_egales = ancienne_dt == nouvelle_dt
+            try:
+                # On calcule la différence absolue pour gérer les fuseaux horaires
+                # (ex: 10:00 UTC == 11:00 CET)
+                diff = ancienne_valeur - nouvelle_valeur
+                if hasattr(diff, 'total_seconds'):
+                    valeurs_egales = abs(diff.total_seconds()) < 1
+                else:
+                    # Cas date simple sans heure
+                    valeurs_egales = diff.days == 0
+            except (TypeError, ValueError):
+                # Cas de secours si mélange naive/aware impossible à soustraire
+                valeurs_egales = str(ancienne_valeur) == str(nouvelle_valeur)
+
         elif ancienne_valeur is None and nouvelle_valeur is None:
             valeurs_egales = True
         elif ancienne_valeur is None or nouvelle_valeur is None:
