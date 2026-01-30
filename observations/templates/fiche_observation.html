@@ -112,7 +112,7 @@
                 </a>
             {% endif %}
 
-            {% if fiche.etat_correction.est_verrouillee %}
+            {% if fiche.etat_correction.est_verrouillee and fiche.etat_correction.statut != 'valide' %}
                 {% if user.role == 'administrateur' or fiche.etat_correction.en_correction_par == user %}
                     <a href="{% url 'observations:liberer_verrou_fiche' fiche_id=fiche.num_fiche %}"
                        class="btn-action btn-warning"
@@ -120,6 +120,18 @@
                        onclick="return confirm('Êtes-vous sûr de vouloir débloquer cette fiche ?');">
                         <i class="fas fa-unlock"></i>
                         <span>Débloquer la fiche</span>
+                    </a>
+                {% endif %}
+            {% endif %}
+
+            {% if fiche.etat_correction.statut == 'valide' %}
+                {% if user.role == 'administrateur' or user == fiche.etat_correction.validee_par %}
+                    <a href="{% url 'observations:rouvrir_fiche' fiche_id=fiche.num_fiche %}"
+                       class="btn-action btn-danger"
+                       style="background-color: #dc3545; color: #fff;"
+                       onclick="return confirm('ATTENTION : Rouvrir la fiche va annuler sa validation et la remettre en correction. Confirmer ?');">
+                        <i class="fas fa-lock-open"></i>
+                        <span>Rouvrir la fiche</span>
                     </a>
                 {% endif %}
             {% endif %}

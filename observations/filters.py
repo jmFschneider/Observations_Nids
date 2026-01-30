@@ -36,9 +36,16 @@ class FicheObservationFilter(django_filters.FilterSet):
         label="Commune",
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Commune'}),
     )
+    # Création d'une liste de choix personnalisée incluant l'option "En attente de correction"
+    STATUTS_CHOICES_CUSTOM = list(EtatCorrection.STATUTS_CHOICES) + [
+        ('en_attente_correction', 'En attente de correction'),
+    ]
+    # Tri par libellé (ordre alphabétique)
+    STATUTS_CHOICES_CUSTOM.sort(key=lambda x: x[1])
+
     statut_correction = django_filters.ChoiceFilter(
-        field_name='etat_correction__statut',
-        choices=EtatCorrection.STATUTS_CHOICES,
+        method='filter_statut',
+        choices=STATUTS_CHOICES_CUSTOM,
         label="Statut de correction",
         empty_label="Tous",
         widget=forms.Select(attrs={'class': 'form-select'}),
@@ -55,6 +62,20 @@ class FicheObservationFilter(django_filters.FilterSet):
             Q(localisation__commune__icontains=value)
             | Q(localisation__commune_saisie__icontains=value)
         )
+
+    def filter_statut(self, queryset, name, value):
+        """
+        Filtre personnalisé pour les statuts.
+        Gère le cas spécial 'en_attente_correction'.
+        """
+        if value == 'en_attente_correction':
+            # Fiches en cours de correction MAIS sans correcteur assigné
+            return queryset.filter(
+                etat_correction__statut='en_cours', etat_correction__en_correction_par__isnull=True
+            )
+        else:
+            # Filtrage standard sur le champ statut
+            return queryset.filter(etat_correction__statut=value)
 
     class Meta:
         model = FicheObservation

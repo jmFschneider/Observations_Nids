@@ -36,9 +36,8 @@ def submit_feedback(request):
 
 @login_required
 def feedback_list(request):
-    """Vue pour lister les feedbacks (Tous les utilisateurs connectés)"""
-    feedbacks = Feedback.objects.all().order_by("-last_activity")
-    return render(request, "feedback/feedback_list.html", {"feedbacks": feedbacks})
+    """Ancienne vue liste, redirige vers la nouvelle vue unifiée de triage"""
+    return redirect("feedback:triage")
 
 
 @login_required
@@ -77,10 +76,13 @@ def feedback_detail(request, feedback_id):
     )
 
 
-@user_passes_test(is_admin)
+@login_required
 def feedback_triage(request):
-    """Vue de gestion (triage) pour les administrateurs"""
-    # On sépare les retours par statut pour faciliter le traitement
+    """Vue unifiée de gestion et liste des retours (Admin + Utilisateurs)"""
+    # Pour l'instant, tout le monde voit tout (comme l'ancienne vue 'list')
+    # Mais on utilise l'interface 'triage' qui est mieux organisée.
+
+    # On sépare les retours par statut
     new_feedbacks = Feedback.objects.filter(status__in=["NEW", "READ"]).order_by(
         "-urgency", "-last_activity"
     )
@@ -95,6 +97,7 @@ def feedback_triage(request):
         "new_feedbacks": new_feedbacks,
         "processing_feedbacks": processing_feedbacks,
         "resolved_feedbacks": resolved_feedbacks,
+        "is_admin": is_admin(request.user),  # Pour conditionner l'affichage dans le template
     }
     return render(request, "feedback/feedback_triage.html", context)
 

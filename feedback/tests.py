@@ -1,9 +1,11 @@
-from django.test import TestCase, RequestFactory
 from django.contrib.auth import get_user_model
-from feedback.models import Feedback
+from django.test import RequestFactory, TestCase
+
 from feedback.context_processors import feedback_notifications
+from feedback.models import Feedback
 
 User = get_user_model()
+
 
 class FeedbackNotificationTest(TestCase):
     def setUp(self):
@@ -12,11 +14,7 @@ class FeedbackNotificationTest(TestCase):
 
     def test_has_waiting_feedback(self):
         # Create feedback with WAITING_USER status
-        Feedback.objects.create(
-            user=self.user,
-            content="Test feedback",
-            status="WAITING_USER"
-        )
+        Feedback.objects.create(user=self.user, content="Test feedback", status="WAITING_USER")
 
         request = self.factory.get('/')
         request.user = self.user
@@ -27,11 +25,7 @@ class FeedbackNotificationTest(TestCase):
 
     def test_has_recent_activity(self):
         # Create feedback with NEW status (recent)
-        Feedback.objects.create(
-            user=self.user,
-            content="Recent feedback",
-            status="NEW"
-        )
+        Feedback.objects.create(user=self.user, content="Recent feedback", status="NEW")
 
         request = self.factory.get('/')
         request.user = self.user

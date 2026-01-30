@@ -55,6 +55,7 @@
 {% endblock %}
 
 {% block extra_js %}
+{% if is_admin %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const forms = document.querySelectorAll('.triage-form');
@@ -97,4 +98,5 @@
         });
     });
 </script>
+{% endif %}
 {% endblock %}

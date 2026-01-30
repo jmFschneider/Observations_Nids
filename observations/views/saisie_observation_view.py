@@ -1,6 +1,6 @@
 # observations/views/saisie_observation_view.py
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import cast
 
 from django.contrib import messages
@@ -979,6 +979,10 @@ def valider_correction(request, fiche_id):
                 categorie='validation',
             )
 
+            # Libérer le verrou technique si présent
+            if etat_correction.en_correction_par:
+                etat_correction.liberer_verrou(motif='validation')
+
             logger.info(
                 f"Fiche {fiche_id} passée en statut 'valide' par {user.username}, "
                 f"pourcentage: {pourcentage}%"
@@ -1011,6 +1015,58 @@ def valider_correction(request, fiche_id):
             return redirect('observations:fiche_observation', fiche_id=fiche_id)
 
     logger.info(f"Méthode GET, redirection vers modifier_observation pour fiche {fiche_id}")
+    return redirect('observations:modifier_observation', fiche_id=fiche_id)
+
+
+@login_required
+def rouvrir_fiche(request, fiche_id):
+    """
+    Permet à un administrateur ou au validateur de rouvrir une fiche validée (repassage au statut 'en_cours').
+    """
+    fiche = get_object_or_404(FicheObservation, pk=fiche_id)
+    user = cast(Utilisateur, request.user)
+    etat = fiche.etat_correction
+
+    # Vérification du rôle administrateur ou de l'auteur de la validation
+    if user.role != 'administrateur' and user != etat.validee_par:
+        messages.error(request, "Vous n'avez pas les droits pour rouvrir cette fiche.")
+        return redirect('observations:fiche_observation', fiche_id=fiche_id)
+
+    # Vérifier que la fiche est bien validée
+    if etat.statut != 'valide':
+        messages.warning(request, "Cette fiche n'est pas validée, impossible de la rouvrir.")
+        return redirect('observations:fiche_observation', fiche_id=fiche_id)
+
+    # Action de réouverture
+    ancien_statut = etat.get_statut_display()
+
+    # On repasse en 'en_cours'
+    etat.statut = 'en_cours'
+    # On efface les infos de validation
+    etat.validee_par = None
+    etat.date_validation = None
+
+    # On assigne la correction à l'admin qui rouvre (optionnel, mais logique)
+    etat.en_correction_par = user
+    etat.date_debut_correction = timezone.now()
+
+    etat.save(skip_auto_calculation=True)
+
+    # Historique
+    HistoriqueModification.objects.create(
+        fiche=fiche,
+        champ_modifie='statut_validation',
+        ancienne_valeur=ancien_statut,
+        nouvelle_valeur="En cours de correction (Réouverture)",
+        modifie_par=user,
+        categorie='validation',
+    )
+
+    logger.info(f"Fiche {fiche_id} rouverte par l'administrateur {user.username}")
+    messages.success(
+        request, f"La fiche #{fiche_id} a été rouverte et placée en cours de correction."
+    )
+
     return redirect('observations:modifier_observation', fiche_id=fiche_id)
 
 
