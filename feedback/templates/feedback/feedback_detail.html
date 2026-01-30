@@ -7,6 +7,67 @@
     <div class="row">
         <div class="col-lg-10 mx-auto">
             
+            {% if user.role == 'administrateur' %}
+            <!-- Panneau d'administration (Visible uniquement par les admins) -->
+            <div class="card shadow border-primary mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="m-0"><i class="fas fa-tools me-2"></i> Administration du ticket</h5>
+                    <span class="badge bg-light text-primary">Admin Only</span>
+                </div>
+                <div class="card-body bg-light">
+                    <form id="admin-update-form" data-feedback-id="{{ feedback.id }}">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <!-- Ligne 1 : Statut et Catégorie -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Statut</label>
+                                <select name="status" class="form-select">
+                                    {% for code, label in feedback.STATUS %}
+                                        <option value="{{ code }}" {% if feedback.status == code %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Catégorie</label>
+                                <select name="category" class="form-select">
+                                    {% for code, label in feedback.CATEGORIES %}
+                                        <option value="{{ code }}" {% if feedback.category == code %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                             <div class="col-md-4">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Réponse publique</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" id="publicResponse" name="is_public_response" value="true" {% if feedback.is_public_response %}checked{% endif %}>
+                                    <label class="form-check-label" for="publicResponse">Visible dans la FAQ</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ligne 2 : IA Infos -->
+                        <div class="row g-3 mt-2">
+                             <div class="col-md-12">
+                                <div class="p-2 border rounded bg-white">
+                                    <label class="small fw-bold text-muted mb-1"><i class="fas fa-robot me-1"></i> Analyse IA</label>
+                                    <div class="d-flex align-items-center flex-wrap gap-3">
+                                        <span class="badge bg-light text-dark border">Résumé : {{ feedback.ai_summary|default:"Aucun" }}</span>
+                                        <span class="badge bg-light text-dark border">Sentiment : {{ feedback.sentiment|default:"Neutre" }}</span>
+                                        <span class="badge bg-light text-dark border">Urgence : {{ feedback.urgency }}/5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Enregistrer les modifications
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Message Initial -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-white">
@@ -104,4 +165,70 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if user.role == 'administrateur' %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const adminForm = document.getElementById('admin-update-form');
+        
+        if (adminForm) {
+            adminForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const feedbackId = this.dataset.feedbackId;
+                const btn = this.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Enregistrement...';
+
+                const formData = new FormData(this);
+
+                // Gestion explicite de la checkbox car FormData peut ne pas l'envoyer si unchecked ? 
+                // Non, update_feedback attend "true" si checked. Si unchecked, POST n'aura pas la clé, 
+                // mais la vue attend request.POST.get("is_public_response") == "true". 
+                // Attention: si la clé est absente, get renvoie None, donc False. C'est correct.
+                // Mais vérifions comment FormData gère les checkbox non cochées : elles ne sont pas envoyées.
+                
+                // Petite correction pour le JS :
+                // La vue attend : request.POST.get("is_public_response") == "true"
+                // Si la case est cochée, la valeur envoyée sera "true" (grâce à value="true").
+                // Si décochée, rien n'est envoyé.
+
+                fetch(`/feedback/update/${feedbackId}/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        btn.classList.replace('btn-primary', 'btn-success');
+                        btn.innerHTML = '<i class="fas fa-check"></i> Enregistré avec succès';
+                        setTimeout(() => {
+                            btn.classList.replace('btn-success', 'btn-primary');
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }, 2000);
+                    } else {
+                        alert("Erreur : " + (data.message || "Une erreur est survenue"));
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Erreur de communication avec le serveur");
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                });
+            });
+        }
+    });
+</script>
+{% endif %}
 {% endblock %}

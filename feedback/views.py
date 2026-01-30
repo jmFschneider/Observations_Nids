@@ -46,9 +46,8 @@ def feedback_detail(request, feedback_id):
     """Vue pour voir le détail d'un feedback et discuter"""
     feedback = get_object_or_404(Feedback, id=feedback_id)
 
-    # Seul l'auteur ou un admin peut voir le détail
-    if not is_admin(request.user) and feedback.user != request.user:
-        return redirect("feedback:list")
+    # ACCÈS OUVERT : Tout utilisateur connecté peut voir et répondre (Logique collaborative)
+    # L'ancienne restriction (auteur ou admin seulement) est supprimée.
 
     if request.method == "POST":
         content = request.POST.get("content")

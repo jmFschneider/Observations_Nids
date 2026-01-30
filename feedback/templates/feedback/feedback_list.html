@@ -28,7 +28,7 @@
                     </thead>
                     <tbody>
                         {% for f in feedbacks %}
-                        <tr {% if f.status == 'WAITING_USER' and f.user == request.user %}class="table-warning"{% endif %}>
+                        <tr class="{% if f.status == 'WAITING_USER' and f.user == request.user %}table-warning{% elif f.messages.count > 0 and f.last_activity > recent_activity_threshold %}table-success bg-opacity-10{% endif %}">
                             <td class="small text-muted">
                                 {{ f.created_at|date:"d/m/Y" }}
                             </td>
