@@ -56,6 +56,13 @@ class TranscriptionOCR(models.Model):
         help_text="Type de traitement appliqué à l'image",
     )
 
+    traitement_image = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="Traitement spécifique",
+        help_text="Nom du traitement appliqué (ex: binarisation, blur, etc.)",
+    )
+
     modele_ocr = models.CharField(
         max_length=50,
         choices=[

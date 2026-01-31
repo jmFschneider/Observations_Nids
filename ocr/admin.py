@@ -9,6 +9,35 @@ from django.utils.safestring import mark_safe
 from .models import TranscriptionOCR
 
 
+class FicheFilter(admin.SimpleListFilter):
+    """Filtre personnalisé pour sélectionner une fiche spécifique"""
+
+    title = 'Fiche de référence'
+    parameter_name = 'fiche_id'
+
+    def lookups(self, request, model_admin):
+        # Récupérer les IDs des fiches qui ont des transcriptions
+        qs = TranscriptionOCR.objects.exclude(fiche__isnull=True).values_list(
+            'fiche__pk', 'fiche__num_fiche'
+        )
+
+        # Dédoublonnage en Python pour être sûr
+        unique_fiches = {}
+        for pk, num in qs:
+            unique_fiches[pk] = num
+
+        # Trier par numéro de fiche
+        sorted_fiches = sorted(unique_fiches.items(), key=lambda x: x[1] if x[1] else 0)
+
+        return [(str(pk), f'Fiche #{num}') for pk, num in sorted_fiches]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            # Filtrer par la clé primaire de la fiche
+            return queryset.filter(fiche__pk=self.value())
+        return queryset
+
+
 @admin.register(TranscriptionOCR)
 class TranscriptionOCRAdmin(admin.ModelAdmin):
     """Interface d'administration pour les transcriptions OCR de test"""
@@ -18,6 +47,7 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
         'fiche_numero',
         'modele_ocr_badge',
         'type_image_badge',
+        'traitement_image',
         'statut_evaluation_badge',
         'score_global_colored',
         'score_texte_colored',
@@ -26,8 +56,10 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
     ]
 
     list_filter = [
+        FicheFilter,  # Ajout du filtre personnalisé en premier
         'modele_ocr',
         'type_image',
+        'traitement_image',
         'statut_evaluation',
         'date_transcription',
         'date_evaluation',
@@ -177,32 +209,44 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
     @admin.display(description='Global', ordering='score_global')
     def score_global_colored(self, obj):
         """Affiche le score global coloré"""
-        color = self._get_score_color(obj.score_global)
+        score = obj.score_global
+        color = self._get_score_color(score)
         if not color:
             return '-'
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, obj.score_global
-        )
+        try:
+            return format_html(
+                '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, float(score)
+            )
+        except (ValueError, TypeError):
+            return str(score)
 
     @admin.display(description='Texte', ordering='score_texte')
     def score_texte_colored(self, obj):
         """Affiche le score texte coloré"""
-        color = self._get_score_color(obj.score_texte)
+        score = obj.score_texte
+        color = self._get_score_color(score)
         if not color:
             return '-'
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, obj.score_texte
-        )
+        try:
+            return format_html(
+                '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, float(score)
+            )
+        except (ValueError, TypeError):
+            return str(score)
 
     @admin.display(description='Num.', ordering='score_numerique')
     def score_numerique_colored(self, obj):
         """Affiche le score numérique coloré"""
-        color = self._get_score_color(obj.score_numerique)
+        score = obj.score_numerique
+        color = self._get_score_color(score)
         if not color:
             return '-'
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, obj.score_numerique
-        )
+        try:
+            return format_html(
+                '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, float(score)
+            )
+        except (ValueError, TypeError):
+            return str(score)
 
     @admin.display(description='Taux de précision')
     def taux_precision_display(self, obj):

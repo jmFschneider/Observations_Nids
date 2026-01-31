@@ -435,12 +435,13 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
     images_par_repertoire = 0
     for dir_info in directories:
         dir_path = os.path.join(media_root, dir_info['path'])
+
         if os.path.exists(dir_path):
             images = [
                 f
                 for f in os.listdir(dir_path)
                 if os.path.isfile(os.path.join(dir_path, f))
-                and f.lower().endswith(('.jpg', '.jpeg'))
+                and f.lower().endswith(('.jpg', '.jpeg', '.png'))
             ]
             images_par_repertoire += len(images)
 
@@ -545,7 +546,7 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                 f
                 for f in os.listdir(dir_path_complet)
                 if os.path.isfile(os.path.join(dir_path_complet, f))
-                and f.lower().endswith(('.jpg', '.jpeg'))
+                and f.lower().endswith(('.jpg', '.jpeg', '.png'))
             ]
 
             if not image_files:
@@ -567,6 +568,26 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                 file_start = time.time()
                 img_path_complet = os.path.join(dir_path_complet, img_file)
                 img_path_relatif = os.path.join(dir_path_relatif, img_file)
+
+                # Définir le chemin de sortie attendu
+                json_filename = f"{os.path.splitext(img_file)[0]}_result.json"
+                json_path_complet = os.path.join(results_dir, json_filename)
+
+                # VÉRIFICATION D'EXISTENCE (SKIP)
+                if os.path.exists(json_path_complet):
+                    logger.info(f"⏭️ Skip {img_file} (déjà transcrit)")
+                    _log_progress(self, f"⏭️ Déjà fait : {img_file}", 'info')
+
+                    # On l'ajoute quand même aux résultats pour que le rapport soit complet
+                    file_result = {
+                        'filename': img_file,
+                        'status': 'skipped',
+                        'message': "Fichier JSON déjà existant",
+                        'duration': 0,
+                    }
+                    dir_results.append(file_result)
+                    processed_count += 1
+                    continue
 
                 logger.info(
                     f"Traitement de {img_path_relatif} ({processed_count + 1}/{total_images})"
@@ -672,6 +693,7 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                             chemin_json=json_path_relatif,
                             chemin_image=img_path_relatif,
                             type_image=type_image,
+                            traitement_image=type_traitement,  # AJOUTÉ: Évite l'erreur 1364
                             modele_ocr=modele_ocr,
                             temps_traitement_secondes=duration,
                             statut_evaluation='non_evaluee',
@@ -813,73 +835,43 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
         logger.exception("Erreur match fiche pour %s", chemin_json_nettoye)
         return {"chemin_json": chemin_json, "statut": "ERREUR", "score_global": None}
 
+    # Extraire les métadonnées globales
     chemin_image_attendu = metadata.get("chemin_image_attendu", "")
-    total_fiches = FicheObservation.objects.filter(chemin_image=chemin_image_attendu).count()
+    type_image = metadata.get("type_image", "")
+    traitement_image = metadata.get("traitement_image", "")
+    modele_ocr_meta = metadata.get("modele_ocr", "")
 
-    if total_fiches == 0:
+    # Si aucune fiche n'est trouvée par le matcher
+    if fiche is None:
         logger.warning(
             "Fiche introuvable pour %s (chemin_image=%s)",
             chemin_json_nettoye,
             chemin_image_attendu,
         )
         if not dry_run:
+            # On crée quand même l'entrée pour signaler l'erreur
             _transcription_ocr, created = TranscriptionOCR.objects.get_or_create(
                 fiche=None,
                 chemin_json=chemin_json_nettoye,
-                modele_ocr=metadata.get("modele_ocr", ""),
                 defaults={
                     "chemin_image": chemin_image_attendu,
-                    "type_image": metadata.get("type_image", ""),
+                    "type_image": type_image,
+                    "traitement_image": traitement_image,
+                    "modele_ocr": modele_ocr_meta,
                     "statut_evaluation": "FICHE_INTROUVABLE",
                 },
             )
+            # Mise à jour si existant
             if not created:
-                _transcription_ocr.chemin_image = chemin_image_attendu
-                _transcription_ocr.type_image = metadata.get("type_image", "")
                 _transcription_ocr.statut_evaluation = "FICHE_INTROUVABLE"
-                _transcription_ocr.save(
-                    update_fields=["chemin_image", "type_image", "statut_evaluation"]
-                )
+                _transcription_ocr.save(update_fields=["statut_evaluation"])
+
         return {"chemin_json": chemin_json, "statut": "ERREUR", "score_global": None}
 
-    if total_fiches > 1:
-        logger.warning(
-            "Correspondance ambiguë pour %s (chemin_image=%s)",
-            chemin_json_nettoye,
-            chemin_image_attendu,
-        )
-        if not dry_run:
-            _transcription_ocr, created = TranscriptionOCR.objects.get_or_create(
-                fiche=None,
-                chemin_json=chemin_json_nettoye,
-                modele_ocr=metadata.get("modele_ocr", ""),
-                defaults={
-                    "chemin_image": chemin_image_attendu,
-                    "type_image": metadata.get("type_image", ""),
-                    "statut_evaluation": "AMBIGU",
-                },
-            )
-            if not created:
-                _transcription_ocr.chemin_image = chemin_image_attendu
-                _transcription_ocr.type_image = metadata.get("type_image", "")
-                _transcription_ocr.statut_evaluation = "AMBIGU"
-                _transcription_ocr.save(
-                    update_fields=["chemin_image", "type_image", "statut_evaluation"]
-                )
-        return {"chemin_json": chemin_json, "statut": "AMBIGU", "score_global": None}
-
-    if fiche is None:
-        logger.error(
-            "Fiche non instanciée pour %s (chemin_image=%s)",
-            chemin_json_nettoye,
-            chemin_image_attendu,
-        )
-        return {"chemin_json": chemin_json, "statut": "ERREUR", "score_global": None}
-
+    # Fiche trouvée !
     transcription_ocr: TranscriptionOCR | None = TranscriptionOCR.objects.filter(
         fiche=fiche,
         chemin_json=chemin_json_nettoye,
-        modele_ocr=metadata.get("modele_ocr", ""),
     ).first()
 
     if transcription_ocr and not force and transcription_ocr.statut_evaluation == "evaluee":
@@ -888,6 +880,8 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
             "chemin_json": chemin_json,
             "statut": "OK",
             "score_global": transcription_ocr.score_global,
+            "score_texte": transcription_ocr.score_texte,
+            "score_numerique": transcription_ocr.score_numerique,
         }
 
     if transcription_ocr is None and not dry_run:
@@ -895,8 +889,9 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
             fiche=fiche,
             chemin_json=chemin_json_nettoye,
             chemin_image=chemin_image_attendu,
-            type_image=metadata.get("type_image", ""),
-            modele_ocr=metadata.get("modele_ocr", ""),
+            type_image=type_image,
+            traitement_image=traitement_image,
+            modele_ocr=modele_ocr_meta,
             statut_evaluation="en_cours",
         )
 
@@ -923,29 +918,24 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
             "score_numerique": score_numerique,
         }
 
-    if transcription_ocr is None:
-        transcription_ocr = TranscriptionOCR(
-            fiche=fiche,
-            chemin_json=chemin_json_nettoye,
-            chemin_image=chemin_image_attendu,
-            type_image=metadata.get("type_image", ""),
-            modele_ocr=metadata.get("modele_ocr", ""),
-        )
-
-    transcription_ocr.chemin_image = chemin_image_attendu
-    transcription_ocr.type_image = metadata.get("type_image", "")
-    transcription_ocr.statut_evaluation = "evaluee"
-    transcription_ocr.date_evaluation = timezone.now()
-    transcription_ocr.score_global = score_global
-    transcription_ocr.score_texte = score_texte
-    transcription_ocr.score_numerique = score_numerique
-    transcription_ocr.nombre_champs_total = resultats.get("nombre_champs_total")
-    transcription_ocr.nombre_champs_corrects = resultats.get("nombre_champs_corrects")
-    transcription_ocr.nombre_erreurs_texte = resultats.get("nombre_erreurs_texte", 0)
-    transcription_ocr.nombre_erreurs_nombres = resultats.get("nombre_erreurs_nombres", 0)
-    transcription_ocr.nombre_erreurs_dates = resultats.get("nombre_erreurs_dates", 0)
-    transcription_ocr.details_comparaison = resultats.get("details_comparaison")
-    transcription_ocr.save()
+    # Mise à jour finale de l'objet
+    if transcription_ocr:
+        transcription_ocr.chemin_image = chemin_image_attendu
+        transcription_ocr.type_image = type_image
+        transcription_ocr.traitement_image = traitement_image
+        transcription_ocr.modele_ocr = modele_ocr_meta
+        transcription_ocr.statut_evaluation = "evaluee"
+        transcription_ocr.date_evaluation = timezone.now()
+        transcription_ocr.score_global = score_global
+        transcription_ocr.score_texte = score_texte
+        transcription_ocr.score_numerique = score_numerique
+        transcription_ocr.nombre_champs_total = resultats.get("nombre_champs_total")
+        transcription_ocr.nombre_champs_corrects = resultats.get("nombre_champs_corrects")
+        transcription_ocr.nombre_erreurs_texte = resultats.get("nombre_erreurs_texte", 0)
+        transcription_ocr.nombre_erreurs_nombres = resultats.get("nombre_erreurs_nombres", 0)
+        transcription_ocr.nombre_erreurs_dates = resultats.get("nombre_erreurs_dates", 0)
+        transcription_ocr.details_comparaison = resultats.get("details_comparaison")
+        transcription_ocr.save()
 
     logger.info("Comparaison OCR terminée pour %s", chemin_json_nettoye)
     return {

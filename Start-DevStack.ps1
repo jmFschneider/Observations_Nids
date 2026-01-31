@@ -30,7 +30,7 @@ $Script
 
 # Préparation des commandes avec couleurs
 $E1 = Get-EncodedCmd "Nids: Django" "python manage.py runserver ${DjangoHost}:${DjangoPort}" "Green"
-$E2 = Get-EncodedCmd "Nids: Celery" "celery -A $CeleryApp worker --loglevel=info --pool=eventlet" "Cyan"
+$E2 = Get-EncodedCmd "Nids: Celery" "celery -A $CeleryApp worker --loglevel=info --pool=solo" "Cyan"
 $E3 = Get-EncodedCmd "Nids: Flower" "celery -A $CeleryApp flower --port=$FlowerPort" "Yellow"
 $E4 = Get-EncodedCmd "Nids: Redis" "if (-not (Get-Process 'redis-server' -ErrorAction SilentlyContinue)) { cd (Split-Path '$RedisExe'); & '$RedisExe' } else { Write-Host 'Redis OK' -ForegroundColor Green }" "White"
 
