@@ -8,10 +8,10 @@ Ce script teste:
 4. Le parsing du JSON retourné
 
 Usage:
-    python pilot/test_gemini_simple.py <chemin_image>
+    python ocr/test_gemini_simple.py <chemin_image>
 
 Exemple:
-    python pilot/test_gemini_simple.py "media/jpeg_pdf/TRI_ANCIEN/FUSION_FULL/fiche 25_FINAL.jpg"
+    python ocr/test_gemini_simple.py "media/jpeg_pdf/TRI_ANCIEN/FUSION_FULL/fiche 25_FINAL.jpg"
 """
 
 import json
@@ -185,10 +185,10 @@ def main():
 
     # Vérifier les arguments
     if len(sys.argv) < 2:
-        print("\n❌ Usage: python pilot/test_gemini_simple.py <chemin_image>")
+        print("\n❌ Usage: python ocr/test_gemini_simple.py <chemin_image>")
         print("\nExemple:")
         print(
-            '  python pilot/test_gemini_simple.py "media/jpeg_pdf/TRI_ANCIEN/FUSION_FULL/fiche 25_FINAL.jpg"'
+            '  python ocr/test_gemini_simple.py "media/jpeg_pdf/TRI_ANCIEN/FUSION_FULL/fiche 25_FINAL.jpg"'
         )
         sys.exit(1)
 

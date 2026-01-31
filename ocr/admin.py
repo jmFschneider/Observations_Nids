@@ -20,8 +20,8 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
         'type_image_badge',
         'statut_evaluation_badge',
         'score_global_colored',
-        'taux_precision_display',
-        'nombre_erreurs_total_display',
+        'score_texte_colored',
+        'score_numerique_colored',
         'date_transcription',
     ]
 
@@ -74,6 +74,8 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
                     'statut_evaluation',
                     'date_evaluation',
                     'score_global',
+                    'score_texte',
+                    'score_numerique',
                     'nombre_champs_corrects',
                     'nombre_champs_total',
                     'taux_precision_display',
@@ -160,23 +162,46 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
             obj.get_statut_evaluation_display(),
         )
 
-    @admin.display(description='Score', ordering='score_global')
-    def score_global_colored(self, obj):
-        """Affiche le score global avec une couleur selon la qualité"""
-        if obj.score_global is None:
-            return '-'
-
-        if obj.score_global >= 90:
-            color = '#28a745'  # vert
-        elif obj.score_global >= 75:
-            color = '#ffc107'  # jaune
-        elif obj.score_global >= 50:
-            color = '#fd7e14'  # orange
+    def _get_score_color(self, score):
+        if score is None:
+            return None
+        if score >= 90:
+            return '#28a745'  # vert
+        elif score >= 75:
+            return '#ffc107'  # jaune
+        elif score >= 50:
+            return '#fd7e14'  # orange
         else:
-            color = '#dc3545'  # rouge
+            return '#dc3545'  # rouge
 
+    @admin.display(description='Global', ordering='score_global')
+    def score_global_colored(self, obj):
+        """Affiche le score global coloré"""
+        color = self._get_score_color(obj.score_global)
+        if not color:
+            return '-'
         return format_html(
             '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, obj.score_global
+        )
+
+    @admin.display(description='Texte', ordering='score_texte')
+    def score_texte_colored(self, obj):
+        """Affiche le score texte coloré"""
+        color = self._get_score_color(obj.score_texte)
+        if not color:
+            return '-'
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, obj.score_texte
+        )
+
+    @admin.display(description='Num.', ordering='score_numerique')
+    def score_numerique_colored(self, obj):
+        """Affiche le score numérique coloré"""
+        color = self._get_score_color(obj.score_numerique)
+        if not color:
+            return '-'
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, obj.score_numerique
         )
 
     @admin.display(description='Taux de précision')

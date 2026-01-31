@@ -1,8 +1,5 @@
 """
-⚠️ ATTENTION: App de PILOTE uniquement - NE PAS déployer en production
-
-Cette app contient les modèles pour l'expérimentation et l'évaluation
-des modèles OCR. Elle doit être retirée de INSTALLED_APPS en production.
+Modèles pour le traitement et l'évaluation des transcriptions OCR.
 """
 
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -101,6 +98,24 @@ class TranscriptionOCR(models.Model):
         validators=[MinValueValidator(0.0), MaxValueValidator(100.0)],
         verbose_name="Score global (%)",
         help_text="Score de similarité global entre OCR et vérité terrain (0-100%)",
+    )
+
+    # Score spécifique Texte (Espèce, Commune, Observations, Remarques)
+    score_texte = models.FloatField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0.0), MaxValueValidator(100.0)],
+        verbose_name="Score Texte (%)",
+        help_text="Score de similarité sémantique (Espèce, Commune, Textes libres)",
+    )
+
+    # Score spécifique Numérique (Dates, Nombres, Coordonnées)
+    score_numerique = models.FloatField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0.0), MaxValueValidator(100.0)],
+        verbose_name="Score Numérique (%)",
+        help_text="Score de précision des données structurées (Dates, Chiffres)",
     )
 
     # Compteurs de précision

@@ -1,8 +1,6 @@
 # pilot/tasks.py
 """
-Le text ci dessous n'est plus correct. Nous avons passsé toutes les fonctionnalités OCR dans ce module.
-Tâches Celery spécifiques pour l'app pilot (optimisation OCR).
-Ces tâches seront supprimées avec l'app une fois les tests terminés.
+Tâches Celery pour le traitement et l'optimisation OCR.
 """
 
 import copy
@@ -383,12 +381,11 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
     """
     Tâche Celery pour traiter plusieurs répertoires en batch avec plusieurs modèles OCR.
 
-    Cette tâche est spécifique à l'app pilot pour l'évaluation OCR.
-    Elle traite chaque répertoire avec chaque modèle sélectionné (exécution séquentielle),
+    Cette tâche traite chaque répertoire avec chaque modèle sélectionné (exécution séquentielle),
     génère les transcriptions JSON, et crée automatiquement les entrées TranscriptionOCR
     pour comparaison avec la vérité terrain.
 
-    **Mode pilote uniquement** : Cette tâche génère les fichiers JSON pour évaluation.
+    Cette tâche génère les fichiers JSON pour évaluation.
     L'importation en base de données se fait depuis l'app observations.
 
     Args:
@@ -664,7 +661,7 @@ def process_batch_transcription_task(self, directories: list[dict], modeles_ocr:
                         duration = round(time.time() - file_start, 2)
                         logger.info(f"Transcription réussie pour {img_file}, durée: {duration}s")
 
-                        # Créer l'entrée TranscriptionOCR (mode pilote: JSON uniquement)
+                        # Créer l'entrée TranscriptionOCR (JSON uniquement)
                         nom_base = _extraire_nom_base_fichier(img_path_relatif)
 
                         # Chercher une fiche correspondante pour la lier (utile pour l'évaluation)
@@ -907,6 +904,8 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
         comparateur = OCRComparator(fiche, json_ocr)
         resultats = comparateur.comparer()
         score_global = resultats.get("score_global")
+        score_texte = resultats.get("score_texte")
+        score_numerique = resultats.get("score_numerique")
     except Exception:
         logger.exception("Erreur comparaison OCR pour %s", chemin_json_nettoye)
         if transcription_ocr and not dry_run:
@@ -916,7 +915,13 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
 
     if dry_run:
         logger.info("Dry-run actif, aucun enregistrement pour %s", chemin_json_nettoye)
-        return {"chemin_json": chemin_json, "statut": "OK", "score_global": score_global}
+        return {
+            "chemin_json": chemin_json,
+            "statut": "OK",
+            "score_global": score_global,
+            "score_texte": score_texte,
+            "score_numerique": score_numerique,
+        }
 
     if transcription_ocr is None:
         transcription_ocr = TranscriptionOCR(
@@ -932,6 +937,8 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
     transcription_ocr.statut_evaluation = "evaluee"
     transcription_ocr.date_evaluation = timezone.now()
     transcription_ocr.score_global = score_global
+    transcription_ocr.score_texte = score_texte
+    transcription_ocr.score_numerique = score_numerique
     transcription_ocr.nombre_champs_total = resultats.get("nombre_champs_total")
     transcription_ocr.nombre_champs_corrects = resultats.get("nombre_champs_corrects")
     transcription_ocr.nombre_erreurs_texte = resultats.get("nombre_erreurs_texte", 0)
@@ -941,4 +948,10 @@ def comparer_ocr_fichier_task(  # noqa: PLR0911
     transcription_ocr.save()
 
     logger.info("Comparaison OCR terminée pour %s", chemin_json_nettoye)
-    return {"chemin_json": chemin_json, "statut": "OK", "score_global": score_global}
+    return {
+        "chemin_json": chemin_json,
+        "statut": "OK",
+        "score_global": score_global,
+        "score_texte": score_texte,
+        "score_numerique": score_numerique,
+    }

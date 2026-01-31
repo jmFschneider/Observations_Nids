@@ -296,7 +296,7 @@ def lancer_transcription_batch(request):  # noqa: PLR0911
             )
 
         logger.info(
-            f"[PILOT] Lancement transcription batch: {len(directories)} répertoire(s), "
+            f"[OCR] Lancement transcription batch: {len(directories)} répertoire(s), "
             f"{len(modeles_ocr)} modèle(s) ({', '.join(modeles_ocr)}) - Mode évaluation (JSON uniquement)"
         )
 

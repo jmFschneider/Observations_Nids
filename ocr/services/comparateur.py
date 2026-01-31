@@ -64,10 +64,26 @@ class OCRComparator:
             ),
         }
 
-        score_global = sum(stats["scores"]) / len(stats["scores"]) if stats["scores"] else 0.0
+        # Calcul des scores
+        tous_scores = stats["scores_texte"] + stats["scores_numerique"]
+        score_global = sum(tous_scores) / len(tous_scores) if tous_scores else 0.0
+
+        score_texte = (
+            sum(stats["scores_texte"]) / len(stats["scores_texte"])
+            if stats["scores_texte"]
+            else None
+        )
+
+        score_numerique = (
+            sum(stats["scores_numerique"]) / len(stats["scores_numerique"])
+            if stats["scores_numerique"]
+            else None
+        )
 
         resultat = {
-            "score_global": score_global,
+            "score_global": score_global * 100,  # Conversion en pourcentage ici
+            "score_texte": score_texte * 100 if score_texte is not None else None,
+            "score_numerique": score_numerique * 100 if score_numerique is not None else None,
             "nombre_champs_total": stats["nombre_champs_total"],
             "nombre_champs_corrects": stats["nombre_champs_corrects"],
             "nombre_erreurs_texte": stats["nombre_erreurs_texte"],
@@ -77,17 +93,18 @@ class OCRComparator:
         }
 
         logger.info(
-            "Comparaison OCR terminee pour fiche %s: %s/%s champs corrects",
+            "Comparaison OCR terminée pour fiche %s: Texte=%.1f%%, Num=%.1f%%",
             self._fiche.pk,
-            stats["nombre_champs_corrects"],
-            stats["nombre_champs_total"],
+            resultat["score_texte"] or 0.0,
+            resultat["score_numerique"] or 0.0,
         )
 
         return resultat
 
     def _initialiser_stats(self) -> dict[str, Any]:
         return {
-            "scores": [],
+            "scores_texte": [],
+            "scores_numerique": [],
             "nombre_champs_total": 0,
             "nombre_champs_corrects": 0,
             "nombre_erreurs_texte": 0,
@@ -320,11 +337,19 @@ class OCRComparator:
 
     def _mettre_a_jour_stats(self, comparaison: dict[str, Any], stats: dict[str, Any]) -> None:
         stats["nombre_champs_total"] += 1
-        stats["scores"].append(comparaison["score"])
+
+        type_champ = comparaison["type"]
+        score = comparaison["score"]
+
+        if type_champ == "texte":
+            stats["scores_texte"].append(score)
+        else:
+            stats["scores_numerique"].append(score)
+
         if comparaison["match"]:
             stats["nombre_champs_corrects"] += 1
             return
-        type_champ = comparaison["type"]
+
         if type_champ == "texte":
             stats["nombre_erreurs_texte"] += 1
         elif type_champ == "nombre":
