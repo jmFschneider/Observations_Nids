@@ -2,6 +2,8 @@
 
 ⚠️ **App temporaire dans la branche `feature/optimisation-ocr-batch`**
 
+
+
 Cette app permet d'évaluer différents modèles OCR sur les images de fiches.
 Elle sera supprimée une fois les tests terminés.
 
