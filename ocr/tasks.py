@@ -2,7 +2,7 @@
 """
 Le text ci dessous n'est plus correct. Nous avons passsé toutes les fonctionnalités OCR dans ce module.
 Tâches Celery spécifiques pour l'app pilot (optimisation OCR).
-Ces tâches seront supprimées avec l'app une fois les tests terminés.  
+Ces tâches seront supprimées avec l'app une fois les tests terminés.
 """
 
 import copy

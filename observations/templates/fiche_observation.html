@@ -17,40 +17,57 @@
             padding: 2px 5px;
             border-radius: 3px;
         }
+
+        /* === BARRE D'ACTIONS FLOTTANTE === */
+        .floating-action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+            border-top: 2px solid #dee2e6;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .floating-action-bar-content {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-start; /* Alignement à gauche comme demandé initialement, ou center ? Le précédent était start */
+            flex-wrap: wrap;
+        }
+        
+        /* Pour centrer le contenu si souhaité, changer justify-content ci-dessus */
+        
+        .floating-action-bar .btn {
+            white-space: nowrap;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .floating-action-bar {
+                padding: 10px;
+            }
+            .floating-action-bar .btn {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+        }
     </style>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    function openResizableImageWindow(imageUrl) {
-        const width = 800;
-        const height = 600;
-        const left = (screen.width - width) / 2;
-        const top = (screen.height - height) / 2;
-
-        const windowFeatures = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`;
-        const newWindow = window.open('', '_blank', windowFeatures);
-
-        if (newWindow) {
-            newWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Image de la fiche</title>
-                    <style>
-                        body { margin: 0; padding: 10px; background: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-                        img { max-width: 100%; height: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: white; }
-                    </style>
-                </head>
-                <body>
-                    <img src="${imageUrl}" alt="Image de la fiche">
-                </body>
-                </html>
-            `);
-            newWindow.document.close();
-        }
-    }
-</script>
 {% endblock %}
 
 
@@ -58,15 +75,21 @@
 <div class="header-container" style="margin-bottom: 20px;">
     <div class="header-section">
         <h2>Fiche Observation n°{{ fiche.num_fiche }}</h2>
-        {% if fiche.etat_correction.est_verrouillee %}
-            <div style="margin-top: 10px;">
+        <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+            {% if fiche.etat_correction.statut == 'valide' %}
+                <span class="badge" style="background-color: #198754; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.9em;">
+                    <i class="fas fa-check-circle"></i>
+                    Validé par {{ fiche.etat_correction.validee_par.get_full_name|default:fiche.etat_correction.validee_par.username }}
+                    le {{ fiche.etat_correction.date_validation|date:"d/m/Y à H:i" }}
+                </span>
+            {% elif fiche.etat_correction.est_verrouillee %}
                 <span class="badge" style="background-color: #ffc107; color: #000; padding: 5px 10px; border-radius: 4px; font-size: 0.9em;">
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-tools"></i>
                     En cours de correction par {{ fiche.etat_correction.en_correction_par.get_full_name|default:fiche.etat_correction.en_correction_par.username }}
                     depuis le {{ fiche.etat_correction.date_debut_correction|date:"d/m/Y à H:i" }}
                 </span>
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 
     <div class="header-section header-right">
@@ -81,15 +104,15 @@
             {% endif %}
 
             {% if fiche.chemin_json %}
-                <a href="{{ MEDIA_URL }}{{ fiche.chemin_json }}"
-                   target="_blank"
+                <a href="javascript:void(0);"
+                   onclick="openFilePreviewWindow('{{ MEDIA_URL|escapejs }}{{ fiche.chemin_json|escapejs }}'); return false;"
                    class="btn-action btn-json">
                     <i class="fas fa-file-code"></i>
                     <span>Voir JSON</span>
                 </a>
             {% endif %}
 
-            {% if fiche.etat_correction.est_verrouillee %}
+            {% if fiche.etat_correction.est_verrouillee and fiche.etat_correction.statut != 'valide' %}
                 {% if user.role == 'administrateur' or fiche.etat_correction.en_correction_par == user %}
                     <a href="{% url 'observations:liberer_verrou_fiche' fiche_id=fiche.num_fiche %}"
                        class="btn-action btn-warning"
@@ -97,6 +120,18 @@
                        onclick="return confirm('Êtes-vous sûr de vouloir débloquer cette fiche ?');">
                         <i class="fas fa-unlock"></i>
                         <span>Débloquer la fiche</span>
+                    </a>
+                {% endif %}
+            {% endif %}
+
+            {% if fiche.etat_correction.statut == 'valide' %}
+                {% if user.role == 'administrateur' or user == fiche.etat_correction.validee_par %}
+                    <a href="{% url 'observations:rouvrir_fiche' fiche_id=fiche.num_fiche %}"
+                       class="btn-action btn-danger"
+                       style="background-color: #dc3545; color: #fff;"
+                       onclick="return confirm('ATTENTION : Rouvrir la fiche va annuler sa validation et la remettre en correction. Confirmer ?');">
+                        <i class="fas fa-lock-open"></i>
+                        <span>Rouvrir la fiche</span>
                     </a>
                 {% endif %}
             {% endif %}
@@ -375,28 +410,34 @@
     </div>
 </div>
 
-<!-- Boutons d'action en bas de page -->
-<div class="form-buttons mt-4 mb-3" style="display: flex; gap: 10px; justify-content: flex-start;">
-    <!-- Bouton Modifier -->
-    {% if fiche.etat_correction.statut == 'valide' %}
-        <!-- Fiche validée - Bouton grisé et inactif -->
-        <button class="btn btn-secondary" disabled style="cursor: not-allowed;">
-            <i class="fas fa-lock"></i> Fiche validée - Non modifiable
-        </button>
-    {% else %}
-        <!-- Fiche modifiable -->
-        <a href="{% url 'observations:modifier_observation' fiche_id=fiche.num_fiche %}"
-           class="btn btn-primary">
-            <i class="fas fa-edit"></i> Modifier
-        </a>
-    {% endif %}
+<!-- Barre d'actions flottante -->
+<div class="floating-action-bar">
+    <div class="floating-action-bar-content">
+        <!-- Bouton Modifier ou Statut -->
+        {% if fiche.etat_correction.statut == 'valide' %}
+            <!-- Fiche validée - Bouton grisé et inactif -->
+            <button class="btn btn-secondary" disabled style="cursor: not-allowed;">
+                <i class="fas fa-lock"></i> Fiche validée - Non modifiable
+            </button>
+        {% else %}
+            <!-- Fiche modifiable -->
+            <a href="{% url 'observations:modifier_observation' fiche_id=fiche.num_fiche %}"
+               class="btn btn-primary">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+        {% endif %}
 
-    <!-- Bouton Historique -->
-    <a href="{% url 'observations:historique_modifications' fiche_id=fiche.num_fiche %}"
-       class="btn btn-info"
-       target="_blank">
-        <i class="fas fa-history"></i> Historique
-    </a>
+        <!-- Bouton Historique -->
+        <a href="{% url 'observations:historique_modifications' fiche_id=fiche.num_fiche %}"
+           class="btn btn-info"
+           target="_blank">
+            <i class="fas fa-history"></i> Historique
+        </a>
+        
+        <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary">
+             <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
 </div>
 
 {% endblock %}

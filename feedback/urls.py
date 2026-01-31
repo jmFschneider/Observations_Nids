@@ -7,6 +7,7 @@ app_name = 'feedback'
 urlpatterns = [
     path('submit/', views.submit_feedback, name='submit'),
     path('list/', views.feedback_list, name='list'),
+    path('detail/<int:feedback_id>/', views.feedback_detail, name='detail'),
     path('triage/', views.feedback_triage, name='triage'),
     path('update/<int:feedback_id>/', views.update_feedback, name='update'),
 ]

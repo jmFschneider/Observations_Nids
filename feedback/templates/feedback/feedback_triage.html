@@ -55,6 +55,7 @@
 {% endblock %}
 
 {% block extra_js %}
+{% if is_admin %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const forms = document.querySelectorAll('.triage-form');
@@ -70,7 +71,7 @@
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
 
                 const formData = new FormData(this);
-                formData.append('is_public_response', this.querySelector('.public-toggle').checked);
+                // formData.append('is_public_response', this.querySelector('.public-toggle').checked); // Supprimé car géré dans la conversation
 
                 fetch(`/feedback/update/${feedbackId}/`, {
                     method: 'POST',
@@ -97,4 +98,5 @@
         });
     });
 </script>
+{% endif %}
 {% endblock %}

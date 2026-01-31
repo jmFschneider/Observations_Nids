@@ -153,46 +153,7 @@ input.nombre-avec-incertitude {
 
 <!-- Script pour gérer la barre d'actions flottante -->
 <script>
-(function() {
-    const floatingBar = document.getElementById('floating-action-bar');
-    const originalButtons = document.getElementById('original-buttons');
-
-    if (!floatingBar || !originalButtons) return;
-
-    let ticking = false;
-
-    function updateFloatingBar() {
-        // Obtenir la position des boutons originaux
-        const rect = originalButtons.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-
-        // Si les boutons originaux sont visibles à l'écran (en bas), masquer la barre flottante
-        // On ajoute une marge de 100px pour une transition douce
-        if (rect.top < windowHeight + 100) {
-            floatingBar.classList.add('hidden');
-        } else {
-            floatingBar.classList.remove('hidden');
-        }
-
-        ticking = false;
-    }
-
-    function requestTick() {
-        if (!ticking) {
-            requestAnimationFrame(updateFloatingBar);
-            ticking = true;
-        }
-    }
-
-    // Écouter le scroll avec throttling via requestAnimationFrame
-    window.addEventListener('scroll', requestTick, { passive: true });
-
-    // Vérifier au chargement de la page
-    updateFloatingBar();
-
-    // Re-vérifier après un petit délai (pour s'assurer que tout est chargé)
-    setTimeout(updateFloatingBar, 500);
-})();
+    // La barre est désormais toujours affichée
 </script>
 
 <!-- Rouvrir la modale des remarques après sauvegarde si demandé -->
@@ -425,6 +386,24 @@ function fermerModalRecherche() {
             Création d'une fiche
           {% endif %}
         </h2>
+        
+        {% if fiche_form.instance.pk %}
+            <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                {% if fiche_form.instance.etat_correction.statut == 'valide' %}
+                    <span class="badge" style="background-color: #198754; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.9em;">
+                        <i class="fas fa-check-circle"></i>
+                        Validé par {{ fiche_form.instance.etat_correction.validee_par.get_full_name|default:fiche_form.instance.etat_correction.validee_par.username }}
+                        le {{ fiche_form.instance.etat_correction.date_validation|date:"d/m/Y à H:i" }}
+                    </span>
+                {% elif fiche_form.instance.etat_correction.est_verrouillee %}
+                    <span class="badge" style="background-color: #ffc107; color: #000; padding: 5px 10px; border-radius: 4px; font-size: 0.9em;">
+                        <i class="fas fa-tools"></i>
+                        En cours de correction par {{ fiche_form.instance.etat_correction.en_correction_par.get_full_name|default:fiche_form.instance.etat_correction.en_correction_par.username }}
+                        depuis le {{ fiche_form.instance.etat_correction.date_debut_correction|date:"d/m/Y à H:i" }}
+                    </span>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 
     {% if fiche_form.instance.pk %}
@@ -440,8 +419,8 @@ function fermerModalRecherche() {
                 {% endif %}
 
                 {% if fiche_form.instance.chemin_json %}
-                    <a href="{{ MEDIA_URL }}{{ fiche_form.instance.chemin_json }}"
-                       target="_blank"
+                    <a href="javascript:void(0);"
+                       onclick="openFilePreviewWindow('{{ MEDIA_URL|escapejs }}{{ fiche_form.instance.chemin_json|escapejs }}'); return false;"
                        class="btn-action btn-json">
                         <i class="fas fa-file-code"></i>
                         <span>Voir JSON</span>
@@ -1063,29 +1042,7 @@ function fermerModalRecherche() {
 
 
 
-    <!-- Boutons de formulaire (originaux en bas de page) -->
-    <div class="form-buttons" id="original-buttons">
-        {% if not read_only %}
-            <button type="submit" class="btn btn-primary" onclick="return confirm('Voulez-vous vraiment enregistrer les modifications ?');">Enregistrer</button>
-            {% if fiche_form.instance.pk %}
-                {% if fiche_form.instance.etat_correction.statut == 'nouveau' or fiche_form.instance.etat_correction.statut == 'en_edition' %}
-                    <button type="submit" class="btn btn-success" formaction="{% url 'observations:soumettre_pour_correction' fiche_id=fiche_form.instance.pk %}" data-confirm-message="Êtes-vous sûr de vouloir soumettre cette fiche pour correction ? Vous ne pourrez plus la modifier ensuite.">
-                        Soumettre pour correction
-                    </button>
-                {% elif fiche_form.instance.etat_correction.statut == 'en_cours' %}
-                    <button type="submit" class="btn btn-success" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" data-confirm-message="Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.">
-                        Valider la correction
-                    </button>
-                {% endif %}
-            {% endif %}
-        {% endif %}
-        {% if fiche_form.instance.pk %}
-            <a href="{% url 'observations:historique_modifications' fiche_id=fiche_form.instance.pk %}" class="btn btn-info" target="_blank">Historique</a>
-            <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary" data-check-changes="true">Retour à la list</a>
-        {% else %}
-            <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary" data-check-changes="true">Annuler</a>
-        {% endif %}
-    </div>
+    <!-- Boutons de formulaire supprimés (remplacés par la barre flottante) -->
 
     <!-- Barre d'actions flottante (sticky en bas d'écran) -->
     <div class="floating-action-bar" id="floating-action-bar">
@@ -1100,15 +1057,27 @@ function fermerModalRecherche() {
                             <i class="fas fa-paper-plane"></i> Soumettre pour correction
                         </button>
                     {% elif fiche_form.instance.etat_correction.statut == 'en_cours' %}
-                        <button type="submit" class="btn btn-success" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" data-confirm-message="Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.">
-                            <i class="fas fa-check-circle"></i> Valider la fiche
-                        </button>
+                        <div class="btn-group dropup">
+                            <button type="submit" class="btn btn-success" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" name="redirect_option" value="home" data-confirm-message="Êtes-vous sûr de vouloir valider cette correction ? La fiche sera figée et ne pourra plus être modifiée.">
+                                <i class="fas fa-check-circle"></i> Valider & Retour vers ma page
+                            </button>
+                            <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="visually-hidden">Options de retour</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><button type="submit" class="dropdown-item" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" name="redirect_option" value="fiche" data-confirm-message="Êtes-vous sûr de vouloir valider cette correction ?">Valider & Voir la fiche</button></li>
+                                <li><button type="submit" class="dropdown-item" formaction="{% url 'observations:valider_correction' fiche_id=fiche_form.instance.pk %}" name="redirect_option" value="liste" data-confirm-message="Êtes-vous sûr de vouloir valider cette correction ?">Valider & Retour à la liste</button></li>
+                            </ul>
+                        </div>
                     {% endif %}
                 {% endif %}
             {% endif %}
             {% if fiche_form.instance.pk %}
+                <a href="{% url 'observations:historique_modifications' fiche_id=fiche_form.instance.pk %}" class="btn btn-info" target="_blank">
+                    <i class="fas fa-history"></i> Historique
+                </a>
                 <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary" data-check-changes="true">
-                    <i class="fas fa-arrow-left"></i> Retour
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
                 </a>
             {% else %}
                 <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary" data-check-changes="true">

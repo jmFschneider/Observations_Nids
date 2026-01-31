@@ -2,9 +2,40 @@
  * Main JavaScript file for the observations Nids application
  */
 
-// Document ready function
+// Global store for preview windows
+var openPreviewWindows = [];
+var previewWindowListenersRegistered = false;
+
+function closeAllPreviewWindows() {
+    openPreviewWindows.forEach(function(win) {
+        try {
+            if (win && !win.closed) {
+                win.close();
+            }
+        } catch (error) {
+            console.warn('Impossible de fermer une fenêtre de prévisualisation', error);
+        }
+    });
+    openPreviewWindows = [];
+}
+
+function registerPreviewWindowListeners() {
+    if (previewWindowListenersRegistered) {
+        return;
+    }
+    previewWindowListenersRegistered = true;
+
+    window.addEventListener('beforeunload', closeAllPreviewWindows);
+    window.addEventListener('pagehide', closeAllPreviewWindows);
+}
+
+/**
+ * Document ready function
+ */
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Main JS loaded');
+
+    registerPreviewWindowListeners();
 
     // Initialize any custom functionality here
     initializeTooltips();
@@ -39,6 +70,7 @@ function setupEventListeners() {
 function openResizableImageWindow(imageUrl) {
     // Open a new window
     var imgWindow = window.open('', '_blank', 'width=800,height=600,resizable=yes,scrollbars=yes,status=yes');
+    openPreviewWindows.push(imgWindow);
 
     // Write HTML content to the new window
     imgWindow.document.write(`
@@ -175,4 +207,14 @@ function openResizableImageWindow(imageUrl) {
     `);
 
     imgWindow.document.close();
+}
+
+/**
+ * Opens a generic preview window and track it to close later.
+ * @param {string} fileUrl
+ */
+function openFilePreviewWindow(fileUrl) {
+    var previewWindow = window.open(fileUrl, '_blank', 'width=1000,height=700,resizable=yes,scrollbars=yes,status=yes');
+    openPreviewWindows.push(previewWindow);
+    return previewWindow;
 }

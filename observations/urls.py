@@ -17,6 +17,7 @@ from .views.saisie_observation_view import (
     historique_modifications,
     liberer_verrou_fiche,
     rechercher_fiches,
+    rouvrir_fiche,
     saisie_observation,
     soumettre_pour_correction,
     valider_correction,
@@ -105,6 +106,12 @@ urlpatterns = [
         'observations/<int:fiche_id>/liberer-verrou/',
         liberer_verrou_fiche,
         name='liberer_verrou_fiche',
+    ),
+    # Route pour rouvrir une fiche validée (Admin)
+    path(
+        'observations/rouvrir/<int:fiche_id>/',
+        rouvrir_fiche,
+        name='rouvrir_fiche',
     ),
     # Route AJAX pour rechercher des fiches
     path(

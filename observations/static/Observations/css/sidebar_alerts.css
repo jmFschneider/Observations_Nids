@@ -1,0 +1,31 @@
+
+/* === SURCHARGES ALERTES ET NOTIFICATIONS === */
+/* Ces règles doivent être en fin de fichier pour surcharger les !important précédents */
+
+/* Alerte Rouge (Action requise / En attente) */
+body #sidebar .nav-item .nav-link.text-danger,
+body #sidebar .section-aide .nav-link.text-danger {
+    color: #dc3545 !important;
+}
+body #sidebar .nav-item .nav-link.text-danger i,
+body #sidebar .section-aide .nav-link.text-danger i {
+    color: #dc3545 !important;
+    animation: pulse-red 2s infinite;
+}
+
+/* Alerte Verte (Activité récente) */
+body #sidebar .nav-item .nav-link.text-success,
+body #sidebar .section-aide .nav-link.text-success {
+    color: #198754 !important;
+}
+body #sidebar .nav-item .nav-link.text-success i,
+body #sidebar .section-aide .nav-link.text-success i {
+    color: #198754 !important;
+}
+
+/* Animation discrète pour l'alerte rouge */
+@keyframes pulse-red {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}

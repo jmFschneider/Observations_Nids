@@ -309,9 +309,14 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
             else:
                 post_data['observateur'] = request.user.id
 
-        # Si le champ coordonnees est vide, donner une valeur par défaut
+        # Si le champ coordonnees est vide, essayer de le construire depuis lat/lon
         if not post_data.get('coordonnees'):
-            post_data['coordonnees'] = '0,0'
+            latitude = post_data.get('latitude')
+            longitude = post_data.get('longitude')
+            if latitude and longitude:
+                post_data['coordonnees'] = f"{latitude},{longitude}"
+            else:
+                post_data['coordonnees'] = '0,0'
 
         # Initialiser tous les formulaires avec les données POST
         fiche_form = FicheObservationForm(
@@ -831,23 +836,19 @@ def enregistrer_modifications_historique(
 
         # Comparaison spéciale pour les DateTimeField avec fuseau horaire
         if hasattr(ancienne_valeur, 'year') and hasattr(nouvelle_valeur, 'year'):
-            ancienne_dt = (
-                ancienne_valeur.year,
-                ancienne_valeur.month,
-                ancienne_valeur.day,
-                ancienne_valeur.hour,
-                ancienne_valeur.minute,
-                ancienne_valeur.second,
-            )
-            nouvelle_dt = (
-                nouvelle_valeur.year,
-                nouvelle_valeur.month,
-                nouvelle_valeur.day,
-                nouvelle_valeur.hour,
-                nouvelle_valeur.minute,
-                nouvelle_valeur.second,
-            )
-            valeurs_egales = ancienne_dt == nouvelle_dt
+            try:
+                # On calcule la différence absolue pour gérer les fuseaux horaires
+                # (ex: 10:00 UTC == 11:00 CET)
+                diff = ancienne_valeur - nouvelle_valeur
+                if hasattr(diff, 'total_seconds'):
+                    valeurs_egales = abs(diff.total_seconds()) < 1
+                else:
+                    # Cas date simple sans heure
+                    valeurs_egales = diff.days == 0
+            except (TypeError, ValueError):
+                # Cas de secours si mélange naive/aware impossible à soustraire
+                valeurs_egales = str(ancienne_valeur) == str(nouvelle_valeur)
+
         elif ancienne_valeur is None and nouvelle_valeur is None:
             valeurs_egales = True
         elif ancienne_valeur is None or nouvelle_valeur is None:
@@ -978,6 +979,10 @@ def valider_correction(request, fiche_id):
                 categorie='validation',
             )
 
+            # Libérer le verrou technique si présent
+            if etat_correction.en_correction_par:
+                etat_correction.liberer_verrou(motif='validation')
+
             logger.info(
                 f"Fiche {fiche_id} passée en statut 'valide' par {user.username}, "
                 f"pourcentage: {pourcentage}%"
@@ -995,11 +1000,73 @@ def valider_correction(request, fiche_id):
                 f"La fiche n'est pas en cours de correction (statut actuel: '{etat_correction.get_statut_display()}')",
             )
 
-        # Rediriger vers la vue de détail (lecture seule)
-        logger.info(f"Redirection vers fiche_observation pour fiche {fiche_id}")
-        return redirect('observations:fiche_observation', fiche_id=fiche_id)
+        # Rediriger selon l'option choisie
+        redirect_option = request.POST.get('redirect_option', 'fiche')
+        if redirect_option == 'home':
+            logger.info(
+                f"Redirection vers accueil (Ma Page) après validation de la fiche {fiche_id}"
+            )
+            return redirect('observations:home')
+        elif redirect_option == 'liste':
+            logger.info(f"Redirection vers liste globale après validation de la fiche {fiche_id}")
+            return redirect('observations:liste_fiches_observations')
+        else:
+            logger.info(f"Redirection vers fiche_observation pour fiche {fiche_id}")
+            return redirect('observations:fiche_observation', fiche_id=fiche_id)
 
     logger.info(f"Méthode GET, redirection vers modifier_observation pour fiche {fiche_id}")
+    return redirect('observations:modifier_observation', fiche_id=fiche_id)
+
+
+@login_required
+def rouvrir_fiche(request, fiche_id):
+    """
+    Permet à un administrateur ou au validateur de rouvrir une fiche validée (repassage au statut 'en_cours').
+    """
+    fiche = get_object_or_404(FicheObservation, pk=fiche_id)
+    user = cast(Utilisateur, request.user)
+    etat = fiche.etat_correction
+
+    # Vérification du rôle administrateur ou de l'auteur de la validation
+    if user.role != 'administrateur' and user != etat.validee_par:
+        messages.error(request, "Vous n'avez pas les droits pour rouvrir cette fiche.")
+        return redirect('observations:fiche_observation', fiche_id=fiche_id)
+
+    # Vérifier que la fiche est bien validée
+    if etat.statut != 'valide':
+        messages.warning(request, "Cette fiche n'est pas validée, impossible de la rouvrir.")
+        return redirect('observations:fiche_observation', fiche_id=fiche_id)
+
+    # Action de réouverture
+    ancien_statut = etat.get_statut_display()
+
+    # On repasse en 'en_cours'
+    etat.statut = 'en_cours'
+    # On efface les infos de validation
+    etat.validee_par = None
+    etat.date_validation = None
+
+    # On assigne la correction à l'admin qui rouvre (optionnel, mais logique)
+    etat.en_correction_par = user
+    etat.date_debut_correction = timezone.now()
+
+    etat.save(skip_auto_calculation=True)
+
+    # Historique
+    HistoriqueModification.objects.create(
+        fiche=fiche,
+        champ_modifie='statut_validation',
+        ancienne_valeur=ancien_statut,
+        nouvelle_valeur="En cours de correction (Réouverture)",
+        modifie_par=user,
+        categorie='validation',
+    )
+
+    logger.info(f"Fiche {fiche_id} rouverte par l'administrateur {user.username}")
+    messages.success(
+        request, f"La fiche #{fiche_id} a été rouverte et placée en cours de correction."
+    )
+
     return redirect('observations:modifier_observation', fiche_id=fiche_id)
 
 
