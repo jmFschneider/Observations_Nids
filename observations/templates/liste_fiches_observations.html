@@ -210,8 +210,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <div class="card">
         <div class="card-header -tertiary  d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Fiches d'observation ({{ fiches.paginator.count }})</h5>
-            <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-sm btn-outline-light">Réinitialiser les filtres</a>
+            <div class="d-flex align-items-center gap-2">
+                <h5 class="mb-0">Fiches d'observation ({{ fiches.paginator.count }})</h5>
+                <a tabindex="0" class="text-secondary" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" title="Astuces de recherche" 
+                   data-bs-content="<ul class='mb-0 ps-3 small'>
+                       <li><strong>ID :</strong> Valeur (ex: <code>16</code>) ou intervalle (ex: <code>10-20</code>)</li>
+                       <li><strong>Date :</strong> Date exacte, Année (ex: <code>2024</code>) ou Période (ex: <code>01/01/24-31/01/24</code>)</li>
+                       <li><strong>Observateur :</strong> Recherche partielle sur le nom/prénom</li>
+                       <li><strong>Commune :</strong> Recherche partielle</li>
+                   </ul>">
+                    <i class="fas fa-circle-question"></i>
+                </a>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                {% if fiches.paginator.num_pages > 1 %}
+                <nav aria-label="Pagination compacte" class="bg-dark bg-opacity-25 rounded px-2 py-1">
+                    <div class="d-flex align-items-center gap-2">
+                        {% if fiches.has_previous %}
+                            <a href="?{% urlencode_without_page %}&page=1" class="text-white text-decoration-none" title="Première page">
+                                <i class="fas fa-fast-backward" style="font-size: 0.75rem;"></i>
+                            </a>
+                            <a href="?{% urlencode_without_page %}&page={{ fiches.previous_page_number }}" class="text-white text-decoration-none" title="Précédente">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% else %}
+                            <span class="text-white-50 opacity-50"><i class="fas fa-fast-backward" style="font-size: 0.75rem;"></i></span>
+                            <span class="text-white-50 opacity-50"><i class="fas fa-chevron-left"></i></span>
+                        {% endif %}
+
+                        <small class="text-white fw-bold mx-1" style="font-size: 0.85rem;">
+                            {{ fiches.number }} / {{ fiches.paginator.num_pages }}
+                        </small>
+
+                        {% if fiches.has_next %}
+                            <a href="?{% urlencode_without_page %}&page={{ fiches.next_page_number }}" class="text-white text-decoration-none" title="Suivante">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="?{% urlencode_without_page %}&page={{ fiches.paginator.num_pages }}" class="text-white text-decoration-none" title="Dernière page">
+                                <i class="fas fa-fast-forward" style="font-size: 0.75rem;"></i>
+                            </a>
+                        {% else %}
+                            <span class="text-white-50 opacity-50"><i class="fas fa-chevron-right"></i></span>
+                            <span class="text-white-50 opacity-50"><i class="fas fa-fast-forward" style="font-size: 0.75rem;"></i></span>
+                        {% endif %}
+                    </div>
+                </nav>
+                {% endif %}
+                <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-sm btn-outline-light">Réinitialiser</a>
+            </div>
         </div>
         <div class="card-body p-0">
             <form method="get" action="" id="filter-form">
@@ -228,7 +274,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <th>Actions</th>
                         </tr>
                         <tr class="table-filters">
-                            <th></th> {# ID #}
+                            <th>
+                                {{ filter.form.num_fiche }}
+                            </th> {# ID #}
                             <th>
                                 {{ filter.form.date_creation }}
                             </th>
@@ -425,9 +473,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
 
                         <div class="text-center">
-                            <span class="badge  text-dark border px-4 py-2" style="font-size: 1rem;">
+                            <span class="badge text-dark border px-3 py-2 d-inline-flex align-items-center gap-1" style="font-size: 1rem;">
                                 <i class="fas fa-file-alt me-1"></i>
-                                Page <strong class="text-primary">{{ fiches.number }}</strong> / <strong>{{ fiches.paginator.num_pages }}</strong>
+                                Page 
+                                <input type="number" 
+                                       class="form-control form-control-sm d-inline-block text-center fw-bold text-primary p-0" 
+                                       style="width: 55px; height: 28px; border: 1px solid #dee2e6;"
+                                       value="{{ fiches.number }}" 
+                                       min="1" 
+                                       max="{{ fiches.paginator.num_pages }}"
+                                       onkeypress="if(event.key === 'Enter') navigateToPage(this.value)"
+                                       title="Saisissez un numéro et appuyez sur Entrée">
+                                / <strong>{{ fiches.paginator.num_pages }}</strong>
                             </span>
                             <small class="d-block text-muted mt-1">
                                 {{ fiches.paginator.count }} fiches au total
@@ -493,6 +550,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (progressBar && progressPercent !== null) {
         progressBar.style.width = `${progressPercent}%`;
     }
+
+    // Initialisation des Popovers Bootstrap
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl)
+    })
 });
 
 // Fonctions pour la pagination avec curseur (Solution 4)
