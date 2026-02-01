@@ -30,7 +30,7 @@ def selection_images(request):
     """Sélection d'images pour transcription."""
     base_dir = settings.MEDIA_ROOT
     current_path = request.GET.get('path', '')
-    safe_path = os.path.normpath(current_path).replace('..', '')
+    safe_path = os.path.normpath(current_path).replace('..', '').replace('\\', '/')
     full_current_path = os.path.join(base_dir, safe_path)
 
     if not full_current_path.startswith(base_dir):

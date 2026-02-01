@@ -179,14 +179,16 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
         img_full_path = os.path.join(media_root, img_rel_path)
         start_time = time.time()
 
-        # Préparation du chemin de sortie
-        # Stockage dans media/transcription_results/PRODUCTION/
-        results_dir = os.path.join(media_root, 'transcription_results', 'PRODUCTION')
-        os.makedirs(results_dir, exist_ok=True)
+        # Construction du chemin de sortie (procédure identique à l'évaluation)
+        # media/transcription_results/[chemin_image]/gemini_3_flash/
+        img_dir_rel = os.path.dirname(img_rel_path)
+        results_dir_rel = os.path.join('transcription_results', img_dir_rel, 'gemini_3_flash')
+        results_dir_full = os.path.join(media_root, results_dir_rel)
+        os.makedirs(results_dir_full, exist_ok=True)
 
         json_filename = f"{os.path.splitext(os.path.basename(img_rel_path))[0]}_result.json"
-        json_full_path = os.path.join(results_dir, json_filename)
-        json_rel_path = os.path.join('transcription_results', 'PRODUCTION', json_filename)
+        json_full_path = os.path.join(results_dir_full, json_filename)
+        json_rel_path = os.path.join(results_dir_rel, json_filename)
 
         _log_progress(
             self, f"🖼️ [{index + 1}/{total}] Traitement de {os.path.basename(img_rel_path)}"
@@ -251,4 +253,4 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
             },
         )
 
-    return {'status': 'COMPLETED', 'total': total, 'success': success_count, 'errors': errors}
+        return {'status': 'SUCCESS', 'total': total, 'success': success_count, 'errors': errors}
