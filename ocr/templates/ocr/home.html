@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2 text-center">
+            <div class="py-5">
+                <i class="fas fa-file-invoice fa-5x text-primary mb-4"></i>
+                <h1 class="display-4">Transcription OCR</h1>
+                <p class="lead">Utilisez l'IA Gemini pour transcrire automatiquement vos fiches d'observation.</p>
+                <hr class="my-4">
+                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                    <a href="{% url 'ocr:selection_images' %}" class="btn btn-primary btn-lg px-4 gap-3">
+                        <i class="fas fa-folder-open me-2"></i> Sélectionner des images
+                    </a>
+                    <a href="{% url 'observations:home' %}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fas fa-home me-2"></i> Retour au tableau de bord
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-bolt fa-2x text-warning mb-3"></i>
+                    <h5>Rapide</h5>
+                    <p class="text-muted">Traitement en lot via Gemini 3 Flash pour une performance optimale.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x text-success mb-3"></i>
+                    <h5>Précis</h5>
+                    <p class="text-muted">Extraction structurée des données : espèces, dates, comptages.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-tasks fa-2x text-info mb-3"></i>
+                    <h5>Workflow</h5>
+                    <p class="text-muted">Les fiches transcrites sont ensuite validées manuellement par un expert.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

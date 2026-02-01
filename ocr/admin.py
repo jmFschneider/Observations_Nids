@@ -1,5 +1,5 @@
 """
-Interface d'administration pour l'app OCR
+Interface d'administration pour l'app OCR en production.
 """
 
 from django.contrib import admin
@@ -9,130 +9,63 @@ from django.utils.safestring import mark_safe
 from .models import TranscriptionOCR
 
 
-class FicheFilter(admin.SimpleListFilter):
-    """Filtre personnalisé pour sélectionner une fiche spécifique"""
-
-    title = 'Fiche de référence'
-    parameter_name = 'fiche_id'
-
-    def lookups(self, request, model_admin):
-        # Récupérer les IDs des fiches qui ont des transcriptions
-        qs = TranscriptionOCR.objects.exclude(fiche__isnull=True).values_list(
-            'fiche__pk', 'fiche__num_fiche'
-        )
-
-        # Dédoublonnage en Python pour être sûr
-        unique_fiches = {}
-        for pk, num in qs:
-            unique_fiches[pk] = num
-
-        # Trier par numéro de fiche
-        sorted_fiches = sorted(unique_fiches.items(), key=lambda x: x[1] if x[1] else 0)
-
-        return [(str(pk), f'Fiche #{num}') for pk, num in sorted_fiches]
-
-    def queryset(self, request, queryset):
-        if self.value():
-            # Filtrer par la clé primaire de la fiche
-            return queryset.filter(fiche__pk=self.value())
-        return queryset
-
-
 @admin.register(TranscriptionOCR)
 class TranscriptionOCRAdmin(admin.ModelAdmin):
-    """Interface d'administration pour les transcriptions OCR de test"""
+    """Interface d'administration simplifiée pour la production."""
 
     list_display = [
         'id',
         'fiche_numero',
-        'modele_ocr_badge',
-        'type_image_badge',
-        'traitement_image',
-        'statut_evaluation_badge',
-        'score_global_colored',
-        'score_texte_colored',
-        'score_numerique_colored',
+        'statut_badge',
+        'modele_ocr',
+        'temps_traitement_secondes',
         'date_transcription',
     ]
 
     list_filter = [
-        FicheFilter,  # Ajout du filtre personnalisé en premier
+        'statut',
         'modele_ocr',
-        'type_image',
-        'traitement_image',
-        'statut_evaluation',
         'date_transcription',
-        'date_evaluation',
     ]
 
     search_fields = [
         'fiche__num_fiche',
         'chemin_json',
-        'notes_evaluation',
+        'chemin_image',
+        'erreur_message',
     ]
 
     readonly_fields = [
         'date_transcription',
-        'taux_precision_display',
-        'nombre_erreurs_total_display',
     ]
 
     fieldsets = [
         (
-            '🔗 Référence',
+            '🔗 Références',
             {
                 'fields': [
                     'fiche',
-                    'chemin_json',
                     'chemin_image',
+                    'chemin_json',
                 ]
             },
         ),
         (
-            '⚙️ Configuration OCR',
+            '⚙️ Métadonnées OCR',
             {
                 'fields': [
-                    'type_image',
                     'modele_ocr',
-                    'date_transcription',
+                    'statut',
                     'temps_traitement_secondes',
+                    'date_transcription',
                 ]
             },
         ),
         (
-            '📊 Évaluation de la qualité',
+            '❌ Erreur',
             {
                 'fields': [
-                    'statut_evaluation',
-                    'date_evaluation',
-                    'score_global',
-                    'score_texte',
-                    'score_numerique',
-                    'nombre_champs_corrects',
-                    'nombre_champs_total',
-                    'taux_precision_display',
-                ]
-            },
-        ),
-        (
-            '❌ Détail des erreurs',
-            {
-                'fields': [
-                    'nombre_erreurs_dates',
-                    'nombre_erreurs_nombres',
-                    'nombre_erreurs_texte',
-                    'nombre_erreurs_especes',
-                    'nombre_erreurs_lieux',
-                    'nombre_erreurs_total_display',
-                ]
-            },
-        ),
-        (
-            '📝 Détails et notes',
-            {
-                'fields': [
-                    'details_comparaison',
-                    'notes_evaluation',
+                    'erreur_message',
                 ],
                 'classes': ['collapse'],
             },
@@ -143,138 +76,23 @@ class TranscriptionOCRAdmin(admin.ModelAdmin):
     def fiche_numero(self, obj):
         """Affiche le numéro de fiche avec lien"""
         if not obj.fiche:
-            return mark_safe('<span style="color: #dc3545;">Aucune fiche</span>')
+            return mark_safe('<span style="color: #6c757d;">Non importée</span>')
         return mark_safe(
             f'<a href="/admin/observations/ficheobservation/{obj.fiche.pk}/change/">Fiche #{obj.fiche.num_fiche}</a>'
         )
 
-    @admin.display(description='Modèle')
-    def modele_ocr_badge(self, obj):
-        """Affiche le modèle OCR avec un badge coloré"""
-        colors = {
-            'gemini_flash': '#17a2b8',  # info
-            'gemini_1.5_pro': '#28a745',  # success
-            'gemini_2_pro': '#007bff',  # primary
-            'gemini_2_flash': '#6c757d',  # secondary
-        }
-        color = colors.get(obj.modele_ocr, '#6c757d')
-        return format_html(
-            '<span style="background-color: {}; color: white; padding: 3px 8px; '
-            'border-radius: 3px; font-size: 11px;">{}</span>',
-            color,
-            obj.get_modele_ocr_display(),
-        )
-
-    @admin.display(description='Image')
-    def type_image_badge(self, obj):
-        """Affiche le type d'image avec un badge"""
-        colors = {'brute': '#ffc107', 'optimisee': '#28a745'}
-        color = colors.get(obj.type_image, '#6c757d')
-        return format_html(
-            '<span style="background-color: {}; color: white; padding: 3px 8px; '
-            'border-radius: 3px; font-size: 11px;">{}</span>',
-            color,
-            obj.get_type_image_display(),
-        )
-
     @admin.display(description='Statut')
-    def statut_evaluation_badge(self, obj):
-        """Affiche le statut d'évaluation avec un badge"""
+    def statut_badge(self, obj):
+        """Affiche le statut avec un badge coloré"""
         colors = {
-            'non_evaluee': '#6c757d',
-            'en_cours': '#ffc107',
-            'evaluee': '#28a745',
-            'erreur': '#dc3545',
+            'succes': '#28a745',  # success
+            'erreur': '#dc3545',  # danger
+            'en_cours': '#ffc107',  # warning
         }
-        color = colors.get(obj.statut_evaluation, '#6c757d')
+        color = colors.get(obj.statut, '#6c757d')
         return format_html(
             '<span style="background-color: {}; color: white; padding: 3px 8px; '
             'border-radius: 3px; font-size: 11px;">{}</span>',
             color,
-            obj.get_statut_evaluation_display(),
+            obj.get_statut_display(),
         )
-
-    def _get_score_color(self, score):
-        if score is None:
-            return None
-        if score >= 90:
-            return '#28a745'  # vert
-        elif score >= 75:
-            return '#ffc107'  # jaune
-        elif score >= 50:
-            return '#fd7e14'  # orange
-        else:
-            return '#dc3545'  # rouge
-
-    @admin.display(description='Global', ordering='score_global')
-    def score_global_colored(self, obj):
-        """Affiche le score global coloré"""
-        score = obj.score_global
-        color = self._get_score_color(score)
-        if not color:
-            return '-'
-        try:
-            return format_html(
-                '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, float(score)
-            )
-        except (ValueError, TypeError):
-            return str(score)
-
-    @admin.display(description='Texte', ordering='score_texte')
-    def score_texte_colored(self, obj):
-        """Affiche le score texte coloré"""
-        score = obj.score_texte
-        color = self._get_score_color(score)
-        if not color:
-            return '-'
-        try:
-            return format_html(
-                '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, float(score)
-            )
-        except (ValueError, TypeError):
-            return str(score)
-
-    @admin.display(description='Num.', ordering='score_numerique')
-    def score_numerique_colored(self, obj):
-        """Affiche le score numérique coloré"""
-        score = obj.score_numerique
-        color = self._get_score_color(score)
-        if not color:
-            return '-'
-        try:
-            return format_html(
-                '<span style="color: {}; font-weight: bold;">{:.1f}%</span>', color, float(score)
-            )
-        except (ValueError, TypeError):
-            return str(score)
-
-    @admin.display(description='Taux de précision')
-    def taux_precision_display(self, obj):
-        """Affiche le taux de précision calculé"""
-        taux = obj.taux_precision
-        if taux is None:
-            return '-'
-        return f'{taux:.1f}%'
-
-    @admin.display(description='Erreurs totales')
-    def nombre_erreurs_total_display(self, obj):
-        """Affiche le nombre total d'erreurs"""
-        total = obj.nombre_erreurs_total
-        if total == 0:
-            return mark_safe('<span style="color: #28a745;">✓ Aucune</span>')
-        return mark_safe(f'<span style="color: #dc3545;">✗ {total}</span>')
-
-    # Actions personnalisées
-    actions = ['marquer_comme_evaluee', 'marquer_comme_non_evaluee']
-
-    @admin.action(description='Marquer comme évaluée')
-    def marquer_comme_evaluee(self, request, queryset):
-        """Marque les transcriptions sélectionnées comme évaluées"""
-        updated = queryset.update(statut_evaluation='evaluee')
-        self.message_user(request, f'{updated} transcription(s) marquée(s) comme évaluée(s).')
-
-    @admin.action(description='Marquer comme non évaluée')
-    def marquer_comme_non_evaluee(self, request, queryset):
-        """Marque les transcriptions sélectionnées comme non évaluées"""
-        updated = queryset.update(statut_evaluation='non_evaluee')
-        self.message_user(request, f'{updated} transcription(s) marquée(s) comme non évaluée(s).')
