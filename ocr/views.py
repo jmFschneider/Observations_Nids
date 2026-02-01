@@ -28,7 +28,11 @@ def ocr_home(request):
 @transcription_required
 def selection_images(request):
     """Sélection d'images pour transcription."""
-    base_dir = settings.MEDIA_ROOT
+    # Navigation désormais ancrée dans media/images/
+    base_dir = os.path.join(settings.MEDIA_ROOT, 'images')
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir)
+
     current_path = request.GET.get('path', '')
     safe_path = os.path.normpath(current_path).replace('..', '').replace('\\', '/')
     full_current_path = os.path.join(base_dir, safe_path)
@@ -87,7 +91,10 @@ def lancer_ocr(request):
             return JsonResponse({'error': 'Aucune image sélectionnée'}, status=400)
 
         image_filenames = json.loads(images_json)
-        image_paths = [os.path.join(repertoire, f) for f in image_filenames]
+        # On ajoute le préfixe 'images/' car la sélection est ancrée dans media/images/
+        image_paths = [
+            os.path.join('images', repertoire, f).replace('\\', '/') for f in image_filenames
+        ]
 
         task = process_images_production_task.delay(image_paths)
         request.session['ocr_task_id'] = task.id

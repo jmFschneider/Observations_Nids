@@ -92,11 +92,16 @@ class ImportationService:
                     nom_image = fichier.replace('_result.json', '.jpg')
                     parts = chemin_json_relatif.split(os.sep)
 
-                    if len(parts) >= 5 and parts[0] == 'transcription_results':
-                        # Reconstruire le chemin image : jpeg/TRI_ANCIEN/FUSION_FULL/nom_image
-                        chemin_image_relatif = os.path.join(parts[1], parts[2], parts[3], nom_image)
+                    # Structure attendue : transcription_results/[DIR_STRUCTURE]/[MODELE]/[FICHIER]_result.json
+                    if len(parts) >= 4 and parts[0] == 'transcription_results':
+                        # Les répertoires de l'image sont tout ce qu'il y a entre 'transcription_results'
+                        # et l'avant-dernier dossier (le modèle)
+                        repertoires_image = parts[1:-2]
+                        # On reconstruit le chemin avec le nouveau préfixe 'images/'
+                        chemin_image_relatif = os.path.join('images', *repertoires_image, nom_image)
                     else:
-                        chemin_image_relatif = nom_image
+                        # Fallback : on cherche dans images/ si c'est une structure simplifiée
+                        chemin_image_relatif = os.path.join('images', nom_image)
 
                     # Normaliser les chemins avec des slashes
                     self._fichiers_cache[fichier] = {
