@@ -68,10 +68,7 @@ click-repl==0.3.0
     #   -r requirements-base.in
     #   celery
 colorama==0.4.6
-    # via
-    #   -r requirements-base.in
-    #   click
-    #   tqdm
+    # via -r requirements-base.in
 crispy-bootstrap5==2025.6
     # via -r requirements-base.in
 defusedxml==0.7.1
@@ -140,7 +137,7 @@ google-auth-httplib2==0.3.0
     # via
     #   -r requirements-base.in
     #   google-api-python-client
-google-genai==1.60.0
+google-genai==1.61.0
     # via -r requirements-base.in
 googleapis-common-protos==1.72.0
     # via
@@ -331,9 +328,7 @@ typing-inspection==0.4.2
 tzdata==2025.3
     # via
     #   -r requirements-base.in
-    #   django
     #   kombu
-    #   tzlocal
 tzlocal==5.3.1
     # via celery
 uritemplate==4.2.0
