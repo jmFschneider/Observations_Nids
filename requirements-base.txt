@@ -68,10 +68,7 @@ click-repl==0.3.0
     #   -r requirements-base.in
     #   celery
 colorama==0.4.6
-    # via
-    #   -r requirements-base.in
-    #   click
-    #   tqdm
+    # via -r requirements-base.in
 crispy-bootstrap5==2025.6
     # via -r requirements-base.in
 defusedxml==0.7.1
@@ -311,7 +308,7 @@ tornado==6.5.4
     # via
     #   -r requirements-base.in
     #   flower
-tqdm==4.67.1
+tqdm==4.67.3
     # via -r requirements-base.in
 typing-extensions==4.15.0
     # via
@@ -331,9 +328,7 @@ typing-inspection==0.4.2
 tzdata==2025.3
     # via
     #   -r requirements-base.in
-    #   django
     #   kombu
-    #   tzlocal
 tzlocal==5.3.1
     # via celery
 uritemplate==4.2.0
