@@ -80,12 +80,7 @@ click-repl==0.3.0
 colorama==0.4.6
     # via
     #   -r requirements-base.in
-    #   build
-    #   click
-    #   mkdocs
     #   mkdocs-material
-    #   pytest
-    #   tqdm
 coverage[toml]==7.13.0
     # via pytest-cov
 crispy-bootstrap5==2025.6
@@ -161,7 +156,7 @@ google-api-core==2.29.0
     # via
     #   -r requirements-base.in
     #   google-api-python-client
-google-api-python-client==2.188.0
+google-api-python-client==2.189.0
     # via -r requirements-base.in
 google-auth[requests]==2.47.0
     # via
@@ -174,7 +169,7 @@ google-auth-httplib2==0.3.0
     # via
     #   -r requirements-base.in
     #   google-api-python-client
-google-genai==1.60.0
+google-genai==1.61.0
     # via -r requirements-base.in
 googleapis-common-protos==1.72.0
     # via
@@ -463,9 +458,7 @@ typing-inspection==0.4.2
 tzdata==2025.3
     # via
     #   -r requirements-base.in
-    #   django
     #   kombu
-    #   tzlocal
 tzlocal==5.3.1
     # via celery
 uritemplate==4.2.0
