@@ -274,7 +274,7 @@ packaging==26.0
     #   wheel
 paginate==0.5.7
     # via mkdocs-material
-pathspec==1.0.3
+pathspec==1.0.4
     # via
     #   -r requirements-dev.in
     #   mkdocs
