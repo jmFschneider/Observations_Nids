@@ -426,7 +426,7 @@ tornado==6.5.4
     # via
     #   -r requirements-base.in
     #   flower
-tqdm==4.67.1
+tqdm==4.67.3
     # via -r requirements-base.in
 types-django-filter==25.2.0.20251228
     # via -r requirements-dev.in
