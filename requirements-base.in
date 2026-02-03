@@ -1,6 +1,6 @@
 # requirements-base.in
 
-Django>=5.2.8
+Django>=6.0.2
 asgiref
 sqlparse
 tzdata
