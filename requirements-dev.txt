@@ -301,7 +301,7 @@ prompt-toolkit==3.0.52
     # via
     #   -r requirements-base.in
     #   click-repl
-proto-plus==1.27.0
+proto-plus==1.27.1
     # via
     #   -r requirements-base.in
     #   google-api-core
