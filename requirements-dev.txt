@@ -479,7 +479,7 @@ vobject==0.9.9
     # via radicale
 watchdog==6.0.0
     # via mkdocs
-wcwidth==0.5.3
+wcwidth==0.6.0
     # via
     #   -r requirements-base.in
     #   prompt-toolkit
