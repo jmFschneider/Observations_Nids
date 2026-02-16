@@ -101,7 +101,7 @@ django-csp==4.0
     # via -r requirements-prod.in
 django-filter==25.2
     # via -r requirements-base.in
-django-helpdesk==2.1.0
+django-helpdesk==2.1.1
     # via -r requirements-base.in
 django-model-utils==5.0.0
     # via django-helpdesk
