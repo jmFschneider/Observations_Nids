@@ -151,11 +151,11 @@ greenlet==3.3.1
     # via
     #   -r requirements-base.in
     #   eventlet
-grpcio==1.76.0
+grpcio==1.78.0
     # via
     #   -r requirements-base.in
     #   grpcio-status
-grpcio-status==1.76.0
+grpcio-status==1.78.0
     # via -r requirements-base.in
 gunicorn==25.1.0
     # via -r requirements-prod.in
