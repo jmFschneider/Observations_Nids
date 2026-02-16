@@ -120,7 +120,7 @@ django-extensions==4.1
     # via -r requirements-dev.in
 django-filter==25.2
     # via -r requirements-base.in
-django-helpdesk==2.1.0
+django-helpdesk==2.1.1
     # via -r requirements-base.in
 django-model-utils==5.0.0
     # via django-helpdesk
