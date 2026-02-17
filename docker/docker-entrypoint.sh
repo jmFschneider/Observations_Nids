@@ -38,7 +38,7 @@ if echo "$1" | grep -q "gunicorn"; then
     # Utilise os.environ pour éviter les problèmes d'échappement des caractères spéciaux
     if [ "$DJANGO_SUPERUSER_USERNAME" ] && [ "$DJANGO_SUPERUSER_EMAIL" ] && [ "$DJANGO_SUPERUSER_PASSWORD" ]; then
         echo "Creating superuser if it doesn't exist..."
-        python -c "
+        python manage.py shell -c "
 import os
 from django.contrib.auth import get_user_model
 User = get_user_model()

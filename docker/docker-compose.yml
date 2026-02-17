@@ -200,8 +200,8 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     ports:
       # Bind sur l'IP LAN du serveur Ubuntu pour accès uniquement depuis le RPi (reverse proxy Apache)
-      # Remplacer 192.168.19.112 par l'IP réelle du serveur Ubuntu sur le réseau 192.168.19.x
-      - "192.168.19.112:5555:5555"
+      # Remplacer 192.168.19.120 par l'IP réelle du serveur Ubuntu sur le réseau 192.168.19.x
+      - "192.168.19.120:5555:5555"
     depends_on:
       - redis
       - celery_worker

@@ -57,7 +57,10 @@ staticfiles/
 docker-compose*.yml
 Dockerfile
 .dockerignore
+# Exclure le dossier docker par défaut, mais garder le Dockerfile et l'entrypoint requis
 docker/
+!docker/Dockerfile
+!docker/docker-entrypoint.sh
 
 # Environment
 .env
