@@ -21,7 +21,11 @@ services:
       retries: 5
 
   # phpMyAdmin pour gestion de la base de données
+  # Désactivé par défaut en production (profil "admin")
+  # Pour activer : docker compose --profile admin up -d phpmyadmin
   phpmyadmin:
+    profiles:
+      - admin
     image: phpmyadmin:latest
     container_name: observations_phpmyadmin
     restart: unless-stopped
@@ -32,6 +36,8 @@ services:
       PMA_PASSWORD: ${DB_ROOT_PASSWORD}
       UPLOAD_LIMIT: 100M
     ports:
+      # Accessible depuis les réseaux locaux 192.168.1.x et 192.168.19.x (pont ER605)
+      # Ne JAMAIS exposer sur Internet sans authentification additionnelle
       - "8081:80"
     depends_on:
       db:
@@ -129,36 +135,16 @@ services:
       dockerfile: docker/Dockerfile
     container_name: observations_celery_worker
     restart: unless-stopped
+    env_file: ../.env
     command: celery -A observations_nids worker --loglevel=info --concurrency=2
     environment:
-      - SECRET_KEY=${SECRET_KEY}
-      - DEBUG=${DEBUG:-False}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      # Surcharges spécifiques pour Docker (noms de services)
       - DB_HOST=db
       - DB_PORT=3306
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - ADMIN_EMAIL=${ADMIN_EMAIL}
-      # Email configuration
-      - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
-      - EMAIL_HOST=${EMAIL_HOST:-}
-      - EMAIL_PORT=${EMAIL_PORT:-587}
-      - EMAIL_USE_TLS=${EMAIL_USE_TLS:-True}
-      - EMAIL_HOST_USER=${EMAIL_HOST_USER:-}
-      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
-      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-}
-      # Environment & version
-      - ENVIRONMENT=${ENVIRONMENT:-development}
-      - VERSION=${VERSION:-dev}
-      # Logging
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      # Debug toolbar
-      - USE_DEBUG_TOOLBAR=${USE_DEBUG_TOOLBAR:-False}
     volumes:
       - /opt/observations_nids_pilote/media:/app/media
       - ../logs:/app/logs
@@ -176,36 +162,16 @@ services:
       dockerfile: docker/Dockerfile
     container_name: observations_celery_beat
     restart: unless-stopped
+    env_file: ../.env
     command: celery -A observations_nids beat --loglevel=info
     environment:
-      - SECRET_KEY=${SECRET_KEY}
-      - DEBUG=${DEBUG:-False}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      # Surcharges spécifiques pour Docker (noms de services)
       - DB_HOST=db
       - DB_PORT=3306
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - ADMIN_EMAIL=${ADMIN_EMAIL}
-      # Email configuration
-      - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
-      - EMAIL_HOST=${EMAIL_HOST:-}
-      - EMAIL_PORT=${EMAIL_PORT:-587}
-      - EMAIL_USE_TLS=${EMAIL_USE_TLS:-True}
-      - EMAIL_HOST_USER=${EMAIL_HOST_USER:-}
-      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
-      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-}
-      # Environment & version
-      - ENVIRONMENT=${ENVIRONMENT:-development}
-      - VERSION=${VERSION:-dev}
-      # Logging
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      # Debug toolbar
-      - USE_DEBUG_TOOLBAR=${USE_DEBUG_TOOLBAR:-False}
     volumes:
       - ../logs:/app/logs
     depends_on:
@@ -222,21 +188,20 @@ services:
       dockerfile: docker/Dockerfile
     container_name: observations_flower
     restart: unless-stopped
+    env_file: ../.env
     command: celery -A observations_nids flower --port=5555 --url-prefix=flower
     environment:
-      - SECRET_KEY=${SECRET_KEY}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      # Surcharges spécifiques pour Docker (noms de services)
       - DB_HOST=db
       - DB_PORT=3306
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - USE_DEBUG_TOOLBAR=${USE_DEBUG_TOOLBAR:-False}
     ports:
-      - "5555:5555"
+      # Bind sur l'IP LAN du serveur Ubuntu pour accès uniquement depuis le RPi (reverse proxy Apache)
+      # Remplacer 192.168.19.112 par l'IP réelle du serveur Ubuntu sur le réseau 192.168.19.x
+      - "192.168.19.112:5555:5555"
     depends_on:
       - redis
       - celery_worker

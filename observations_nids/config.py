@@ -63,9 +63,9 @@ class Settings(BaseSettings):
     celery: CelerySettings = Field(default_factory=CelerySettings)
     DATABASE: DatabaseSettings = Field(
         default_factory=lambda: DatabaseSettings(
-            name=os.environ.get("DB_NAME", "NidsObservation"),
-            user=os.environ.get("DB_USER", "jms"),
-            password=os.environ.get("DB_PASSWORD", "pointeur"),
+            name=os.environ.get("DB_NAME", "observations_nids"),
+            user=os.environ.get("DB_USER", ""),
+            password=os.environ.get("DB_PASSWORD", ""),
             host=os.environ.get("DB_HOST", "db"),
             port=os.environ.get("DB_PORT", "3306"),
         )
@@ -75,6 +75,12 @@ class Settings(BaseSettings):
     USE_DEBUG_TOOLBAR: bool = False
     SESSION_COOKIE_AGE: int = 3600
     SESSION_EXPIRE_AT_BROWSER_CLOSE: bool = True
+
+    # Security settings (HTTPS/SSL)
+    SECURE_SSL_REDIRECT: bool = False
+    SESSION_COOKIE_SECURE: bool = False
+    CSRF_COOKIE_SECURE: bool = False
+    SECURE_HSTS_SECONDS: int = 0  # 0 = désactivé par défaut, mettre 31536000 en production
 
     # Media and static settings
     MEDIA_ROOT: str = str(BASE_DIR / "media")
@@ -140,10 +146,10 @@ def get_settings() -> Settings:
     load_dotenv(BASE_DIR / ".env")
 
     database_settings = DatabaseSettings(
-        name=os.environ.get("DB_NAME", "NidsObservation"),
-        user=os.environ.get("DB_USER", "jms"),
-        password=os.environ.get("DB_PASSWORD", "pointeur"),
-        host=os.environ.get("DB_HOST", "192.168.1.176"),
+        name=os.environ.get("DB_NAME", "observations_nids"),
+        user=os.environ.get("DB_USER", ""),
+        password=os.environ.get("DB_PASSWORD", ""),
+        host=os.environ.get("DB_HOST", "db"),
         port=os.environ.get("DB_PORT", "3306"),
     )
 

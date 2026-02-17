@@ -227,9 +227,42 @@ Internet :80  → Freebox (NAT) → 192.168.1.XXX:80 (Raspberry Pi)
 | `8081` | phpMyAdmin | Réseau local | Admin BDD (HTTP) - JAMAIS via Internet |
 
 **⚠️ Sécurité réseau**:
-- Firewall UFW recommandé pour bloquer les ports sauf 8010 et 5555 depuis le réseau local
-- MariaDB (3306) et Redis (6379) **NE DOIVENT JAMAIS** être exposés sur l'hôte
-- phpMyAdmin accessible uniquement depuis le réseau local (usage admin uniquement)
+- Firewall UFW configuré pour bloquer les ports sauf 8010 et 5555 depuis le Raspberry Pi
+- MariaDB (3306) et Redis (6379) **NE SONT JAMAIS** exposés sur l'hôte (réseau Docker interne uniquement)
+- phpMyAdmin accessible uniquement depuis les réseaux locaux 192.168.1.x et 192.168.19.x (pont ER605)
+
+**Configuration UFW sur le serveur Ubuntu** :
+
+```bash
+# Configuration initiale
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# SSH depuis les réseaux locaux
+sudo ufw allow from 192.168.1.0/24 to any port 22 comment 'SSH depuis réseau Freebox'
+sudo ufw allow from 192.168.19.0/24 to any port 22 comment 'SSH depuis réseau ER605'
+
+# Nginx Docker depuis le Raspberry Pi uniquement
+# Remplacer XXX par l'IP réelle du RPi sur le réseau 192.168.1.x
+sudo ufw allow from 192.168.1.XXX to any port 8010 comment 'Nginx depuis RPi'
+
+# Flower depuis le Raspberry Pi uniquement
+sudo ufw allow from 192.168.1.XXX to any port 5555 comment 'Flower depuis RPi'
+
+# phpMyAdmin depuis les réseaux locaux (pas de règle spécifique, déjà accessible via binding 0.0.0.0:8081)
+# Le port 8081 reste accessible depuis les deux réseaux locaux grâce au pont ER605
+
+# Activer le firewall
+sudo ufw enable
+
+# Vérifier la configuration
+sudo ufw status verbose
+```
+
+**Notes importantes** :
+- Le port 8081 (phpMyAdmin) n'a pas de règle UFW restrictive car il doit être accessible depuis les deux réseaux locaux (192.168.1.x et 192.168.19.x)
+- Le port 5555 (Flower) est bindé sur l'IP LAN du serveur Ubuntu (192.168.19.112) pour limiter l'accès
+- Les ports 3306 (MariaDB) et 6379 (Redis) ne sont jamais exposés sur l'hôte, ils restent dans le réseau Docker interne
 
 ### Communication inter-machines
 

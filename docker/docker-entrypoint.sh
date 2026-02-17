@@ -25,26 +25,37 @@ wait_for_redis() {
 wait_for_db
 wait_for_redis
 
-# Exécuter les migrations Django
-echo "Running database migrations..."
-python manage.py migrate --noinput
+# Migrations et collectstatic uniquement pour le service web (gunicorn)
+# Les workers Celery, Beat et Flower n'ont pas besoin de ces opérations
+if echo "$1" | grep -q "gunicorn"; then
+    echo "Running database migrations..."
+    python manage.py migrate --noinput
 
-# Collecter les fichiers statiques
-echo "Collecting static files..."
-python manage.py collectstatic --noinput
+    echo "Collecting static files..."
+    python manage.py collectstatic --noinput
 
-# Créer un superuser si les variables sont définies
-if [ "$DJANGO_SUPERUSER_USERNAME" ] && [ "$DJANGO_SUPERUSER_EMAIL" ] && [ "$DJANGO_SUPERUSER_PASSWORD" ]; then
-    echo "Creating superuser if it doesn't exist..."
-    python manage.py shell << END
+    # Créer un superuser si les variables sont définies
+    # Utilise os.environ pour éviter les problèmes d'échappement des caractères spéciaux
+    if [ "$DJANGO_SUPERUSER_USERNAME" ] && [ "$DJANGO_SUPERUSER_EMAIL" ] && [ "$DJANGO_SUPERUSER_PASSWORD" ]; then
+        echo "Creating superuser if it doesn't exist..."
+        python -c "
+import os
 from django.contrib.auth import get_user_model
 User = get_user_model()
-if not User.objects.filter(username='$DJANGO_SUPERUSER_USERNAME').exists():
-    User.objects.create_superuser('$DJANGO_SUPERUSER_USERNAME', '$DJANGO_SUPERUSER_EMAIL', '$DJANGO_SUPERUSER_PASSWORD')
+username = os.environ['DJANGO_SUPERUSER_USERNAME']
+if not User.objects.filter(username=username).exists():
+    User.objects.create_superuser(
+        username=username,
+        email=os.environ['DJANGO_SUPERUSER_EMAIL'],
+        password=os.environ['DJANGO_SUPERUSER_PASSWORD'],
+    )
     print('Superuser created successfully')
 else:
     print('Superuser already exists')
-END
+"
+    fi
+else
+    echo "Skipping migrations and collectstatic for non-web service"
 fi
 
 echo "Starting application..."

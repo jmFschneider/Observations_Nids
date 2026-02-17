@@ -100,6 +100,16 @@ LOGIN_REDIRECT_URL = '/'
 SESSION_COOKIE_AGE = settings.SESSION_COOKIE_AGE
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Déconnexion si l'utilisateur ferme son navigateur
 
+# Security settings (HTTPS/SSL)
+SECURE_SSL_REDIRECT = settings.SECURE_SSL_REDIRECT
+SESSION_COOKIE_SECURE = settings.SESSION_COOKIE_SECURE
+CSRF_COOKIE_SECURE = settings.CSRF_COOKIE_SECURE
+
+# HSTS (HTTP Strict Transport Security)
+SECURE_HSTS_SECONDS = settings.SECURE_HSTS_SECONDS
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
 # Celery Configuration - utilise les variables d'environnement
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
