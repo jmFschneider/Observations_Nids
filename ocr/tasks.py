@@ -12,7 +12,6 @@ from functools import wraps
 from typing import Any, ParamSpec, TypeVar
 
 from celery import shared_task
-from celery.result import AsyncResult
 from django.conf import settings
 from django.utils import timezone
 from google import genai
@@ -138,25 +137,6 @@ def _charger_prompt_production(image_path: str) -> str:
         return f.read()
 
 
-def _log_progress(task_self, message, level='info', details=None):
-    """Mise à jour de la progression dans Redis pour Flower/UI."""
-    timestamp = timezone.now().strftime('%H:%M:%S')
-    log_entry = {'timestamp': timestamp, 'message': message, 'level': level}
-    if details:
-        log_entry['details'] = details
-
-    try:
-        result = AsyncResult(task_self.request.id)
-        current_meta = result.info if result.info and isinstance(result.info, dict) else {}
-    except Exception:
-        current_meta = {}
-
-    logs = current_meta.get('logs', [])
-    logs.append(log_entry)
-    current_meta['logs'] = logs[-100:]  # Garder 100 derniers
-    task_self.update_state(state='PROGRESS', meta=current_meta)
-
-
 @shared_task(bind=True, name='ocr.process_images_production')
 def process_images_production_task(self, image_paths_relatifs: list[str]):
     """
@@ -173,13 +153,28 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
 
     total = len(image_paths_relatifs)
     success_count = 0
-    errors = []
+    errors: list[dict] = []
+    logs: list[dict] = []
+
+    def log_progress(message: str, level: str = 'info') -> None:
+        """Log un message et met à jour l'état Celery en une seule écriture Redis."""
+        timestamp = timezone.now().strftime('%H:%M:%S')
+        logs.append({'timestamp': timestamp, 'message': message, 'level': level})
+        self.update_state(
+            state='PROGRESS',
+            meta={
+                'processed': index + 1,
+                'total': total,
+                'percent': int(((index + 1) / total) * 100),
+                'logs': logs[-100:],
+            },
+        )
 
     for index, img_rel_path in enumerate(image_paths_relatifs):
         img_full_path = os.path.join(media_root, img_rel_path)
         start_time = time.time()
 
-        # Construction du chemin de sortie (procédure identique à l'évaluation)
+        # Construction du chemin de sortie
         # media/transcription_results/[chemin_image]/gemini_3_flash/
         img_dir_rel = os.path.dirname(img_rel_path)
         results_dir_rel = os.path.join('transcription_results', img_dir_rel, 'gemini_3_flash')
@@ -190,9 +185,7 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
         json_full_path = os.path.join(results_dir_full, json_filename)
         json_rel_path = os.path.join(results_dir_rel, json_filename)
 
-        _log_progress(
-            self, f"🖼️ [{index + 1}/{total}] Traitement de {os.path.basename(img_rel_path)}"
-        )
+        log_progress(f"🖼️ [{index + 1}/{total}] Traitement de {os.path.basename(img_rel_path)}")
 
         try:
             rate_limiter.wait_if_needed()
@@ -211,9 +204,13 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
 
             json_data = json.loads(text_response)
 
-            # Validation / Correction structurelle
-            if validate_json_structure(json_data):
-                json_data = corriger_json(json_data)
+            # Validation structurelle + normalisation (toujours appliquée)
+            structure_errors = validate_json_structure(json_data)
+            if structure_errors:
+                logger.warning(
+                    f"Structure JSON non conforme pour {img_rel_path}: {structure_errors}"
+                )
+            json_data = corriger_json(json_data)
 
             # Sauvegarde
             with open(json_full_path, 'w', encoding='utf-8') as f:
@@ -231,9 +228,7 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
             )
 
             success_count += 1
-            _log_progress(
-                self, f"✅ {os.path.basename(img_rel_path)} traité avec succès", 'success'
-            )
+            log_progress(f"✅ {os.path.basename(img_rel_path)} traité avec succès", 'success')
 
         except Exception as e:
             logger.error(f"Erreur OCR sur {img_rel_path}: {str(e)}")
@@ -241,16 +236,6 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
                 chemin_image=img_rel_path, chemin_json='', statut='erreur', erreur_message=str(e)
             )
             errors.append({'file': img_rel_path, 'error': str(e)})
-            _log_progress(self, f"❌ Erreur sur {os.path.basename(img_rel_path)}", 'error')
+            log_progress(f"❌ Erreur sur {os.path.basename(img_rel_path)}", 'error')
 
-        # Mise à jour progression globale
-        self.update_state(
-            state='PROGRESS',
-            meta={
-                'processed': index + 1,
-                'total': total,
-                'percent': int(((index + 1) / total) * 100),
-            },
-        )
-
-        return {'status': 'SUCCESS', 'total': total, 'success': success_count, 'errors': errors}
+    return {'status': 'SUCCESS', 'total': total, 'success': success_count, 'errors': errors}
