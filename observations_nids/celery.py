@@ -31,12 +31,10 @@ app.conf.update(
     # --- Améliorations robustesse ---
     task_acks_late=True,
     task_default_retry_delay=30,  # 30s avant un retry automatique
-    # --- Routage par files (désactivé pour l'instant) ---
-    # task_routes={
-    #     "importation.tasks.*": {"queue": "import"},
-    #     "Transcription.tasks.*": {"queue": "ocr"},
-    #     # tu peux en ajouter d'autres si besoin
-    # },
+    # Routage : les tâches OCR vont dans la queue dédiée "ocr"
+    task_routes={
+        'ocr.process_images_production': {'queue': 'ocr'},
+    },
 )
 
 # Configuration spécifique à Windows pour Celery

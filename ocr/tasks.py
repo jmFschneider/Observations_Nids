@@ -12,6 +12,7 @@ from concurrent.futures import TimeoutError as FutureTimeoutError
 from functools import wraps
 from typing import Any, ParamSpec, TypeVar
 
+import redis
 from celery import shared_task
 from django.conf import settings
 from django.utils import timezone
@@ -93,19 +94,76 @@ def call_gemini_api_with_timeout(
             raise TimeoutError(f"API call exceeded {timeout}s timeout") from None
 
 
-class RateLimiter:
-    """Gestionnaire de rate limiting pour Gemini API (60 RPM)."""
+class RedisRateLimiter:
+    """
+    Rate limiter distribué via Redis pour respecter le quota Gemini (60 RPM global).
 
-    def __init__(self, requests_per_minute=60):
-        self.min_delay = 60.0 / requests_per_minute
-        self.last_request_time = 0.0
+    Utilise une fenêtre fixe par minute avec INCR atomique.
+    En cas d'indisponibilité Redis, bascule en mode local avec avertissement.
+    """
 
-    def wait_if_needed(self):
+    KEY_PREFIX = 'ocr:rate_limiter'
+    KEY_TTL = 70  # secondes (légèrement > 60 pour couvrir la transition de fenêtre)
+    POLL_INTERVAL = 5  # secondes entre chaque vérification quand le quota est atteint
+
+    def __init__(self, requests_per_minute: int = 60) -> None:
+        self.rpm = requests_per_minute
+        self._redis: redis.Redis | None = None
+        # Fallback local (mode dégradé)
+        self._fallback_min_delay = 60.0 / requests_per_minute
+        self._fallback_last_request: float = 0.0
+
+        redis_url = os.environ.get('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
+        try:
+            client = redis.Redis.from_url(redis_url, decode_responses=True, socket_connect_timeout=2)
+            client.ping()
+            self._redis = client
+            logger.info("RedisRateLimiter initialisé — mode distribué (%d RPM partagés entre workers)", self.rpm)
+        except Exception as exc:
+            logger.warning(
+                "Redis inaccessible pour le rate limiter (%s). "
+                "Mode local activé : le quota Gemini n'est PAS partagé entre workers.",
+                exc,
+            )
+
+    def wait_if_needed(self) -> None:
+        """Acquiert un slot dans la fenêtre courante, attend si le quota global est atteint."""
+        if self._redis is None:
+            self._wait_local()
+            return
+
+        while True:
+            minute_bucket = int(time.time() // 60)
+            key = f"{self.KEY_PREFIX}:{minute_bucket}"
+            try:
+                count = self._redis.incr(key)
+                if count == 1:
+                    self._redis.expire(key, self.KEY_TTL)
+                if count <= self.rpm:
+                    return
+                # Quota atteint : calculer le temps restant dans la fenêtre courante
+                seconds_to_next = 60 - (time.time() % 60)
+                logger.info(
+                    "Rate limit OCR atteint (%d/%d RPM) — attente %.1fs avant la prochaine fenêtre",
+                    count,
+                    self.rpm,
+                    seconds_to_next,
+                )
+                time.sleep(min(seconds_to_next, self.POLL_INTERVAL))
+            except redis.RedisError as exc:
+                logger.warning(
+                    "Erreur Redis dans le rate limiter (%s) — requête envoyée sans limitation pour ce slot.",
+                    exc,
+                )
+                return
+
+    def _wait_local(self) -> None:
+        """Fallback : rate limiting local (non partagé, mode dégradé)."""
         now = time.time()
-        elapsed = now - self.last_request_time
-        if elapsed < self.min_delay:
-            time.sleep(self.min_delay - elapsed)
-        self.last_request_time = time.time()
+        elapsed = now - self._fallback_last_request
+        if elapsed < self._fallback_min_delay:
+            time.sleep(self._fallback_min_delay - elapsed)
+        self._fallback_last_request = time.time()
 
 
 def _charger_prompt_production(image_path: str) -> str:
@@ -123,7 +181,7 @@ def _charger_prompt_production(image_path: str) -> str:
         return f.read()
 
 
-@shared_task(bind=True, name='ocr.process_images_production')
+@shared_task(bind=True, name='ocr.process_images_production', queue='ocr')
 def process_images_production_task(self, image_paths_relatifs: list[str]):
     """
     Tâche de production pour traiter un lot d'images.
@@ -135,7 +193,7 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
         return {'status': 'ERROR', 'error': "Clé API Gemini non configurée"}
 
     client = genai.Client(api_key=api_key)
-    rate_limiter = RateLimiter(60)
+    rate_limiter = RedisRateLimiter(60)
 
     total = len(image_paths_relatifs)
     success_count = 0
