@@ -10,7 +10,7 @@ from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from functools import wraps
-from typing import Any, ParamSpec, TypeVar
+from typing import Any, ParamSpec, TypeVar, cast
 
 import redis
 from celery import shared_task
@@ -115,10 +115,15 @@ class RedisRateLimiter:
 
         redis_url = os.environ.get('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
         try:
-            client = redis.Redis.from_url(redis_url, decode_responses=True, socket_connect_timeout=2)
+            client = redis.Redis.from_url(
+                redis_url, decode_responses=True, socket_connect_timeout=2
+            )
             client.ping()
             self._redis = client
-            logger.info("RedisRateLimiter initialisé — mode distribué (%d RPM partagés entre workers)", self.rpm)
+            logger.info(
+                "RedisRateLimiter initialisé — mode distribué (%d RPM partagés entre workers)",
+                self.rpm,
+            )
         except Exception as exc:
             logger.warning(
                 "Redis inaccessible pour le rate limiter (%s). "
@@ -136,7 +141,7 @@ class RedisRateLimiter:
             minute_bucket = int(time.time() // 60)
             key = f"{self.KEY_PREFIX}:{minute_bucket}"
             try:
-                count = self._redis.incr(key)
+                count = cast(int, self._redis.incr(key))
                 if count == 1:
                     self._redis.expire(key, self.KEY_TTL)
                 if count <= self.rpm:

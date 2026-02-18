@@ -11,10 +11,12 @@ from typing import Any, cast
 from celery.result import AsyncResult
 from django.conf import settings
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import render
 
 from observations.decorators import transcription_required
+from ocr.models import TranscriptionOCR
 from ocr.tasks import process_images_production_task
 
 logger = logging.getLogger('ocr')
@@ -128,6 +130,7 @@ def verifier_progression(request: HttpRequest) -> JsonResponse:
                 'percent': info.get('percent', 0),
                 'processed': info.get('processed', 0),
                 'total': info.get('total', 0),
+                'logs': info.get('logs', []),
             }
         )
     elif result.status == 'SUCCESS':
@@ -135,3 +138,25 @@ def verifier_progression(request: HttpRequest) -> JsonResponse:
         response['percent'] = 100
 
     return JsonResponse(response)
+
+
+@transcription_required
+def historique_ocr(request: HttpRequest):
+    """Historique des transcriptions OCR avec filtres statut et pagination."""
+    statut = request.GET.get('statut', '')
+    qs = TranscriptionOCR.objects.select_related('fiche')
+    if statut in ('succes', 'erreur', 'en_cours'):
+        qs = qs.filter(statut=statut)
+
+    paginator = Paginator(qs, 25)
+    page_obj = paginator.get_page(request.GET.get('page', 1))
+
+    return render(
+        request,
+        'ocr/historique.html',
+        {
+            'page_obj': page_obj,
+            'statut_filtre': statut,
+            'total': qs.count(),
+        },
+    )

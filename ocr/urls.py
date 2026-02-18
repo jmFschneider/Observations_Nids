@@ -13,4 +13,5 @@ urlpatterns = [
     path('selection/', views.selection_images, name='selection_images'),
     path('lancer/', views.lancer_ocr, name='lancer_ocr'),
     path('progression/', views.verifier_progression, name='verifier_progression'),
+    path('historique/', views.historique_ocr, name='historique_ocr'),
 ]
