@@ -5,6 +5,7 @@ Vues pour l'app ocr en production.
 import json
 import logging
 import os
+from pathlib import Path
 from typing import Any, cast
 
 from celery.result import AsyncResult
@@ -34,12 +35,12 @@ def selection_images(request):
         os.makedirs(base_dir)
 
     current_path = request.GET.get('path', '')
-    safe_path = os.path.normpath(current_path).replace('..', '').replace('\\', '/')
-    full_current_path = os.path.join(base_dir, safe_path)
-
-    if not full_current_path.startswith(base_dir):
-        safe_path = ''
-        full_current_path = base_dir
+    base_path = Path(base_dir).resolve()
+    requested = (base_path / current_path).resolve()
+    if not str(requested).startswith(str(base_path)):
+        requested = base_path
+    full_current_path = str(requested)
+    safe_path = str(requested.relative_to(base_path)).replace('\\', '/')
 
     directories = []
     images = []
@@ -58,12 +59,12 @@ def selection_images(request):
         messages.error(request, "Impossible d'accéder à ce répertoire")
 
     breadcrumb = []
-    if safe_path:
-        parts = safe_path.split(os.sep)
+    if safe_path and safe_path != '.':
+        parts = safe_path.split('/')
         current = ''
         for part in parts:
             if part:
-                current = os.path.join(current, part) if current else part
+                current = f"{current}/{part}" if current else part
                 breadcrumb.append({'name': part, 'path': current})
 
     context = {
@@ -71,7 +72,9 @@ def selection_images(request):
         'images': images,
         'current_path': safe_path,
         'breadcrumb': breadcrumb,
-        'parent_path': os.path.dirname(safe_path) if safe_path else None,
+        'parent_path': '/'.join(safe_path.split('/')[:-1])
+        if safe_path and safe_path != '.'
+        else None,
     }
 
     return render(request, 'ocr/selection_images.html', context)

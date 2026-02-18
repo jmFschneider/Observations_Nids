@@ -21,6 +21,7 @@ from observations.models import (
     Remarque,
     ResumeObservation,
 )
+from ocr.models import TranscriptionOCR
 from taxonomy.models import Espece
 
 from .models import EspeceCandidate, ImportationEnCours, TranscriptionBrute
@@ -857,6 +858,11 @@ class ImportationService:
                 transcription=True,
             )
             importation.fiche_observation = fiche
+
+            # Lier la TranscriptionOCR à la fiche nouvellement créée
+            TranscriptionOCR.objects.filter(chemin_image=chemin_image, statut='succes').update(
+                fiche=fiche
+            )
 
             # Mettre à jour l'état de correction à "en cours de correction"
             # car la fiche issue d'une transcription OCR nécessite une correction manuelle

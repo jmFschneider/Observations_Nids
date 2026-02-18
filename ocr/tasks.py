@@ -5,9 +5,10 @@ Tâches Celery pour le traitement OCR en production.
 import json
 import logging
 import os
-import threading
 import time
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from functools import wraps
 from typing import Any, ParamSpec, TypeVar
 
@@ -73,38 +74,23 @@ def call_gemini_api_with_timeout(
     image_path: str,
     timeout: int = 120,
 ) -> str:
-    """Appel API Gemini avec timeout et retry automatique."""
-    result: list[str | None] = [None]
-    exception: list[Exception | None] = [None]
+    """Appel API Gemini avec timeout via ThreadPoolExecutor (future annulable)."""
 
-    def api_call():
+    def api_call() -> str:
+        image = Image.open(image_path)
         try:
-            image = Image.open(image_path)
-            try:
-                response = client.models.generate_content(
-                    model=model_name, contents=[prompt, image]
-                )
-                result[0] = response.text.encode('utf-8').decode('utf-8')
-            finally:
-                image.close()
-        except Exception as e:
-            exception[0] = e
+            response = client.models.generate_content(model=model_name, contents=[prompt, image])
+            return response.text.encode('utf-8').decode('utf-8')
+        finally:
+            image.close()
 
-    thread = threading.Thread(target=api_call)
-    thread.daemon = True
-    thread.start()
-    thread.join(timeout=timeout)
-
-    if thread.is_alive():
-        raise TimeoutError(f"API call exceeded {timeout}s timeout")
-
-    if exception[0]:
-        raise exception[0]
-
-    if result[0] is None:
-        raise ValueError("API call returned None")
-
-    return result[0]
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(api_call)
+        try:
+            return future.result(timeout=timeout)
+        except FutureTimeoutError:
+            future.cancel()
+            raise TimeoutError(f"API call exceeded {timeout}s timeout") from None
 
 
 class RateLimiter:
@@ -153,6 +139,7 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
 
     total = len(image_paths_relatifs)
     success_count = 0
+    ignored_count = 0
     errors: list[dict] = []
     logs: list[dict] = []
 
@@ -171,6 +158,14 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
         )
 
     for index, img_rel_path in enumerate(image_paths_relatifs):
+        basename = os.path.basename(img_rel_path)
+
+        # Déduplication : ignorer les images déjà transcrites avec succès
+        if TranscriptionOCR.objects.filter(chemin_image=img_rel_path, statut='succes').exists():
+            log_progress(f"⏭️ [{index + 1}/{total}] {basename} déjà transcrit, ignoré", 'warning')
+            ignored_count += 1
+            continue
+
         img_full_path = os.path.join(media_root, img_rel_path)
         start_time = time.time()
 
@@ -185,7 +180,7 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
         json_full_path = os.path.join(results_dir_full, json_filename)
         json_rel_path = os.path.join(results_dir_rel, json_filename)
 
-        log_progress(f"🖼️ [{index + 1}/{total}] Traitement de {os.path.basename(img_rel_path)}")
+        log_progress(f"🖼️ [{index + 1}/{total}] Traitement de {basename}")
 
         try:
             rate_limiter.wait_if_needed()
@@ -228,7 +223,7 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
             )
 
             success_count += 1
-            log_progress(f"✅ {os.path.basename(img_rel_path)} traité avec succès", 'success')
+            log_progress(f"✅ {basename} traité avec succès", 'success')
 
         except Exception as e:
             logger.error(f"Erreur OCR sur {img_rel_path}: {str(e)}")
@@ -236,6 +231,12 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
                 chemin_image=img_rel_path, chemin_json='', statut='erreur', erreur_message=str(e)
             )
             errors.append({'file': img_rel_path, 'error': str(e)})
-            log_progress(f"❌ Erreur sur {os.path.basename(img_rel_path)}", 'error')
+            log_progress(f"❌ Erreur sur {basename}", 'error')
 
-    return {'status': 'SUCCESS', 'total': total, 'success': success_count, 'errors': errors}
+    return {
+        'status': 'SUCCESS',
+        'total': total,
+        'success': success_count,
+        'ignored': ignored_count,
+        'errors': errors,
+    }
