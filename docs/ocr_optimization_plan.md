@@ -94,7 +94,7 @@ self.update_state(
     meta={'processed': index + 1, 'total': total, 'percent': ...}
     # ← 'logs' absent : effacement des logs !
 )
-```
+```gi
 
 **Correction** : Fusionner les deux `update_state`. Accumuler les logs dans une variable locale et les inclure dans chaque mise à jour.
 

@@ -23,7 +23,7 @@ services:
     volumes:
       - ..:/app
     # Loglevel debug pour plus de détails
-    command: celery -A observations_nids worker --loglevel=debug --concurrency=1
+    command: celery -A observations_nids worker --loglevel=debug --concurrency=1 -Q celery,ocr
 
   # Celery Beat en mode développement
   celery_beat:

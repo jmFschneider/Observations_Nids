@@ -192,6 +192,11 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
     Tâche de production pour traiter un lot d'images.
     Utilise gemini-3-flash par défaut.
     """
+    logger.info(
+        "OCR: tâche démarrée (task_id=%s) — %d image(s) à traiter",
+        self.request.id,
+        len(image_paths_relatifs),
+    )
     media_root = str(settings.MEDIA_ROOT)
     api_key = getattr(settings, 'GEMINI_API_KEY', os.environ.get("GEMINI_API_KEY"))
     if not api_key:

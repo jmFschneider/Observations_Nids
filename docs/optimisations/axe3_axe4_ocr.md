@@ -61,11 +61,15 @@ task_routes={
 ```
 
 **`docker/docker-compose.yml`** : le worker Docker écoute désormais les deux
-queues pour ne pas perdre les tâches générales :
+queues pour ne pas perdre les tâches générales (ingest, etc.) ni les tâches OCR :
 
 ```
-celery -A observations_nids worker --loglevel=info --concurrency=2 -Q default,ocr
+celery -A observations_nids worker --loglevel=info --concurrency=2 -Q celery,ocr
 ```
+
+La queue par défaut Celery s’appelle `celery` (pas `default`) ; les tâches sans
+route (ex. `ingest.process_json_batch`) partent donc en `celery`. Il faut
+toujours utiliser `-Q celery,ocr` et non `-Q default,ocr`.
 
 **Monitoring** : la clé Redis du rate limiter est observable en direct :
 

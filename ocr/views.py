@@ -101,6 +101,11 @@ def lancer_ocr(request):
             os.path.join('images', repertoire, f).replace('\\', '/') for f in image_filenames
         ]
 
+        logger.info(
+            "OCR: envoi tâche Celery queue=ocr — %d image(s), repertoire=%s",
+            len(image_paths),
+            repertoire,
+        )
         task = process_images_production_task.delay(image_paths)
         request.session['ocr_task_id'] = task.id
 

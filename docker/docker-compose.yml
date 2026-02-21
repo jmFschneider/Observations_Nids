@@ -136,7 +136,7 @@ services:
     container_name: observations_celery_worker
     restart: unless-stopped
     env_file: ../.env
-    command: celery -A observations_nids worker --loglevel=info --concurrency=2 -Q default,ocr
+    command: celery -A observations_nids worker --loglevel=info --concurrency=2 -Q celery,ocr
     environment:
       # Surcharges spécifiques pour Docker (noms de services)
       - DB_HOST=db
