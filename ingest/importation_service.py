@@ -146,8 +146,13 @@ class ImportationService:
                 # Parser le JSON nettoyé
                 contenu_json = json.loads(contenu)
 
-                # Créer l'entrée dans TranscriptionBrute
-                TranscriptionBrute.objects.create(fichier_source=fichier, json_brut=contenu_json)
+                # Créer l'entrée dans TranscriptionBrute (repertoire pour agrégations par dossier)
+                repertoire_norm = repertoire.replace('\\', '/').strip('/') if repertoire else ''
+                TranscriptionBrute.objects.create(
+                    fichier_source=fichier,
+                    repertoire=repertoire_norm,
+                    json_brut=contenu_json,
+                )
                 resultats['reussis'] += 1
                 logger.info(f"Fichier importé avec succès: {fichier}")
 
@@ -590,9 +595,12 @@ class ImportationService:
                         'message': f"Erreur de format JSON dans {fichier_source}: {str(e)}",
                     }
 
-                # Créer la transcription
+                # Créer la transcription (repertoire pour agrégations par dossier)
+                repertoire_norm = repertoire.replace('\\', '/').strip('/') if repertoire else ''
                 transcription = TranscriptionBrute.objects.create(
-                    fichier_source=fichier_source, json_brut=contenu_json
+                    fichier_source=fichier_source,
+                    repertoire=repertoire_norm,
+                    json_brut=contenu_json,
                 )
                 logger.info(f"TranscriptionBrute créée : {transcription.id}")
             else:

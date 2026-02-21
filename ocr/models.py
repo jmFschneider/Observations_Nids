@@ -40,6 +40,15 @@ class TranscriptionOCR(models.Model):
         help_text="Chemin de l'image utilisée pour cette transcription",
     )
 
+    repertoire = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        db_index=True,
+        verbose_name="Répertoire de l'image",
+        help_text="Répertoire parent (dirname de chemin_image) pour agrégations par dossier",
+    )
+
     modele_ocr = models.CharField(
         max_length=50,
         default='gemini_3_flash',
@@ -83,6 +92,7 @@ class TranscriptionOCR(models.Model):
         indexes = [
             models.Index(fields=['fiche']),
             models.Index(fields=['statut']),
+            models.Index(fields=['statut', 'repertoire'], name='ocr_statut_repertoire_idx'),
         ]
 
     def __str__(self):

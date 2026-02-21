@@ -281,10 +281,12 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
 
             duration = time.time() - start_time
 
-            # Tracking BDD
+            # Tracking BDD (repertoire = dirname pour agrégations par dossier)
+            repertoire = os.path.dirname(img_rel_path).replace('\\', '/')
             TranscriptionOCR.objects.create(
                 chemin_json=json_rel_path,
                 chemin_image=img_rel_path,
+                repertoire=repertoire,
                 modele_ocr='gemini_3_flash',
                 statut='succes',
                 temps_traitement_secondes=duration,
@@ -295,8 +297,13 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
 
         except Exception as e:
             logger.error(f"Erreur OCR sur {img_rel_path}: {str(e)}")
+            repertoire = os.path.dirname(img_rel_path).replace('\\', '/')
             TranscriptionOCR.objects.create(
-                chemin_image=img_rel_path, chemin_json='', statut='erreur', erreur_message=str(e)
+                chemin_image=img_rel_path,
+                chemin_json='',
+                repertoire=repertoire,
+                statut='erreur',
+                erreur_message=str(e),
             )
             errors.append({'file': img_rel_path, 'error': str(e)})
             log_progress(f"❌ Erreur sur {basename}", 'error')

@@ -61,6 +61,14 @@ class PreparationImage(models.Model):
 
 class TranscriptionBrute(models.Model):
     fichier_source = models.CharField(max_length=255, unique=True)
+    repertoire = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        db_index=True,
+        verbose_name="Répertoire du fichier",
+        help_text="Chemin relatif sous transcription_results/ pour agrégations par dossier",
+    )
     json_brut = models.JSONField()
     date_importation = models.DateTimeField(auto_now_add=True)
     traite = models.BooleanField(default=False)

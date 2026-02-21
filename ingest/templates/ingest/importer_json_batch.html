@@ -118,8 +118,8 @@
                             <th class="text-center" style="width: 150px;">
                                 <i class="fas fa-folder"></i> Sous-dossiers
                             </th>
-                            <th class="text-center" style="width: 150px;">
-                                <i class="fas fa-file-code"></i> Fichiers JSON
+                            <th class="text-center" style="width: 150px;" title="Importés / Total (répertoire et sous-répertoires)">
+                                <i class="fas fa-file-import"></i> Importés / Total
                             </th>
                             <th style="width: 50px;"></th>
                         </tr>
@@ -141,11 +141,7 @@
                                 {% endif %}
                             </td>
                             <td class="text-center">
-                                {% if dir.json_count > 0 %}
-                                    <span class="badge -subtle text-primary-emphasis">{{ dir.json_count }}</span>
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
+                                <span class="badge bg-light text-dark border" title="JSON déjà importés / Total JSON">{{ dir.imported_count }} / {{ dir.total_json }}</span>
                             </td>
                             <td class="text-center">
                                 <i class="fas fa-chevron-right text-muted"></i>

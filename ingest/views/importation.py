@@ -7,18 +7,83 @@ from celery.result import AsyncResult
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.cache import cache
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from ingest.importation_service import ImportationService
-from ingest.models import ImportationEnCours
+from ingest.models import ImportationEnCours, TranscriptionBrute
 from ingest.tasks import process_json_batch_task
 
 from .auth import peut_transcrire
 
 logger = logging.getLogger(__name__)
+
+# TTL du cache des comptages JSON par répertoire (secondes)
+CACHE_JSON_COUNTS_TTL = 300
+
+
+def _prefix_transcription_results(safe_path: str) -> str:
+    """Préfixe pour requêtes sur TranscriptionBrute.repertoire (ex: '' ou '2024/')."""
+    if not safe_path:
+        return ''
+    return f"{safe_path.rstrip('/')}/"
+
+
+def _comptages_importes_par_sous_repertoire(prefix: str) -> dict[str, int]:
+    """
+    Une requête SQL : compte des TranscriptionBrute par répertoire sous prefix.
+    Retourne un dict {nom_sous_repertoire: count}.
+    """
+    if prefix and not prefix.endswith('/'):
+        prefix = prefix + '/'
+    qs = (
+        TranscriptionBrute.objects.filter(repertoire__startswith=prefix)
+        .exclude(repertoire='')
+        .values('repertoire')
+        .annotate(count=Count('id'))
+    )
+    result: dict[str, int] = {}
+    for entry in qs:
+        rep = entry['repertoire'] or ''
+        count = entry['count']
+        if not rep.startswith(prefix):
+            continue
+        relative = rep[len(prefix) :].strip('/')
+        if not relative:
+            continue
+        top_dir = relative.split('/')[0]
+        result[top_dir] = result.get(top_dir, 0) + count
+    return result
+
+
+def _comptages_json_fs_par_sous_repertoire(
+    full_current_path: str, cache_key: str
+) -> dict[str, int]:
+    """
+    Compte récursif des fichiers *_result.json par sous-répertoire direct.
+    Utilise le cache Django (TTL 5 min).
+    """
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+    result: dict[str, int] = {}
+    try:
+        for root, _dirs, files in os.walk(full_current_path):
+            json_count = sum(1 for f in files if f.lower().endswith('_result.json'))
+            if json_count == 0:
+                continue
+            rel = os.path.relpath(root, full_current_path).replace('\\', '/')
+            if rel == '.':
+                continue
+            top_dir = rel.split('/')[0]
+            result[top_dir] = result.get(top_dir, 0) + json_count
+    except (OSError, PermissionError):
+        pass
+    cache.set(cache_key, result, timeout=CACHE_JSON_COUNTS_TTL)
+    return result
 
 
 @login_required
@@ -52,55 +117,43 @@ def importer_json(request):
         safe_path = ''
         full_current_path = base_dir
 
-    # Récupérer la liste des sous-répertoires avec statistiques
-    directories = []
+    # Liste des sous-répertoires
+    dir_list = []
     try:
         dir_list = [
             d
             for d in os.listdir(full_current_path)
             if os.path.isdir(os.path.join(full_current_path, d))
         ]
-
-        for dir_name in dir_list:
-            dir_path = os.path.join(full_current_path, dir_name)
-
-            try:
-                # Compter les sous-répertoires
-                subdirs_count = len(
-                    [d for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))]
-                )
-
-                # Compter les fichiers JSON
-                json_count = len(
-                    [
-                        f
-                        for f in os.listdir(dir_path)
-                        if os.path.isfile(os.path.join(dir_path, f)) and f.lower().endswith('.json')
-                    ]
-                )
-
-                directories.append(
-                    {
-                        'name': dir_name,
-                        'subdirs_count': subdirs_count,
-                        'json_count': json_count,
-                    }
-                )
-            except (OSError, PermissionError):
-                directories.append(
-                    {
-                        'name': dir_name,
-                        'subdirs_count': 0,
-                        'json_count': 0,
-                    }
-                )
-
-        directories.sort(key=lambda x: str(x['name']).lower())
+        dir_list.sort(key=lambda x: str(x).lower())
     except (OSError, PermissionError):
-        directories = []
         messages.error(request, "Impossible d'accéder à ce répertoire")
         safe_path = ''
         full_current_path = base_dir
+
+    # Compteurs par répertoire (BDD + cache filesystem)
+    prefix = _prefix_transcription_results(safe_path)
+    importes_counts = _comptages_importes_par_sous_repertoire(prefix)
+    cache_key = f"ingest:json_counts:{safe_path or '.'}"
+    total_counts = _comptages_json_fs_par_sous_repertoire(full_current_path, cache_key)
+
+    directories = []
+    for dir_name in dir_list:
+        dir_path = os.path.join(full_current_path, dir_name)
+        try:
+            subdirs_count = len(
+                [d for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))]
+            )
+        except (OSError, PermissionError):
+            subdirs_count = 0
+        directories.append(
+            {
+                'name': dir_name,
+                'subdirs_count': subdirs_count,
+                'total_json': total_counts.get(dir_name, 0),
+                'imported_count': importes_counts.get(dir_name, 0),
+            }
+        )
 
     # Créer le fil d'Ariane
     breadcrumb = []
@@ -379,55 +432,43 @@ def importer_json_batch(request):
         safe_path = ''
         full_current_path = base_dir
 
-    # Récupérer la liste des sous-répertoires avec statistiques
-    directories = []
+    # Liste des sous-répertoires
+    dir_list = []
     try:
         dir_list = [
             d
             for d in os.listdir(full_current_path)
             if os.path.isdir(os.path.join(full_current_path, d))
         ]
-
-        for dir_name in dir_list:
-            dir_path = os.path.join(full_current_path, dir_name)
-
-            try:
-                # Compter les sous-répertoires
-                subdirs_count = len(
-                    [d for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))]
-                )
-
-                # Compter les fichiers JSON
-                json_count = len(
-                    [
-                        f
-                        for f in os.listdir(dir_path)
-                        if os.path.isfile(os.path.join(dir_path, f)) and f.lower().endswith('.json')
-                    ]
-                )
-
-                directories.append(
-                    {
-                        'name': dir_name,
-                        'subdirs_count': subdirs_count,
-                        'json_count': json_count,
-                    }
-                )
-            except (OSError, PermissionError):
-                directories.append(
-                    {
-                        'name': dir_name,
-                        'subdirs_count': 0,
-                        'json_count': 0,
-                    }
-                )
-
-        directories.sort(key=lambda x: str(x['name']).lower())
+        dir_list.sort(key=lambda x: str(x).lower())
     except (OSError, PermissionError):
-        directories = []
         messages.error(request, "Impossible d'accéder à ce répertoire")
         safe_path = ''
         full_current_path = base_dir
+
+    # Compteurs par répertoire (BDD + cache filesystem)
+    prefix = _prefix_transcription_results(safe_path)
+    importes_counts = _comptages_importes_par_sous_repertoire(prefix)
+    cache_key = f"ingest:json_counts:{safe_path or '.'}"
+    total_counts = _comptages_json_fs_par_sous_repertoire(full_current_path, cache_key)
+
+    directories = []
+    for dir_name in dir_list:
+        dir_path = os.path.join(full_current_path, dir_name)
+        try:
+            subdirs_count = len(
+                [d for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))]
+            )
+        except (OSError, PermissionError):
+            subdirs_count = 0
+        directories.append(
+            {
+                'name': dir_name,
+                'subdirs_count': subdirs_count,
+                'total_json': total_counts.get(dir_name, 0),
+                'imported_count': importes_counts.get(dir_name, 0),
+            }
+        )
 
     # Créer le fil d'Ariane
     breadcrumb = []

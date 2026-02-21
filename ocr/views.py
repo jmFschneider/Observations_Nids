@@ -11,8 +11,10 @@ from typing import Any, cast
 from celery.result import AsyncResult
 from django.conf import settings
 from django.contrib import messages
+from django.core.cache import cache
 from django.core.paginator import Paginator
-from django.http import HttpRequest, JsonResponse
+from django.db.models import Count
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 
 from observations.decorators import transcription_required
@@ -21,15 +23,76 @@ from ocr.tasks import process_images_production_task
 
 logger = logging.getLogger('ocr')
 
+# TTL du cache des comptages d'images par répertoire (secondes)
+CACHE_IMG_COUNTS_TTL = 300
+
 
 @transcription_required
-def ocr_home(request):
+def ocr_home(request: HttpRequest) -> HttpResponse:
     """Page d'accueil de l'OCR"""
     return render(request, 'ocr/home.html')
 
 
+def _prefix_images(safe_path: str) -> str:
+    """Préfixe DB pour chemin sous media/images/ (ex: 'images/' ou 'images/2024/')."""
+    if not safe_path or safe_path == '.':
+        return 'images/'
+    return f"images/{safe_path.rstrip('/')}/"
+
+
+def _comptages_ocr_par_sous_repertoire(prefix: str) -> dict[str, int]:
+    """
+    Une requête SQL : compte des transcriptions en succès par répertoire sous prefix.
+    Retourne un dict {nom_sous_repertoire: count} (agrégé sur le premier niveau sous prefix).
+    """
+    qs = (
+        TranscriptionOCR.objects.filter(statut='succes', repertoire__startswith=prefix)
+        .values('repertoire')
+        .annotate(count=Count('id'))
+    )
+    result: dict[str, int] = {}
+    for entry in qs:
+        rep = entry['repertoire']
+        count = entry['count']
+        if not rep or not rep.startswith(prefix):
+            continue
+        relative = rep[len(prefix) :].strip('/')
+        if not relative:
+            continue
+        top_dir = relative.split('/')[0]
+        result[top_dir] = result.get(top_dir, 0) + count
+    return result
+
+
+def _comptages_images_fs_par_sous_repertoire(
+    full_current_path: str, cache_key: str
+) -> dict[str, int]:
+    """
+    Compte récursif des images (jpg, jpeg, png) par sous-répertoire direct.
+    Utilise le cache Django (TTL 5 min) pour éviter des os.walk répétés.
+    """
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+    result: dict[str, int] = {}
+    try:
+        for root, _dirs, files in os.walk(full_current_path):
+            img_count = sum(1 for f in files if f.lower().endswith(('.jpg', '.jpeg', '.png')))
+            if img_count == 0:
+                continue
+            rel = os.path.relpath(root, full_current_path).replace('\\', '/')
+            if rel == '.':
+                continue
+            top_dir = rel.split('/')[0]
+            result[top_dir] = result.get(top_dir, 0) + img_count
+    except (OSError, PermissionError):
+        pass
+    cache.set(cache_key, result, timeout=CACHE_IMG_COUNTS_TTL)
+    return result
+
+
 @transcription_required
-def selection_images(request):
+def selection_images(request: HttpRequest) -> HttpResponse:
     """Sélection d'images pour transcription."""
     # Navigation désormais ancrée dans media/images/
     base_dir = os.path.join(settings.MEDIA_ROOT, 'images')
@@ -44,21 +107,36 @@ def selection_images(request):
     full_current_path = str(requested)
     safe_path = str(requested.relative_to(base_path)).replace('\\', '/')
 
-    directories = []
-    images = []
+    dir_names: list[str] = []
+    images: list[str] = []
 
     try:
         for item in os.listdir(full_current_path):
             item_path = os.path.join(full_current_path, item)
             if os.path.isdir(item_path):
-                directories.append(item)
+                dir_names.append(item)
             elif item.lower().endswith(('.jpg', '.jpeg', '.png')):
                 images.append(item)
 
-        directories.sort()
+        dir_names.sort()
         images.sort()
     except (OSError, PermissionError):
         messages.error(request, "Impossible d'accéder à ce répertoire")
+
+    # Compteurs par répertoire (BDD + cache filesystem)
+    prefix = _prefix_images(safe_path)
+    ocr_counts = _comptages_ocr_par_sous_repertoire(prefix)
+    cache_key = f"ocr:img_counts:{safe_path or '.'}"
+    total_counts = _comptages_images_fs_par_sous_repertoire(full_current_path, cache_key)
+
+    directories = [
+        {
+            'name': name,
+            'total_images': total_counts.get(name, 0),
+            'transcribed_count': ocr_counts.get(name, 0),
+        }
+        for name in dir_names
+    ]
 
     breadcrumb = []
     if safe_path and safe_path != '.':
@@ -83,7 +161,7 @@ def selection_images(request):
 
 
 @transcription_required
-def lancer_ocr(request):
+def lancer_ocr(request: HttpRequest) -> JsonResponse:
     """Lance la transcription des images sélectionnées."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
@@ -146,7 +224,7 @@ def verifier_progression(request: HttpRequest) -> JsonResponse:
 
 
 @transcription_required
-def historique_ocr(request: HttpRequest):
+def historique_ocr(request: HttpRequest) -> HttpResponse:
     """Historique des transcriptions OCR avec filtres statut et pagination."""
     statut = request.GET.get('statut', '')
     qs = TranscriptionOCR.objects.select_related('fiche')
