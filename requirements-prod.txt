@@ -215,7 +215,7 @@ packaging==26.0
     #   radicale
 pika==1.3.2
     # via radicale
-pillow==12.1.0
+pillow==12.1.1
     # via -r requirements-base.in
 prometheus-client==0.24.1
     # via
