@@ -255,7 +255,7 @@ mypy==1.19.1
     # via -r requirements-dev.in
 mypy-extensions==1.1.0
     # via mypy
-mysqlclient==2.2.7
+mysqlclient==2.2.8
     # via -r requirements-base.in
 oauthlib==3.3.1
     # via
