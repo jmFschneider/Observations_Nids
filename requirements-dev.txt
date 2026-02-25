@@ -4,6 +4,12 @@
 #
 #    pip-compile requirements-dev.in
 #
+aiohappyeyeballs==2.6.1
+    # via aiohttp
+aiohttp==3.13.3
+    # via google-genai
+aiosignal==1.4.0
+    # via aiohttp
 akismet==25.10.1
     # via django-helpdesk
 amqp==5.3.1
@@ -22,6 +28,8 @@ asgiref==3.11.1
     # via
     #   -r requirements-base.in
     #   django
+attrs==25.4.0
+    # via aiohttp
 babel==2.17.0
     # via mkdocs-material
 backrefs==6.1
@@ -146,13 +154,17 @@ eventlet==0.40.4
     # via -r requirements-base.in
 flower==2.0.1
     # via -r requirements-base.in
+frozenlist==1.8.0
+    # via
+    #   aiohttp
+    #   aiosignal
 geographiclib==2.1
     # via geopy
 geopy==2.4.1
     # via -r requirements-base.in
 ghp-import==2.1.0
     # via mkdocs
-google-api-core==2.29.0
+google-api-core==2.30.0
     # via
     #   -r requirements-base.in
     #   google-api-python-client
@@ -169,7 +181,7 @@ google-auth-httplib2==0.3.0
     # via
     #   -r requirements-base.in
     #   google-api-python-client
-google-genai==1.63.0
+google-genai==1.64.0
     # via -r requirements-base.in
 googleapis-common-protos==1.72.0
     # via
@@ -209,6 +221,7 @@ idna==3.11
     #   anyio
     #   httpx
     #   requests
+    #   yarl
 iniconfig==2.3.0
     # via pytest
 jinja2==3.1.6
@@ -251,6 +264,10 @@ mkdocs-material==9.7.2
     # via -r requirements-dev.in
 mkdocs-material-extensions==1.3.1
     # via mkdocs-material
+multidict==6.7.1
+    # via
+    #   aiohttp
+    #   yarl
 mypy==1.19.1
     # via -r requirements-dev.in
 mypy-extensions==1.1.0
@@ -301,6 +318,10 @@ prompt-toolkit==3.0.52
     # via
     #   -r requirements-base.in
     #   click-repl
+propcache==0.4.1
+    # via
+    #   aiohttp
+    #   yarl
 proto-plus==1.27.1
     # via
     #   -r requirements-base.in
@@ -439,6 +460,7 @@ types-pyyaml==6.0.12.20250915
 typing-extensions==4.15.0
     # via
     #   -r requirements-base.in
+    #   aiosignal
     #   akismet
     #   anyio
     #   beautifulsoup4
@@ -489,6 +511,8 @@ wheel==0.46.3
     # via
     #   -r requirements-dev.in
     #   pip-tools
+yarl==1.22.0
+    # via aiohttp
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
