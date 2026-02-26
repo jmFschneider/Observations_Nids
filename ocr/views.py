@@ -322,10 +322,7 @@ def verifier_progression(request: HttpRequest) -> JsonResponse:
                         )
         elif status in {'PENDING', 'STARTED'}:
             task_entry.update({'processed': 0, 'total': chunk_total, 'percent': 0})
-            if status == 'STARTED':
-                all_success = False
-            else:
-                all_success = False
+            all_success = False
         else:
             all_success = False
 
