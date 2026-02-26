@@ -19,7 +19,7 @@ from django.shortcuts import render
 
 from observations.decorators import transcription_required
 from ocr.models import TranscriptionOCR
-from ocr.tasks import process_images_production_task
+from ocr.tasks import enqueue_parallel_ocr_tasks
 
 logger = logging.getLogger('ocr')
 
@@ -169,6 +169,7 @@ def lancer_ocr(request: HttpRequest) -> JsonResponse:
     try:
         images_json = request.POST.get('images')
         repertoire = request.POST.get('repertoire', '')
+        parallelism_raw = request.POST.get('parallelism')
 
         if not images_json:
             return JsonResponse({'error': 'Aucune image sélectionnée'}, status=400)
@@ -184,11 +185,33 @@ def lancer_ocr(request: HttpRequest) -> JsonResponse:
             len(image_paths),
             repertoire,
         )
-        task = process_images_production_task.delay(image_paths)
-        request.session['ocr_task_id'] = task.id
+        parallelism: int | None = None
+        if parallelism_raw:
+            try:
+                parallelism = max(1, int(parallelism_raw))
+            except ValueError:
+                parallelism = None
+
+        dispatch = enqueue_parallel_ocr_tasks(image_paths, requested_parallelism=parallelism)
+        task_ids = dispatch['task_ids']
+        chunk_sizes = cast(list[int], dispatch.get('chunks', []))
+        request.session['ocr_task_id'] = task_ids[0] if task_ids else None
+        request.session['ocr_task_ids'] = task_ids
+        request.session['ocr_total_images'] = len(image_paths)
+        request.session['ocr_task_chunks'] = chunk_sizes
 
         return JsonResponse(
-            {'success': True, 'task_id': task.id, 'message': 'Transcription démarrée'}
+            {
+                'success': True,
+                'task_id': task_ids[0] if task_ids else None,
+                'task_ids': task_ids,
+                'chunks': chunk_sizes,
+                'message': (
+                    f"Transcription démarrée ({len(task_ids)} tâche(s) parallèle(s))"
+                    if task_ids
+                    else "Aucune image à traiter"
+                ),
+            }
         )
 
     except Exception as e:
@@ -199,28 +222,162 @@ def lancer_ocr(request: HttpRequest) -> JsonResponse:
 @transcription_required
 def verifier_progression(request: HttpRequest) -> JsonResponse:
     """Suivi de progression Celery."""
-    task_id = request.session.get('ocr_task_id')
-    if not task_id:
+    task_ids = request.session.get('ocr_task_ids')
+    if isinstance(task_ids, str):
+        task_ids = [task_ids]
+    if not task_ids:
+        task_id = request.session.get('ocr_task_id')
+        task_ids = [task_id] if task_id else []
+
+    if not task_ids:
         return JsonResponse({'status': 'NO_TASK'})
 
-    result = AsyncResult(task_id)
-    response: dict[str, Any] = {'status': result.status}
+    total = int(request.session.get('ocr_total_images') or 0)
+    task_chunks = request.session.get('ocr_task_chunks')
+    if not isinstance(task_chunks, list):
+        task_chunks = []
+    processed = 0
+    success_count = 0
+    ignored_count = 0
+    errors: list[dict[str, str]] = []
+    merged_logs: list[dict[str, str]] = []
+    per_task: list[dict[str, Any]] = []
+    has_failure = False
+    all_success = True
+    completed_tasks = 0
+    total_tasks = len(task_ids)
 
-    if result.status == 'PROGRESS':
-        info = cast(dict, result.info)
-        response.update(
+    for index, task_id in enumerate(task_ids):
+        result = AsyncResult(task_id)
+        status = result.status
+        chunk_total = (
+            int(task_chunks[index])
+            if index < len(task_chunks) and isinstance(task_chunks[index], int)
+            else 0
+        )
+        task_entry: dict[str, Any] = {
+            'task_id': task_id,
+            'task_short_id': task_id[:8],
+            'status': status,
+            'processed': 0,
+            'total': chunk_total,
+            'percent': 0,
+        }
+
+        if status in {'FAILURE', 'REVOKED'}:
+            has_failure = True
+            all_success = False
+            failure_message = str(result.result) if result.result else "Erreur inconnue"
+            errors.append({'file': f'task:{task_id[:8]}', 'error': failure_message})
+            task_entry['error'] = failure_message
+            per_task.append(task_entry)
+            continue
+
+        if status == 'SUCCESS':
+            payload = cast(dict[str, Any], result.result) if isinstance(result.result, dict) else {}
+            task_processed = int(payload.get('total', chunk_total))
+            task_total = int(payload.get('total', chunk_total))
+            processed += task_processed
+            success_count += int(payload.get('success', 0))
+            ignored_count += int(payload.get('ignored', 0))
+            task_errors = payload.get('errors', [])
+            if isinstance(task_errors, list):
+                errors.extend(cast(list[dict[str, str]], task_errors))
+            task_entry.update(
+                {
+                    'processed': task_processed,
+                    'total': task_total,
+                    'percent': 100 if task_total else 0,
+                }
+            )
+            completed_tasks += 1
+            per_task.append(task_entry)
+            continue
+
+        all_success = False
+        if status == 'PROGRESS':
+            info = cast(dict[str, Any], result.info) if isinstance(result.info, dict) else {}
+            task_processed = int(info.get('processed', 0))
+            task_total = int(info.get('total', chunk_total))
+            task_percent = int(info.get('percent', 0))
+            processed += task_processed
+            task_entry.update(
+                {
+                    'processed': task_processed,
+                    'total': task_total,
+                    'percent': task_percent,
+                }
+            )
+            task_logs = info.get('logs', [])
+            if isinstance(task_logs, list):
+                for log in task_logs:
+                    if isinstance(log, dict):
+                        message = str(log.get('message', ''))
+                        merged_logs.append(
+                            {
+                                'timestamp': str(log.get('timestamp', '')),
+                                'level': str(log.get('level', 'info')),
+                                'message': f"[{task_id[:8]}] {message}",
+                            }
+                        )
+        elif status in {'PENDING', 'STARTED'}:
+            task_entry.update({'processed': 0, 'total': chunk_total, 'percent': 0})
+            if status == 'STARTED':
+                all_success = False
+            else:
+                all_success = False
+        else:
+            all_success = False
+
+        per_task.append(task_entry)
+
+    merged_logs = merged_logs[-100:]
+    effective_total = max(total, processed, 1)
+    percent = 100 if all_success else min(99, int((processed / effective_total) * 100))
+
+    if has_failure:
+        return JsonResponse(
             {
-                'percent': info.get('percent', 0),
-                'processed': info.get('processed', 0),
-                'total': info.get('total', 0),
-                'logs': info.get('logs', []),
+                'status': 'FAILURE',
+                'percent': percent,
+                'processed': processed,
+                'total': effective_total,
+                'logs': merged_logs,
+                'errors': errors,
+                'per_task': per_task,
+                'completed_tasks': completed_tasks,
+                'total_tasks': total_tasks,
             }
         )
-    elif result.status == 'SUCCESS':
-        response.update(cast(dict, result.result))
-        response['percent'] = 100
 
-    return JsonResponse(response)
+    if all_success:
+        return JsonResponse(
+            {
+                'status': 'SUCCESS',
+                'percent': 100,
+                'processed': effective_total,
+                'total': effective_total,
+                'success': success_count,
+                'ignored': ignored_count,
+                'errors': errors,
+                'per_task': per_task,
+                'completed_tasks': completed_tasks,
+                'total_tasks': total_tasks,
+            }
+        )
+
+    return JsonResponse(
+        {
+            'status': 'PROGRESS',
+            'percent': percent,
+            'processed': processed,
+            'total': effective_total,
+            'logs': merged_logs,
+            'per_task': per_task,
+            'completed_tasks': completed_tasks,
+            'total_tasks': total_tasks,
+        }
+    )
 
 
 @transcription_required

@@ -94,12 +94,24 @@
                         <p class="text-muted">Aucune image sélectionnée</p>
                     </div>
 
+                    <div class="form-check mt-3">
+                        <input class="form-check-input" type="checkbox" id="open-flower-on-start">
+                        <label class="form-check-label small" for="open-flower-on-start">
+                            Ouvrir Flower au lancement
+                        </label>
+                    </div>
+
                     <div id="progress-container" class="mt-4 d-none">
                         <h6>Progression</h6>
                         <div class="progress mb-2">
                             <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
                         </div>
                         <p id="progress-text" class="small text-center">Initialisation...</p>
+                        <p class="small text-center mb-2">
+                            <a href="/flower" target="_blank" rel="noopener noreferrer">Ouvrir Flower dans un nouvel onglet</a>
+                        </p>
+                        <p id="tasks-progress-text" class="small text-muted text-center mb-2 d-none"></p>
+                        <div id="tasks-progress-list" class="small mb-2"></div>
                         <div id="log-container" class="mt-2 d-none">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <small class="text-muted">Journal</small>
@@ -135,6 +147,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressBar = document.getElementById('progress-bar');
     const progressText = document.getElementById('progress-text');
     const progressContainer = document.getElementById('progress-container');
+    const tasksProgressText = document.getElementById('tasks-progress-text');
+    const tasksProgressList = document.getElementById('tasks-progress-list');
+    const openFlowerCheckbox = document.getElementById('open-flower-on-start');
     
     function updateSummary() {
         const count = document.querySelectorAll('.image-checkbox:checked').length;
@@ -163,10 +178,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedImages = Array.from(checkboxes)
             .filter(cb => cb.checked)
             .map(cb => cb.value);
+        let flowerWindow = null;
+        if (openFlowerCheckbox && openFlowerCheckbox.checked) {
+            // Appel direct dans le click handler pour limiter le blocage popup navigateur.
+            flowerWindow = window.open('', '_blank', 'noopener,noreferrer');
+            if (flowerWindow) {
+                flowerWindow.document.write('<p style="font-family:sans-serif;padding:1rem;">Ouverture de Flower...</p>');
+            }
+        }
             
         btnLancer.disabled = true;
         btnLancer.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Traitement...';
         progressContainer.classList.remove('d-none');
+        progressBar.classList.remove('bg-success', 'bg-danger');
+        progressBar.classList.add('progress-bar-animated');
+        progressBar.style.width = '0%';
+        progressText.innerText = 'Initialisation...';
+        const resultsContainer = document.getElementById('results-container');
+        resultsContainer.classList.add('d-none');
+        resultsContainer.innerHTML = '';
+        if (tasksProgressText) tasksProgressText.classList.add('d-none');
+        if (tasksProgressList) tasksProgressList.innerHTML = '';
         
         const formData = new FormData();
         formData.append('images', JSON.stringify(selectedImages));
@@ -180,10 +212,21 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                if (flowerWindow) {
+                    flowerWindow.location.href = '/flower';
+                }
                 pollProgress();
             } else {
                 alert("Erreur: " + data.error);
                 btnLancer.disabled = false;
+                if (flowerWindow) {
+                    flowerWindow.close();
+                }
+            }
+        })
+        .catch(() => {
+            if (flowerWindow) {
+                flowerWindow.close();
             }
         });
     };
@@ -253,6 +296,108 @@ document.addEventListener('DOMContentLoaded', function() {
         container.classList.remove('d-none');
     }
 
+    function updateTasksProgress(data) {
+        if (!tasksProgressText || !tasksProgressList) return;
+        const totalTasks = data.total_tasks || 0;
+        const completedTasks = data.completed_tasks || 0;
+        const tasks = data.per_task || [];
+
+        if (totalTasks > 0) {
+            tasksProgressText.classList.remove('d-none');
+            tasksProgressText.innerText = `Tâches OCR terminées : ${completedTasks} / ${totalTasks}`;
+        }
+
+        if (!Array.isArray(tasks) || tasks.length === 0) return;
+
+        tasksProgressList.innerHTML = tasks.map(task => {
+            const status = task.status || 'PENDING';
+            const percent = Number(task.percent || 0);
+            const processed = Number(task.processed || 0);
+            const total = Number(task.total || 0);
+            const statusClass =
+                status === 'SUCCESS' ? 'text-success' :
+                status === 'FAILURE' || status === 'REVOKED' ? 'text-danger' :
+                status === 'PROGRESS' || status === 'STARTED' ? 'text-primary' : 'text-muted';
+            const errorLabel = task.error ? ` — ${escapeHtml(task.error)}` : '';
+            return `
+                <div class="border rounded p-2 mb-1">
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold">Task ${escapeHtml(task.task_short_id || '')}</span>
+                        <span class="${statusClass}">${escapeHtml(status)}</span>
+                    </div>
+                    <div>${processed}/${total} (${percent}%)${errorLabel}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function showFailureResults(data) {
+        const container = document.getElementById('results-container');
+        const errors = Array.isArray(data.errors) ? data.errors : [];
+        const errorsHtml = errors.length > 0
+            ? `<ul class="list-unstyled mt-2 mb-0 small">
+                ${errors.map(e =>
+                    `<li class="text-danger"><i class="fas fa-times-circle me-1"></i>${escapeHtml((e.file || '').toString())}: ${escapeHtml((e.error || '').toString())}</li>`
+                ).join('')}
+               </ul>`
+            : '<p class="text-muted small mb-0">Aucun détail d’erreur disponible.</p>';
+
+        container.innerHTML = `
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white py-2">
+                    <i class="fas fa-exclamation-triangle me-1" aria-hidden="true"></i> Traitement interrompu
+                </div>
+                <div class="card-body py-3">
+                    <p class="mb-2">Le batch OCR s'est terminé avec erreur.</p>
+                    ${errorsHtml}
+                </div>
+            </div>`;
+        container.classList.remove('d-none');
+    }
+
+    function applyProgressPayload(data, scheduleNextPoll = true) {
+        if (data.status === 'PROGRESS' || data.status === 'SUCCESS') {
+            const percent = data.percent || 0;
+            progressBar.style.width = percent + '%';
+            progressText.innerText = `Traité : ${data.processed || 0} / ${data.total || 0}`;
+
+            if (data.logs) updateLogs(data.logs);
+            updateTasksProgress(data);
+
+            if (data.status === 'SUCCESS') {
+                progressBar.classList.remove('progress-bar-animated');
+                progressBar.classList.remove('bg-danger');
+                progressBar.classList.add('bg-success');
+                progressText.innerHTML = `<strong class="text-success">Terminé !</strong>`;
+                btnLancer.disabled = false;
+                btnLancer.innerHTML = '<i class="fas fa-check me-2"></i> Terminé';
+                showResults(data);
+                return;
+            }
+
+            if (scheduleNextPoll) {
+                setTimeout(pollProgress, 2000);
+            }
+            return;
+        }
+
+        if (data.status === 'FAILURE') {
+            progressBar.classList.remove('progress-bar-animated');
+            progressBar.classList.remove('bg-success');
+            progressBar.classList.add('bg-danger');
+            progressText.innerHTML = `<span class="text-danger">Erreur lors du traitement</span>`;
+            updateTasksProgress(data);
+            showFailureResults(data);
+            btnLancer.disabled = false;
+            btnLancer.innerHTML = '<i class="fas fa-robot me-2"></i> Réessayer';
+            return;
+        }
+
+        if (scheduleNextPoll) {
+            setTimeout(pollProgress, 5000);
+        }
+    }
+
     document.getElementById('btn-clear-log').addEventListener('click', function () {
         document.getElementById('log-content').innerHTML = '';
         displayedLogsCount = 0;
@@ -261,34 +406,29 @@ document.addEventListener('DOMContentLoaded', function() {
     function pollProgress() {
         fetch('{% url "ocr:verifier_progression" %}')
             .then(response => response.json())
-            .then(data => {
-                if (data.status === 'PROGRESS' || data.status === 'SUCCESS') {
-                    const percent = data.percent || 0;
-                    progressBar.style.width = percent + '%';
-                    progressText.innerText = `Traité : ${data.processed || 0} / ${data.total || 0}`;
-
-                    if (data.logs) updateLogs(data.logs);
-
-                    if (data.status === 'SUCCESS') {
-                        progressBar.classList.remove('progress-bar-animated');
-                        progressBar.classList.add('bg-success');
-                        progressText.innerHTML = `<strong class="text-success">Terminé !</strong>`;
-                        btnLancer.innerHTML = '<i class="fas fa-check me-2"></i> Terminé';
-                        showResults(data);
-                        return;
-                    }
-                } else if (data.status === 'FAILURE') {
-                    progressBar.classList.remove('progress-bar-animated');
-                    progressBar.classList.add('bg-danger');
-                    progressText.innerHTML = `<span class="text-danger">Erreur lors du traitement</span>`;
-                    btnLancer.disabled = false;
-                    btnLancer.innerHTML = '<i class="fas fa-robot me-2"></i> Réessayer';
-                    return;
-                }
-                setTimeout(pollProgress, 2000);
-            })
+            .then(data => applyProgressPayload(data, true))
             .catch(() => setTimeout(pollProgress, 5000));
     }
+
+    function restoreProgressOnPageLoad() {
+        fetch('{% url "ocr:verifier_progression" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (!data || data.status === 'NO_TASK') return;
+
+                progressContainer.classList.remove('d-none');
+                btnLancer.disabled = true;
+                btnLancer.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Suivi OCR en cours';
+                applyProgressPayload(data, false);
+
+                if (data.status === 'PROGRESS' || data.status === 'PENDING' || data.status === 'STARTED') {
+                    setTimeout(pollProgress, 2000);
+                }
+            })
+            .catch(() => {});
+    }
+
+    restoreProgressOnPageLoad();
 });
 </script>
 {% endblock %}

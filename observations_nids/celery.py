@@ -24,9 +24,11 @@ app.conf.update(
     task_serializer='json',
     accept_content=['json'],
     result_serializer='json',
+    result_expires=24 * 60 * 60,  # 24h
     timezone='Europe/Paris',
     task_track_started=True,
     task_time_limit=30 * 60,  # 30 minutes
+    task_soft_time_limit=25 * 60,  # 25 minutes
     worker_hijack_root_logger=False,
     # --- Améliorations robustesse ---
     task_acks_late=True,

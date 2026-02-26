@@ -10,11 +10,13 @@ from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from functools import wraps
+from math import ceil
 from typing import Any, ParamSpec, TypeVar, cast
 
 import redis
 from celery import shared_task
 from django.conf import settings
+from django.db.models import Avg
 from django.utils import timezone
 from google import genai
 from PIL import Image
@@ -26,6 +28,90 @@ logger = logging.getLogger('ocr')
 
 P = ParamSpec("P")
 R = TypeVar("R")
+
+DEFAULT_OCR_PARALLEL_TASKS = 4
+MAX_OCR_PARALLEL_TASKS = 8
+MIN_OCR_CHUNK_SIZE = 100
+FALLBACK_SECONDS_PER_IMAGE = 35.0
+TIMEOUT_MARGIN_FACTOR = 1.5
+MIN_CHUNK_TIME_LIMIT_SECONDS = 30 * 60
+MAX_CHUNK_TIME_LIMIT_SECONDS = 8 * 60 * 60
+SOFT_TIME_LIMIT_RATIO = 0.9
+
+
+def _estimer_seconds_par_image() -> float:
+    """Estime un temps moyen/image à partir de l'historique OCR (succès)."""
+    avg_seconds = (
+        TranscriptionOCR.objects.filter(
+            statut='succes',
+            temps_traitement_secondes__isnull=False,
+            temps_traitement_secondes__gt=0,
+        ).aggregate(avg=Avg('temps_traitement_secondes'))['avg']
+    )
+    return float(avg_seconds) if avg_seconds else FALLBACK_SECONDS_PER_IMAGE
+
+
+def _compute_time_limit_seconds(chunk_size: int, seconds_per_image: float) -> int:
+    """Calcule une limite de temps avec marge pour un chunk OCR."""
+    estimated = int(chunk_size * seconds_per_image * TIMEOUT_MARGIN_FACTOR)
+    return max(MIN_CHUNK_TIME_LIMIT_SECONDS, min(estimated, MAX_CHUNK_TIME_LIMIT_SECONDS))
+
+
+def _chunk_image_paths(image_paths_relatifs: list[str], parallel_tasks: int) -> list[list[str]]:
+    """Découpe les images en chunks équilibrés pour traitement parallèle."""
+    total = len(image_paths_relatifs)
+    if total == 0:
+        return []
+
+    tasks = max(1, min(parallel_tasks, total, MAX_OCR_PARALLEL_TASKS))
+    while tasks > 1 and (total / tasks) < MIN_OCR_CHUNK_SIZE:
+        tasks -= 1
+
+    chunk_size = ceil(total / tasks)
+    return [image_paths_relatifs[i : i + chunk_size] for i in range(0, total, chunk_size)]
+
+
+def enqueue_parallel_ocr_tasks(
+    image_paths_relatifs: list[str], requested_parallelism: int | None = None
+) -> dict[str, Any]:
+    """
+    Lance plusieurs tâches OCR en parallèle avec time_limit dynamique par chunk.
+    Retourne les IDs de tâches et les métadonnées de découpage.
+    """
+    if not image_paths_relatifs:
+        return {'task_ids': [], 'chunks': [], 'seconds_per_image': FALLBACK_SECONDS_PER_IMAGE}
+
+    parallelism = requested_parallelism or DEFAULT_OCR_PARALLEL_TASKS
+    chunks = _chunk_image_paths(image_paths_relatifs, parallelism)
+    seconds_per_image = _estimer_seconds_par_image()
+
+    task_ids: list[str] = []
+    chunk_sizes: list[int] = []
+    for chunk in chunks:
+        hard_limit = _compute_time_limit_seconds(len(chunk), seconds_per_image)
+        soft_limit = max(60, min(hard_limit - 30, int(hard_limit * SOFT_TIME_LIMIT_RATIO)))
+
+        task = process_images_production_task.apply_async(
+            args=[chunk],
+            queue='ocr',
+            time_limit=hard_limit,
+            soft_time_limit=soft_limit,
+        )
+        task_ids.append(task.id)
+        chunk_sizes.append(len(chunk))
+
+    logger.info(
+        "OCR: %d image(s) dispatchée(s) en %d tâche(s) (chunks=%s, avg=%.1fs/image)",
+        len(image_paths_relatifs),
+        len(task_ids),
+        chunk_sizes,
+        seconds_per_image,
+    )
+    return {
+        'task_ids': task_ids,
+        'chunks': chunk_sizes,
+        'seconds_per_image': seconds_per_image,
+    }
 
 
 def retry_with_backoff(
