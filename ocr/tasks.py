@@ -41,13 +41,11 @@ SOFT_TIME_LIMIT_RATIO = 0.9
 
 def _estimer_seconds_par_image() -> float:
     """Estime un temps moyen/image à partir de l'historique OCR (succès)."""
-    avg_seconds = (
-        TranscriptionOCR.objects.filter(
-            statut='succes',
-            temps_traitement_secondes__isnull=False,
-            temps_traitement_secondes__gt=0,
-        ).aggregate(avg=Avg('temps_traitement_secondes'))['avg']
-    )
+    avg_seconds = TranscriptionOCR.objects.filter(
+        statut='succes',
+        temps_traitement_secondes__isnull=False,
+        temps_traitement_secondes__gt=0,
+    ).aggregate(avg=Avg('temps_traitement_secondes'))['avg']
     return float(avg_seconds) if avg_seconds else FALLBACK_SECONDS_PER_IMAGE
 
 
