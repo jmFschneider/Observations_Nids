@@ -4,12 +4,6 @@
 #
 #    pip-compile requirements-prod.in
 #
-aiohappyeyeballs==2.6.1
-    # via aiohttp
-aiohttp==3.13.3
-    # via google-genai
-aiosignal==1.4.0
-    # via aiohttp
 akismet==25.10.1
     # via django-helpdesk
 amqp==5.3.1
@@ -28,8 +22,6 @@ asgiref==3.11.1
     # via
     #   -r requirements-base.in
     #   django
-attrs==25.4.0
-    # via aiohttp
 beautifulsoup4==4.14.3
     # via
     #   -r requirements-base.in
@@ -127,10 +119,6 @@ eventlet==0.40.4
     # via -r requirements-base.in
 flower==2.0.1
     # via -r requirements-base.in
-frozenlist==1.8.0
-    # via
-    #   aiohttp
-    #   aiosignal
 geographiclib==2.1
     # via geopy
 geopy==2.4.1
@@ -152,7 +140,7 @@ google-auth-httplib2==0.3.0
     # via
     #   -r requirements-base.in
     #   google-api-python-client
-google-genai==1.64.0
+google-genai==1.65.0
     # via -r requirements-base.in
 googleapis-common-protos==1.72.0
     # via
@@ -194,7 +182,6 @@ idna==3.11
     #   anyio
     #   httpx
     #   requests
-    #   yarl
 jinja2==3.1.6
     # via -r requirements-base.in
 kombu==5.6.2
@@ -211,10 +198,6 @@ markupsafe==3.0.3
     # via
     #   -r requirements-base.in
     #   jinja2
-multidict==6.7.1
-    # via
-    #   aiohttp
-    #   yarl
 mysqlclient==2.2.8
     # via -r requirements-base.in
 oauthlib==3.3.1
@@ -242,10 +225,6 @@ prompt-toolkit==3.0.52
     # via
     #   -r requirements-base.in
     #   click-repl
-propcache==0.4.1
-    # via
-    #   aiohttp
-    #   yarl
 proto-plus==1.27.1
     # via
     #   -r requirements-base.in
@@ -341,7 +320,6 @@ tqdm==4.67.3
 typing-extensions==4.15.0
     # via
     #   -r requirements-base.in
-    #   aiosignal
     #   akismet
     #   anyio
     #   beautifulsoup4
@@ -384,8 +362,6 @@ websockets==15.0.1
     # via google-genai
 whitenoise==6.11.0
     # via -r requirements-prod.in
-yarl==1.22.0
-    # via aiohttp
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
