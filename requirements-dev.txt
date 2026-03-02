@@ -403,7 +403,7 @@ pyyaml==6.0.3
     #   pyyaml-env-tag
 pyyaml-env-tag==1.1
     # via mkdocs
-radicale==3.6.0
+radicale==3.6.1
     # via -r requirements-base.in
 redis==7.2.0
     # via -r requirements-base.in
