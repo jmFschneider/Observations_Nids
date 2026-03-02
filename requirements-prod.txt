@@ -275,7 +275,7 @@ pydantic-core==2.41.5
     # via
     #   -r requirements-base.in
     #   pydantic
-pydantic-settings==2.12.0
+pydantic-settings==2.13.1
     # via -r requirements-base.in
 pyparsing==3.3.2
     # via
