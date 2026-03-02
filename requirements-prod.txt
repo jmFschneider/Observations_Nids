@@ -77,7 +77,7 @@ click-repl==0.3.0
     #   celery
 colorama==0.4.6
     # via -r requirements-base.in
-crispy-bootstrap5==2025.6
+crispy-bootstrap5==2026.3
     # via -r requirements-base.in
 defusedxml==0.7.1
     # via radicale
