@@ -1,3 +1,4 @@
+import unicodedata
 from datetime import datetime
 
 import django_filters
@@ -7,6 +8,14 @@ from django.db.models import Q
 from taxonomy.models import Espece
 
 from .models import EtatCorrection, FicheObservation
+
+
+def _sans_accents(s: str) -> str:
+    """Normalise une chaîne pour comparaison insensible aux accents."""
+    if not s:
+        return ""
+    nfd = unicodedata.normalize("NFD", s)
+    return "".join(c for c in nfd if unicodedata.category(c) != "Mn")
 
 
 class FicheObservationFilter(django_filters.FilterSet):
@@ -25,13 +34,15 @@ class FicheObservationFilter(django_filters.FilterSet):
         label="Observateur",
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom...'}),
     )
-    espece = django_filters.ModelChoiceFilter(
-        queryset=Espece.objects.all().order_by('nom'),
-        field_name='espece',
-        to_field_name='pk',
+    espece = django_filters.CharFilter(
+        method='filter_by_espece',
         label="Espèce",
-        empty_label="Toutes",
-        widget=forms.Select(attrs={'class': 'form-select'}),
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Nom français ou scientifique...',
+            }
+        ),
     )
     commune = django_filters.CharFilter(
         method='filter_by_commune',
@@ -51,6 +62,16 @@ class FicheObservationFilter(django_filters.FilterSet):
         label="Statut de correction",
         empty_label="Tous",
         widget=forms.Select(attrs={'class': 'form-select'}),
+    )
+    correcteur = django_filters.CharFilter(
+        method='filter_by_correcteur',
+        label="Correcteur",
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Nom du correcteur...',
+            }
+        ),
     )
 
     def __init__(self, *args, **kwargs):
@@ -125,6 +146,24 @@ class FicheObservationFilter(django_filters.FilterSet):
         # Si aucun format ne correspond, on ignore ou on cherche en tant que chaîne (peu utile pour une date)
         return queryset
 
+    def filter_by_espece(self, queryset, name, value):
+        """
+        Filtre par nom d'espèce (français ou scientifique), insensible aux accents.
+        Ex. "ecureuil" trouve "Écureuil roux".
+        """
+        if not value or not value.strip():
+            return queryset
+        search_norm = _sans_accents(value.strip()).lower()
+        matching_ids = [
+            e.pk
+            for e in Espece.objects.only("pk", "nom", "nom_scientifique").iterator(chunk_size=200)
+            if search_norm in _sans_accents(e.nom or "").lower()
+            or search_norm in _sans_accents(e.nom_scientifique or "").lower()
+        ]
+        if not matching_ids:
+            return queryset.none()
+        return queryset.filter(espece_id__in=matching_ids)
+
     def filter_by_observateur(self, queryset, name, value):
         return queryset.filter(
             Q(observateur__first_name__icontains=value) | Q(observateur__last_name__icontains=value)
@@ -149,6 +188,21 @@ class FicheObservationFilter(django_filters.FilterSet):
         else:
             # Filtrage standard sur le champ statut
             return queryset.filter(etat_correction__statut=value)
+
+    def filter_by_correcteur(self, queryset, name, value):
+        """
+        Filtre par nom du correcteur (en cours de correction ou ayant validé).
+        Recherche sur prénom et nom, insensible à la casse.
+        """
+        if not value or not value.strip():
+            return queryset
+        term = value.strip()
+        return queryset.filter(
+            Q(etat_correction__en_correction_par__first_name__icontains=term)
+            | Q(etat_correction__en_correction_par__last_name__icontains=term)
+            | Q(etat_correction__validee_par__first_name__icontains=term)
+            | Q(etat_correction__validee_par__last_name__icontains=term)
+        )
 
     class Meta:
         model = FicheObservation

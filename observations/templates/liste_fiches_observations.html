@@ -184,9 +184,15 @@ document.addEventListener('DOMContentLoaded', function() {
             cell.style.backgroundColor = 'rgba(13, 110, 253, 0.16)'; // bleu clair - en édition
         } else if (statut === 'en_cours') {
             if (enCorrectionPar) {
-                cell.style.backgroundColor = 'rgba(255, 193, 7, 0.25)'; // jaune - verrouillée
+                cell.style.backgroundColor = 'rgba(255, 193, 7, 0.45)'; // jaune - verrouillée
             } else if (aEteVerrouille) {
-                cell.style.backgroundColor = 'rgba(255, 159, 67, 0.35)'; // orange - libérée
+                // Même ton orange : fond moyen, texte orange foncé pour contraste
+                cell.style.backgroundColor = 'rgba(255, 159, 67, 0.24)';
+                const textColor = '#a84500';
+                cell.style.setProperty('color', textColor, 'important');
+                cell.querySelectorAll('.badge, .text-warning, .text-muted, small, span').forEach(function(el) {
+                    el.style.setProperty('color', textColor, 'important');
+                });
             } else {
                 cell.style.backgroundColor = 'rgba(108, 117, 125, 0.15)'; // gris clair - disponible
             }
@@ -291,7 +297,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             </th>
                             <th></th> {# Image source #}
                             <th>
-                                {{ filter.form.statut_correction }}
+                                <div>{{ filter.form.statut_correction }}</div>
+                                <div class="mt-1">{{ filter.form.correcteur }}</div>
                             </th>
                             <th></th> {# Actions #}
                         </tr>
@@ -385,24 +392,24 @@ document.addEventListener('DOMContentLoaded', function() {
                             </td>
                             <td>
                                 <div class="d-flex gap-1">
-                                    <a href="{% url 'observations:fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Visualiser</a>
+                                    <a href="{% url 'observations:fiche_observation' fiche.num_fiche %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-sm btn-info">Visualiser</a>
                                     {% if fiche.etat_correction.statut == 'en_edition' or fiche.etat_correction.statut == 'nouveau' %}
                                         {% if user == fiche.observateur or user.role == 'administrateur' %}
-                                            <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-primary">Continuer</a>
+                                            <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-sm btn-primary">Continuer</a>
                                         {% else %}
                                             <button class="btn btn-sm btn-secondary" disabled title="Seul l'auteur peut continuer la saisie">Continuer</button>
                                         {% endif %}
                                     {% elif fiche.etat_correction.statut == 'en_cours' %}
                                         {% if fiche.etat_correction.est_verrouillee %}
                                             {% if user == fiche.etat_correction.en_correction_par or user.role == 'administrateur' %}
-                                                <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-warning">Corriger</a>
+                                                <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-sm btn-warning">Corriger</a>
                                             {% else %}
                                                 <button class="btn btn-sm btn-secondary" disabled title="En correction par {{ fiche.etat_correction.en_correction_par.first_name }} {{ fiche.etat_correction.en_correction_par.last_name }}">
                                                     <i class="fas fa-lock"></i> Verrouillée
                                                 </button>
                                             {% endif %}
                                         {% else %}
-                                            <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-warning">Corriger</a>
+                                            <a href="{% url 'observations:modifier_observation' fiche.num_fiche %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-sm btn-warning">Corriger</a>
                                         {% endif %}
                                     {% endif %}
                                 </div>
@@ -536,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const debouncedSubmit = function() {
         clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(submitForm, 300);
+        debounceTimeout = setTimeout(submitForm, 700);
     };
 
     inputs.forEach(input => {

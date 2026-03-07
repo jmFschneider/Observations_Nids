@@ -98,8 +98,8 @@ class ImportationService:
                         # Les répertoires de l'image sont tout ce qu'il y a entre 'transcription_results'
                         # et l'avant-dernier dossier (le modèle)
                         repertoires_image = parts[1:-2]
-                        # On reconstruit le chemin avec le nouveau préfixe 'images/'
-                        chemin_image_relatif = os.path.join('images', *repertoires_image, nom_image)
+                        # parts[1:-2] contient déjà 'images' comme premier élément
+                        chemin_image_relatif = os.path.join(*repertoires_image, nom_image)
                     else:
                         # Fallback : on cherche dans images/ si c'est une structure simplifiée
                         chemin_image_relatif = os.path.join('images', nom_image)

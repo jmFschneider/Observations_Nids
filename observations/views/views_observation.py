@@ -25,6 +25,9 @@ def fiche_observation_view(request, fiche_id):
     observations = fiche.observations.all() if hasattr(fiche, 'observations') else None
     remarques = fiche.remarques.all() if hasattr(fiche, 'remarques') else None
 
+    # Préserver la query string de la liste pour le bouton "Retour" (page, filtres)
+    return_list_query = request.GET.urlencode()
+
     context = {
         'fiche': fiche,
         'localisation': localisation,
@@ -33,6 +36,7 @@ def fiche_observation_view(request, fiche_id):
         'causes_echec': causes_echec,
         'observations': observations,
         'remarques': remarques,
+        'return_list_query': return_list_query,
     }
     return render(request, 'fiche_observation.html', context)
 

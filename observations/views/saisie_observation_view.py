@@ -156,6 +156,9 @@ def fiche_observation_view(request, fiche_id):
     observations = fiche.observations.all() if hasattr(fiche, 'observations') else None
     remarques = fiche.remarques.all() if hasattr(fiche, 'remarques') else None
 
+    # Préserver la query string de la liste pour le bouton "Retour" (page, filtres)
+    return_list_query = request.GET.urlencode()
+
     context = {
         'fiche': fiche,
         'localisation': localisation,
@@ -164,6 +167,7 @@ def fiche_observation_view(request, fiche_id):
         'causes_echec': causes_echec,
         'observations': observations,
         'remarques': remarques,
+        'return_list_query': return_list_query,
     }
     return render(request, 'fiche_observation.html', context)
 
@@ -661,15 +665,16 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
 
                     # Vérifier si on doit rouvrir la modal des remarques après sauvegarde
                     reopen_remarques = post_data.get('reopen_remarques_modal')
+                    base_url = reverse(
+                        'observations:modifier_observation', kwargs={'fiche_id': fiche.pk}
+                    )
+                    # Préserver la query string (page, filtres liste) pour "Retour à la liste"
+                    query_params = request.GET.copy()
                     if reopen_remarques:
-                        # Rediriger vers la même page avec un paramètre GET pour rouvrir la modal
-                        redirect_url = reverse(
-                            'observations:modifier_observation', kwargs={'fiche_id': fiche.pk}
-                        )
-                        redirect_url += '?reopen_remarques_modal=1'
-                        return redirect(redirect_url)
-
-                    return redirect('observations:modifier_observation', fiche_id=fiche.pk)
+                        query_params['reopen_remarques_modal'] = '1'
+                    if query_params:
+                        base_url = f"{base_url}?{query_params.urlencode()}"
+                    return redirect(base_url)
 
             except Exception as e:
                 logger.exception(f"Erreur lors de la sauvegarde: {e}")
@@ -707,6 +712,9 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
         disable_formset_fields(observation_formset)
         disable_formset_fields(remarque_formset)
 
+    # Préserver la query string de la liste pour "Retour à la liste" (page, filtres)
+    return_list_query = request.GET.urlencode()
+
     context = {
         'fiche_form': fiche_form,
         'localisation_form': localisation_form,
@@ -717,6 +725,7 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
         'remarque_formset': remarque_formset,
         'remarques': remarques,
         'read_only': read_only,
+        'return_list_query': return_list_query,
     }
 
     return render(request, 'saisie/saisie_observation.html', context)
@@ -1008,8 +1017,16 @@ def valider_correction(request, fiche_id):
             )
             return redirect('observations:home')
         elif redirect_option == 'liste':
-            logger.info(f"Redirection vers liste globale après validation de la fiche {fiche_id}")
-            return redirect('observations:liste_fiches_observations')
+            list_url = reverse('observations:liste_fiches_observations')
+            return_list_query = request.POST.get('return_list_query', '').strip()
+            if return_list_query:
+                list_url = f"{list_url}?{return_list_query}"
+            logger.info(
+                "Redirection vers liste après validation de la fiche %s (contexte: %s)",
+                fiche_id,
+                return_list_query or "aucun",
+            )
+            return redirect(list_url)
         else:
             logger.info(f"Redirection vers fiche_observation pour fiche {fiche_id}")
             return redirect('observations:fiche_observation', fiche_id=fiche_id)

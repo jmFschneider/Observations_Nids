@@ -433,6 +433,7 @@ function fermerModalRecherche() {
 
 <form method="post">
     {% csrf_token %}
+    {% if return_list_query %}<input type="hidden" name="return_list_query" value="{{ return_list_query }}">{% endif %}
 
     <!-- Section d'informations générales -->
     <section class="card mb-4">
@@ -1076,9 +1077,19 @@ function fermerModalRecherche() {
                 <a href="{% url 'observations:historique_modifications' fiche_id=fiche_form.instance.pk %}" class="btn btn-info" target="_blank">
                     <i class="fas fa-history"></i> Historique
                 </a>
-                <a href="{% url 'observations:liste_fiches_observations' %}" class="btn btn-secondary" data-check-changes="true">
-                    <i class="fas fa-arrow-left"></i> Retour à la liste
-                </a>
+                <div class="btn-group dropup">
+                    <a href="{% url 'observations:liste_fiches_observations' %}{% if return_list_query %}?{{ return_list_query }}{% endif %}" class="btn btn-secondary" data-check-changes="true">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+                    <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Options de retour</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'observations:liste_fiches_observations' %}{% if return_list_query %}?{{ return_list_query }}{% endif %}" data-check-changes="true">Retour à la liste</a></li>
+                        <li><a class="dropdown-item" href="{% url 'observations:home' %}" data-check-changes="true">Retour vers ma page</a></li>
+                        <li><a class="dropdown-item" href="{% url 'observations:fiche_observation' fiche_id=fiche_form.instance.pk %}" data-check-changes="true">Voir la fiche</a></li>
+                    </ul>
+                </div>
             {% else %}
                 <a href="{% url 'observations:observations_list' %}" class="btn btn-outline-secondary" data-check-changes="true">
                     <i class="fas fa-times"></i> Annuler
