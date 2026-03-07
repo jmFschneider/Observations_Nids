@@ -10,4 +10,5 @@ urlpatterns = [
     path('detail/<int:feedback_id>/', views.feedback_detail, name='detail'),
     path('triage/', views.feedback_triage, name='triage'),
     path('update/<int:feedback_id>/', views.update_feedback, name='update'),
+    path('ocr/', views.ocr_problems, name='ocr_problems'),
 ]

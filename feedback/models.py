@@ -8,6 +8,7 @@ class Feedback(models.Model):
         ("IDEA", "Suggestion / Idée"),
         ("DATA", "Donnée erronée"),
         ("QUESTION", "Question"),
+        ("OCR", "Problème OCR / Prompt Gemini"),
         ("OTHER", "Autre"),
     ]
 
@@ -20,6 +21,7 @@ class Feedback(models.Model):
         ("ARCHIVED", "Archivé"),
     ]
 
+    title = models.CharField(max_length=200, blank=True, verbose_name="Titre")
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

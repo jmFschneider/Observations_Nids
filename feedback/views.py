@@ -102,6 +102,45 @@ def feedback_triage(request):
     return render(request, "feedback/feedback_triage.html", context)
 
 
+@login_required
+def ocr_problems(request):
+    """Liste et création des problèmes OCR / Prompt Gemini"""
+    errors = {}
+    form_data = {}
+
+    if request.method == "POST":
+        title = request.POST.get("title", "").strip()
+        content = request.POST.get("content", "").strip()
+        form_data = {"title": title, "content": content}
+
+        if not title:
+            errors["title"] = "Le titre est obligatoire."
+        if not content or len(content) < 5:
+            errors["content"] = "La description est obligatoire (5 caractères minimum)."
+
+        if not errors:
+            feedback = Feedback.objects.create(
+                user=request.user,
+                title=title,
+                content=content,
+                category="OCR",
+                status="IN_PROGRESS",
+                urgency=3,
+            )
+            return redirect("feedback:detail", feedback_id=feedback.id)
+
+    problems = Feedback.objects.filter(category="OCR").order_by("-last_activity")
+    return render(
+        request,
+        "feedback/ocr_problems.html",
+        {
+            "problems": problems,
+            "errors": errors,
+            "form_data": form_data,
+        },
+    )
+
+
 @user_passes_test(is_admin)
 @require_POST
 def update_feedback(request, feedback_id):

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Problèmes OCR / Prompt Gemini{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-robot text-primary me-2"></i> Problèmes OCR / Prompt Gemini
+        </h1>
+        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#formNouveauProbleme">
+            <i class="fas fa-plus me-1"></i> Nouveau problème
+        </button>
+    </div>
+
+    <!-- Formulaire de création -->
+    <div class="collapse mb-4 {% if errors %}show{% endif %}" id="formNouveauProbleme">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Décrire un nouveau problème</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="ocr-title" class="form-label fw-bold">Titre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control {% if errors.title %}is-invalid{% endif %}"
+                               id="ocr-title" name="title"
+                               value="{{ form_data.title }}"
+                               placeholder="Ex: Tableau Résumé absent sur certaines fiches">
+                        {% if errors.title %}
+                            <div class="invalid-feedback">{{ errors.title }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="ocr-content" class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                        <textarea class="form-control {% if errors.content %}is-invalid{% endif %}"
+                                  id="ocr-content" name="content" rows="5"
+                                  placeholder="Décrivez le problème en détail : comportement observé, fiches concernées, exemples...">{{ form_data.content }}</textarea>
+                        {% if errors.content %}
+                            <div class="invalid-feedback">{{ errors.content }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#formNouveauProbleme">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des problèmes -->
+    {% if problems %}
+        {% for problem in problems %}
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                    <div>
+                        <h5 class="card-title mb-1">
+                            <a href="{% url 'feedback:detail' feedback_id=problem.id %}" class="text-decoration-none text-dark">
+                                {{ problem.title|default:problem.content|truncatechars:80 }}
+                            </a>
+                        </h5>
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-user me-1"></i>{{ problem.user.get_full_name|default:problem.user.username }}
+                            &nbsp;·&nbsp;
+                            <i class="fas fa-clock me-1"></i>{{ problem.created_at|date:"d/m/Y à H:i" }}
+                            &nbsp;·&nbsp;
+                            <i class="fas fa-comments me-1"></i>{{ problem.messages.count }} message{{ problem.messages.count|pluralize }}
+                        </p>
+                        <p class="card-text text-muted small">{{ problem.content|truncatechars:150 }}</p>
+                    </div>
+                    <div class="ms-3 text-end flex-shrink-0">
+                        {% if problem.status == 'NEW' or problem.status == 'READ' %}
+                            <span class="badge bg-danger">Nouveau</span>
+                        {% elif problem.status == 'IN_PROGRESS' %}
+                            <span class="badge bg-warning text-dark">En cours</span>
+                        {% elif problem.status == 'WAITING_USER' %}
+                            <span class="badge bg-info">En attente</span>
+                        {% elif problem.status == 'RESOLVED' %}
+                            <span class="badge bg-success">Résolu</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Archivé</span>
+                        {% endif %}
+                        <div class="mt-2">
+                            <a href="{% url 'feedback:detail' feedback_id=problem.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-comments"></i> Ouvrir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-muted small">
+                Dernière activité : {{ problem.last_activity|date:"d/m/Y à H:i" }}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="fas fa-robot fa-3x mb-3 opacity-25"></i>
+            <p>Aucun problème OCR enregistré pour l'instant.</p>
+            <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#formNouveauProbleme">
+                <i class="fas fa-plus me-1"></i> Créer le premier
+            </button>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
