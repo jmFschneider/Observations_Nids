@@ -1,80 +1,93 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'Observations/css/styles.css' %}">
-    <style>
-        /* Style pour l'affichage séparé de la date et de l'heure en lecture seule */
-        .observation-date-time {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'Observations/css/styles.css' %}">
+<style>
+/* === BARRE D'ACTIONS FLOTTANTE === */
+.floating-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border-top: 2px solid #dee2e6;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 12px 20px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
 
-        .observation-time.time-unknown {
-            background-color: #e9ecef;
-            color: #6c757d;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
+.floating-action-bar.hidden {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+}
 
-        /* === BARRE D'ACTIONS FLOTTANTE === */
-        .floating-action-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
-            border-top: 2px solid #dee2e6;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: center;
-        }
+.floating-action-bar-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
 
-        .floating-action-bar-content {
-            max-width: 1200px;
-            width: 100%;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            justify-content: flex-start; /* Alignement à gauche comme demandé initialement, ou center ? Le précédent était start */
-            flex-wrap: wrap;
-        }
-        
-        /* Pour centrer le contenu si souhaité, changer justify-content ci-dessus */
-        
-        .floating-action-bar .btn {
-            white-space: nowrap;
-            font-size: 0.9rem;
-            padding: 8px 16px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+.floating-action-bar .btn {
+    white-space: nowrap;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .floating-action-bar {
-                padding: 10px;
-            }
-            .floating-action-bar .btn {
-                font-size: 0.85rem;
-                padding: 6px 12px;
-            }
-        }
-    </style>
+.floating-action-bar .btn i {
+    font-size: 0.85rem;
+}
+
+/* Responsive pour petits écrans */
+@media (max-width: 768px) {
+    .floating-action-bar {
+        padding: 10px;
+    }
+
+    .floating-action-bar-content {
+        gap: 6px;
+    }
+
+    .floating-action-bar .btn {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+}
+
+/* Style pour l'affichage séparé de la date et de l'heure */
+.observation-date-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.observation-time.time-unknown {
+    background-color: #e9ecef;
+    color: #6c757d;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
 {% endblock %}
 
-
 {% block content %}
-<div class="header-container" style="margin-bottom: 20px;">
+
+<div class="header-container">
     <div class="header-section">
         <h2>Fiche Observation n°{{ fiche.num_fiche }}</h2>
+
         <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
             {% if fiche.etat_correction.statut == 'valide' %}
                 <span class="badge" style="background-color: #198754; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.9em;">
@@ -139,240 +152,277 @@
     </div>
 </div>
 
-<table class="fiche-table">
-    <tr>
-        <th>Fiche ID</th>
-        <th>Observateur</th>
-        <th>N° perso de fiche</th>
-        <th>Espèce</th>
-        <th>Code GONM</th>
-        <th>Année</th>
-    </tr>
-    <tr>
-        <td>{{ fiche.num_fiche }}</td>
-        <td>{{ fiche.observateur.first_name }} {{ fiche.observateur.last_name }}</td>
-        <td>{% if fiche.numero_personnel %}{{ fiche.numero_personnel }}{% else %}-{% endif %}</td>
-        <td>{{ fiche.espece.nom }}</td>
-        <td>{% if fiche.espece.code_gonm %}{{ fiche.espece.code_gonm }}{% else %}-{% endif %}</td>
-        <td>{{ fiche.annee }}</td>
-    </tr>
-</table>
-
-<div class="lieu">
-   <table class="localisation-table">
-		<tr>
-			<th>Commune</th>
-			<td>
-				{% if localisation.commune_saisie and localisation.commune_saisie != localisation.commune %}
-					{{ localisation.commune_saisie }} → {{ localisation.commune }}
-				{% elif localisation.commune_saisie %}
-					{{ localisation.commune_saisie }}
-				{% else %}
-					{{ localisation.commune }}
-				{% endif %}
-			</td>
-			<th>Département</th>
-			<td>{{ localisation.departement }}</td>
-		</tr>
-		<tr>
-			<th>Lieu-dit</th>
-			<td>{{ localisation.lieu_dit }}</td>
-			<th>Altitude</th>
-			<td>{{ localisation.altitude }}</td>
-		</tr>
-		<tr>
-			<th>Latitude</th>
-			<td>{{ localisation.latitude }}</td>
-			<th>Longitude</th>
-			<td>{{ localisation.longitude }}</td>
-		</tr>
-	</table>
-</div>		
-
-<div class="localisation-container">
-    <!-- Partie gauche : Paysage -->
-    <div class="localisation-left">
-        <div class="section-title">Paysage (200 à 500m)</div>
-        <div class="section-content">{{ localisation.paysage }}</div>
+<!-- Section d'informations générales -->
+<section class="card mb-4">
+    <header class="card-header -tertiary ">
+        <h2 class="mb-0 h5">Informations générales</h2>
+    </header>
+    <div class="card-body">
+        <table class="fiche-table table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col" style="width: 10%;">Fiche ID</th>
+                    <th scope="col" style="width: 40%;">Observateur</th>
+                    <th scope="col" style="width: 12%;">N° perso de fiche</th>
+                    <th scope="col" style="width: 18%;">Espèce</th>
+                    <th scope="col" style="width: 10%;">Code GONM</th>
+                    <th scope="col" style="width: 10%;">Année</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="background-color: #e9ecef; color: #6c757d;">{{ fiche.num_fiche }}</td>
+                    <td>{{ fiche.observateur.first_name }} {{ fiche.observateur.last_name }}</td>
+                    <td>{% if fiche.numero_personnel %}{{ fiche.numero_personnel }}{% else %}-{% endif %}</td>
+                    <td>{{ fiche.espece.nom }}</td>
+                    <td>{% if fiche.espece.code_gonm %}{{ fiche.espece.code_gonm }}{% else %}-{% endif %}</td>
+                    <td>{{ fiche.annee }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-    <!-- Partie droite : Alentours -->
-    <div class="localisation-right">
-        <div class="section-title">Alentours (20 à 50m)</div>
-        <div class="section-content">{{ localisation.alentours }}</div>
-    </div>
-</div>
+</section>
 
-<div class="nid">
-	<!-- Tableau pour les informations du nid -->
-		<h3>Description du Nid</h3>
-	<table class="nid-table">
-		<tr>
-			<th style="width: 25%; text-align: center;">Nid précédent</th>
-			<th style="width: 25%; text-align: center;">Nid suivant</th>
-			<th style="width: 25%; text-align: center;">Hauteur du nid (cm)</th>
-			<th style="width: 25%; text-align: center;">Hauteur du couvert (cm)</th>
-		</tr>
-		<tr>
-			<td style="text-align: center; background-color: #f8f9fa;">
-				{% if fiche.nid.fiche_precedente %}
-					<a href="{% url 'observations:fiche_observation' fiche_id=fiche.nid.fiche_precedente.num_fiche %}" style="color: #0d6efd; text-decoration: none; font-weight: bold;">
-						#{{ fiche.nid.fiche_precedente.num_fiche }}
-					</a>
-				{% else %}
-					<span style="color: #6c757d;">-</span>
-				{% endif %}
-			</td>
-			<td style="text-align: center; background-color: #f8f9fa;">
-				{% if fiche.nids_suivants.exists %}
-					{% for nid_suivant in fiche.nids_suivants.all %}
-						<a href="{% url 'observations:fiche_observation' fiche_id=nid_suivant.fiche.num_fiche %}" style="color: #0d6efd; text-decoration: none; font-weight: bold;">
-							#{{ nid_suivant.fiche.num_fiche }}
-						</a>{% if not forloop.last %}, {% endif %}
-					{% endfor %}
-				{% else %}
-					<span style="color: #6c757d;">-</span>
-				{% endif %}
-			</td>
-			<td style="text-align: center;">{% if fiche.nid.hauteur_nid is not None %}{{ fiche.nid.hauteur_nid }}{% else %}-{% endif %}</td>
-			<td style="text-align: center;">{% if fiche.nid.hauteur_couvert is not None %}{{ fiche.nid.hauteur_couvert }}{% else %}-{% endif %}</td>
-		</tr>
-	</table>
-	<!-- Section Détails du Nid sous forme de cadre -->
-	<div class="section-title">Détails du Nid</div>
-	<div class="section-content">{{ fiche.nid.details_nid }}</div>
-</div>
-<!-- Résumé de l'observation en pleine largeur -->
-        <!-- Tableau des observations -->
-<div class="observations">
-	<h3>Observations</h3>
-	<div class="observations-table">
-		<table>
-			<thead>
-				<tr>
-					<th style="text-align: center;">Date et heure</th>
-					<th style="text-align: center;">Nombre d'œufs</th>
-					<th style="text-align: center;">Nombre de poussins</th>
-					<th>Observations</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for observation in observations %}
-				<tr>
-					<td style="text-align: center;">
-						<span class="observation-date-time" style="justify-content: center;">
-							<span class="observation-date">{{ observation.date_observation|date:"d/m/Y" }}</span>
-							<span class="observation-time {% if not observation.heure_connue %}time-unknown{% endif %}">{{ observation.date_observation|date:"H:i" }}</span>
-						</span>
-					</td>
-					<td style="text-align: center;">
-						{% if observation.nombre_oeufs is not None %}
-							{{ observation.nombre_oeufs }}
-							{% if observation.nombre_oeufs_incertain %}
-								<i class="fas fa-question-circle text-warning" 
-								   title="Estimation incertaine" 
-								   style="margin-left: 3px;"></i>
-							{% endif %}
-						{% elif observation.nombre_oeufs_incertain %}
-							?
-							<i class="fas fa-question-circle text-warning" 
-							   title="Estimation incertaine" 
-							   style="margin-left: 3px;"></i>
-						{% else %}
-							-
-						{% endif %}
-					</td>
-					<td style="text-align: center;">
-						{% if observation.nombre_poussins is not None %}
-							{{ observation.nombre_poussins }}
-							{% if observation.nombre_poussins_incertain %}
-								<i class="fas fa-question-circle text-warning" 
-								   title="Estimation incertaine" 
-								   style="margin-left: 3px;"></i>
-							{% endif %}
-						{% elif observation.nombre_poussins_incertain %}
-							?
-							<i class="fas fa-question-circle text-warning" 
-							   title="Estimation incertaine" 
-							   style="margin-left: 3px;"></i>
-						{% else %}
-							-
-						{% endif %}
-					</td>
-					<td>{{ observation.observations }}</td>
-				</tr>
-				{% empty %}
-				<tr>
-					<td colspan="4">Aucune observation enregistrée.</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	</div>
-</div>
-<div class="resume-container">
-	<table>
-		<thead>
-			<tr>
-				<th>Premier œuf pondu</th>
-				<th>Premier poussin éclos</th>
-				<th>Premier poussin volant</th>
-				<th>Œufs pondus</th>
-				<th>Œufs éclos</th>
-				<th>Œufs non éclos</th>
-				<th>Poussins</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>
-					{% if fiche.resume.premier_oeuf_pondu_jour and fiche.resume.premier_oeuf_pondu_mois %}
-						{{ fiche.resume.premier_oeuf_pondu_jour }}/{{ fiche.resume.premier_oeuf_pondu_mois }}
-					{% else %}
-						Non renseigné
-					{% endif %}
-				</td>
-				<td>
-					{% if fiche.resume.premier_poussin_eclos_jour and fiche.resume.premier_poussin_eclos_mois %}
-						{{ fiche.resume.premier_poussin_eclos_jour }}/{{ fiche.resume.premier_poussin_eclos_mois }}
-					{% else %}
-						Non renseigné
-					{% endif %}
-				</td>
-				<td>
-					{% if fiche.resume.premier_poussin_volant_jour and fiche.resume.premier_poussin_volant_mois %}
-						{{ fiche.resume.premier_poussin_volant_jour }}/{{ fiche.resume.premier_poussin_volant_mois }}
-					{% else %}
-						Non renseigné
-					{% endif %}
-				</td>
-				<td>{{ fiche.resume.nombre_oeufs_pondus }}</td>
-				<td>{{ fiche.resume.nombre_oeufs_eclos }}</td>
-				<td>{{ fiche.resume.nombre_oeufs_non_eclos }}</td>
-				<td>{{ fiche.resume.nombre_poussins }}</td>
-			</tr>
-		</tbody>
-	</table>
-</div>
-<!-- Conteneur pour Causes de l'échec et Remarques -->
+<!-- Section de localisation -->
+<section class="card mb-4">
+    <header class="card-header -subtle text-primary-emphasis ">
+        <h2 class="mb-0 h5">Localisation</h2>
+    </header>
+    <div class="card-body">
+        <div class="lieu">
+            <table class="localisation-table">
+                <tr>
+                    <th>Commune</th>
+                    <td>
+                        {% if localisation.commune_saisie and localisation.commune_saisie != localisation.commune %}
+                            {{ localisation.commune_saisie }} → {{ localisation.commune }}
+                        {% elif localisation.commune_saisie %}
+                            {{ localisation.commune_saisie }}
+                        {% else %}
+                            {{ localisation.commune }}
+                        {% endif %}
+                    </td>
+                    <th>Département</th>
+                    <td>{{ localisation.departement }}</td>
+                </tr>
+                <tr>
+                    <th>Lieu-dit</th>
+                    <td>{{ localisation.lieu_dit }}</td>
+                    <th>Altitude</th>
+                    <td>{{ localisation.altitude }}</td>
+                </tr>
+                <tr>
+                    <th>Latitude</th>
+                    <td>{{ localisation.latitude }}</td>
+                    <th>Longitude</th>
+                    <td>{{ localisation.longitude }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="localisation-container">
+            <div class="localisation-left">
+                <div class="section-title">Paysage (200 à 500m)</div>
+                <div class="section-content">{{ localisation.paysage }}</div>
+            </div>
+
+            <div class="localisation-right">
+                <div class="section-title">Alentours (20 à 50m)</div>
+                <div class="section-content">{{ localisation.alentours }}</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section du nid -->
+<section class="card mb-4">
+    <header class="card-header -subtle text-primary-emphasis ">
+        <h2 class="mb-0 h5">Description du Nid</h2>
+    </header>
+    <div class="card-body">
+        <table class="table table-bordered" style="margin-bottom: 15px;">
+            <thead>
+                <tr>
+                    <th style="width: 25%; text-align: center;">Nid précédent</th>
+                    <th style="width: 25%; text-align: center;">Nid suivant</th>
+                    <th style="width: 25%; text-align: center;">Hauteur du nid (cm)</th>
+                    <th style="width: 25%; text-align: center;">Hauteur du couvert (cm)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="text-align: center; background-color: #f8f9fa; vertical-align: middle;">
+                        {% if fiche.nid.fiche_precedente %}
+                            <a href="{% url 'observations:fiche_observation' fiche_id=fiche.nid.fiche_precedente.num_fiche %}" style="color: #0d6efd; text-decoration: none; font-weight: bold;">
+                                #{{ fiche.nid.fiche_precedente.num_fiche }}
+                            </a>
+                        {% else %}
+                            <span style="color: #6c757d;">-</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center; background-color: #f8f9fa; vertical-align: middle;">
+                        {% if fiche.nids_suivants.exists %}
+                            {% for nid_suivant in fiche.nids_suivants.all %}
+                                <a href="{% url 'observations:fiche_observation' fiche_id=nid_suivant.fiche.num_fiche %}" style="color: #0d6efd; text-decoration: none; font-weight: bold;">
+                                    #{{ nid_suivant.fiche.num_fiche }}
+                                </a>{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <span style="color: #6c757d;">-</span>
+                        {% endif %}
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        {% if fiche.nid.hauteur_nid is not None %}{{ fiche.nid.hauteur_nid }}{% else %}-{% endif %}
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        {% if fiche.nid.hauteur_couvert is not None %}{{ fiche.nid.hauteur_couvert }}{% else %}-{% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-title">Détails du Nid</div>
+        <div class="section-content">{{ fiche.nid.details_nid }}</div>
+    </div>
+</section>
+
+<!-- Section des observations -->
+<section class="card mb-4">
+    <header class="card-header -subtle text-primary-emphasis text-dark">
+        <h2 class="mb-0 h5">Observations</h2>
+    </header>
+    <div class="card-body">
+        <div class="observations-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">Date et heure</th>
+                        <th style="text-align: center;">Nombre d'œufs</th>
+                        <th style="text-align: center;">Nombre de poussins</th>
+                        <th>Observations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for observation in observations %}
+                    <tr>
+                        <td style="text-align: center;">
+                            <span class="observation-date-time" style="justify-content: center;">
+                                <span class="observation-date">{{ observation.date_observation|date:"d/m/Y" }}</span>
+                                <span class="observation-time {% if not observation.heure_connue %}time-unknown{% endif %}">{{ observation.date_observation|date:"H:i" }}</span>
+                            </span>
+                        </td>
+                        <td style="text-align: center;">
+                            {% if observation.nombre_oeufs is not None %}
+                                {{ observation.nombre_oeufs }}
+                                {% if observation.nombre_oeufs_incertain %}
+                                    <i class="fas fa-question-circle text-warning"
+                                       title="Estimation incertaine"
+                                       style="margin-left: 3px;"></i>
+                                {% endif %}
+                            {% elif observation.nombre_oeufs_incertain %}
+                                ?
+                                <i class="fas fa-question-circle text-warning"
+                                   title="Estimation incertaine"
+                                   style="margin-left: 3px;"></i>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td style="text-align: center;">
+                            {% if observation.nombre_poussins is not None %}
+                                {{ observation.nombre_poussins }}
+                                {% if observation.nombre_poussins_incertain %}
+                                    <i class="fas fa-question-circle text-warning"
+                                       title="Estimation incertaine"
+                                       style="margin-left: 3px;"></i>
+                                {% endif %}
+                            {% elif observation.nombre_poussins_incertain %}
+                                ?
+                                <i class="fas fa-question-circle text-warning"
+                                   title="Estimation incertaine"
+                                   style="margin-left: 3px;"></i>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ observation.observations }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">Aucune observation enregistrée.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- Section résumé de l'observation -->
+<section class="card mb-4">
+    <header class="card-header -tertiary ">
+        <h2 class="mb-0 h5">Résumé de l'observation</h2>
+    </header>
+    <div class="card-body">
+        <div class="resume-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Premier œuf pondu</th>
+                        <th>Premier poussin éclos</th>
+                        <th>Premier poussin volant</th>
+                        <th>Œufs pondus</th>
+                        <th>Œufs éclos</th>
+                        <th>Œufs non éclos</th>
+                        <th>Nombre de poussins</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            {% if fiche.resume.premier_oeuf_pondu_jour and fiche.resume.premier_oeuf_pondu_mois %}
+                                {{ fiche.resume.premier_oeuf_pondu_jour }}/{{ fiche.resume.premier_oeuf_pondu_mois }}
+                            {% else %}
+                                <span class="text-muted">Non renseigné</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if fiche.resume.premier_poussin_eclos_jour and fiche.resume.premier_poussin_eclos_mois %}
+                                {{ fiche.resume.premier_poussin_eclos_jour }}/{{ fiche.resume.premier_poussin_eclos_mois }}
+                            {% else %}
+                                <span class="text-muted">Non renseigné</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if fiche.resume.premier_poussin_volant_jour and fiche.resume.premier_poussin_volant_mois %}
+                                {{ fiche.resume.premier_poussin_volant_jour }}/{{ fiche.resume.premier_poussin_volant_mois }}
+                            {% else %}
+                                <span class="text-muted">Non renseigné</span>
+                            {% endif %}
+                        </td>
+                        <td>{% if fiche.resume.nombre_oeufs_pondus is not None %}{{ fiche.resume.nombre_oeufs_pondus }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                        <td>{% if fiche.resume.nombre_oeufs_eclos is not None %}{{ fiche.resume.nombre_oeufs_eclos }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                        <td>{% if fiche.resume.nombre_oeufs_non_eclos is not None %}{{ fiche.resume.nombre_oeufs_non_eclos }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                        <td>{% if fiche.resume.nombre_poussins is not None %}{{ fiche.resume.nombre_poussins }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- Causes de l'échec et Remarques -->
 <div class="row g-4">
     <div class="col-lg-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
                 <div class="section-title mb-3">Description des causes d'échec</div>
                 <div class="form-field">
-                    <table class="table table-borderless mb-0">
-                        <tbody>
-                            <tr>
-                                <td class="p-0">
-                                    {% if fiche.causes_echec.description %}
-                                        {{ fiche.causes_echec.description }}
-                                    {% else %}
-                                        <span class="text-muted">Non renseigné</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    {% if fiche.causes_echec.description %}
+                        {{ fiche.causes_echec.description }}
+                    {% else %}
+                        <span class="text-muted">Non renseigné</span>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -380,30 +430,32 @@
     <div class="col-lg-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-transparent border-0 px-3 pt-3 pb-0">
-                <h5 class="mb-0">Remarques</h5>
+                <span class="form-label fw-bold text-primary-emphasis mb-0">Remarques</span>
             </div>
             <div class="card-body px-0 pt-3 pb-3">
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Date</th>
-                                <th>Remarque</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for remarque in remarques %}
+                <div class="card shadow-sm border-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <td>{{ remarque.date_remarque|date:"d/m/Y H:i" }}</td>
-                                    <td>{{ remarque.remarque }}</td>
+                                    <th style="width: 30%;">Date</th>
+                                    <th>Remarque</th>
                                 </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="2" class="text-center text-muted small py-3">Aucune remarque trouvée.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="align-middle">
+                                {% for remarque in remarques %}
+                                    <tr>
+                                        <td class="text-muted small">{{ remarque.date_remarque|date:"d/m/Y H:i" }}</td>
+                                        <td class="small">{{ remarque.remarque }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted small py-3">Aucune remarque trouvée.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -411,32 +463,37 @@
 </div>
 
 <!-- Barre d'actions flottante -->
-<div class="floating-action-bar">
+<div class="floating-action-bar" id="floating-action-bar">
     <div class="floating-action-bar-content">
-        <!-- Bouton Modifier ou Statut -->
         {% if fiche.etat_correction.statut == 'valide' %}
-            <!-- Fiche validée - Bouton grisé et inactif -->
             <button class="btn btn-secondary" disabled style="cursor: not-allowed;">
                 <i class="fas fa-lock"></i> Fiche validée - Non modifiable
             </button>
         {% else %}
-            <!-- Fiche modifiable -->
             <a href="{% url 'observations:modifier_observation' fiche_id=fiche.num_fiche %}{% if return_list_query %}?{{ return_list_query }}{% endif %}"
                class="btn btn-primary">
                 <i class="fas fa-edit"></i> Modifier
             </a>
         {% endif %}
 
-        <!-- Bouton Historique -->
         <a href="{% url 'observations:historique_modifications' fiche_id=fiche.num_fiche %}"
            class="btn btn-info"
            target="_blank">
             <i class="fas fa-history"></i> Historique
         </a>
-        
-        <a href="{% url 'observations:liste_fiches_observations' %}{% if return_list_query %}?{{ return_list_query }}{% endif %}" class="btn btn-secondary">
-             <i class="fas fa-arrow-left"></i> Retour
-        </a>
+
+        <div class="btn-group dropup">
+            <a href="{% url 'observations:liste_fiches_observations' %}{% if return_list_query %}?{{ return_list_query }}{% endif %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="visually-hidden">Options de retour</span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'observations:liste_fiches_observations' %}{% if return_list_query %}?{{ return_list_query }}{% endif %}">Retour à la liste</a></li>
+                <li><a class="dropdown-item" href="{% url 'observations:home' %}">Retour vers ma page</a></li>
+            </ul>
+        </div>
     </div>
 </div>
 
