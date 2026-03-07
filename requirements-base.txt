@@ -268,7 +268,7 @@ pytz==2025.2
     #   django-helpdesk
     #   flower
     #   vobject
-radicale==3.6.0
+radicale==3.6.1
     # via -r requirements-base.in
 redis==7.2.1
     # via -r requirements-base.in
