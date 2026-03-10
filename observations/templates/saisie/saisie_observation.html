@@ -1181,31 +1181,61 @@ function fermerModalRecherche() {
 
 <!-- Modale de recherche/fusion d'observateurs -->
 <div class="modal" id="modalRechercheObservateur" tabindex="-1" style="display: none; z-index: 2000; position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header -tertiary ">
+            <div class="modal-header -tertiary">
                 <h5 class="modal-title"><i class="fas fa-user-edit"></i> Corriger l'observateur</h5>
-                <button type="button" class="btn-close btn-close-white" onclick="fermerModalObservateur()" aria-label="Fermer"></button>
+                <button type="button" class="btn btn-sm btn-outline-light ms-3"
+                        onclick="document.getElementById('aide-modale-observateur').classList.toggle('d-none')"
+                        title="Afficher ou masquer le mode opératoire complet">
+                    <i class="fas fa-question-circle"></i> Aide
+                </button>
+                <button type="button" class="btn-close btn-close-white ms-2" onclick="fermerModalObservateur()" aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
-                <!-- Section 1: Comparaison OCR / Actuel -->
+
+                <!-- Aide contextuelle (masquée par défaut) -->
+                <div id="aide-modale-observateur" class="alert alert-info d-none mb-3">
+                    <h6 class="alert-heading"><i class="fas fa-map-signs"></i> Mode opératoire — Comment corriger un observateur ?</h6>
+                    <hr class="my-2">
+                    <ol class="mb-0 ps-3" style="line-height: 2.1;">
+                        <li><strong>Vérifiez le contexte</strong> : comparez le nom lu par l'OCR (transcription automatique de la fiche papier) avec l'observateur actuellement enregistré dans la fiche.</li>
+                        <li><strong>Consultez les suggestions</strong> : si des observateurs existants ressemblent à plus de 80 % au nom OCR, ils sont proposés automatiquement. Cliquez sur "Sélectionner" pour en choisir un directement.</li>
+                        <li><strong>Ou recherchez manuellement</strong> : tapez le nom correct dans le champ de saisie. La recherche se lance <em>automatiquement</em> dès 2 caractères — inutile d'appuyer sur Entrée.</li>
+                        <li><strong>Sélectionnez dans les résultats</strong> : cliquez sur <i class="fas fa-check text-success"></i> pour choisir l'observateur correspondant dans le tableau.</li>
+                        <li><strong>Ou créez un nouvel observateur</strong> : si aucun résultat ne correspond, un bouton "Créer" apparaît. Vérifiez bien l'orthographe avant de valider pour éviter les doublons.</li>
+                        <li><strong>Choisissez la portée</strong> : dans la fenêtre de confirmation, indiquez si la correction s'applique uniquement à cette fiche, ou à toutes les fiches de cet observateur (fusion avec suppression de l'entrée en double).</li>
+                    </ol>
+                </div>
+
+                <!-- Section 1 : Vérifier le contexte -->
                 <div class="row mb-3">
+                    <div class="col-12 mb-2">
+                        <span class="badge bg-secondary rounded-pill me-1">①</span>
+                        <strong>Vérifier le contexte</strong>
+                        <small class="text-muted ms-2">Comparez le nom lu par l'OCR et l'observateur actuellement enregistré dans la fiche</small>
+                    </div>
                     <div class="col-md-6">
                         <div class="card h-100 border-warning">
-                            <div class="card-header -subtle text-primary-emphasis text-dark py-2">
+                            <div class="card-header -subtle text-primary-emphasis text-dark py-2"
+                                 title="Nom tel qu'il a été lu automatiquement sur la fiche papier scannée. Peut contenir des erreurs de lecture OCR.">
                                 <i class="fas fa-file-alt"></i> Nom transcrit (OCR)
+                                <i class="fas fa-info-circle text-muted ms-1" style="font-size: 0.8em;" title="Ce nom provient de la lecture automatique de la fiche papier. Il peut être mal orthographié."></i>
                             </div>
                             <div class="card-body py-2">
                                 <p id="nom-ocr-original" class="mb-0 fs-5">
                                     <span class="text-muted"><i class="fas fa-spinner fa-spin"></i> Chargement...</span>
                                 </p>
+                                <small class="text-muted">Tel que lu sur la fiche papier scannée</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="card h-100 border-info">
-                            <div class="card-header -subtle text-primary-emphasis  py-2">
-                                <i class="fas fa-user"></i> Observateur actuel
+                            <div class="card-header -subtle text-primary-emphasis py-2"
+                                 title="Observateur actuellement associé à cette fiche dans la base de données.">
+                                <i class="fas fa-user"></i> Observateur actuel dans la fiche
+                                <i class="fas fa-info-circle text-muted ms-1" style="font-size: 0.8em;" title="C'est l'observateur enregistré en base. 'OCR' signifie qu'il vient d'une transcription automatique, 'Valide' qu'il s'agit d'un compte vérifié."></i>
                             </div>
                             <div class="card-body py-2">
                                 <p id="nom-observateur-actuel" class="mb-0 fs-5"><strong>-</strong></p>
@@ -1215,49 +1245,62 @@ function fermerModalRecherche() {
                     </div>
                 </div>
 
-                <!-- Section 2: Saisie manuelle du nom correct -->
+                <!-- Section 2 : Suggestions automatiques -->
+                <div id="suggestions-automatiques" class="mb-3" style="display:none;">
+                    <div class="mb-2">
+                        <span class="badge bg-success rounded-pill me-1">②</span>
+                        <strong>Suggestions automatiques</strong>
+                        <small class="text-muted ms-2">Ces observateurs ressemblent à plus de 80 % au nom OCR — si l'un correspond, cliquez directement sur "Sélectionner"</small>
+                    </div>
+                    <div id="liste-suggestions-auto"></div>
+                </div>
+
+                <!-- Section 3 : Saisie manuelle -->
                 <div class="card mb-3 border-success">
-                    <div class="card-header -subtle text-primary-emphasis  py-2">
-                        <i class="fas fa-edit"></i> Corriger le nom
+                    <div class="card-header -subtle text-primary-emphasis py-2">
+                        <span class="badge bg-success rounded-pill me-1">③</span>
+                        <i class="fas fa-keyboard"></i> Rechercher ou saisir le nom correct
                     </div>
                     <div class="card-body py-3">
                         <div class="input-group">
                             <input type="text" id="saisie-nom-correct" class="form-control form-control-lg"
-                                   placeholder="Tapez le nom correct (ex: Jean-Marie Martinez)" autocomplete="off">
-                            <button type="button" class="btn btn-success" id="btn-valider-nom" title="Valider ce nom">
-                                <i class="fas fa-check"></i> Valider
+                                   placeholder="Tapez le nom correct (ex: Jean-Marie Martinez)" autocomplete="off"
+                                   title="La recherche se lance automatiquement dès 2 caractères — les résultats s'affichent en temps réel dans le tableau ci-dessous">
+                            <button type="button" class="btn btn-outline-success" id="btn-valider-nom"
+                                    title="Si aucun résultat ne correspond dans le tableau ci-dessous, cliquez ici pour proposer la création d'un nouvel observateur avec ce nom exact">
+                                <i class="fas fa-user-plus"></i> Proposer la création
                             </button>
                         </div>
                         <small class="text-muted mt-1 d-block">
-                            Tapez le nom correct. S'il existe deja, il sera propose ci-dessous. Sinon, un nouvel observateur sera cree.
+                            <i class="fas fa-bolt text-warning"></i>
+                            La recherche se lance <strong>automatiquement</strong> pendant la frappe.
+                            Si aucun résultat ne correspond, utilisez le bouton "Proposer la création".
                         </small>
                     </div>
                 </div>
 
-                <!-- Section 3: Suggestions automatiques -->
-                <div id="suggestions-automatiques" class="mb-3" style="display:none;">
-                    <h6><i class="fas fa-magic text-success"></i> Suggestions automatiques (similarite > 80%)</h6>
-                    <div id="liste-suggestions-auto"></div>
-                </div>
-
-                <!-- Section 4: Resultats de recherche -->
-                <div id="resultats-recherche-observateur">
-                    <h6><i class="fas fa-search"></i> Resultats de recherche</h6>
-                    <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
-                        <table class="table table-striped table-hover table-sm">
-                            <thead class="table-light sticky-top">
+                <!-- Section 4 : Résultats de recherche -->
+                <div id="resultats-recherche-observateur" class="mb-3">
+                    <div class="mb-2">
+                        <span class="badge bg-primary rounded-pill me-1">④</span>
+                        <strong>Résultats de recherche</strong>
+                        <small class="text-muted ms-2">Cliquez sur <i class="fas fa-check text-success"></i> pour sélectionner l'observateur correct</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-sm mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>Nom</th>
-                                    <th>Similarite</th>
-                                    <th>Type</th>
-                                    <th>Fiches</th>
-                                    <th>Action</th>
+                                    <th title="Nom complet de l'observateur dans la base de données">Nom</th>
+                                    <th title="Pourcentage de ressemblance avec le nom recherché, calculé automatiquement">Similarité</th>
+                                    <th title="'OCR' = issu d'une transcription automatique (potentiel doublon) — 'Valide' = compte utilisateur vérifié">Type</th>
+                                    <th title="Nombre total de fiches d'observation associées à cet observateur">Fiches</th>
+                                    <th title="Cliquez sur ✓ pour remplacer l'observateur actuel par celui-ci">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-observateurs">
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">
-                                        Tapez un nom ci-dessus pour rechercher
+                                    <td colspan="5" class="text-center text-muted py-3">
+                                        <i class="fas fa-keyboard me-1"></i> Tapez un nom ci-dessus pour lancer la recherche
                                     </td>
                                 </tr>
                             </tbody>
@@ -1265,22 +1308,36 @@ function fermerModalRecherche() {
                     </div>
                 </div>
 
-                <!-- Section 5: Option creer nouvel observateur -->
-                <div id="section-creer-observateur" class="alert alert-secondary mt-3" style="display: none;">
-                    <div class="d-flex align-items-center justify-content-between">
+                <!-- Section 5 : Créer nouvel observateur -->
+                <div id="section-creer-observateur" class="alert alert-warning mt-2" style="display: none;">
+                    <div class="mb-1">
+                        <span class="badge bg-warning text-dark rounded-pill me-1">⑤</span>
+                        <strong>Aucun observateur correspondant trouvé</strong>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                         <div>
-                            <i class="fas fa-user-plus"></i>
-                            <span>Aucun observateur correspondant trouve.</span>
+                            <i class="fas fa-info-circle text-muted"></i>
+                            <span class="text-muted">Le nom</span>
                             <strong id="nom-a-creer" class="ms-1"></strong>
+                            <span class="text-muted ms-1">n'existe pas encore dans la base.</span>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" id="btn-creer-observateur">
-                            <i class="fas fa-plus"></i> Creer cet observateur
+                        <button type="button" class="btn btn-primary btn-sm" id="btn-creer-observateur"
+                                title="Créer un nouvel observateur avec ce nom exact — il sera immédiatement associé à cette fiche">
+                            <i class="fas fa-plus"></i> Créer cet observateur
                         </button>
                     </div>
+                    <small class="text-muted d-block mt-2">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        Vérifiez l'orthographe avant de créer : cela évite les doublons dans la base.
+                    </small>
                 </div>
+
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="fermerModalObservateur()">Annuler</button>
+                <button type="button" class="btn btn-secondary" onclick="fermerModalObservateur()"
+                        title="Fermer cette fenêtre sans appliquer de modification">
+                    <i class="fas fa-times me-1"></i> Annuler
+                </button>
             </div>
         </div>
     </div>
@@ -1296,27 +1353,36 @@ function fermerModalRecherche() {
             </div>
             <div class="modal-body">
                 <p id="message-fusion"></p>
-                <div class="form-check mb-2">
+                <p class="text-muted" style="font-size: 0.9em;">Choisissez la portée de la correction :</p>
+                <div class="form-check mb-3">
                     <input type="radio" class="form-check-input" id="fusion-toutes-fiches" name="type-fusion" value="toutes" checked>
                     <label class="form-check-label" for="fusion-toutes-fiches">
-                        <strong>Fusionner TOUTES les fiches</strong> (<span id="nombre-fiches-fusion">0</span> fiches)
-                        et supprimer l'ancien observateur
+                        <strong>Fusionner TOUTES les fiches</strong>
+                        <span class="badge bg-secondary ms-1"><span id="nombre-fiches-fusion">0</span> fiche(s)</span>
+                        <div class="text-muted" style="font-size: 0.85em;">
+                            Toutes les fiches de l'ancien observateur seront rattachées au nouveau, et l'entrée en doublon sera supprimée. À privilégier si le nom OCR est un doublon d'un observateur existant.
+                        </div>
                     </label>
                 </div>
                 <div class="form-check">
                     <input type="radio" class="form-check-input" id="fusion-fiche-courante" name="type-fusion" value="courante">
                     <label class="form-check-label" for="fusion-fiche-courante">
-                        Changer uniquement pour cette fiche
+                        <strong>Changer uniquement pour cette fiche</strong>
+                        <div class="text-muted" style="font-size: 0.85em;">
+                            Seule cette fiche est modifiée. L'ancien observateur reste dans la base et ses autres fiches ne sont pas touchées.
+                        </div>
                     </label>
                 </div>
                 <div class="alert alert-info mt-3 mb-0 py-2" style="font-size: 0.85em;">
-                    <i class="fas fa-info-circle"></i> La fusion sera tracee dans l'historique des modifications.
+                    <i class="fas fa-history"></i> La modification sera tracée dans l'historique des modifications.
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="fermerModalConfirmation()">Annuler</button>
-                <button type="button" class="btn btn-warning" id="btn-confirmer-fusion">
-                    <i class="fas fa-check"></i> Confirmer
+                <button type="button" class="btn btn-secondary" onclick="fermerModalConfirmation()"
+                        title="Annuler sans effectuer de modification">Annuler</button>
+                <button type="button" class="btn btn-warning" id="btn-confirmer-fusion"
+                        title="Appliquer la correction selon le choix sélectionné ci-dessus">
+                    <i class="fas fa-check"></i> Confirmer la correction
                 </button>
             </div>
         </div>
