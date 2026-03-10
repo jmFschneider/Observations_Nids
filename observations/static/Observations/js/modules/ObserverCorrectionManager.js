@@ -47,6 +47,27 @@ export default function initObserverCorrectionManager() {
         observateurActuelNom = selectedOption ? selectedOption.text : '';
     }
 
+    // === Indicateur d'étape active ===
+    var sectionsEtapes = [
+        'section-contexte',
+        'suggestions-automatiques',
+        'section-saisie',
+        'resultats-recherche-observateur',
+        'section-creer-observateur'
+    ];
+
+    function setEtapeActive(num) {
+        sectionsEtapes.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.classList.remove('etape-active');
+        });
+        var activeId = sectionsEtapes[num - 1];
+        if (activeId) {
+            var activeEl = document.getElementById(activeId);
+            if (activeEl) activeEl.classList.add('etape-active');
+        }
+    }
+
     // === Utilitaire d'echappement HTML ===
     function escapeHtml(text) {
         if (!text) return '';
@@ -118,6 +139,9 @@ export default function initObserverCorrectionManager() {
         // Afficher info observateur actuel
         document.getElementById('nom-observateur-actuel').innerHTML = '<strong>' + escapeHtml(observateurActuelNom) + '</strong>';
 
+        // Étape 1 active à l'ouverture
+        setEtapeActive(1);
+
         // Charger le nom OCR depuis le JSON
         chargerNomOcr();
 
@@ -179,6 +203,7 @@ export default function initObserverCorrectionManager() {
 
             if (data.success && data.suggestions && data.suggestions.length > 0) {
                 section.style.display = 'block';
+                setEtapeActive(2); // Des suggestions existent → attirer l'attention dessus
                 container.innerHTML = data.suggestions.map(function(obs) {
                     var scorePercent = Math.round(obs.score_similarite * 100);
                     var badgeClass = scorePercent >= 90 ? '-subtle text-primary-emphasis' : '-subtle text-primary-emphasis';
@@ -203,6 +228,7 @@ export default function initObserverCorrectionManager() {
                 }
             } else {
                 section.style.display = 'none';
+                setEtapeActive(3); // Pas de suggestions → guider vers la saisie
                 if (data && data.observateur_actuel) {
                     var typeObs2 = data.observateur_actuel.est_transcription ? 'Transcription OCR' : 'Compte valide';
                     document.getElementById('stats-observateur-actuel').textContent =
@@ -265,12 +291,14 @@ export default function initObserverCorrectionManager() {
             if (sectionCreerObservateur && queryOriginal && queryOriginal.length >= 2) {
                 document.getElementById('nom-a-creer').textContent = '"' + queryOriginal + '"';
                 sectionCreerObservateur.style.display = 'block';
+                setEtapeActive(5); // Aucun résultat → guider vers la création
             }
             return;
         }
 
         // Cacher l option de creation si des resultats existent
         if (sectionCreerObservateur) sectionCreerObservateur.style.display = 'none';
+        setEtapeActive(4); // Des résultats trouvés → guider vers la sélection
 
         tbody.innerHTML = observateurs.map(function(obs) {
             var similarite = '-';
@@ -474,6 +502,7 @@ export default function initObserverCorrectionManager() {
     // Recherche en temps reel pendant la saisie
     if (inputSaisieNom) {
         inputSaisieNom.addEventListener('input', function() {
+            setEtapeActive(3);
             rechercherObservateurs(this.value.trim());
         });
     }

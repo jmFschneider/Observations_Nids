@@ -141,6 +141,19 @@ input.nombre-avec-incertitude {
     border-radius: 3px !important;
     border-color: #ced4da !important;
 }
+
+/* === MODALE CORRECTION OBSERVATEUR - Étape active === */
+.etape-active {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.35);
+    border-radius: 0.375rem;
+    transition: box-shadow 0.4s ease;
+}
+.etape-active > div > .badge:first-child,
+.etape-active > .badge:first-child {
+    transform: scale(1.25);
+    display: inline-block;
+    transition: transform 0.4s ease;
+}
 </style>
 {% endblock %}
 
@@ -1209,7 +1222,7 @@ function fermerModalRecherche() {
                 </div>
 
                 <!-- Section 1 : Vérifier le contexte -->
-                <div class="row mb-3">
+                <div id="section-contexte" class="row mb-3">
                     <div class="col-12 mb-2">
                         <span class="badge bg-secondary rounded-pill me-1">①</span>
                         <strong>Vérifier le contexte</strong>
@@ -1256,7 +1269,7 @@ function fermerModalRecherche() {
                 </div>
 
                 <!-- Section 3 : Saisie manuelle -->
-                <div class="card mb-3 border-success">
+                <div id="section-saisie" class="card mb-3 border-success">
                     <div class="card-header -subtle text-primary-emphasis py-2">
                         <span class="badge bg-success rounded-pill me-1">③</span>
                         <i class="fas fa-keyboard"></i> Rechercher ou saisir le nom correct
