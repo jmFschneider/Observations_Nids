@@ -1198,12 +1198,14 @@ function fermerModalRecherche() {
         <div class="modal-content">
             <div class="modal-header -tertiary">
                 <h5 class="modal-title"><i class="fas fa-user-edit"></i> Corriger l'observateur</h5>
-                <button type="button" class="btn btn-sm btn-outline-light ms-3"
-                        onclick="document.getElementById('aide-modale-observateur').classList.toggle('d-none')"
-                        title="Afficher ou masquer le mode opératoire complet">
-                    <i class="fas fa-question-circle"></i> Aide
-                </button>
-                <button type="button" class="btn-close btn-close-white ms-2" onclick="fermerModalObservateur()" aria-label="Fermer"></button>
+                <div class="d-flex align-items-center gap-2 ms-auto">
+                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                            onclick="document.getElementById('aide-modale-observateur').classList.toggle('d-none')"
+                            title="Afficher ou masquer le mode opératoire complet">
+                        <i class="fas fa-question-circle"></i> Aide
+                    </button>
+                    <button type="button" class="btn-close" onclick="fermerModalObservateur()" aria-label="Fermer"></button>
+                </div>
             </div>
             <div class="modal-body">
 
