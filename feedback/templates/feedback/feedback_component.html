@@ -170,9 +170,9 @@ document.addEventListener('DOMContentLoaded', function() {
         responseDiv.classList.add('d-none');
         btnSubmit.disabled = false;
 
-        // Auto-détection du numéro de fiche depuis l'URL courante (/fiche/42/)
+        // Auto-détection du numéro de fiche depuis l'URL courante (/observations/42/)
         const ficheInput = document.getElementById('feedbackFicheId');
-        const ficheMatch = window.location.pathname.match(/\/fiche\/(\d+)/);
+        const ficheMatch = window.location.pathname.match(/\/observations\/(\d+)/);
         if (ficheMatch) {
             ficheInput.value = ficheMatch[1];
         }
