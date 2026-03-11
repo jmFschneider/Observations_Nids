@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Problèmes techniques OCR & Import{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-tools text-primary me-2"></i> Problèmes techniques
+        </h1>
+        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#formNouveauProbleme">
+            <i class="fas fa-plus me-1"></i> Signaler un problème
+        </button>
+    </div>
+
+    <!-- Formulaire de création -->
+    <div class="collapse mb-4 {% if errors %}show{% endif %}" id="formNouveauProbleme">
+        <div class="card border-primary shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Décrire un nouveau problème</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="technicalProblemForm" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Catégorie -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Type de problème <span class="text-danger">*</span></label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="category" id="cat-ocr" value="OCR"
+                                    {% if form_data.category != 'INGEST' %}checked{% endif %}>
+                                <label class="form-check-label" for="cat-ocr">
+                                    <i class="fas fa-robot text-primary me-1"></i>
+                                    <strong>OCR / Prompt Gemini</strong>
+                                    <small class="d-block text-muted">Mauvaise lecture de la fiche, données mal extraites</small>
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="category" id="cat-ingest" value="INGEST"
+                                    {% if form_data.category == 'INGEST' %}checked{% endif %}>
+                                <label class="form-check-label" for="cat-ingest">
+                                    <i class="fas fa-file-import text-warning me-1"></i>
+                                    <strong>Import / Algorithme</strong>
+                                    <small class="d-block text-muted">Espèce non reconnue, observateur dupliqué, données incorrectes après import</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Titre -->
+                    <div class="mb-3">
+                        <label for="prob-title" class="form-label fw-bold">Titre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control {% if errors.title %}is-invalid{% endif %}"
+                               id="prob-title" name="title"
+                               value="{{ form_data.title }}"
+                               placeholder="Ex : Espèce non reconnue après import, Commune mal géocodée...">
+                        {% if errors.title %}
+                            <div class="invalid-feedback">{{ errors.title }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="prob-content" class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                        <textarea class="form-control {% if errors.content %}is-invalid{% endif %}"
+                                  id="prob-content" name="content" rows="5"
+                                  placeholder="Décrivez le problème en détail : comportement observé, exemples de valeurs, fiches concernées...">{{ form_data.content }}</textarea>
+                        {% if errors.content %}
+                            <div class="invalid-feedback">{{ errors.content }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Fiche de référence -->
+                    <div class="mb-3">
+                        <label for="prob-fiche" class="form-label fw-bold">
+                            Numéro de fiche concernée
+                            <span class="text-muted fw-normal">(recommandé)</span>
+                        </label>
+                        <div class="input-group" style="max-width: 300px;">
+                            <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                            <input type="number" class="form-control {% if errors.fiche_id %}is-invalid{% endif %}"
+                                   id="prob-fiche" name="fiche_id"
+                                   value="{{ form_data.fiche_id }}"
+                                   placeholder="Ex : 42" min="1">
+                            {% if errors.fiche_id %}
+                                <div class="invalid-feedback">{{ errors.fiche_id }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-text" id="fiche-hint">
+                            Si le problème concerne une fiche précise, indiquez son numéro pour faciliter le diagnostic.
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#formNouveauProbleme">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onglets OCR / Ingest -->
+    <ul class="nav nav-pills mb-4" id="techTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link {% if active_tab == 'OCR' %}active{% endif %}"
+                    id="ocr-tab" data-bs-toggle="pill" data-bs-target="#tab-ocr" type="button">
+                <i class="fas fa-robot me-1"></i>
+                OCR / Prompt Gemini
+                <span class="badge bg-secondary ms-1">{{ ocr_problems.count }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link {% if active_tab == 'INGEST' %}active{% endif %}"
+                    id="ingest-tab" data-bs-toggle="pill" data-bs-target="#tab-ingest" type="button">
+                <i class="fas fa-file-import me-1"></i>
+                Import / Algorithme
+                <span class="badge bg-secondary ms-1">{{ ingest_problems.count }}</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- Onglet OCR -->
+        <div class="tab-pane fade {% if active_tab == 'OCR' %}show active{% endif %}" id="tab-ocr">
+            {% include "feedback/includes/technical_problem_list.html" with problems=ocr_problems category="OCR" %}
+        </div>
+        <!-- Onglet Ingest -->
+        <div class="tab-pane fade {% if active_tab == 'INGEST' %}show active{% endif %}" id="tab-ingest">
+            {% include "feedback/includes/technical_problem_list.html" with problems=ingest_problems category="INGEST" %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('technicalProblemForm');
+    const ficheInput = document.getElementById('prob-fiche');
+    const ficheHint = document.getElementById('fiche-hint');
+
+    // Auto-détection de la fiche depuis l'URL de référence (si on vient d'une page fiche)
+    // Format attendu : /observations/42/
+    const ficheMatch = document.referrer.match(/\/observations\/(?:\w+\/)?(\d+)/);
+    if (ficheMatch && !ficheInput.value) {
+        ficheInput.value = ficheMatch[1];
+        ficheHint.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i>Numéro de fiche détecté automatiquement depuis la page précédente.';
+        ficheHint.classList.add('text-success');
+    }
+
+    // Confirmation si la fiche n'est pas renseignée
+    let ficheConfirmed = false;
+    form.addEventListener('submit', function (e) {
+        if (!ficheInput.value.trim() && !ficheConfirmed) {
+            e.preventDefault();
+
+            // Création d'une modale de confirmation légère
+            const existingModal = document.getElementById('ficheConfirmModal');
+            if (existingModal) existingModal.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'ficheConfirmModal';
+            modal.className = 'modal fade';
+            modal.setAttribute('tabindex', '-1');
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning">
+                            <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Fiche de référence manquante</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Vous n'avez pas indiqué de numéro de fiche concernée.</p>
+                            <p class="text-muted small">Cela aide à reproduire et corriger le problème plus rapidement. Avez-vous un numéro de fiche à associer ?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnAddFiche">
+                                <i class="fas fa-edit me-1"></i> Ajouter un numéro
+                            </button>
+                            <button type="button" class="btn btn-primary" id="btnConfirmWithout">
+                                <i class="fas fa-paper-plane me-1"></i> Envoyer sans numéro
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+
+            document.getElementById('btnAddFiche').addEventListener('click', function () {
+                bsModal.hide();
+                ficheInput.focus();
+            });
+
+            document.getElementById('btnConfirmWithout').addEventListener('click', function () {
+                ficheConfirmed = true;
+                bsModal.hide();
+                form.submit();
+            });
+        }
+    });
+
+    // Sélection de l'onglet actif selon le radio choisi lors d'une erreur de formulaire
+    {% if errors and form_data.category %}
+    const activeTab = '{{ form_data.category }}' === 'INGEST' ? 'ingest-tab' : 'ocr-tab';
+    document.getElementById(activeTab)?.click();
+    {% endif %}
+});
+</script>
+{% endblock %}

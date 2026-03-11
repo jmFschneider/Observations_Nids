@@ -5,14 +5,22 @@ from .models import Feedback
 
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
-    list_display = ('created_at', 'user', 'category', 'urgency', 'status', 'ai_summary')
+    list_display = (
+        'created_at',
+        'user',
+        'category',
+        'urgency',
+        'status',
+        'fiche_observation',
+        'ai_summary',
+    )
     list_filter = ('category', 'status', 'urgency', 'created_at')
-    search_fields = ('content', 'user__username', 'ai_summary')
+    search_fields = ('title', 'content', 'user__username', 'ai_summary')
     readonly_fields = ('created_at', 'updated_at', 'ai_summary', 'sentiment', 'category', 'urgency')
 
     fieldsets = (
         ('Information Utilisateur', {'fields': ('user', 'url_source', 'created_at')}),
-        ('Contenu', {'fields': ('content', 'status')}),
+        ('Contenu', {'fields': ('title', 'content', 'status', 'fiche_observation')}),
         (
             'Analyse IA',
             {

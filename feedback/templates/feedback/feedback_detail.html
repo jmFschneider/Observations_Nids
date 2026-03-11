@@ -44,9 +44,9 @@
                             </div>
                         </div>
 
-                        <!-- Ligne 2 : IA Infos -->
+                        <!-- Ligne 2 : IA Infos + Fiche liée -->
                         <div class="row g-3 mt-2">
-                             <div class="col-md-12">
+                             <div class="col-md-8">
                                 <div class="p-2 border rounded bg-white">
                                     <label class="small fw-bold text-muted mb-1"><i class="fas fa-robot me-1"></i> Analyse IA</label>
                                     <div class="d-flex align-items-center flex-wrap gap-3">
@@ -54,6 +54,20 @@
                                         <span class="badge bg-light text-dark border">Sentiment : {{ feedback.sentiment|default:"Neutre" }}</span>
                                         <span class="badge bg-light text-dark border">Urgence : {{ feedback.urgency }}/5</span>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-2 border rounded bg-white h-100">
+                                    <label class="small fw-bold text-muted mb-1"><i class="fas fa-hashtag me-1"></i> Fiche concernée</label>
+                                    {% if feedback.fiche_observation %}
+                                        <div>
+                                            <a href="{% url 'fiche_observation' feedback.fiche_observation.pk %}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-external-link-alt me-1"></i> Fiche n°{{ feedback.fiche_observation.pk }}
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted small">Aucune fiche associée</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

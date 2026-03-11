@@ -24,7 +24,14 @@ def analyze_feedback_with_ai(feedback_content):
         prompt = f"""
         Analyse le retour utilisateur suivant pour une application d'observation de nids d'oiseaux.
         Retourne uniquement un objet JSON valide avec les clés suivantes :
-        - category: une valeur parmi ["BUG", "IDEA", "DATA", "QUESTION", "OTHER"]
+        - category: une valeur parmi ["BUG", "IDEA", "DATA", "QUESTION", "OCR", "INGEST", "OTHER"]
+          * OCR : problème lié à la transcription Gemini (lecture de fiches papier, prompt OCR)
+          * INGEST : problème lié à l'import du JSON (correspondance espèce, observateur, géocodage, données incohérentes après import)
+          * BUG : autre problème technique de l'application
+          * DATA : donnée erronée dans une fiche
+          * IDEA : suggestion d'amélioration
+          * QUESTION : demande d'information
+          * OTHER : autre
         - urgency: un entier de 1 (faible) à 5 (critique)
         - sentiment: un court texte décrivant l'humeur (ex: "Frustré", "Constructif", "Satisfait")
         - summary: un résumé très court (max 10 mots) du problème ou de l'idée.
