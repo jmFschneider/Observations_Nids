@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Auto-détection de la fiche depuis l'URL de référence (si on vient d'une page fiche)
     // Format attendu : /observations/42/
-    const ficheMatch = document.referrer.match(/\/observations\/(\d+)/);
+    const ficheMatch = document.referrer.match(/\/observations\/(?:\w+\/)?(\d+)/);
     if (ficheMatch && !ficheInput.value) {
         ficheInput.value = ficheMatch[1];
         ficheHint.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i>Numéro de fiche détecté automatiquement depuis la page précédente.';

@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Auto-détection du numéro de fiche depuis l'URL courante (/observations/42/)
         const ficheInput = document.getElementById('feedbackFicheId');
-        const ficheMatch = window.location.pathname.match(/\/observations\/(\d+)/);
+        const ficheMatch = window.location.pathname.match(/\/observations\/(?:\w+\/)?(\d+)/);
         if (ficheMatch) {
             ficheInput.value = ficheMatch[1];
         }
