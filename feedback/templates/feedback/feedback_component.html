@@ -191,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 responseDiv.classList.add('alert-success');
                 // Fermeture auto après 2 secondes
                 setTimeout(() => {
+                    if (document.activeElement) document.activeElement.blur();
                     const modalInstance = bootstrap.Modal.getInstance(feedbackModal);
                     modalInstance.hide();
                 }, 2000);

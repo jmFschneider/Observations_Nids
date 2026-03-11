@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -5,6 +7,8 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .models import Feedback, FeedbackMessage
+
+logger = logging.getLogger(__name__)
 
 
 def is_admin(user):
@@ -26,8 +30,11 @@ def submit_feedback(request):
     # Création du feedback
     feedback = Feedback.objects.create(user=request.user, content=content, url_source=url_source)
 
-    # Lancement de l'analyse IA en arrière-plan
-    process_feedback_ai.delay(feedback.id)
+    # Lancement de l'analyse IA en arrière-plan (silencieux si Celery indisponible)
+    try:
+        process_feedback_ai.delay(feedback.id)
+    except Exception:
+        logger.warning("Celery indisponible, analyse IA du feedback %s ignorée.", feedback.id)
 
     return JsonResponse(
         {"status": "success", "message": "Merci ! Votre retour a bien été pris en compte."}
