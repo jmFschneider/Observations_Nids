@@ -103,15 +103,22 @@ def feedback_triage(request):
 
 
 @login_required
-def ocr_problems(request):
-    """Liste et création des problèmes OCR / Prompt Gemini"""
+def technical_problems(request):
+    """Vue unifiée pour les problèmes techniques OCR et Ingest"""
+    from observations.models import FicheObservation  # noqa: PLC0415
+
     errors = {}
     form_data = {}
 
     if request.method == "POST":
         title = request.POST.get("title", "").strip()
         content = request.POST.get("content", "").strip()
-        form_data = {"title": title, "content": content}
+        category = request.POST.get("category", "OCR").strip()
+        fiche_id = request.POST.get("fiche_id", "").strip()
+        form_data = {"title": title, "content": content, "category": category, "fiche_id": fiche_id}
+
+        if category not in ("OCR", "INGEST"):
+            category = "OCR"
 
         if not title:
             errors["title"] = "Le titre est obligatoire."
@@ -119,26 +126,50 @@ def ocr_problems(request):
             errors["content"] = "La description est obligatoire (5 caractères minimum)."
 
         if not errors:
-            feedback = Feedback.objects.create(
+            fiche = None
+            if fiche_id:
+                try:
+                    fiche = FicheObservation.objects.get(pk=int(fiche_id))
+                except (FicheObservation.DoesNotExist, ValueError):
+                    errors["fiche_id"] = f"Fiche n°{fiche_id} introuvable."
+
+        if not errors:
+            Feedback.objects.create(
                 user=request.user,
                 title=title,
                 content=content,
-                category="OCR",
+                category=category,
                 status="IN_PROGRESS",
                 urgency=3,
+                fiche_observation=fiche,
             )
-            return redirect("feedback:detail", feedback_id=feedback.id)
+            return redirect("feedback:technical_problems")
 
-    problems = Feedback.objects.filter(category="OCR").order_by("-last_activity")
+    # Filtre par catégorie (onglets)
+    active_tab = request.GET.get("tab", "OCR")
+    if active_tab not in ("OCR", "INGEST"):
+        active_tab = "OCR"
+
+    ocr_problems = Feedback.objects.filter(category="OCR").order_by("-last_activity")
+    ingest_problems = Feedback.objects.filter(category="INGEST").order_by("-last_activity")
+
     return render(
         request,
-        "feedback/ocr_problems.html",
+        "feedback/technical_problems.html",
         {
-            "problems": problems,
+            "ocr_problems": ocr_problems,
+            "ingest_problems": ingest_problems,
+            "active_tab": active_tab,
             "errors": errors,
             "form_data": form_data,
         },
     )
+
+
+@login_required
+def ocr_problems(request):
+    """Redirige vers la vue unifiée (compatibilité ascendante)"""
+    return redirect("feedback:technical_problems")  # noqa: RET504
 
 
 @user_passes_test(is_admin)

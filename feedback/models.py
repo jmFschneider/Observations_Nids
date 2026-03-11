@@ -9,6 +9,7 @@ class Feedback(models.Model):
         ("DATA", "Donnée erronée"),
         ("QUESTION", "Question"),
         ("OCR", "Problème OCR / Prompt Gemini"),
+        ("INGEST", "Problème d'import / Algorithme"),
         ("OTHER", "Autre"),
     ]
 
@@ -50,6 +51,15 @@ class Feedback(models.Model):
         blank=True, verbose_name="Note / Décision Administrateur (Legacy)"
     )
     is_public_response = models.BooleanField(default=False, verbose_name="Rendre la note publique")
+
+    fiche_observation = models.ForeignKey(
+        "observations.FicheObservation",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="feedbacks",
+        verbose_name="Fiche concernée",
+    )
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True)
