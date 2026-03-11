@@ -63,11 +63,20 @@ export default function initSpeciesSearch() {
         let searchTimeout;
         let currentSearchTerm = '';
 
+        // Fonction utilitaire : normalise une chaîne en supprimant les accents
+        function normalizeString(str) {
+            if (!str) return '';
+            return str
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
+        }
+
         // Fonction pour filtrer et afficher les résultats
         function filterAndDisplayResults(searchTerm) {
-            currentSearchTerm = searchTerm.toLowerCase();
+            currentSearchTerm = searchTerm;
+            const normalizedSearch = normalizeString(searchTerm).toLowerCase();
 
-            if (!currentSearchTerm) {
+            if (!normalizedSearch) {
                 resultsList.style.display = 'none';
                 return;
             }
@@ -75,7 +84,8 @@ export default function initSpeciesSearch() {
             // Filtrer les options (recherche dans le texte complet, pas lettre par lettre)
             const filtered = allOptions.filter(opt => {
                 if (!opt.value) return false; // Ignorer l'option vide
-                return opt.text.toLowerCase().includes(currentSearchTerm);
+                const normalizedText = normalizeString(opt.text).toLowerCase();
+                return normalizedText.includes(normalizedSearch);
             });
 
             // Afficher les résultats
