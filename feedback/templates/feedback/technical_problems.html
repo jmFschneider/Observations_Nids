@@ -155,8 +155,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Confirmation si la fiche n'est pas renseignée
+    let ficheConfirmed = false;
     form.addEventListener('submit', function (e) {
-        if (!ficheInput.value.trim()) {
+        if (!ficheInput.value.trim() && !ficheConfirmed) {
             e.preventDefault();
 
             // Création d'une modale de confirmation légère
@@ -200,9 +201,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             document.getElementById('btnConfirmWithout').addEventListener('click', function () {
+                ficheConfirmed = true;
                 bsModal.hide();
-                // Soumission forcée en contournant l'interception
-                form.removeEventListener('submit', arguments.callee);
                 form.submit();
             });
         }

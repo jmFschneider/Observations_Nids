@@ -19,16 +19,28 @@ def is_admin(user):
 @require_POST
 def submit_feedback(request):
     """Vue pour recevoir le feedback en AJAX"""
+    import contextlib  # noqa: PLC0415
+
+    from observations.models import FicheObservation  # noqa: PLC0415
+
     from .tasks import process_feedback_ai  # noqa: PLC0415
 
     content = request.POST.get("content")
     url_source = request.POST.get("url_source")
+    fiche_id = request.POST.get("fiche_id", "").strip()
 
     if not content or len(content.strip()) < 5:
         return JsonResponse({"status": "error", "message": "Message trop court"}, status=400)
 
+    fiche = None
+    if fiche_id:
+        with contextlib.suppress(FicheObservation.DoesNotExist, ValueError):
+            fiche = FicheObservation.objects.get(pk=int(fiche_id))
+
     # Création du feedback
-    feedback = Feedback.objects.create(user=request.user, content=content, url_source=url_source)
+    feedback = Feedback.objects.create(
+        user=request.user, content=content, url_source=url_source, fiche_observation=fiche
+    )
 
     # Lancement de l'analyse IA en arrière-plan (silencieux si Celery indisponible)
     try:

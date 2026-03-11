@@ -76,8 +76,16 @@
                     {% csrf_token %}
                     <input type="hidden" name="url_source" id="feedback_url_source">
                     <div class="mb-3">
-                        <textarea class="form-control" name="content" id="feedbackContent" rows="4" 
+                        <textarea class="form-control" name="content" id="feedbackContent" rows="4"
                                   placeholder="Dites-nous tout..." required minlength="5"></textarea>
+                    </div>
+                    <div class="mb-3" id="feedbackFicheWrapper">
+                        <label for="feedbackFicheId" class="form-label small text-muted">
+                            <i class="fas fa-hashtag me-1"></i>Numéro de fiche concernée
+                            <span class="fw-normal">(si applicable — aide à l'analyse)</span>
+                        </label>
+                        <input type="number" class="form-control form-control-sm" name="fiche_id"
+                               id="feedbackFicheId" placeholder="Ex : 42" min="1">
                     </div>
                     <div id="feedbackResponse" class="alert d-none"></div>
                     <div class="d-grid">
@@ -161,6 +169,13 @@ document.addEventListener('DOMContentLoaded', function() {
         feedbackForm.reset();
         responseDiv.classList.add('d-none');
         btnSubmit.disabled = false;
+
+        // Auto-détection du numéro de fiche depuis l'URL courante (/fiche/42/)
+        const ficheInput = document.getElementById('feedbackFicheId');
+        const ficheMatch = window.location.pathname.match(/\/fiche\/(\d+)/);
+        if (ficheMatch) {
+            ficheInput.value = ficheMatch[1];
+        }
     });
 
     // Envoi AJAX
