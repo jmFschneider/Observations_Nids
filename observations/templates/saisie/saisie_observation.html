@@ -1066,7 +1066,7 @@ function fermerModalRecherche() {
                 <div class="btn-group dropup">
                     <button type="submit"
                             class="btn btn-primary"
-                            onclick="document.getElementById('redirect-after-save').value=''; return confirm('Voulez-vous vraiment enregistrer les modifications ?');">
+                            onclick="document.getElementById('redirect-after-save').value='';">
                         <i class="fas fa-save"></i> Enregistrer
                     </button>
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
@@ -1076,14 +1076,14 @@ function fermerModalRecherche() {
                         <li>
                             <button type="submit"
                                     class="dropdown-item"
-                                    onclick="document.getElementById('redirect-after-save').value='{% url 'observations:liste_fiches_observations' %}{% if return_list_query %}?{{ return_list_query }}{% endif %}'; return confirm('Voulez-vous vraiment enregistrer les modifications ?');">
+                                    onclick="document.getElementById('redirect-after-save').value='{% url 'observations:liste_fiches_observations' %}{% if return_list_query %}?{{ return_list_query }}{% endif %}';">
                                 Enregistrer & Retour à la liste
                             </button>
                         </li>
                         <li>
                             <button type="submit"
                                     class="dropdown-item"
-                                    onclick="document.getElementById('redirect-after-save').value='{% url 'observations:home' %}'; return confirm('Voulez-vous vraiment enregistrer les modifications ?');">
+                                    onclick="document.getElementById('redirect-after-save').value='{% url 'observations:home' %}';">
                                 Enregistrer & Retour à l'accueil
                             </button>
                         </li>
