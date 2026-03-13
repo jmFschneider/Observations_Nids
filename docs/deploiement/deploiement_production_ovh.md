@@ -144,14 +144,34 @@ sudo iptables -t nat -A POSTROUTING -s 172.18.0.0/16 -o ens3 -j MASQUERADE
 sudo ip route add default via 135.125.72.1 dev ens3 table 201
 sudo ip rule add from 172.18.0.0/16 table 201 pref 101
 
-# 4. Rendre la configuration persistante au redémarrage
+# 4. Sauvegarder les règles iptables
 sudo apt install iptables-persistent -y
 sudo netfilter-persistent save
-echo "ip route add default via 135.125.72.1 dev ens3 table 200" | sudo tee -a /etc/rc.local
-echo "ip rule add from 172.17.0.0/16 table 200 pref 100" | sudo tee -a /etc/rc.local
-echo "ip route add default via 135.125.72.1 dev ens3 table 201" | sudo tee -a /etc/rc.local
-echo "ip rule add from 172.18.0.0/16 table 201 pref 101" | sudo tee -a /etc/rc.local
+
+# 5. Persister les règles de routage (ip route / ip rule) dans /etc/rc.local
+sudo nano /etc/rc.local
+```
+
+Contenu de `/etc/rc.local` (remplacer le gateway par celui de `ens3`) :
+```bash
+#!/bin/bash
+# Routage politique pour Docker — forcer le trafic via ens3 (interface publique OVH)
+
+# Table 200 : docker0 (172.17.0.0/16 — build Docker)
+ip route replace default via 135.125.72.1 dev ens3 table 200
+ip rule add from 172.17.0.0/16 lookup 200 pref 100 2>/dev/null || true
+
+# Table 201 : br-* réseau Docker prod (172.18.0.0/16 — trafic runtime)
+ip route replace default via 135.125.72.1 dev ens3 table 201
+ip rule add from 172.18.0.0/16 lookup 201 pref 101 2>/dev/null || true
+
+exit 0
+```
+
+```bash
 sudo chmod +x /etc/rc.local
+# Tester
+sudo /etc/rc.local && echo "OK"
 ```
 
 **Vérifier que le build peut accéder à Internet :**
@@ -233,7 +253,7 @@ ALLOWED_HOSTS='["observation-nids.meteo-poelley50.fr","localhost"]'
 
 > **Important** : obtenir le certificat **avant** de démarrer le stack (Nginx doit être arrêté,
 > le port 80 doit être libre). Utiliser `certbot` installé sur l'hôte, pas via Docker
-> (les conteneurs ont un problème de connectivité IPv6 sortante).
+> (les conteneurs ont un problème de connectivité IPv6 sortante sur OVH).
 
 ```bash
 sudo apt install certbot -y
@@ -267,8 +287,17 @@ bash docker/scripts/setup-phpmyadmin-auth.sh
 
 Le script demande un **nom d'utilisateur** et un **mot de passe** — credentials propres
 à la Basic Auth Nginx, indépendants de tout autre compte (Linux, Django, MariaDB).
+**Retenir ces credentials** : ils seront demandés à chaque accès phpMyAdmin.
 
 Le fichier `docker/nginx/auth/.htpasswd` est créé localement (non commité sur GitHub).
+
+**Vérifier les permissions du fichier** (nginx doit pouvoir le lire) :
+```bash
+ls -la /opt/observations_nids/docker/nginx/auth/.htpasswd
+# Doit afficher : -rw-r--r-- (644)
+# Si 600, corriger avec :
+sudo chmod 644 /opt/observations_nids/docker/nginx/auth/.htpasswd
+```
 
 ---
 
@@ -311,10 +340,9 @@ sudo iptables -t nat -A POSTROUTING -s 172.18.0.0/16 -o ens3 -j MASQUERADE
 sudo ip route add default via 135.125.72.1 dev ens3 table 201
 sudo ip rule add from 172.18.0.0/16 table 201 pref 101
 
-# Sauvegarder
+# Sauvegarder les règles iptables
 sudo netfilter-persistent save
-echo "ip route add default via 135.125.72.1 dev ens3 table 201" | sudo tee -a /etc/rc.local
-echo "ip rule add from 172.18.0.0/16 table 201 pref 101" | sudo tee -a /etc/rc.local
+# Puis ajouter les règles ip route/ip rule dans /etc/rc.local (voir section 1)
 ```
 
 ### Vérification
@@ -358,7 +386,37 @@ bash /opt/observations_nids/docker/scripts/disable-phpmyadmin.sh
 
 ---
 
-## 7. Accès à Flower (monitoring Celery)
+## 7. Import des données depuis le pilote
+
+Pour migrer la base de données depuis l'environnement pilote :
+
+**Export depuis le pilote** (sur la machine pilote) :
+```bash
+docker compose exec db mysqldump -u root -p<DB_ROOT_PASSWORD_PILOTE> <DB_NAME_PILOTE> > dump_pilote.sql
+```
+
+**Import via phpMyAdmin** (le plus simple) :
+1. Activer phpMyAdmin (`enable-phpmyadmin.sh`)
+2. Se connecter à phpMyAdmin
+3. Sélectionner la base `observations_nids` dans la colonne de gauche
+4. Onglet **Importer** → choisir le fichier `.sql` → Go
+
+**Import en ligne de commande** (pour les gros fichiers) :
+```bash
+docker compose -f docker/docker-compose.prod.yml --env-file .env.prod exec -T db \
+  mysql -u root -p${DB_ROOT_PASSWORD} observations_nids \
+  < dump_pilote.sql
+```
+
+Vérifier après import :
+```bash
+docker compose -f docker/docker-compose.prod.yml --env-file .env.prod exec web \
+  python manage.py migrate --check
+```
+
+---
+
+## 8. Accès à Flower (monitoring Celery)
 
 Flower n'est pas exposé publiquement. Accès via tunnel SSH depuis le poste admin :
 
@@ -371,10 +429,10 @@ ssh -L 5555:localhost:5555 ubuntu@[IP-OVH]
 
 ---
 
-## 8. Renouvellement automatique SSL
+## 9. Renouvellement automatique SSL
 
 ```bash
-crontab -e
+sudo crontab -e
 ```
 
 Ajouter (renouvellement chaque lundi à 3h du matin) :
@@ -385,11 +443,11 @@ Ajouter (renouvellement chaque lundi à 3h du matin) :
 
 ---
 
-## 9. Mises à jour de l'application
+## 10. Mises à jour de l'application
 
 ```bash
 cd /opt/observations_nids
-git pull
+sudo git pull
 docker compose -f docker/docker-compose.prod.yml --env-file .env.prod build web celery_worker celery_beat
 docker compose -f docker/docker-compose.prod.yml --env-file .env.prod up -d
 docker compose -f docker/docker-compose.prod.yml --env-file .env.prod logs -f web
@@ -400,7 +458,7 @@ docker compose -f docker/docker-compose.prod.yml --env-file .env.prod logs -f we
 
 ---
 
-## 10. Sauvegarde de la base de données
+## 11. Sauvegarde de la base de données
 
 ```bash
 # Créer un dump SQL
@@ -416,9 +474,9 @@ docker compose -f docker/docker-compose.prod.yml --env-file .env.prod exec -T db
 
 ---
 
-## 11. Snapshot OVH (sauvegarde serveur)
+## 12. Snapshot OVH (sauvegarde serveur)
 
-1. Manager OVH → Public Cloud → Instances → **Créer un snapshot**
+1. Manager OVH → Public Cloud → Instances → menu `...` (trois points) à côté de l'instance → **Créer un snapshot** (ou "Créer un instantané")
 2. Le snapshot conserve le système complet (Docker, données, config, règles iptables)
 3. Pour restaurer : créer une nouvelle instance depuis le snapshot
 
@@ -426,7 +484,7 @@ docker compose -f docker/docker-compose.prod.yml --env-file .env.prod exec -T db
 
 ---
 
-## 12. Commandes utiles
+## 13. Commandes utiles
 
 Alias pratique à ajouter dans `~/.bashrc` :
 
@@ -459,12 +517,17 @@ dcp down && dcp up -d                     # Redémarrage complet
 - [ ] Fichier `.env.prod` complété (`ALLOWED_HOSTS` inclut `localhost`)
 - [ ] Certificat SSL obtenu (`sudo certbot certonly --standalone ...`)
 - [ ] Credentials phpMyAdmin créés (`setup-phpmyadmin-auth.sh`)
+- [ ] Permissions `.htpasswd` vérifiées (644)
 - [ ] Stack construit (`docker compose ... --env-file .env.prod build`)
 - [ ] Stack démarré (`docker compose ... --env-file .env.prod up -d`)
 - [ ] Correction réseau Docker — Problème 2 (bridge `br-*`, FORWARD iptables)
-- [ ] Règles iptables sauvegardées (`netfilter-persistent save` + `/etc/rc.local`)
+- [ ] Règles iptables sauvegardées (`netfilter-persistent save`)
+- [ ] Routage persisté dans `/etc/rc.local` (testé avec `sudo /etc/rc.local && echo OK`)
+- [ ] Alias `dcp` configuré dans `~/.bashrc`
 - [ ] Application accessible en HTTPS (cadenas dans le navigateur)
-- [ ] Cron renouvellement SSL configuré
+- [ ] Données importées depuis le pilote
+- [ ] Cron renouvellement SSL configuré (`sudo crontab -e`)
+- [ ] phpMyAdmin testé et désactivé après usage (`disable-phpmyadmin.sh`)
 - [ ] Snapshot OVH de l'état initial créé
 
 ---
@@ -543,9 +606,33 @@ sudo certbot certonly --standalone \
 docker compose -f docker/docker-compose.prod.yml --env-file .env.prod start nginx
 ```
 
-### Erreur 502 sur /phpmyadmin/
+### Erreur 500 sur /phpmyadmin/ au chargement
 
-phpMyAdmin n'est pas démarré — comportement normal quand désactivé.
+Deux causes possibles :
+
+**Cause 1 — Permissions `.htpasswd`** : le fichier doit être lisible par nginx (644, pas 600).
+```bash
+ls -la /opt/observations_nids/docker/nginx/auth/.htpasswd
+sudo chmod 644 /opt/observations_nids/docker/nginx/auth/.htpasswd
+dcp exec nginx nginx -s reload
+```
+
+**Cause 2 — phpMyAdmin non démarré** : comportement normal quand désactivé (retourne 502).
+```bash
+bash /opt/observations_nids/docker/scripts/enable-phpmyadmin.sh
+```
+
+### phpMyAdmin : "Access denied" après le login MariaDB
+
+`PMA_PASSWORD` est vide — le container a été démarré sans `--env-file .env.prod`.
+Recréer le container :
+```bash
+docker stop observations_phpmyadmin && docker rm observations_phpmyadmin
+docker compose -f /opt/observations_nids/docker/docker-compose.prod.yml \
+  --env-file /opt/observations_nids/.env.prod --profile admin up -d phpmyadmin
+```
+
+Ou simplement relancer le script (qui inclut maintenant `--env-file`) :
 ```bash
 bash /opt/observations_nids/docker/scripts/enable-phpmyadmin.sh
 ```
