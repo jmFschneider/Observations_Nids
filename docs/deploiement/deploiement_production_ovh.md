@@ -25,12 +25,30 @@ MariaDB / Redis / Celery  (réseau Docker interne)
 
 ---
 
+## Authentification — Vue d'ensemble
+
+Le système utilise plusieurs couches d'authentification indépendantes :
+
+| Service | Couche | Credentials |
+|---------|--------|-------------|
+| SSH serveur | Clé SSH | Clé privée `~/.ssh/id_ed25519` sur le poste admin |
+| Application Django | Login Django | Compte créé dans l'application |
+| Admin Django `/admin/` | Login Django | Compte superuser (`DJANGO_SUPERUSER_*` dans `.env.prod`) |
+| phpMyAdmin `/phpmyadmin/` | **1. HTTP Basic Auth** | Login/mdp choisi lors de `setup-phpmyadmin-auth.sh` |
+| phpMyAdmin (interface) | **2. Login MariaDB** | `root` / `DB_ROOT_PASSWORD` du `.env.prod` |
+| Flower (SSH tunnel) | Tunnel SSH | Clé SSH du poste admin |
+
+> **phpMyAdmin = double authentification** : il faut passer la Basic Auth Nginx (premier écran navigateur),
+> puis saisir les credentials MariaDB dans l'interface phpMyAdmin.
+
+---
+
 ## Prérequis
 
 - Instance OVH Ubuntu 22.04 LTS (B3-8 ou équivalent : 2 vCores, 8 Go RAM recommandés)
 - Ports 22, 80, 443 ouverts dans le groupe de sécurité OVH
 - Domaine pointant vers l'IP publique de l'instance (enregistrement A dans Hostinger)
-- Docker installé sur l'instance (voir section Installation)
+- Docker installé sur l'instance (voir section ci-dessous)
 - Clé SSH configurée sur le poste de développement
 
 ---
@@ -62,8 +80,7 @@ docker compose version
 ### Création des répertoires
 
 ```bash
-sudo mkdir -p /opt/observations_nids/media
-sudo mkdir -p /opt/observations_nids/logs
+sudo mkdir -p /opt/observations_nids/media /opt/observations_nids/logs
 sudo chown -R ubuntu:ubuntu /opt/observations_nids
 ```
 
@@ -74,21 +91,32 @@ sudo chown -R ubuntu:ubuntu /opt/observations_nids
 ### Cloner le dépôt
 
 ```bash
-cd /opt/observations_nids
-git clone https://github.com/jmFschneider/Observations_Nids.git .
+# Cloner depuis /opt (pas depuis /opt/observations_nids)
+cd /opt
+sudo git clone https://github.com/jmFschneider/Observations_Nids.git observations_nids
+sudo chown -R ubuntu:ubuntu /opt/observations_nids
+mkdir -p /opt/observations_nids/media /opt/observations_nids/logs
 ```
+
+> **Attention** : cloner depuis `/opt` avec le nom de destination explicite `observations_nids`.
+> Ne pas cloner depuis l'intérieur du répertoire `/opt/observations_nids/` (erreur "not an empty directory").
 
 ### Créer le fichier de configuration
 
 ```bash
-cp docker/.env.prod.example .env.prod
-nano .env.prod
+cp /opt/observations_nids/docker/.env.prod.example /opt/observations_nids/.env.prod
+nano /opt/observations_nids/.env.prod
+```
+
+Générer une `SECRET_KEY` :
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(50))"
 ```
 
 **Variables à renseigner obligatoirement :**
 
 ```env
-SECRET_KEY=           # Générer : python3 -c "import secrets; print(secrets.token_urlsafe(50))"
+SECRET_KEY=           # Clé secrète Django (générée ci-dessus)
 DB_PASSWORD=          # Mot de passe fort pour l'utilisateur BDD
 DB_ROOT_PASSWORD=     # Mot de passe root MariaDB (très fort)
 DJANGO_SUPERUSER_PASSWORD=   # Mot de passe admin Django
@@ -97,41 +125,57 @@ EMAIL_HOST_USER=      # Compte SMTP Brevo
 EMAIL_HOST_PASSWORD=  # Mot de passe SMTP Brevo
 ```
 
-**Variables déjà pré-remplies pour la production :**
+**Variables pré-remplies dans le template :**
 - `DEBUG=False`
 - `SESSION_COOKIE_SECURE=True`
 - `CSRF_COOKIE_SECURE=True`
-- `ALLOWED_HOSTS='["observation-nids.meteo-poelley50.fr"]'`
-- `CSRF_TRUSTED_ORIGINS='["https://observation-nids.meteo-poelley50.fr"]'`
+- `ALLOWED_HOSTS` et `CSRF_TRUSTED_ORIGINS` avec le domaine production
+
+> Toutes les variables `DB_*`, `DJANGO_*`, etc. du `.env.prod` sont lues directement
+> par `docker-compose.prod.yml` — pas besoin de modifier le `.yml`.
 
 ---
 
 ## 3. Certificat SSL (Let's Encrypt)
 
-À effectuer **avant** de démarrer le stack complet.
-Le port 80 doit être libre (Nginx pas encore démarré).
+> **Important** : utiliser `certbot` installé directement sur le serveur (pas via Docker).
+> Les conteneurs Docker ont un problème de connectivité IPv6 sortante qui empêche
+> d'atteindre les serveurs Let's Encrypt depuis un conteneur.
 
 ```bash
-cd /opt/observations_nids
-bash docker/scripts/init-ssl.sh
+sudo apt install certbot -y
+sudo certbot certonly --standalone \
+  -d observation-nids.meteo-poelley50.fr \
+  --email admin@meteo-poelley50.fr \
+  --agree-tos --no-eff-email
 ```
 
-Le script demande confirmation, puis obtient le certificat via certbot.
-Les certificats sont stockés dans `/etc/letsencrypt/`.
+Les certificats sont placés dans `/etc/letsencrypt/live/observation-nids.meteo-poelley50.fr/` :
+```
+cert.pem       # Certificat
+chain.pem      # Chaîne intermédiaire
+fullchain.pem  # Certificat + chaîne (utilisé par Nginx)
+privkey.pem    # Clé privée
+```
 
-> **En cas d'erreur "port 80 already in use"** : vérifier qu'aucun service n'écoute sur :80 avec `sudo ss -tlnp | grep :80`.
+Ces fichiers appartiennent à `root` — c'est normal. Le conteneur Nginx tourne en `root`
+en interne et peut les lire via le volume mount `/etc/letsencrypt`.
 
 ---
 
 ## 4. Configuration des credentials phpMyAdmin
 
-À effectuer une seule fois, avant le premier démarrage :
+À effectuer une seule fois avant le premier démarrage :
 
 ```bash
+cd /opt/observations_nids
 bash docker/scripts/setup-phpmyadmin-auth.sh
 ```
 
-Le script crée le fichier `docker/nginx/auth/.htpasswd` avec le login/mot de passe choisi.
+Le script demande un **nom d'utilisateur** et un **mot de passe** — ce sont des credentials
+propres à la Basic Auth Nginx, indépendants de tout autre compte (Linux, Django, MariaDB).
+
+Le fichier `docker/nginx/auth/.htpasswd` est créé localement (non commité sur GitHub).
 
 ---
 
@@ -179,17 +223,22 @@ phpMyAdmin est désactivé par défaut. Pour y accéder :
 ```bash
 # Activer
 bash docker/scripts/enable-phpmyadmin.sh
-
-# Accès : https://observation-nids.meteo-poelley50.fr/phpmyadmin/
-# Login : credentials définis lors du setup-phpmyadmin-auth.sh
-
-# Désactiver après utilisation
-bash docker/scripts/disable-phpmyadmin.sh
 ```
 
-**Double protection :**
-1. Authentification HTTP Basic Auth (login/mot de passe)
-2. Le container phpMyAdmin doit être démarré (sinon 502)
+Accès : **https://observation-nids.meteo-poelley50.fr/phpmyadmin/**
+
+**Étape 1 — Basic Auth Nginx** (fenêtre navigateur) :
+- Login : défini lors de `setup-phpmyadmin-auth.sh`
+- Mot de passe : défini lors de `setup-phpmyadmin-auth.sh`
+
+**Étape 2 — Interface phpMyAdmin** :
+- Utilisateur : `root`
+- Mot de passe : `DB_ROOT_PASSWORD` du `.env.prod`
+
+```bash
+# Désactiver après utilisation (toujours faire !)
+bash docker/scripts/disable-phpmyadmin.sh
+```
 
 ---
 
@@ -209,19 +258,17 @@ ssh -L 5555:localhost:5555 ubuntu@[IP-OVH]
 
 ## 8. Renouvellement automatique SSL
 
-Configurer un cron job sur le serveur pour renouveler le certificat automatiquement :
+Configurer un cron job pour renouveler le certificat automatiquement :
 
 ```bash
 crontab -e
 ```
 
-Ajouter la ligne suivante (renouvellement chaque lundi à 3h du matin) :
+Ajouter (renouvellement chaque lundi à 3h du matin) :
 
 ```cron
-0 3 * * 1 /opt/observations_nids/docker/scripts/renew-ssl.sh >> /var/log/certbot-renew.log 2>&1
+0 3 * * 1 certbot renew --quiet && docker compose -f /opt/observations_nids/docker/docker-compose.prod.yml exec nginx nginx -s reload >> /var/log/certbot-renew.log 2>&1
 ```
-
-Le script `renew-ssl.sh` renouvelle le certificat via certbot webroot et recharge Nginx.
 
 ---
 
@@ -229,21 +276,14 @@ Le script `renew-ssl.sh` renouvelle le certificat via certbot webroot et recharg
 
 ```bash
 cd /opt/observations_nids
-
-# Récupérer les modifications
 git pull
-
-# Rebuild des images concernées
 docker compose -f docker/docker-compose.prod.yml build web celery_worker celery_beat
-
-# Redémarrer
 docker compose -f docker/docker-compose.prod.yml up -d
-
-# Vérifier les logs
 docker compose -f docker/docker-compose.prod.yml logs -f web
 ```
 
-> **Important** : Un simple `git pull` ne suffit pas. Les conteneurs contiennent une copie du code faite lors du build — un rebuild est nécessaire.
+> **Important** : Un simple `git pull` ne suffit pas. Les conteneurs contiennent une copie
+> du code faite lors du build — un rebuild est nécessaire après chaque mise à jour.
 
 ---
 
@@ -267,7 +307,7 @@ docker compose -f docker/docker-compose.prod.yml exec -T db \
 
 Pour sauvegarder l'état complet du serveur avant/après une opération importante :
 
-1. Dans le Manager OVH → Instance → **Créer un snapshot**
+1. Manager OVH → Instance → **Créer un snapshot**
 2. Le snapshot conserve le système complet (Docker, données, config)
 3. Pour restaurer : créer une nouvelle instance depuis le snapshot
 
@@ -277,15 +317,21 @@ Pour sauvegarder l'état complet du serveur avant/après une opération importan
 
 ## 12. Commandes utiles
 
-```bash
-# Alias pratique (à ajouter dans ~/.bashrc)
-alias dcp='docker compose -f /opt/observations_nids/docker/docker-compose.prod.yml'
+Alias pratique à ajouter dans `~/.bashrc` :
 
-# Ensuite :
-dcp ps
-dcp logs -f web
-dcp exec web python manage.py shell
-dcp restart nginx
+```bash
+echo "alias dcp='docker compose -f /opt/observations_nids/docker/docker-compose.prod.yml'" >> ~/.bashrc
+source ~/.bashrc
+```
+
+Ensuite :
+```bash
+dcp ps                          # État des conteneurs
+dcp logs -f web                 # Logs Django
+dcp logs -f nginx               # Logs Nginx
+dcp exec web python manage.py shell   # Shell Django
+dcp restart nginx               # Recharger Nginx
+dcp down && dcp up -d           # Redémarrage complet
 ```
 
 ---
@@ -293,14 +339,15 @@ dcp restart nginx
 ## Checklist de déploiement initial
 
 - [ ] Instance OVH créée (Ubuntu 22.04, B3-8)
-- [ ] DNS mis à jour (enregistrement A → IP OVH)
-- [ ] Docker installé
-- [ ] Répertoires `/opt/observations_nids/` créés
+- [ ] Ports 22, 80, 443 ouverts dans le groupe de sécurité OVH
+- [ ] DNS mis à jour (enregistrement A → IP OVH, propagation vérifiée)
+- [ ] Docker installé (`docker --version`)
+- [ ] Répertoires `/opt/observations_nids/media` et `/opt/observations_nids/logs` créés
 - [ ] Dépôt cloné dans `/opt/observations_nids/`
 - [ ] Fichier `.env.prod` complété
-- [ ] Certificat SSL obtenu (`init-ssl.sh`)
+- [ ] Certificat SSL obtenu (`sudo certbot certonly --standalone ...`)
 - [ ] Credentials phpMyAdmin créés (`setup-phpmyadmin-auth.sh`)
-- [ ] Stack démarré (`docker compose ... up -d`)
+- [ ] Stack démarré (`docker compose -f docker/docker-compose.prod.yml up -d`)
 - [ ] Application accessible en HTTPS
 - [ ] Cron renouvellement SSL configuré
 - [ ] Snapshot OVH de l'état initial créé
@@ -312,18 +359,16 @@ dcp restart nginx
 ### Nginx ne démarre pas : certificat introuvable
 
 ```bash
-# Vérifier que le certificat existe
 ls /etc/letsencrypt/live/observation-nids.meteo-poelley50.fr/
-
-# Si absent, relancer init-ssl.sh (Nginx doit être arrêté)
+# Si absent, obtenir le certificat (Nginx doit être arrêté)
 docker compose -f docker/docker-compose.prod.yml stop nginx
-bash docker/scripts/init-ssl.sh
+sudo certbot certonly --standalone -d observation-nids.meteo-poelley50.fr --email admin@meteo-poelley50.fr --agree-tos --no-eff-email
 docker compose -f docker/docker-compose.prod.yml start nginx
 ```
 
 ### Erreur 502 sur /phpmyadmin/
 
-phpMyAdmin n'est pas démarré — comportement normal.
+phpMyAdmin n'est pas démarré — comportement normal quand désactivé.
 ```bash
 bash docker/scripts/enable-phpmyadmin.sh
 ```
@@ -334,12 +379,20 @@ Vérifier dans `.env.prod` :
 ```env
 CSRF_TRUSTED_ORIGINS='["https://observation-nids.meteo-poelley50.fr"]'
 ```
-Puis redémarrer : `docker compose -f docker/docker-compose.prod.yml down && ... up -d`
+Puis redémarrer le stack.
 
 ### Consulter les logs Nginx
 
 ```bash
 docker compose -f docker/docker-compose.prod.yml exec nginx cat /var/log/nginx/observations_error.log
+```
+
+### Clonage Git : "not an empty directory"
+
+Ne pas cloner depuis l'intérieur du répertoire cible. Toujours cloner depuis le parent :
+```bash
+cd /opt
+sudo git clone https://github.com/jmFschneider/Observations_Nids.git observations_nids
 ```
 
 ---
