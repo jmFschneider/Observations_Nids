@@ -4,6 +4,10 @@
 .env
 .env_*
 *.env_*
+.env.prod
+
+# Credentials HTTP Basic Auth (générés sur le serveur)
+docker/nginx/auth/.htpasswd
 observations_nids/settings_local.py
 
 # Python

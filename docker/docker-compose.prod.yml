@@ -1,0 +1,212 @@
+services:
+  # Base de données MariaDB
+  db:
+    image: mariadb:10.11
+    container_name: observations_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - observations_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # phpMyAdmin - profil "admin" uniquement, accessible depuis localhost
+  phpmyadmin:
+    profiles:
+      - admin
+    image: phpmyadmin:latest
+    container_name: observations_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${DB_ROOT_PASSWORD}
+      UPLOAD_LIMIT: 100M
+      # Indique à phpMyAdmin qu'il est servi sous /phpmyadmin/
+      PMA_ABSOLUTE_URI: https://observation-nids.meteo-poelley50.fr/phpmyadmin/
+    # Pas de port exposé : Nginx proxie vers ce container via le réseau Docker
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - observations_network
+
+  # Redis pour cache et broker Celery
+  redis:
+    image: redis:7-alpine
+    container_name: observations_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - observations_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Application Django avec Gunicorn
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: observations_web
+    restart: unless-stopped
+    env_file: ../.env.prod
+    command: gunicorn observations_nids.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 120 --access-logfile - --error-logfile -
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+      - static_volume:/app/staticfiles
+      - /opt/observations_nids/media:/app/media
+      - /opt/observations_nids/logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - observations_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Celery Worker
+  celery_worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: observations_celery_worker
+    restart: unless-stopped
+    env_file: ../.env.prod
+    command: celery -A observations_nids worker --loglevel=info --concurrency=5 -Q celery,ocr
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+      - /opt/observations_nids/media:/app/media
+      - /opt/observations_nids/logs:/app/logs
+    depends_on:
+      - db
+      - redis
+      - web
+    networks:
+      - observations_network
+
+  # Celery Beat
+  celery_beat:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: observations_celery_beat
+    restart: unless-stopped
+    env_file: ../.env.prod
+    command: celery -A observations_nids beat --loglevel=info
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+      - /opt/observations_nids/logs:/app/logs
+    depends_on:
+      - db
+      - redis
+      - web
+    networks:
+      - observations_network
+
+  # Flower - accessible uniquement via SSH tunnel (pas exposé publiquement)
+  flower:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: observations_flower
+    restart: unless-stopped
+    env_file: ../.env.prod
+    command: celery -A observations_nids flower --port=5555 --url-prefix=flower
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    ports:
+      # Uniquement accessible en local (SSH tunnel depuis le poste admin)
+      - "127.0.0.1:5555:5555"
+    depends_on:
+      - redis
+      - celery_worker
+    networks:
+      - observations_network
+
+  # Nginx - frontal SSL direct (pas de reverse proxy Apache devant)
+  nginx:
+    image: nginx:alpine
+    container_name: observations_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d/prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/conf.d/prod-phpmyadmin.conf:/etc/nginx/conf.d/prod-phpmyadmin.conf:ro
+      # Credentials Basic Auth pour phpMyAdmin
+      - ./nginx/auth:/etc/nginx/auth:ro
+      - static_volume:/app/staticfiles:ro
+      - /opt/observations_nids/media:/app/media:ro
+      # Certificats Let's Encrypt (générés par init-ssl.sh)
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Webroot pour le renouvellement certbot
+      - certbot_webroot:/var/www/certbot:ro
+    depends_on:
+      - web
+    networks:
+      - observations_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  observations_network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
+  redis_data:
+    driver: local
+  static_volume:
+    driver: local
+  certbot_webroot:
+    driver: local
