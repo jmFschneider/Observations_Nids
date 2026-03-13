@@ -5,6 +5,7 @@
 set -e
 
 COMPOSE_FILE="/opt/observations_nids/docker/docker-compose.prod.yml"
+ENV_FILE="/opt/observations_nids/.env.prod"
 HTPASSWD_FILE="/opt/observations_nids/docker/nginx/auth/.htpasswd"
 
 # Vérifier que le fichier htpasswd existe
@@ -16,7 +17,7 @@ if [ ! -f "$HTPASSWD_FILE" ]; then
 fi
 
 echo "Démarrage du container phpMyAdmin..."
-docker compose -f "$COMPOSE_FILE" --profile admin up -d phpmyadmin
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" --profile admin up -d phpmyadmin
 
 echo ""
 echo "=== phpMyAdmin activé ==="
