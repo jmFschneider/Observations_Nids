@@ -77,6 +77,64 @@ docker --version
 docker compose version
 ```
 
+### Correction du réseau Docker (spécifique OVH Public Cloud)
+
+Les instances OVH Public Cloud ont **deux interfaces réseau** :
+- `ens3` → IP publique (ex: 135.125.72.x) — celle qui donne accès à Internet
+- `ens4` → IP privée OVH (ex: 10.1.0.x) — réseau interne OVH
+
+Par défaut, Docker route ses paquets de façon aléatoire entre les deux interfaces.
+Quand les paquets passent par `ens4`, ils n'atteignent pas Internet et le build échoue
+(`apt-get update` : "No route to host").
+
+**Vérifier les interfaces :**
+```bash
+ip route | grep default
+# Doit afficher deux routes : une via ens3 (IP publique) et une via ens4 (IP privée)
+```
+
+**Correction : forcer le trafic Docker via `ens3` (interface publique) :**
+
+Remplacer `135.125.72.1` par le gateway affiché pour `ens3` dans `ip route` :
+
+```bash
+# Configurer le DNS dans Docker daemon
+sudo nano /etc/docker/daemon.json
+```
+
+Contenu :
+```json
+{
+    "dns": ["8.8.8.8", "1.1.1.1"],
+    "ipv6": false
+}
+```
+
+```bash
+sudo systemctl restart docker
+
+# Forcer le routage Docker via l'interface publique
+sudo iptables -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
+sudo ip route add default via 135.125.72.1 dev ens3 table 200
+sudo ip rule add from 172.17.0.0/16 table 200 pref 100
+
+# Rendre la configuration persistante au redémarrage
+sudo apt install iptables-persistent -y
+sudo netfilter-persistent save
+echo "ip route add default via 135.125.72.1 dev ens3 table 200" | sudo tee -a /etc/rc.local
+echo "ip rule add from 172.17.0.0/16 table 200 pref 100" | sudo tee -a /etc/rc.local
+sudo chmod +x /etc/rc.local
+```
+
+**Vérifier que ça fonctionne :**
+```bash
+docker run --rm alpine wget -qO- http://example.com 2>&1 | head -3
+# Doit afficher le HTML d'example.com
+```
+
+> **Note** : Cette correction est nécessaire avant tout `docker compose build`.
+> Sans elle, `apt-get update` échoue dans les conteneurs pendant le build.
+
 ### Création des répertoires
 
 ```bash
@@ -342,6 +400,7 @@ dcp down && dcp up -d           # Redémarrage complet
 - [ ] Ports 22, 80, 443 ouverts dans le groupe de sécurité OVH
 - [ ] DNS mis à jour (enregistrement A → IP OVH, propagation vérifiée)
 - [ ] Docker installé (`docker --version`)
+- [ ] Réseau Docker corrigé pour OVH (routage via ens3, persistance iptables)
 - [ ] Répertoires `/opt/observations_nids/media` et `/opt/observations_nids/logs` créés
 - [ ] Dépôt cloné dans `/opt/observations_nids/`
 - [ ] Fichier `.env.prod` complété
@@ -385,6 +444,25 @@ Puis redémarrer le stack.
 
 ```bash
 docker compose -f docker/docker-compose.prod.yml exec nginx cat /var/log/nginx/observations_error.log
+```
+
+### Build Docker échoue : "No route to host" ou "Unable to locate package"
+
+Les conteneurs Docker n'arrivent pas à accéder à Internet pendant le build.
+Cause : OVH Public Cloud a deux interfaces réseau (`ens3` publique, `ens4` privée) et
+Docker route parfois les paquets par `ens4` qui n'a pas accès à Internet.
+
+```bash
+# Vérifier les interfaces
+ip route | grep default
+
+# Appliquer la correction (voir section "Correction du réseau Docker")
+sudo iptables -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
+sudo ip route add default via 135.125.72.1 dev ens3 table 200
+sudo ip rule add from 172.17.0.0/16 table 200 pref 100
+
+# Tester
+docker run --rm alpine wget -qO- http://example.com 2>&1 | head -3
 ```
 
 ### Clonage Git : "not an empty directory"
