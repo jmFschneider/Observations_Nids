@@ -2,7 +2,43 @@
 
 > Document de travail issu de l'audit de sécurité réalisé en mars 2026.
 > À traiter avant la mise en production définitive.
-> **Règle** : une modification à la fois, testée sur le pilote avant déploiement OVH.
+> **Règle** : une modification à la fois, testée sur une instance OVH bac à sable (depuis le snapshot) avant déploiement définitif.
+> ⚠️ Ne jamais tester sur le pilote (= pré-production en cours d'utilisation).
+
+---
+
+## PRIORITÉ 0 — Suppression de Flower (avant toute sécurisation)
+
+**Contexte** : Flower n'apporte pas d'information supplémentaire par rapport à ce que l'application affiche déjà (progression OCR en temps réel). Il consomme des ressources inutilement et ajoute une surface d'attaque.
+
+**Méthode de test** : instance OVH bac à sable créée depuis le snapshot (sans toucher au snapshot de référence, sans mettre à jour le DNS Hostinger).
+
+**Travail à faire :**
+
+- [ ] Préparer les modifications en local (code) :
+  - [ ] Supprimer le service `flower` de `docker-compose.prod.yml`
+  - [ ] Supprimer le service `flower` de `docker-compose.yml`
+  - [ ] Nettoyer les liens `/flower` dans `ocr/templates/ocr/selection_images.html`
+  - [ ] Nettoyer les liens `/flower` dans `ocr/templates/ocr/selection_repertoire_ocr.html`
+  - [ ] Nettoyer les liens `/flower` dans `taxonomy/templates/taxonomy/administration_donnees.html`
+  - [ ] Supprimer `flower` des dépendances dans `requirements-base.txt` (si présent)
+  - [ ] Commit + push
+
+- [ ] Créer une instance OVH bac à sable depuis le snapshot (via Horizon → Launch)
+  - Ne pas modifier le DNS Hostinger
+  - Accès via IP directement : `https://[IP-BAC-A-SABLE]`
+
+- [ ] Sur l'instance bac à sable :
+  - [ ] `git pull`
+  - [ ] `dcp build && dcp up -d`
+  - [ ] Vérifier que le stack démarre sans Flower
+  - [ ] Tester le lancement d'une transcription OCR (progression affichée ?)
+  - [ ] Tester le lancement d'un import JSON
+  - [ ] Vérifier qu'il n'y a pas d'erreur JS dans la console navigateur (liens /flower cassés ?)
+
+- [ ] Si tout est bon :
+  - [ ] Supprimer l'instance bac à sable
+  - [ ] Prendre un nouveau snapshot de référence depuis l'instance principale (après `git pull`)
 
 ---
 
