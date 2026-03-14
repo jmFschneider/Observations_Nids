@@ -416,6 +416,51 @@ docker compose -f docker/docker-compose.prod.yml --env-file .env.prod exec web \
 
 ---
 
+## 7b. Transfert des fichiers media depuis le pilote
+
+Les fichiers media (images scannées, JSON OCR) ne sont pas dans Git — ils doivent être
+transférés manuellement depuis le serveur pilote.
+
+### Nettoyage préalable des orphelins (recommandé)
+
+Avant le transfert, supprimer les fichiers obsolètes du pilote grâce à la commande dédiée :
+
+```bash
+# Sur le pilote — dry-run pour voir les orphelins
+docker compose -f docker/docker-compose.yml exec web python manage.py audit_media_orphelins
+
+# Si la liste est correcte, déplacer les orphelins dans media/sauvegarde/
+docker compose -f docker/docker-compose.yml exec web python manage.py audit_media_orphelins --execute
+```
+
+Vérifier que le site pilote fonctionne toujours après l'opération, puis supprimer
+`media/sauvegarde/` si tout est bon.
+
+### Transfert via scp
+
+Depuis le poste local (Git Bash), un seul transfert suffit :
+
+```bash
+# Récupérer le media du pilote vers le poste local
+scp -r ubuntu@[IP-PILOTE]:/opt/observations_nids_pilote/media ./media_backup
+
+# Envoyer vers OVH
+scp -r ./media_backup/* ubuntu@[IP-OVH]:/opt/observations_nids/media/
+```
+
+Ou directement de serveur à serveur (sans passer par le local) :
+```bash
+scp -r ubuntu@[IP-PILOTE]:/opt/observations_nids_pilote/media/* ubuntu@[IP-OVH]:/opt/observations_nids/media/
+```
+
+Vérifier la structure après transfert :
+```bash
+# Sur OVH
+tree /opt/observations_nids/media -d
+```
+
+---
+
 ## 8. Accès à Flower (monitoring Celery)
 
 Flower n'est pas exposé publiquement. Accès via tunnel SSH depuis le poste admin :
