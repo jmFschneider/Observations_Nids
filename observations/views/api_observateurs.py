@@ -364,45 +364,43 @@ def fusionner_observateurs(request):  # noqa: PLR0911
                 fiche.observateur = nouveau_obs
                 fiche.save(update_fields=['observateur'])
 
-            # Gérer l'ancien observateur après fusion complète
+            # Gérer l'ancien observateur si plus aucune fiche ne lui est rattachée
             ancien_obs_supprime = False
             ancien_obs_desactive = False
 
-            if fusionner_toutes:
-                # Vérifier qu'il n'a plus de fiches
-                fiches_restantes = FicheObservation.objects.filter(observateur=ancien_obs).count()
+            fiches_restantes = FicheObservation.objects.filter(observateur=ancien_obs).count()
 
-                if fiches_restantes == 0:
-                    # Déterminer si l'observateur peut être supprimé :
-                    # - Créé par OCR (est_transcription=True)
-                    # - OU créé via la modale de correction (@observateur.local)
-                    est_supprimable = ancien_obs.est_transcription or ancien_obs.email.endswith(
-                        '@observateur.local'
+            if fiches_restantes == 0:
+                # Déterminer si l'observateur peut être supprimé :
+                # - Créé par OCR (est_transcription=True)
+                # - OU créé via la modale de correction (@observateur.local)
+                est_supprimable = ancien_obs.est_transcription or ancien_obs.email.endswith(
+                    '@observateur.local'
+                )
+
+                if est_supprimable:
+                    # Observateur temporaire → SUPPRIMER
+                    ancien_obs_id = ancien_obs.id
+                    raison = (
+                        "transcription OCR"
+                        if ancien_obs.est_transcription
+                        else "correction temporaire"
                     )
-
-                    if est_supprimable:
-                        # Observateur temporaire → SUPPRIMER
-                        ancien_obs_id = ancien_obs.id
-                        raison = (
-                            "transcription OCR"
-                            if ancien_obs.est_transcription
-                            else "correction temporaire"
-                        )
-                        ancien_obs.delete()
-                        ancien_obs_supprime = True
-                        logger.info(
-                            f"Observateur {ancien_obs_id} ({ancien_nom}) SUPPRIMÉ "
-                            f"après fusion complète ({raison})"
-                        )
-                    else:
-                        # Observateur réel → DÉSACTIVER (peut être réutilisé)
-                        ancien_obs.is_active = False
-                        ancien_obs.save(update_fields=['is_active'])
-                        ancien_obs_desactive = True
-                        logger.info(
-                            f"Observateur {ancien_obs.id} ({ancien_nom}) désactivé "
-                            f"après fusion complète"
-                        )
+                    ancien_obs.delete()
+                    ancien_obs_supprime = True
+                    logger.info(
+                        f"Observateur {ancien_obs_id} ({ancien_nom}) SUPPRIMÉ "
+                        f"après transfert de toutes ses fiches ({raison})"
+                    )
+                else:
+                    # Observateur réel → DÉSACTIVER (peut être réutilisé)
+                    ancien_obs.is_active = False
+                    ancien_obs.save(update_fields=['is_active'])
+                    ancien_obs_desactive = True
+                    logger.info(
+                        f"Observateur {ancien_obs.id} ({ancien_nom}) désactivé "
+                        f"après transfert de toutes ses fiches"
+                    )
 
             logger.info(
                 f"Fusion réussie: {nombre_fiches} fiche(s) de {ancien_nom} vers {nouveau_nom} "
