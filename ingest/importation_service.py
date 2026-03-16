@@ -887,13 +887,14 @@ class ImportationService:
                 nom_commune = loc.get('commune') or loc.get('IGN_50000') or 'Non spécifiée'
                 departement = loc.get('dep_t') or '00'
 
-                # Géocoder la commune pour obtenir les coordonnées
+                # Rechercher la commune uniquement dans la base locale (pas de Nominatim)
                 altitude_depuis_geo = None
                 if nom_commune != 'Non spécifiée':
                     try:
-                        resultat_geo = self.geocodeur.geocoder_commune(nom_commune, departement)
+                        resultat_geo = self.geocodeur._recherche_base_locale(
+                            nom_commune, departement
+                        )
                         if resultat_geo:
-                            # Utiliser le nom officiel et les coordonnées trouvées
                             localisation.commune = resultat_geo.get(
                                 'adresse_complete', nom_commune
                             ).split(',')[0]
@@ -904,24 +905,29 @@ class ImportationService:
                             localisation.precision_gps = resultat_geo.get('precision_metres', 5000)
                             if 'code_insee' in resultat_geo:
                                 localisation.code_insee = resultat_geo['code_insee']
-                            # Récupérer l'altitude si disponible
                             if 'altitude' in resultat_geo and resultat_geo['altitude'] is not None:
                                 altitude_depuis_geo = resultat_geo['altitude']
+                            localisation.commune_non_resolue = False
+                            localisation.commune_ocr_brute = ''
                             logger.info(
-                                f"Fiche {fiche.num_fiche}: Commune géocodée '{nom_commune}' -> "
-                                f"{localisation.commune} (source: {resultat_geo['source']})"
+                                f"Fiche {fiche.num_fiche}: Commune trouvée en base locale '{nom_commune}' -> "
+                                f"{localisation.commune}"
                             )
                         else:
-                            # Pas trouvé, garder le nom brut
+                            # Commune introuvable en base locale — on garde la valeur OCR brute
                             localisation.commune = nom_commune
+                            localisation.commune_non_resolue = True
+                            localisation.commune_ocr_brute = nom_commune
                             logger.warning(
-                                f"Fiche {fiche.num_fiche}: Commune '{nom_commune}' non trouvée, coordonnées non mises à jour"
+                                f"Fiche {fiche.num_fiche}: Commune '{nom_commune}' non trouvée en base locale — "
+                                f"à corriger manuellement"
                             )
                     except Exception as e:
-                        # En cas d'erreur, garder le nom brut
                         localisation.commune = nom_commune
+                        localisation.commune_non_resolue = True
+                        localisation.commune_ocr_brute = nom_commune
                         logger.error(
-                            f"Fiche {fiche.num_fiche}: Erreur géocodage '{nom_commune}': {str(e)}"
+                            f"Fiche {fiche.num_fiche}: Erreur recherche commune '{nom_commune}': {str(e)}"
                         )
                 else:
                     localisation.commune = nom_commune

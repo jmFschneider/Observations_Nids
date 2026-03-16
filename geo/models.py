@@ -223,5 +223,17 @@ class Localisation(models.Model):
     )
     code_insee = models.CharField(max_length=5, blank=True, help_text="Code INSEE de la commune")
 
+    # Indicateur de commune non résolue lors de l'import OCR
+    commune_non_resolue = models.BooleanField(
+        default=False,
+        help_text="True si la commune OCR n'a pas été trouvée dans la base locale lors de l'import",
+    )
+    commune_ocr_brute = models.CharField(
+        max_length=200,
+        blank=True,
+        default='',
+        help_text="Valeur brute de la commune telle que transcrite par l'OCR",
+    )
+
     def __str__(self):
         return f"Localisation {self.commune} ({self.departement})"

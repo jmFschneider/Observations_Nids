@@ -511,7 +511,16 @@ function fermerModalRecherche() {
             <h2 class="mb-0 h5">Localisation</h2>
         </header>
         <div class="card-body">
-            <div class="lieu">
+            <div class="lieu{% if localisation_form.instance.commune_non_resolue %} border border-warning rounded p-2{% endif %}">
+                {% if localisation_form.instance.commune_non_resolue %}
+                <div class="alert alert-warning py-2 mb-2" style="font-size: 0.9em;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Commune non résolue.</strong>
+                    Valeur OCR brute : <code>{{ localisation_form.instance.commune_ocr_brute }}</code>
+                    — les coordonnées GPS, l'altitude et le code INSEE n'ont pas pu être renseignés automatiquement.
+                    Veuillez corriger la commune manuellement.
+                </div>
+                {% endif %}
                 <table class="localisation-table">
                     <tr>
                         <th>Commune</th>
