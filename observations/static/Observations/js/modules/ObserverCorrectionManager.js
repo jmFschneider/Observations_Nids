@@ -244,10 +244,14 @@ export default function initObserverCorrectionManager() {
     // === Recherche manuelle avec debounce ===
     var rechercheTimeout = null;
     var derniereRecherche = '';
+    var creationExplicitementDemandee = false; // true quand l'utilisateur a cliqué "Proposer la création"
+    var modeCreation = false;       // true quand la modale confirme une création (pas une fusion)
+    var nomPourCreation = '';       // nom saisi à créer
 
     function rechercherObservateurs(query) {
         var tbody = document.getElementById('tbody-observateurs');
         nomSaisiCorrect = query;
+        creationExplicitementDemandee = false; // une nouvelle frappe annule la demande explicite
 
         if (query.length < 2) {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Tapez au moins 2 caracteres</td></tr>';
@@ -296,8 +300,10 @@ export default function initObserverCorrectionManager() {
             return;
         }
 
-        // Cacher l option de creation si des resultats existent
-        if (sectionCreerObservateur) sectionCreerObservateur.style.display = 'none';
+        // Cacher la section création seulement si l'utilisateur ne l'a pas demandée explicitement
+        if (sectionCreerObservateur && !creationExplicitementDemandee) {
+            sectionCreerObservateur.style.display = 'none';
+        }
         setEtapeActive(4); // Des résultats trouvés → guider vers la sélection
 
         tbody.innerHTML = observateurs.map(function(obs) {
@@ -325,7 +331,7 @@ export default function initObserverCorrectionManager() {
         }).join('');
     }
 
-    // === Valider le nom saisi (bouton Valider) ===
+    // === Proposer la création : ouvre directement la modale de confirmation ===
     function validerNomSaisi() {
         var nomSaisi = inputSaisieNom ? inputSaisieNom.value.trim() : '';
         if (nomSaisi.length < 2) {
@@ -333,19 +339,49 @@ export default function initObserverCorrectionManager() {
             return;
         }
 
-        // Si la recherche a trouve des resultats, afficher un message
+        // Collecter les similaires actuellement affichés dans la table
         var tbody = document.getElementById('tbody-observateurs');
-        var hasResults = tbody && tbody.querySelectorAll('tr td button').length > 0;
-
-        if (hasResults) {
-            alert('Des observateurs correspondants ont ete trouves. Selectionnez-en un dans la liste ou modifiez le nom pour creer un nouvel observateur.');
-        } else {
-            // Proposer de creer l observateur
-            if (sectionCreerObservateur) {
-                document.getElementById('nom-a-creer').textContent = '"' + nomSaisi + '"';
-                sectionCreerObservateur.style.display = 'block';
-            }
+        var similaires = [];
+        if (tbody) {
+            tbody.querySelectorAll('tr td:first-child strong').forEach(function(el) {
+                if (el.textContent.trim()) similaires.push(el.textContent.trim());
+            });
         }
+
+        // Préparer le mode création
+        modeCreation = true;
+        nomPourCreation = nomSaisi;
+        creationExplicitementDemandee = true;
+
+        // Message principal
+        document.getElementById('message-fusion').innerHTML =
+            'Vous allez créer l\'observateur <strong>' + escapeHtml(nomSaisi) +
+            '</strong> et l\'associer à cette fiche.';
+
+        // Section similaires
+        var sectionSimilaires = document.getElementById('section-similaires-creation');
+        var listeSimilaires = document.getElementById('liste-similaires-creation');
+        if (similaires.length > 0 && sectionSimilaires && listeSimilaires) {
+            listeSimilaires.innerHTML = similaires.map(function(s) {
+                return '<li>' + escapeHtml(s) + '</li>';
+            }).join('');
+            sectionSimilaires.style.display = 'block';
+        } else if (sectionSimilaires) {
+            sectionSimilaires.style.display = 'none';
+        }
+
+        // S'assurer que la section portée est visible et réinitialiser sur "cette fiche"
+        var sectionPortee = document.getElementById('section-portee-fusion');
+        if (sectionPortee) sectionPortee.style.display = 'block';
+        var radioFicheCourante = document.getElementById('fusion-fiche-courante');
+        if (radioFicheCourante) radioFicheCourante.checked = true;
+
+        // Ouvrir la modale de confirmation
+        window.fermerModalObservateur();
+        modalConfirmation.style.display = 'flex';
+        modalConfirmation.style.alignItems = 'center';
+        modalConfirmation.style.justifyContent = 'center';
+        document.body.style.overflow = 'hidden';
     }
 
     // === Creer un nouvel observateur ===
@@ -407,10 +443,19 @@ export default function initObserverCorrectionManager() {
 
     // === Selection et confirmation fusion ===
     window.selectionnerObservateur = function(id, nom, nombreFiches) {
+        // Réinitialiser le mode création
+        modeCreation = false;
+        nomPourCreation = '';
         observateurCible = { id: id, nom: nom, nombreFiches: nombreFiches };
 
         // Fermer modale recherche
         window.fermerModalObservateur();
+
+        // Restaurer la section portée et masquer les similaires
+        var sectionPortee = document.getElementById('section-portee-fusion');
+        if (sectionPortee) sectionPortee.style.display = 'block';
+        var sectionSimilaires = document.getElementById('section-similaires-creation');
+        if (sectionSimilaires) sectionSimilaires.style.display = 'none';
 
         // Afficher modale confirmation
         document.getElementById('message-fusion').innerHTML =
@@ -437,8 +482,13 @@ export default function initObserverCorrectionManager() {
         document.body.style.overflow = 'hidden';
     };
 
-    // === Execution de la fusion ===
+    // === Execution de la fusion (ou création + association) ===
     function executerFusion() {
+        if (modeCreation) {
+            executerCreationEtAssociation();
+            return;
+        }
+
         var typeFusion = document.querySelector('input[name="type-fusion"]:checked').value;
         var fusionnerToutes = typeFusion === 'toutes';
 
@@ -482,6 +532,63 @@ export default function initObserverCorrectionManager() {
         .catch(function(error) {
             console.error('Erreur fusion:', error);
             alert('Une erreur est survenue lors de la fusion');
+            btnConfirmer.innerHTML = originalText;
+            btnConfirmer.disabled = false;
+        })
+        .finally(function() {
+            window.fermerModalConfirmation();
+        });
+    }
+
+    // === Création d'un nouvel observateur puis association à la fiche courante ===
+    function executerCreationEtAssociation() {
+        var btnConfirmer = document.getElementById('btn-confirmer-fusion');
+        var originalText = btnConfirmer.innerHTML;
+        btnConfirmer.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création...';
+        btnConfirmer.disabled = true;
+
+        var formData = new FormData();
+        formData.append('nom', nomPourCreation);
+        var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (csrfToken) formData.append('csrfmiddlewaretoken', csrfToken.value);
+
+        fetch('/api/observateurs/creer/', {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            body: formData
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (!data.success || !data.observateur) {
+                throw new Error(data.message || 'Impossible de créer l\'observateur');
+            }
+            // Associer le nouvel observateur à cette fiche uniquement
+            btnConfirmer.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Association...';
+            var formData2 = new FormData();
+            formData2.append('ancien_observateur_id', observateurActuelId);
+            formData2.append('nouvel_observateur_id', data.observateur.id);
+            formData2.append('fiche_id', ficheCouranteId);
+            var typeFusion = document.querySelector('input[name="type-fusion"]:checked');
+            formData2.append('fusionner_toutes', typeFusion && typeFusion.value === 'toutes' ? 'true' : 'false');
+            var csrf2 = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (csrf2) formData2.append('csrfmiddlewaretoken', csrf2.value);
+
+            return fetch('/api/observateurs/fusionner/', {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData2
+            }).then(function(r) { return r.json(); });
+        })
+        .then(function(data) {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                throw new Error(data.message);
+            }
+        })
+        .catch(function(error) {
+            alert('Erreur : ' + error.message);
             btnConfirmer.innerHTML = originalText;
             btnConfirmer.disabled = false;
         })

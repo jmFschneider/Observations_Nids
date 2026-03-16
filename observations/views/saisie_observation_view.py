@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.cache import never_cache
 
 from accounts.models import Utilisateur
 from audit.models import HistoriqueModification
@@ -172,6 +173,7 @@ def fiche_observation_view(request, fiche_id):
     return render(request, 'fiche_observation.html', context)
 
 
+@never_cache
 @login_required
 def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
     """

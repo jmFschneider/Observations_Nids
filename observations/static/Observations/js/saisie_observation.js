@@ -13,6 +13,14 @@ import initFormChangeManager from './modules/FormChangeManager.js';
 import initRemarksManager from './modules/RemarksManager.js';
 import initObserverCorrectionManager from './modules/ObserverCorrectionManager.js';
 
+// Forcer un rechargement réseau si Firefox restaure la page depuis le bfcache
+// (cas typique : retour arrière après une fusion d'observateur)
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialisation séquentielle des modules
     

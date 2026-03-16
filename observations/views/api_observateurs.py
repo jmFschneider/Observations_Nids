@@ -12,7 +12,8 @@ from difflib import SequenceMatcher
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import CharField, Count, Q, Value
+from django.db.models.functions import Concat
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 
@@ -167,6 +168,7 @@ def rechercher_observateurs(request):
 
     # Récupérer le nom de référence pour calcul de similarité
     nom_reference = None
+    obs_ref = None
     if reference_id:
         try:
             obs_ref = Utilisateur.objects.get(pk=reference_id)
@@ -174,29 +176,57 @@ def rechercher_observateurs(request):
         except Utilisateur.DoesNotExist:
             pass
 
-    # Rechercher les observateurs
-    # Priorité : commence par > contient
-    observateurs_startswith = (
-        Utilisateur.objects.filter(is_active=True, est_valide=True)
-        .filter(Q(first_name__istartswith=query) | Q(last_name__istartswith=query))
-        .exclude(pk=reference_id)
-        .annotate(nombre_fiches=Count('fiches'))
+    # Base queryset avec noms concaténés pour couvrir les variantes OCR :
+    #   nom_fn  : "A. TYPLOT"  (prénom + nom)
+    #   nom_nf  : "TYPLOT A."  (nom + prénom)
+    #   nom_colle : "TYPLOTA." (nom + prénom sans espace, comme les fusions OCR)
+    base_qs = Utilisateur.objects.filter(is_active=True, est_valide=True).annotate(
+        nom_fn=Concat('first_name', Value(' '), 'last_name', output_field=CharField()),
+        nom_nf=Concat('last_name', Value(' '), 'first_name', output_field=CharField()),
+        nom_colle=Concat('last_name', 'first_name', output_field=CharField()),
+    )
+
+    # Exclure l'observateur de référence uniquement s'il est une transcription OCR
+    # (pas un compte validé — on veut pouvoir le retrouver dans la recherche)
+    if reference_id and obs_ref and obs_ref.est_transcription:
+        base_qs = base_qs.exclude(pk=reference_id)
+
+    startswith_filter = (
+        Q(first_name__istartswith=query)
+        | Q(last_name__istartswith=query)
+        | Q(nom_fn__istartswith=query)
+        | Q(nom_nf__istartswith=query)
+        | Q(nom_colle__istartswith=query)
+    )
+
+    contains_filter = (
+        Q(first_name__icontains=query)
+        | Q(last_name__icontains=query)
+        | Q(nom_fn__icontains=query)
+        | Q(nom_nf__icontains=query)
+        | Q(nom_colle__icontains=query)
+    )
+
+    observateurs_startswith = base_qs.filter(startswith_filter).annotate(
+        nombre_fiches=Count('fiches', distinct=True)
     )
 
     observateurs_contains = (
-        Utilisateur.objects.filter(is_active=True, est_valide=True)
-        .filter(Q(first_name__icontains=query) | Q(last_name__icontains=query))
-        .exclude(pk=reference_id)
-        .exclude(Q(first_name__istartswith=query) | Q(last_name__istartswith=query))
-        .annotate(nombre_fiches=Count('fiches'))
+        base_qs.filter(contains_filter)
+        .exclude(startswith_filter)
+        .annotate(nombre_fiches=Count('fiches', distinct=True))
     )
 
-    # Combiner les résultats
+    # Combiner les résultats (dédoublonnage par id)
     resultats = []
+    seen_ids: set[int] = set()
 
     for obs in list(observateurs_startswith) + list(observateurs_contains):
         if len(resultats) >= limit:
             break
+        if obs.id in seen_ids:
+            continue
+        seen_ids.add(obs.id)
 
         nom_complet = obtenir_nom_complet(obs)
         score = calculer_similarite(nom_reference, nom_complet) if nom_reference else None
@@ -334,45 +364,43 @@ def fusionner_observateurs(request):  # noqa: PLR0911
                 fiche.observateur = nouveau_obs
                 fiche.save(update_fields=['observateur'])
 
-            # Gérer l'ancien observateur après fusion complète
+            # Gérer l'ancien observateur si plus aucune fiche ne lui est rattachée
             ancien_obs_supprime = False
             ancien_obs_desactive = False
 
-            if fusionner_toutes:
-                # Vérifier qu'il n'a plus de fiches
-                fiches_restantes = FicheObservation.objects.filter(observateur=ancien_obs).count()
+            fiches_restantes = FicheObservation.objects.filter(observateur=ancien_obs).count()
 
-                if fiches_restantes == 0:
-                    # Déterminer si l'observateur peut être supprimé :
-                    # - Créé par OCR (est_transcription=True)
-                    # - OU créé via la modale de correction (@observateur.local)
-                    est_supprimable = ancien_obs.est_transcription or ancien_obs.email.endswith(
-                        '@observateur.local'
+            if fiches_restantes == 0:
+                # Déterminer si l'observateur peut être supprimé :
+                # - Créé par OCR (est_transcription=True)
+                # - OU créé via la modale de correction (@observateur.local)
+                est_supprimable = ancien_obs.est_transcription or ancien_obs.email.endswith(
+                    '@observateur.local'
+                )
+
+                if est_supprimable:
+                    # Observateur temporaire → SUPPRIMER
+                    ancien_obs_id = ancien_obs.id
+                    raison = (
+                        "transcription OCR"
+                        if ancien_obs.est_transcription
+                        else "correction temporaire"
                     )
-
-                    if est_supprimable:
-                        # Observateur temporaire → SUPPRIMER
-                        ancien_obs_id = ancien_obs.id
-                        raison = (
-                            "transcription OCR"
-                            if ancien_obs.est_transcription
-                            else "correction temporaire"
-                        )
-                        ancien_obs.delete()
-                        ancien_obs_supprime = True
-                        logger.info(
-                            f"Observateur {ancien_obs_id} ({ancien_nom}) SUPPRIMÉ "
-                            f"après fusion complète ({raison})"
-                        )
-                    else:
-                        # Observateur réel → DÉSACTIVER (peut être réutilisé)
-                        ancien_obs.is_active = False
-                        ancien_obs.save(update_fields=['is_active'])
-                        ancien_obs_desactive = True
-                        logger.info(
-                            f"Observateur {ancien_obs.id} ({ancien_nom}) désactivé "
-                            f"après fusion complète"
-                        )
+                    ancien_obs.delete()
+                    ancien_obs_supprime = True
+                    logger.info(
+                        f"Observateur {ancien_obs_id} ({ancien_nom}) SUPPRIMÉ "
+                        f"après transfert de toutes ses fiches ({raison})"
+                    )
+                else:
+                    # Observateur réel → DÉSACTIVER (peut être réutilisé)
+                    ancien_obs.is_active = False
+                    ancien_obs.save(update_fields=['is_active'])
+                    ancien_obs_desactive = True
+                    logger.info(
+                        f"Observateur {ancien_obs.id} ({ancien_nom}) désactivé "
+                        f"après transfert de toutes ses fiches"
+                    )
 
             logger.info(
                 f"Fusion réussie: {nombre_fiches} fiche(s) de {ancien_nom} vers {nouveau_nom} "
