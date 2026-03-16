@@ -325,7 +325,7 @@ export default function initObserverCorrectionManager() {
         }).join('');
     }
 
-    // === Valider le nom saisi (bouton Valider) ===
+    // === Valider le nom saisi (bouton Proposer la création) ===
     function validerNomSaisi() {
         var nomSaisi = inputSaisieNom ? inputSaisieNom.value.trim() : '';
         if (nomSaisi.length < 2) {
@@ -333,18 +333,25 @@ export default function initObserverCorrectionManager() {
             return;
         }
 
-        // Si la recherche a trouve des resultats, afficher un message
         var tbody = document.getElementById('tbody-observateurs');
         var hasResults = tbody && tbody.querySelectorAll('tr td button').length > 0;
 
-        if (hasResults) {
-            alert('Des observateurs correspondants ont ete trouves. Selectionnez-en un dans la liste ou modifiez le nom pour creer un nouvel observateur.');
-        } else {
-            // Proposer de creer l observateur
-            if (sectionCreerObservateur) {
-                document.getElementById('nom-a-creer').textContent = '"' + nomSaisi + '"';
-                sectionCreerObservateur.style.display = 'block';
+        if (sectionCreerObservateur) {
+            document.getElementById('nom-a-creer').textContent = '"' + nomSaisi + '"';
+
+            // Adapter le message selon qu'il existe ou non des résultats similaires
+            var avertissement = document.getElementById('avertissement-similaires');
+            var titre = document.getElementById('titre-section-creer');
+            if (hasResults) {
+                if (titre) titre.textContent = 'Créer malgré des résultats similaires ?';
+                if (avertissement) avertissement.style.display = 'block';
+            } else {
+                if (titre) titre.textContent = 'Aucun observateur correspondant trouvé';
+                if (avertissement) avertissement.style.display = 'none';
             }
+
+            sectionCreerObservateur.style.display = 'block';
+            setEtapeActive(5);
         }
     }
 
