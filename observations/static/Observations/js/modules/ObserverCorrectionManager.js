@@ -244,10 +244,12 @@ export default function initObserverCorrectionManager() {
     // === Recherche manuelle avec debounce ===
     var rechercheTimeout = null;
     var derniereRecherche = '';
+    var creationExplicitementDemandee = false; // true quand l'utilisateur a cliqué "Proposer la création"
 
     function rechercherObservateurs(query) {
         var tbody = document.getElementById('tbody-observateurs');
         nomSaisiCorrect = query;
+        creationExplicitementDemandee = false; // une nouvelle frappe annule la demande explicite
 
         if (query.length < 2) {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Tapez au moins 2 caracteres</td></tr>';
@@ -296,8 +298,10 @@ export default function initObserverCorrectionManager() {
             return;
         }
 
-        // Cacher l option de creation si des resultats existent
-        if (sectionCreerObservateur) sectionCreerObservateur.style.display = 'none';
+        // Cacher la section création seulement si l'utilisateur ne l'a pas demandée explicitement
+        if (sectionCreerObservateur && !creationExplicitementDemandee) {
+            sectionCreerObservateur.style.display = 'none';
+        }
         setEtapeActive(4); // Des résultats trouvés → guider vers la sélection
 
         tbody.innerHTML = observateurs.map(function(obs) {
@@ -350,6 +354,7 @@ export default function initObserverCorrectionManager() {
                 if (avertissement) avertissement.style.display = 'none';
             }
 
+            creationExplicitementDemandee = true;
             sectionCreerObservateur.style.display = 'block';
             setEtapeActive(5);
         }
