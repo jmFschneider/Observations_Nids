@@ -370,9 +370,11 @@ export default function initObserverCorrectionManager() {
             sectionSimilaires.style.display = 'none';
         }
 
-        // Masquer le choix de portée (création = toujours cette fiche uniquement)
+        // S'assurer que la section portée est visible et réinitialiser sur "cette fiche"
         var sectionPortee = document.getElementById('section-portee-fusion');
-        if (sectionPortee) sectionPortee.style.display = 'none';
+        if (sectionPortee) sectionPortee.style.display = 'block';
+        var radioFicheCourante = document.getElementById('fusion-fiche-courante');
+        if (radioFicheCourante) radioFicheCourante.checked = true;
 
         // Ouvrir la modale de confirmation
         window.fermerModalObservateur();
@@ -566,7 +568,8 @@ export default function initObserverCorrectionManager() {
             formData2.append('ancien_observateur_id', observateurActuelId);
             formData2.append('nouvel_observateur_id', data.observateur.id);
             formData2.append('fiche_id', ficheCouranteId);
-            formData2.append('fusionner_toutes', 'false');
+            var typeFusion = document.querySelector('input[name="type-fusion"]:checked');
+            formData2.append('fusionner_toutes', typeFusion && typeFusion.value === 'toutes' ? 'true' : 'false');
             var csrf2 = document.querySelector('[name=csrfmiddlewaretoken]');
             if (csrf2) formData2.append('csrfmiddlewaretoken', csrf2.value);
 
