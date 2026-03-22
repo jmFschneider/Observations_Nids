@@ -48,7 +48,7 @@
                         <td>{{ fiche.resume.nombre_oeufs_pondus }}</td>
                         <td>{{ fiche.resume.nombre_poussins }}</td>
                         <td>
-                            <a href="{% url 'fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Voir détails</a>
+                            <a href="{% url 'observations:fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Voir détails</a>
                             <a href="{% url 'modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-primary">Modifier</a>
                         </td>
                     </tr>

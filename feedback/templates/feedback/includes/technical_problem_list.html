@@ -18,7 +18,7 @@
                         {% if problem.fiche_observation %}
                         &nbsp;·&nbsp;
                         <i class="fas fa-hashtag me-1"></i>
-                        <a href="{% url 'fiche_observation' problem.fiche_observation.pk %}" class="text-decoration-none">
+                        <a href="{% url 'observations:fiche_observation' problem.fiche_observation.pk %}" class="text-decoration-none">
                             Fiche n°{{ problem.fiche_observation.pk }}
                         </a>
                         {% endif %}
