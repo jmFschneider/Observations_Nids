@@ -77,12 +77,14 @@
                     <li class="nav-item">
                         <h6 class="sidebar-heading">Fiches Observations</h6>
                     </li>
+                    <!-- 
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'observations:observations_list' %}" data-title="Nouvelle fiche">
                             <i class="fas fa-plus-circle"></i>
                             <span class="link-text">Nouvelle fiche</span>
                         </a>
                     </li>
+                     -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'observations:liste_fiches_observations' %}" data-title="Liste des fiches">
                             <i class="fas fa-list-alt"></i>
@@ -96,7 +98,7 @@
                         </a>
                     </li>
 
-                    <!-- Section Mes Images -->
+                    <!-- Section Mes Images 
                     <li class="nav-item section-disabled">
                         <div class="sidebar-divider"></div>
                         <h6 class="sidebar-heading">Mes Images</h6>
@@ -113,6 +115,7 @@
                             <span class="link-text">Mes images téléversées</span>
                         </a>
                     </li>
+                    -->
 
                     <!-- Section Transcription (si autorisé) -->
                     {% if user.est_transcription or user.role == 'administrateur' %}
