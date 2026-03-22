@@ -905,6 +905,59 @@ function fermerModalRecherche() {
         </div>
     </div>
 
+    {% if fiche_form.instance.pk %}
+    <!-- Section Notes de fin de correction -->
+    <div class="row g-4 mt-2">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-transparent border-0 px-3 pt-3 pb-0">
+                    <span class="form-label fw-bold text-primary-emphasis mb-0">
+                        <i class="fas fa-flag-checkered me-1"></i> Notes relatives à la correction
+                    </span>
+                </div>
+                <div class="card-body">
+                    {% if notes_correction %}
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm table-hover mb-0" id="notes-correction-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 20%;">Date</th>
+                                    <th style="width: 20%;">Auteur</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
+                            <tbody class="align-middle">
+                                {% for note in notes_correction %}
+                                <tr>
+                                    <td class="text-muted small">{{ note.date_note|date:"d/m/Y H:i" }}</td>
+                                    <td class="small">{{ note.auteur.get_full_name|default:"Inconnu" }}</td>
+                                    <td class="small">{{ note.note }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted small mb-3" id="aucune-note-correction">Aucune note relative à la correction.</p>
+                    {% endif %}
+
+                    {% if peut_ajouter_note %}
+                    <div id="note-correction-form-zone">
+                        <div class="form-field">
+                            {{ note_correction_form.note }}
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="save-note-correction-btn">
+                            <i class="fas fa-plus me-1"></i> Ajouter la note
+                        </button>
+                        <span class="text-danger small ms-2" id="note-correction-error" style="display:none;"></span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Modal pour édition des remarques -->
     <div id="remarques-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
@@ -1453,5 +1506,84 @@ function fermerModalRecherche() {
         </div>
     </div>
 </div>
+
+{% if fiche_form.instance.pk and peut_ajouter_note %}
+<!-- Script pour l'ajout de note de fin de correction -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('save-note-correction-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', async function() {
+        const textarea = document.querySelector('#note-correction-form-zone textarea');
+        const errorSpan = document.getElementById('note-correction-error');
+        const noteText = textarea ? textarea.value.trim() : '';
+
+        errorSpan.style.display = 'none';
+
+        if (!noteText) {
+            errorSpan.textContent = 'La note ne peut pas être vide.';
+            errorSpan.style.display = 'inline';
+            return;
+        }
+
+        btn.disabled = true;
+        try {
+            const formData = new FormData();
+            formData.append('action', 'add_note_correction');
+            formData.append('note', noteText);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            const response = await fetch(window.location.pathname, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                const note = data.note;
+                // Masquer le message "aucune note"
+                const aucune = document.getElementById('aucune-note-correction');
+                if (aucune) aucune.style.display = 'none';
+
+                // Ajouter la ligne dans le tableau ou créer le tableau
+                let tbody = document.querySelector('#notes-correction-table tbody');
+                if (!tbody) {
+                    // Créer le tableau s'il n'existait pas encore
+                    const cardBody = document.querySelector('#note-correction-form-zone').closest('.card-body');
+                    const table = document.createElement('div');
+                    table.className = 'table-responsive mb-3';
+                    table.innerHTML = `<table class="table table-sm table-hover mb-0" id="notes-correction-table">
+                        <thead class="table-light"><tr>
+                            <th style="width:20%;">Date</th>
+                            <th style="width:20%;">Auteur</th>
+                            <th>Note</th>
+                        </tr></thead>
+                        <tbody class="align-middle"></tbody>
+                    </table>`;
+                    cardBody.insertBefore(table, document.getElementById('note-correction-form-zone'));
+                    tbody = document.querySelector('#notes-correction-table tbody');
+                }
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="text-muted small">${note.date_note}</td>
+                                <td class="small">${note.auteur}</td>
+                                <td class="small">${note.note.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</td>`;
+                tbody.appendChild(tr);
+                textarea.value = '';
+            } else {
+                errorSpan.textContent = data.message || 'Erreur lors de l\'ajout.';
+                errorSpan.style.display = 'inline';
+            }
+        } catch (e) {
+            errorSpan.textContent = 'Erreur réseau.';
+            errorSpan.style.display = 'inline';
+        } finally {
+            btn.disabled = false;
+        }
+    });
+});
+</script>
+{% endif %}
 
 {% endblock %}

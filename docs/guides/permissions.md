@@ -6,12 +6,13 @@
 
 ## 🎯 Vue d'Ensemble
 
-Le système de permissions repose sur **3 rôles** et **2 flags** additionnels :
+Le système de permissions repose sur **4 rôles** et **2 flags** additionnels :
 
 ```mermaid
 flowchart TB
     subgraph Roles["🎭 Rôles"]
         Admin[Administrateur]
+        SuperUser[Super Utilisateur]
         Reviewer[Reviewer]
         Observateur[Observateur]
     end
@@ -21,7 +22,8 @@ flowchart TB
         Staff[is_staff]
     end
 
-    Admin -->|inclut| Reviewer
+    Admin -->|inclut| SuperUser
+    SuperUser -->|inclut| Reviewer
     Reviewer -->|inclut| Observateur
 
     Admin -.->|auto| Transcription
@@ -40,6 +42,7 @@ flowchart TB
 ROLE_CHOICES = [
     ('observateur', 'Observateur'),
     ('reviewer', 'Reviewer'),
+    ('super_utilisateur', 'Super Utilisateur'),
     ('administrateur', 'Administrateur'),
 ]
 ```
@@ -49,7 +52,8 @@ ROLE_CHOICES = [
 | Rôle | Niveau | Description |
 |------|--------|-------------|
 | **Observateur** | Base | Saisie de ses propres fiches |
-| **Reviewer** | Intermédiaire | Correction des fiches soumises |
+| **Reviewer** | Intermédiaire | Correction et validation des fiches soumises |
+| **Super Utilisateur** | Élevé | Tous les droits reviewer + réouverture de toutes les fiches validées |
 | **Administrateur** | Complet | Gestion globale + tous droits |
 
 ---
@@ -58,56 +62,67 @@ ROLE_CHOICES = [
 
 ### Gestion des Fiches
 
-| Action | Observateur | Reviewer | Admin |
-|--------|:-----------:|:--------:|:-----:|
-| Créer une fiche | ✅ | ❌ | ✅ |
-| Modifier sa fiche (en_edition) | ✅ | ❌ | ✅ |
-| Voir ses fiches | ✅ | ✅ | ✅ |
-| Voir toutes les fiches | 👁️ lecture | ✅ | ✅ |
-| Soumettre pour correction | ✅ | ❌ | ✅ |
-| Corriger une fiche (en_cours) | ❌ | ✅ | ✅ |
-| Valider une fiche | ❌ | ✅ | ✅ |
-| Libérer son verrou | ❌ | ✅ | ✅ |
-| Libérer tout verrou | ❌ | ❌ | ✅ |
+| Action | Observateur | Reviewer | Super Util. | Admin |
+|--------|:-----------:|:--------:|:-----------:|:-----:|
+| Créer une fiche | ✅ | ✅ | ✅ | ✅ |
+| Modifier sa fiche (en_edition) | ✅ | ✅ | ✅ | ✅ |
+| Voir ses fiches | ✅ | ✅ | ✅ | ✅ |
+| Voir toutes les fiches | 👁️ lecture | ✅ | ✅ | ✅ |
+| Soumettre pour correction | ✅ | ✅ | ✅ | ✅ |
+| Corriger une fiche (en_cours) | ❌ | ✅ | ✅ | ✅ |
+| Valider une fiche | ❌ | ✅ | ✅ | ✅ |
+| Ajouter une note de correction | ❌ | ✅ | ✅ | ✅ |
+| Rouvrir une fiche qu'il a validée | ❌ | ✅ | ✅ | ✅ |
+| Rouvrir **toute** fiche validée | ❌ | ❌ | ✅ | ✅ |
+| Libérer son verrou | ❌ | ✅ | ✅ | ✅ |
+| Libérer tout verrou | ❌ | ❌ | ✅ | ✅ |
+| Supprimer une fiche | ❌ | ❌ | ❌ | ✅ |
+
+### Gestion des Observateurs
+
+| Action | Observateur | Reviewer | Super Util. | Admin |
+|--------|:-----------:|:--------:|:-----------:|:-----:|
+| Fusionner des observateurs | ❌ | ✅ | ✅ | ✅ |
+| Créer un observateur | ❌ | ✅ | ✅ | ✅ |
 
 ### Gestion des Images
 
-| Action | Observateur | Reviewer | Admin |
-|--------|:-----------:|:--------:|:-----:|
-| Uploader une image | ✅ | ✅ | ✅ |
-| Voir ses images | ✅ | ✅ | ✅ |
-| Voir toutes les images | ❌ | ❌ | ✅ |
+| Action | Observateur | Reviewer | Super Util. | Admin |
+|--------|:-----------:|:--------:|:-----------:|:-----:|
+| Uploader une image | ✅ | ✅ | ✅ | ✅ |
+| Voir ses images | ✅ | ✅ | ✅ | ✅ |
+| Voir toutes les images | ❌ | ❌ | ❌ | ✅ |
 
 ### Transcription & Import (avec flag)
 
-| Action | Observateur | Reviewer | Admin |
-|--------|:-----------:|:--------:|:-----:|
-| Accès menu Transcription | ❌* | ❌* | ✅ |
-| Préparer des images | ❌* | ❌* | ✅ |
-| Lancer transcription OCR | ❌* | ❌* | ✅ |
-| Importer JSON | ❌* | ❌* | ✅ |
-| Finaliser importations | ❌* | ❌* | ✅ |
+| Action | Observateur | Reviewer | Super Util. | Admin |
+|--------|:-----------:|:--------:|:-----------:|:-----:|
+| Accès menu Transcription | ❌* | ❌* | ❌* | ✅ |
+| Préparer des images | ❌* | ❌* | ❌* | ✅ |
+| Lancer transcription OCR | ❌* | ❌* | ❌* | ✅ |
+| Importer JSON | ❌* | ❌* | ❌* | ✅ |
+| Finaliser importations | ❌* | ❌* | ❌* | ✅ |
 
 *\* Sauf si `est_transcription = True`*
 
 ### Gestion des Utilisateurs
 
-| Action | Observateur | Reviewer | Admin |
-|--------|:-----------:|:--------:|:-----:|
-| Voir liste utilisateurs | ❌ | ❌ | ✅ |
-| Créer un utilisateur | ❌ | ❌ | ✅ |
-| Modifier un utilisateur | ❌ | ❌ | ✅ |
-| Valider un compte | ❌ | ❌ | ✅ |
-| Refuser un compte | ❌ | ❌ | ✅ |
-| Désactiver un utilisateur | ❌ | ❌ | ✅ |
-| Promouvoir administrateur | ❌ | ❌ | 🔒 superuser |
+| Action | Observateur | Reviewer | Super Util. | Admin |
+|--------|:-----------:|:--------:|:-----------:|:-----:|
+| Voir liste utilisateurs | ❌ | ❌ | ❌ | ✅ |
+| Créer un utilisateur | ❌ | ❌ | ❌ | ✅ |
+| Modifier un utilisateur | ❌ | ❌ | ❌ | ✅ |
+| Valider un compte | ❌ | ❌ | ❌ | ✅ |
+| Refuser un compte | ❌ | ❌ | ❌ | ✅ |
+| Désactiver un utilisateur | ❌ | ❌ | ❌ | ✅ |
+| Promouvoir administrateur | ❌ | ❌ | ❌ | 🔒 superuser |
 
 ### Référentiels (avec flag is_staff)
 
-| Action | Observateur | Reviewer | Admin |
-|--------|:-----------:|:--------:|:-----:|
-| Gérer les espèces | ❌ | ❌ | ✅* |
-| Gérer les communes | ❌ | ❌ | ✅* |
+| Action | Observateur | Reviewer | Super Util. | Admin |
+|--------|:-----------:|:--------:|:-----------:|:-----:|
+| Gérer les espèces | ❌ | ❌ | ❌ | ✅* |
+| Gérer les communes | ❌ | ❌ | ❌ | ✅* |
 
 *\* Requiert également `is_staff = True`*
 
@@ -266,19 +281,28 @@ sequenceDiagram
 
 ### Règles de Verrouillage
 
-| Situation | Observateur | Reviewer | Admin |
-|-----------|:-----------:|:--------:|:-----:|
-| Fiche verrouillée par autre | 👁️ lecture | 👁️ lecture | ⚠️ peut forcer |
-| Fiche verrouillée par soi | - | ✏️ édition | ✏️ édition |
-| Fiche non verrouillée | - | ✏️ verrouille | ✏️ verrouille |
+| Situation | Observateur | Reviewer | Super Util. | Admin |
+|-----------|:-----------:|:--------:|:-----------:|:-----:|
+| Fiche verrouillée par autre | 👁️ lecture | 👁️ lecture | ⚠️ peut forcer | ⚠️ peut forcer |
+| Fiche verrouillée par soi | - | ✏️ édition | ✏️ édition | ✏️ édition |
+| Fiche non verrouillée | - | ✏️ verrouille | ✏️ verrouille | ✏️ verrouille |
 
 ### Libération de Verrou
 
 | Qui | Peut libérer |
 |-----|--------------|
 | Reviewer | Son propre verrou |
+| Super Utilisateur | N'importe quel verrou |
 | Administrateur | N'importe quel verrou |
 | Système | Verrous expirés (auto) |
+
+### Réouverture de Fiche Validée
+
+| Qui | Peut rouvrir |
+|-----|--------------|
+| Reviewer | Uniquement les fiches qu'il a lui-même validées |
+| Super Utilisateur | Toutes les fiches validées |
+| Administrateur | Toutes les fiches validées |
 
 ---
 
@@ -311,9 +335,20 @@ sequenceDiagram
 - ✅ Tout ce que peut l'observateur
 - ✅ Corriger les fiches soumises
 - ✅ Valider les fiches
+- ✅ Ajouter des notes de correction
 - ✅ Gérer ses verrous
-- ❌ Créer des fiches
+- ✅ Rouvrir les fiches qu'il a validées
+- ✅ Créer et modifier ses propres fiches
+- ✅ Fusionner / créer des observateurs
 - ❌ Gérer les utilisateurs
+
+### Super Utilisateur
+
+- ✅ Tout ce que peut le reviewer
+- ✅ Rouvrir **toutes** les fiches validées (pas seulement les siennes)
+- ✅ Libérer n'importe quel verrou
+- ❌ Gérer les utilisateurs
+- ❌ Accès Django Admin
 
 ### Administrateur
 

@@ -20,11 +20,12 @@ from observations.forms import (
     FicheObservationForm,
     LocalisationForm,
     NidForm,
+    NoteCorrectionForm,
     ObservationForm,
     RemarqueForm,
     ResumeObservationForm,
 )
-from observations.models import FicheObservation, Observation, Remarque
+from observations.models import FicheObservation, NoteCorrection, Observation, Remarque
 
 logger = logging.getLogger('observations')
 
@@ -47,6 +48,7 @@ def handle_remarques_update(request, fiche_instance, remarqueformset):
         if request.user != fiche_instance.observateur and request.user.role not in [
             'administrateur',
             'reviewer',
+            'super_utilisateur',
         ]:
             return JsonResponse(
                 {
@@ -144,6 +146,59 @@ def handle_get_remarques(request, fiche_instance):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+def handle_add_note_correction(request, fiche_instance):
+    """
+    Ajoute une note de fin de correction via AJAX.
+    Réservé aux reviewer et administrateur.
+    """
+    try:
+        if request.user.role not in ['administrateur', 'reviewer', 'super_utilisateur']:
+            return JsonResponse(
+                {
+                    'status': 'forbidden',
+                    'message': "Vous n'êtes pas autorisé à ajouter une note de correction.",
+                },
+                status=403,
+            )
+        form = NoteCorrectionForm(request.POST)
+        if form.is_valid():
+            note_text = form.cleaned_data['note'].strip()
+            if not note_text:
+                return JsonResponse(
+                    {'status': 'error', 'message': 'La note ne peut pas être vide.'},
+                    status=400,
+                )
+            note = NoteCorrection.objects.create(
+                fiche=fiche_instance,
+                note=note_text,
+                auteur=request.user,
+            )
+            HistoriqueModification.objects.create(
+                fiche=fiche_instance,
+                champ_modifie='note_correction_ajoutee',
+                ancienne_valeur='',
+                nouvelle_valeur=note_text,
+                categorie='note_correction',
+                modifie_par=request.user,
+            )
+            return JsonResponse(
+                {
+                    'status': 'success',
+                    'note': {
+                        'id': note.id,
+                        'note': note.note,
+                        'date_note': note.date_note.strftime('%d/%m/%Y %H:%M'),
+                        'auteur': note.auteur.get_full_name() if note.auteur else '',
+                    },
+                }
+            )
+        else:
+            return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
+    except Exception as e:
+        logger.error(f"Erreur lors de l'ajout d'une note de correction: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
 @login_required
 def fiche_observation_view(request, fiche_id):
     fiche = get_object_or_404(FicheObservation, pk=fiche_id)
@@ -156,6 +211,11 @@ def fiche_observation_view(request, fiche_id):
     # Ajout de vérification pour les champs manquants
     observations = fiche.observations.all() if hasattr(fiche, 'observations') else None
     remarques = fiche.remarques.all() if hasattr(fiche, 'remarques') else None
+    notes_correction = (
+        fiche.notes_correction.select_related('auteur').order_by('date_note')
+        if hasattr(fiche, 'notes_correction')
+        else []
+    )
 
     # Préserver la query string de la liste pour le bouton "Retour" (page, filtres)
     return_list_query = request.GET.urlencode()
@@ -168,6 +228,7 @@ def fiche_observation_view(request, fiche_id):
         'causes_echec': causes_echec,
         'observations': observations,
         'remarques': remarques,
+        'notes_correction': notes_correction,
         'return_list_query': return_list_query,
     }
     return render(request, 'fiche_observation.html', context)
@@ -188,6 +249,7 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
     resume_instance = None
     causes_echec_instance = None
     remarques = []
+    notes_correction = []
 
     # Récupérer les données existantes si on est en mode modification
     read_only = False
@@ -200,6 +262,7 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
             read_only = user != fiche_instance.observateur and user.role not in [
                 'administrateur',
                 'reviewer',
+                'super_utilisateur',
             ]
 
             # Vérifier les permissions pour les fiches en cours de saisie
@@ -219,7 +282,7 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
                 elif etat.statut == 'en_cours':
                     if etat.est_verrouillee() and user != etat.en_correction_par:
                         # Un autre reviewer ou un admin tente d'accéder
-                        if user.role == 'administrateur':
+                        if user.role in ['administrateur', 'super_utilisateur']:
                             messages.warning(
                                 request,
                                 f"Cette fiche est en cours de correction par "
@@ -254,6 +317,9 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
             resume_instance = fiche_instance.resume
             causes_echec_instance = fiche_instance.causes_echec
             remarques = fiche_instance.remarques.all()
+            notes_correction = fiche_instance.notes_correction.select_related('auteur').order_by(
+                'date_note'
+            )
         except FicheObservation.DoesNotExist:
             return render(request, 'saisie/error_page.html', {'message': "Fiche non trouvée"})
 
@@ -293,6 +359,10 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
     if request.method == "POST" and request.POST.get('action') == 'update_remarques':
         # Traitement spécial pour la mise à jour des remarques uniquement (via AJAX)
         return handle_remarques_update(request, fiche_instance, remarqueformset)
+
+    if request.method == "POST" and request.POST.get('action') == 'add_note_correction':
+        # Ajout d'une note de fin de correction (reviewer/administrateur uniquement)
+        return handle_add_note_correction(request, fiche_instance)
 
     # Traitement spécial pour récupérer les remarques via AJAX (GET)
     if (
@@ -717,6 +787,9 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
     # Préserver la query string de la liste pour "Retour à la liste" (page, filtres)
     return_list_query = request.GET.urlencode()
 
+    user = cast(Utilisateur, request.user)
+    peut_ajouter_note = user.role in ['administrateur', 'reviewer', 'super_utilisateur']
+
     context = {
         'fiche_form': fiche_form,
         'localisation_form': localisation_form,
@@ -726,6 +799,9 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
         'observation_formset': observation_formset,
         'remarque_formset': remarque_formset,
         'remarques': remarques,
+        'notes_correction': notes_correction,
+        'note_correction_form': NoteCorrectionForm() if peut_ajouter_note else None,
+        'peut_ajouter_note': peut_ajouter_note,
         'read_only': read_only,
         'return_list_query': return_list_query,
     }
@@ -956,7 +1032,7 @@ def valider_correction(request, fiche_id):
     logger.info(f"valider_correction appelé pour fiche {fiche_id}, méthode: {request.method}")
 
     # Vérifier que l'utilisateur est un reviewer ou administrateur
-    if user.role not in ["reviewer", "administrateur"]:
+    if user.role not in ["reviewer", "administrateur", "super_utilisateur"]:
         messages.error(request, "Vous n'êtes pas autorisé à valider cette correction")
         return redirect('observations:modifier_observation', fiche_id=fiche_id)
 
@@ -1046,8 +1122,9 @@ def rouvrir_fiche(request, fiche_id):
     user = cast(Utilisateur, request.user)
     etat = fiche.etat_correction
 
-    # Vérification du rôle administrateur ou de l'auteur de la validation
-    if user.role != 'administrateur' and user != etat.validee_par:
+    # Vérification du rôle : administrateur et super_utilisateur peuvent rouvrir toutes les fiches,
+    # un reviewer ne peut rouvrir que les fiches qu'il a lui-même validées
+    if user.role not in ['administrateur', 'super_utilisateur'] and user != etat.validee_par:
         messages.error(request, "Vous n'avez pas les droits pour rouvrir cette fiche.")
         return redirect('observations:fiche_observation', fiche_id=fiche_id)
 
@@ -1174,8 +1251,8 @@ def liberer_verrou_fiche(request, fiche_id):
     # Vérifier les permissions
     peut_debloquer = False
 
-    if user.role == 'administrateur':
-        # Les administrateurs peuvent toujours débloquer
+    if user.role in ['administrateur', 'super_utilisateur']:
+        # Les administrateurs et super_utilisateurs peuvent toujours débloquer
         peut_debloquer = True
     elif etat.en_correction_par == user:
         # Un reviewer peut débloquer sa propre fiche

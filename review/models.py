@@ -9,7 +9,9 @@ class Validation(models.Model):
         'observations.FicheObservation', on_delete=models.CASCADE, related_name="validations"
     )
     reviewer = models.ForeignKey(
-        Utilisateur, on_delete=models.CASCADE, limit_choices_to={'role': 'reviewer'}
+        Utilisateur,
+        on_delete=models.CASCADE,
+        limit_choices_to={'role__in': ['reviewer', 'super_utilisateur']},
     )
     statut = models.CharField(max_length=10, choices=STATUT_VALIDATION_CHOICES, default='en_cours')
     date_modification = models.DateTimeField(auto_now_add=True)

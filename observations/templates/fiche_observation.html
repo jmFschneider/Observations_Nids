@@ -462,6 +462,43 @@
     </div>
 </div>
 
+<!-- Notes relatives à la correction -->
+{% if notes_correction %}
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent border-0 px-3 pt-3 pb-0">
+                <span class="form-label fw-bold text-primary-emphasis mb-0">
+                    <i class="fas fa-flag-checkered me-1"></i> Notes relatives à la correction
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 20%;">Date</th>
+                                <th style="width: 20%;">Auteur</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody class="align-middle">
+                            {% for note in notes_correction %}
+                            <tr>
+                                <td class="text-muted small">{{ note.date_note|date:"d/m/Y H:i" }}</td>
+                                <td class="small">{{ note.auteur.get_full_name|default:"Inconnu" }}</td>
+                                <td class="small">{{ note.note }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Barre d'actions flottante -->
 <div class="floating-action-bar" id="floating-action-bar">
     <div class="floating-action-bar-content">

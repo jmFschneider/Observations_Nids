@@ -46,9 +46,9 @@ def calculer_similarite(nom1: str, nom2: str) -> float:
 def verifier_permission_fusion(user) -> bool:
     """
     Vérifie si l'utilisateur peut effectuer une fusion d'observateurs.
-    Seuls les reviewers et administrateurs ont cette permission.
+    Seuls les reviewers, super_utilisateurs et administrateurs ont cette permission.
     """
-    return user.role in ['reviewer', 'administrateur']
+    return user.role in ['reviewer', 'administrateur', 'super_utilisateur']
 
 
 def obtenir_nom_complet(utilisateur: Utilisateur) -> str:

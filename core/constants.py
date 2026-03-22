@@ -13,6 +13,7 @@ STATUT_IMPORTATION_CHOICES = [
 ROLE_CHOICES = [
     ('observateur', 'Observateur'),
     ('reviewer', 'Reviewer'),
+    ('super_utilisateur', 'Super Utilisateur'),
     ('administrateur', 'Administrateur'),
 ]
 
@@ -25,4 +26,5 @@ CATEGORIE_MODIFICATION_CHOICES = [
     ('resume_observation', 'Résumé Observation'),
     ('causes_echec', 'Causes d\'échec'),
     ('remarque', 'Remarque'),
+    ('note_correction', 'Note de correction'),
 ]

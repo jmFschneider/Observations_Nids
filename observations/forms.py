@@ -9,6 +9,7 @@ from observations.models import (
     FicheObservation,
     ImageSource,
     Nid,
+    NoteCorrection,
     Observation,
     Remarque,
     ResumeObservation,
@@ -504,6 +505,23 @@ RemarqueFormSet = forms.inlineformset_factory(
     min_num=0,  # Aucune remarque minimum requise
     validate_min=True,
 )
+
+
+class NoteCorrectionForm(forms.ModelForm):
+    note = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                'placeholder': 'Saisir une note relative à la correction',
+                'rows': 3,
+                'required': False,
+            }
+        ),
+    )
+
+    class Meta:
+        model = NoteCorrection
+        fields = ['note']
 
 
 class ImageSourceForm(forms.ModelForm):

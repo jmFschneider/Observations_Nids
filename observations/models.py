@@ -307,6 +307,25 @@ class Remarque(models.Model):
         super().save(*args, **kwargs)
 
 
+class NoteCorrection(models.Model):
+    fiche = models.ForeignKey(
+        FicheObservation, on_delete=models.CASCADE, related_name="notes_correction"
+    )
+    note = models.TextField()
+    date_note = models.DateTimeField(auto_now_add=True)
+    auteur = models.ForeignKey(
+        Utilisateur,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="notes_correction",
+    )
+
+    def __str__(self) -> str:
+        auteur_str = self.auteur.get_full_name() if self.auteur else "Inconnu"
+        return f"Note du {self.date_note.strftime('%d/%m/%Y %H:%M')} par {auteur_str} (Fiche {self.fiche.num_fiche})"
+
+
 class EtatCorrection(models.Model):
     STATUTS_CHOICES = [
         ('nouveau', 'Nouvelle fiche'),
