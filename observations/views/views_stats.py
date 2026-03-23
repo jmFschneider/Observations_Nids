@@ -9,9 +9,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.generic import TemplateView
 
 from accounts.models import Utilisateur
+from observations.models import FicheObservation
 from observations.stats import StatsGeographie, get_stats_tableau_bord
 
 
@@ -172,5 +174,82 @@ def stats_geo_data(request):
         {
             'communes': communes_serializables,
             'kpis': donnees['kpis'],
+        }
+    )
+
+
+def stats_geo_fiches(request):
+    """
+    Endpoint AJAX retournant la liste des fiches d'une commune donnée.
+
+    Paramètres GET :
+        commune     (str) : nom de la commune
+        departement (str) : code ou nom du département
+        annee_debut (int, optionnel)
+        annee_fin   (int, optionnel)
+        espece_id   (int, optionnel)
+
+    Retourne :
+        JsonResponse avec les clés 'commune', 'departement', 'total', 'fiches'.
+    """
+    if not request.user.is_authenticated or request.user.role not in [
+        'administrateur',
+        'correcteur',
+    ]:
+        return JsonResponse({'error': 'Accès refusé'}, status=403)
+
+    commune = request.GET.get('commune', '').strip()
+    departement = request.GET.get('departement', '').strip()
+
+    if not commune or not departement:
+        return JsonResponse({'error': 'Paramètres commune et departement requis'}, status=400)
+
+    annee_debut = request.GET.get('annee_debut') or None
+    annee_fin = request.GET.get('annee_fin') or None
+    espece_id = request.GET.get('espece_id') or None
+
+    qs = FicheObservation.objects.filter(
+        localisation__commune=commune,
+        localisation__departement=departement,
+    )
+
+    if annee_debut:
+        qs = qs.filter(annee__gte=int(annee_debut))
+    if annee_fin:
+        qs = qs.filter(annee__lte=int(annee_fin))
+    if espece_id:
+        qs = qs.filter(espece_id=int(espece_id))
+
+    badge_par_statut = {
+        'nouveau': 'bg-info',
+        'en_edition': 'bg-info',
+        'en_cours': 'bg-warning text-dark',
+        'valide': 'bg-success',
+    }
+
+    fiches = []
+    for fiche in qs.select_related('espece', 'etat_correction').order_by(
+        '-annee', '-date_creation'
+    ):
+        statut_code = getattr(fiche.etat_correction, 'statut', 'nouveau')
+        fiches.append(
+            {
+                'num': fiche.num_fiche,
+                'espece': fiche.espece.nom,
+                'annee': fiche.annee,
+                'statut': fiche.etat_correction.get_statut_display(),
+                'badge': badge_par_statut.get(statut_code, 'bg-secondary'),
+                'url': reverse(
+                    'observations:fiche_observation', kwargs={'fiche_id': fiche.num_fiche}
+                ),
+            }
+        )
+
+    return JsonResponse(
+        {
+            'commune': commune,
+            'departement': departement,
+            'total': len(fiches),
+            'fiches': fiches,
         }
     )

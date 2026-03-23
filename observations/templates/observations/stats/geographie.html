@@ -91,7 +91,9 @@
                 <h5 class="mb-0">
                     <i class="fas fa-map-marked-alt text-primary me-2"></i>Carte des observations
                 </h5>
-                <small class="text-muted">Taille des cercles proportionnelle au nombre de fiches</small>
+                <small class="text-muted">
+                    <i class="fas fa-hand-pointer me-1"></i>Cliquez sur un cercle pour voir les fiches
+                </small>
             </div>
             <div class="card-body p-0">
                 <div id="carte-geo" style="height: 480px; border-radius: 0 0 0.375rem 0;"></div>
@@ -117,6 +119,37 @@
     </div>
 </div>
 
+<!-- Offcanvas : liste des fiches d'une commune (C) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="panneau-fiches"
+     aria-labelledby="panneau-fiches-label" style="width: 420px;">
+    <div class="offcanvas-header border-bottom">
+        <div>
+            <h5 class="offcanvas-title mb-0" id="panneau-fiches-label">
+                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                <span id="panneau-titre-commune">—</span>
+            </h5>
+            <small class="text-muted" id="panneau-sous-titre"></small>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+        <!-- Spinner de chargement -->
+        <div id="panneau-loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted mt-2 small">Chargement des fiches…</p>
+        </div>
+        <!-- Liste des fiches -->
+        <div id="panneau-liste" style="display:none;">
+            <ul class="list-group list-group-flush" id="panneau-ul"></ul>
+        </div>
+        <!-- Aucune fiche -->
+        <div id="panneau-vide" class="text-center py-5" style="display:none;">
+            <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+            <p class="text-muted">Aucune fiche pour cette sélection.</p>
+        </div>
+    </div>
+</div>
+
 <!-- Leaflet CSS + JS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -127,9 +160,12 @@
 (function () {
     'use strict';
 
-    const DATA_URL = "{% url 'observations:stats_geo_data' %}";
+    const DATA_URL        = "{% url 'observations:stats_geo_data' %}";
+    const FICHES_URL      = "{% url 'observations:stats_geo_fiches' %}";
 
-    // --- Carte Leaflet ---
+    // -----------------------------------------------------------------------
+    // Carte Leaflet
+    // -----------------------------------------------------------------------
     const map = L.map('carte-geo').setView([49.0, -1.2], 8);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -138,7 +174,19 @@
 
     let circlesLayer = L.layerGroup().addTo(map);
 
-    // --- Graphique Chart.js (barres horizontales) ---
+    // Offcanvas Bootstrap (C)
+    const panneauEl    = document.getElementById('panneau-fiches');
+    const panneauBS    = new bootstrap.Offcanvas(panneauEl);
+    const panneauTitre = document.getElementById('panneau-titre-commune');
+    const panneauSous  = document.getElementById('panneau-sous-titre');
+    const panneauLoad  = document.getElementById('panneau-loading');
+    const panneauListe = document.getElementById('panneau-liste');
+    const panneauUl    = document.getElementById('panneau-ul');
+    const panneauVide  = document.getElementById('panneau-vide');
+
+    // -----------------------------------------------------------------------
+    // Graphique Chart.js (barres horizontales)
+    // -----------------------------------------------------------------------
     const chartCtx = document.getElementById('chartCommunes');
     const chart = new Chart(chartCtx, {
         type: 'bar',
@@ -147,92 +195,222 @@
             datasets: [{
                 data: [],
                 backgroundColor: 'rgba(13, 110, 253, 0.55)',
-                borderColor: 'rgba(13, 110, 253, 0.85)',
+                borderColor:     'rgba(13, 110, 253, 0.85)',
                 borderWidth: 1,
             }],
         },
         options: {
             indexAxis: 'y',
             responsive: true,
-            plugins: {
-                legend: { display: false },
-            },
+            plugins: { legend: { display: false } },
             scales: {
-                x: {
-                    beginAtZero: true,
-                    ticks: { precision: 0 },
-                },
-                y: {
-                    ticks: { font: { size: 11 } },
-                },
+                x: { beginAtZero: true, ticks: { precision: 0 } },
+                y: { ticks: { font: { size: 11 } } },
             },
         },
     });
 
-    // --- Mise à jour des KPIs ---
-    function updateKpis(kpis) {
-        document.getElementById('kpi-fiches').textContent = kpis.nb_fiches.toLocaleString('fr-FR');
-        document.getElementById('kpi-communes').textContent = kpis.nb_communes.toLocaleString('fr-FR');
-        document.getElementById('kpi-departements').textContent = kpis.nb_departements.toLocaleString('fr-FR');
-        document.getElementById('kpi-non-geo').textContent = kpis.nb_non_geocodees.toLocaleString('fr-FR');
+    // -----------------------------------------------------------------------
+    // Styles des cercles
+    // -----------------------------------------------------------------------
+    const styleNormal = {
+        color:       'rgba(13, 110, 253, 0.85)',
+        fillColor:   'rgba(13, 110, 253, 0.28)',
+        fillOpacity: 0.65,
+        weight:      1.5,
+    };
+    const styleHover = {
+        color:       'rgba(13, 110, 253, 1)',
+        fillColor:   'rgba(13, 110, 253, 0.55)',
+        fillOpacity: 0.80,
+        weight:      3,
+    };
+    const styleActif = {
+        color:       'rgba(220, 53, 69, 1)',
+        fillColor:   'rgba(220, 53, 69, 0.45)',
+        fillOpacity: 0.80,
+        weight:      3,
+    };
+
+    let circleActif = null;   // référence au dernier cercle cliqué
+
+    // -----------------------------------------------------------------------
+    // Panneau fiches (C) — chargement AJAX
+    // -----------------------------------------------------------------------
+    function ouvrirPanneauFiches(commune, departement) {
+        // Titre
+        panneauTitre.textContent = commune + ' (' + departement + ')';
+        panneauSous.textContent  = '';
+
+        // Réinitialiser l'état
+        panneauLoad.style.display  = '';
+        panneauListe.style.display = 'none';
+        panneauVide.style.display  = 'none';
+        panneauUl.innerHTML        = '';
+
+        panneauBS.show();
+
+        // Transmettre les filtres actifs pour cohérence avec la carte
+        const params = new URLSearchParams({
+            commune:     commune,
+            departement: departement,
+            annee_debut: document.getElementById('annee_debut').value,
+            annee_fin:   document.getElementById('annee_fin').value,
+            espece_id:   document.getElementById('espece_id').value,
+        });
+
+        fetch(FICHES_URL + '?' + params.toString())
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                panneauLoad.style.display = 'none';
+                panneauSous.textContent   = data.total + ' fiche' + (data.total > 1 ? 's' : '');
+
+                if (!data.fiches.length) {
+                    panneauVide.style.display = '';
+                    return;
+                }
+
+                data.fiches.forEach(function (f) {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item list-group-item-action px-3 py-2';
+                    li.innerHTML =
+                        '<div class="d-flex justify-content-between align-items-start">'
+                        + '<div>'
+                        +   '<a href="' + f.url + '" target="_blank" class="fw-semibold text-decoration-none">'
+                        +     '<i class="fas fa-file-alt me-1 text-muted"></i>#' + f.num
+                        +   '</a>'
+                        +   '<span class="ms-2 text-muted small">' + f.annee + '</span>'
+                        +   '<div class="small text-muted mt-1">' + f.espece + '</div>'
+                        + '</div>'
+                        + '<span class="badge ' + f.badge + ' ms-2 align-self-center">' + f.statut + '</span>'
+                        + '</div>';
+                    panneauUl.appendChild(li);
+                });
+
+                panneauListe.style.display = '';
+            })
+            .catch(function (err) {
+                panneauLoad.style.display = 'none';
+                panneauVide.style.display = '';
+                console.error('Erreur chargement fiches commune :', err);
+            });
     }
 
-    // --- Mise à jour de la carte ---
+    // -----------------------------------------------------------------------
+    // Mise à jour de la carte
+    // -----------------------------------------------------------------------
     function updateMap(communes) {
         circlesLayer.clearLayers();
+        circleActif = null;
 
         if (!communes.length) return;
 
         const maxFiches = communes[0].nb_fiches;
 
         communes.forEach(function (c) {
-            // Rayon : racine carrée du nombre de fiches, mise à l'échelle
-            // entre 1 500 m (minimum) et 20 000 m (maximum)
-            const ratio = Math.sqrt(c.nb_fiches / maxFiches);
+            const ratio  = Math.sqrt(c.nb_fiches / maxFiches);
             const radius = 1500 + ratio * 18500;
 
-            const circle = L.circle([c.lat, c.lon], {
-                radius: radius,
-                color: 'rgba(13, 110, 253, 0.9)',
-                fillColor: 'rgba(13, 110, 253, 0.3)',
-                fillOpacity: 0.6,
-                weight: 1.5,
-            }).bindPopup(
-                '<strong>' + c.commune + '</strong>'
-                + ' <span class="text-muted">(' + c.departement + ')</span>'
-                + '<br><i class="fas fa-file-alt me-1"></i>'
-                + c.nb_fiches + ' fiche' + (c.nb_fiches > 1 ? 's' : '')
+            const circle = L.circle([c.lat, c.lon], Object.assign({ radius: radius }, styleNormal));
+
+            // Tooltip permanent au survol (A)
+            circle.bindTooltip(
+                '<strong>' + c.commune + '</strong> (' + c.departement + ')'
+                + '<br><i class="fas fa-file-alt"></i> '
+                + c.nb_fiches + ' fiche' + (c.nb_fiches > 1 ? 's' : ''),
+                { sticky: true, direction: 'top', opacity: 0.92 }
             );
+
+            // Survol — highlight (A)
+            circle.on('mouseover', function () {
+                if (this !== circleActif) {
+                    this.setStyle(styleHover);
+                }
+                this.openTooltip();
+            });
+            circle.on('mouseout', function () {
+                if (this !== circleActif) {
+                    this.setStyle(styleNormal);
+                }
+                this.closeTooltip();
+            });
+
+            // Clic — zoom + popup + panneau fiches (B + C)
+            circle.on('click', function () {
+                // Réinitialiser le cercle précédemment actif
+                if (circleActif && circleActif !== this) {
+                    circleActif.setStyle(styleNormal);
+                }
+                circleActif = this;
+                this.setStyle(styleActif);
+
+                // Zoom sur la commune (B)
+                map.flyTo([c.lat, c.lon], 12, { duration: 0.7 });
+
+                // Popup synthétique (B)
+                L.popup()
+                    .setLatLng([c.lat, c.lon])
+                    .setContent(
+                        '<strong>' + c.commune + '</strong> (' + c.departement + ')'
+                        + '<br><i class="fas fa-file-alt me-1"></i>'
+                        + c.nb_fiches + ' fiche' + (c.nb_fiches > 1 ? 's' : '')
+                        + '<br><small class="text-muted">Cliquez sur un titre pour ouvrir la fiche</small>'
+                    )
+                    .openOn(map);
+
+                // Panneau latéral avec liste fiches (C)
+                ouvrirPanneauFiches(c.commune, c.departement);
+            });
 
             circlesLayer.addLayer(circle);
         });
     }
 
-    // --- Mise à jour du graphique ---
+    // Réinitialiser le cercle actif si l'offcanvas est fermé manuellement
+    panneauEl.addEventListener('hidden.bs.offcanvas', function () {
+        if (circleActif) {
+            circleActif.setStyle(styleNormal);
+            circleActif = null;
+        }
+    });
+
+    // -----------------------------------------------------------------------
+    // Mise à jour des KPIs
+    // -----------------------------------------------------------------------
+    function updateKpis(kpis) {
+        document.getElementById('kpi-fiches').textContent       = kpis.nb_fiches.toLocaleString('fr-FR');
+        document.getElementById('kpi-communes').textContent     = kpis.nb_communes.toLocaleString('fr-FR');
+        document.getElementById('kpi-departements').textContent = kpis.nb_departements.toLocaleString('fr-FR');
+        document.getElementById('kpi-non-geo').textContent      = kpis.nb_non_geocodees.toLocaleString('fr-FR');
+    }
+
+    // -----------------------------------------------------------------------
+    // Mise à jour du graphique
+    // -----------------------------------------------------------------------
     function updateChart(communes) {
-        const top10 = communes.slice(0, 10);
-        const msgAucune = document.getElementById('msg-aucune-donnee');
+        const top10    = communes.slice(0, 10);
+        const msgVide  = document.getElementById('msg-aucune-donnee');
 
         if (!top10.length) {
             chartCtx.style.display = 'none';
-            msgAucune.style.display = '';
-            chart.data.labels = [];
-            chart.data.datasets[0].data = [];
+            msgVide.style.display  = '';
+            chart.data.labels              = [];
+            chart.data.datasets[0].data    = [];
             chart.update();
             return;
         }
 
         chartCtx.style.display = '';
-        msgAucune.style.display = 'none';
+        msgVide.style.display  = 'none';
 
-        chart.data.labels = top10.map(function (c) {
-            return c.commune + ' (' + c.departement + ')';
-        });
+        chart.data.labels           = top10.map(function (c) { return c.commune + ' (' + c.departement + ')'; });
         chart.data.datasets[0].data = top10.map(function (c) { return c.nb_fiches; });
         chart.update();
     }
 
-    // --- Chargement des données ---
+    // -----------------------------------------------------------------------
+    // Chargement des données carte + KPIs
+    // -----------------------------------------------------------------------
     function chargerDonnees() {
         const params = new URLSearchParams({
             annee_debut: document.getElementById('annee_debut').value,
@@ -252,13 +430,12 @@
             });
     }
 
-    // Soumission du formulaire de filtres
     document.getElementById('filtres-geo').addEventListener('submit', function (e) {
         e.preventDefault();
         chargerDonnees();
     });
 
-    // Chargement initial (toutes années, toutes espèces)
+    // Chargement initial
     chargerDonnees();
 })();
 </script>
