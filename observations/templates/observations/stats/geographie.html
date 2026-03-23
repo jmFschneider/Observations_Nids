@@ -1,0 +1,266 @@
+{% extends "observations/stats/base_stats.html" %}
+
+{% block stats_title %}Géographie - Statistiques{% endblock %}
+{% block stats_page_title %}Géographie{% endblock %}
+
+{% block stats_content %}
+
+<!-- Barre de filtres -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body py-3">
+        <form id="filtres-geo" class="row g-3 align-items-end">
+            <div class="col-12 col-md-3">
+                <label for="annee_debut" class="form-label small fw-bold mb-1">Année de</label>
+                <select class="form-select form-select-sm" name="annee_debut" id="annee_debut">
+                    <option value="">Toutes</option>
+                    {% for annee in annees_disponibles %}
+                    <option value="{{ annee }}">{{ annee }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label for="annee_fin" class="form-label small fw-bold mb-1">à</label>
+                <select class="form-select form-select-sm" name="annee_fin" id="annee_fin">
+                    <option value="">Toutes</option>
+                    {% for annee in annees_disponibles reversed %}
+                    <option value="{{ annee }}">{{ annee }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-4">
+                <label for="espece_id" class="form-label small fw-bold mb-1">Espèce</label>
+                <select class="form-select form-select-sm" name="espece_id" id="espece_id">
+                    <option value="">Toutes les espèces</option>
+                    {% for espece in especes_disponibles %}
+                    <option value="{{ espece.id }}">{{ espece.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="fas fa-filter me-1"></i>Appliquer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- KPIs (remplis dynamiquement) -->
+<div class="row row-cols-2 row-cols-md-4 g-3 mb-4" id="kpis-geo">
+    <div class="col">
+        <div class="card bg-primary-subtle text-primary-emphasis h-100 border-primary-subtle">
+            <div class="card-body text-center py-3">
+                <p class="card-title mb-1 small">Fiches</p>
+                <h2 class="fw-bold mb-0" id="kpi-fiches">—</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-success-subtle text-success-emphasis h-100 border-success-subtle">
+            <div class="card-body text-center py-3">
+                <p class="card-title mb-1 small">Communes</p>
+                <h2 class="fw-bold mb-0" id="kpi-communes">—</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-info-subtle text-info-emphasis h-100 border-info-subtle">
+            <div class="card-body text-center py-3">
+                <p class="card-title mb-1 small">Départements</p>
+                <h2 class="fw-bold mb-0" id="kpi-departements">—</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-warning-subtle text-warning-emphasis h-100 border-warning-subtle">
+            <div class="card-body text-center py-3">
+                <p class="card-title mb-1 small">Non géolocalisées</p>
+                <h2 class="fw-bold mb-0" id="kpi-non-geo">—</h2>
+                <small class="text-muted" style="font-size:0.7rem;">fiches sans coordonnées</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Carte + Graphique -->
+<div class="row g-3">
+    <!-- Carte Leaflet -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-map-marked-alt text-primary me-2"></i>Carte des observations
+                </h5>
+                <small class="text-muted">Taille des cercles proportionnelle au nombre de fiches</small>
+            </div>
+            <div class="card-body p-0">
+                <div id="carte-geo" style="height: 480px; border-radius: 0 0 0.375rem 0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top 10 communes -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar text-success me-2"></i>Top 10 communes
+                </h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <canvas id="chartCommunes"></canvas>
+                <p class="text-center text-muted mt-3 mb-0 small" id="msg-aucune-donnee" style="display:none;">
+                    <i class="fas fa-info-circle me-1"></i>Aucune donnée géolocalisée pour cette sélection.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet CSS + JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    const DATA_URL = "{% url 'observations:stats_geo_data' %}";
+
+    // --- Carte Leaflet ---
+    const map = L.map('carte-geo').setView([49.0, -1.2], 8);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 18,
+    }).addTo(map);
+
+    let circlesLayer = L.layerGroup().addTo(map);
+
+    // --- Graphique Chart.js (barres horizontales) ---
+    const chartCtx = document.getElementById('chartCommunes');
+    const chart = new Chart(chartCtx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: 'rgba(13, 110, 253, 0.55)',
+                borderColor: 'rgba(13, 110, 253, 0.85)',
+                borderWidth: 1,
+            }],
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 },
+                },
+                y: {
+                    ticks: { font: { size: 11 } },
+                },
+            },
+        },
+    });
+
+    // --- Mise à jour des KPIs ---
+    function updateKpis(kpis) {
+        document.getElementById('kpi-fiches').textContent = kpis.nb_fiches.toLocaleString('fr-FR');
+        document.getElementById('kpi-communes').textContent = kpis.nb_communes.toLocaleString('fr-FR');
+        document.getElementById('kpi-departements').textContent = kpis.nb_departements.toLocaleString('fr-FR');
+        document.getElementById('kpi-non-geo').textContent = kpis.nb_non_geocodees.toLocaleString('fr-FR');
+    }
+
+    // --- Mise à jour de la carte ---
+    function updateMap(communes) {
+        circlesLayer.clearLayers();
+
+        if (!communes.length) return;
+
+        const maxFiches = communes[0].nb_fiches;
+
+        communes.forEach(function (c) {
+            // Rayon : racine carrée du nombre de fiches, mise à l'échelle
+            // entre 1 500 m (minimum) et 20 000 m (maximum)
+            const ratio = Math.sqrt(c.nb_fiches / maxFiches);
+            const radius = 1500 + ratio * 18500;
+
+            const circle = L.circle([c.lat, c.lon], {
+                radius: radius,
+                color: 'rgba(13, 110, 253, 0.9)',
+                fillColor: 'rgba(13, 110, 253, 0.3)',
+                fillOpacity: 0.6,
+                weight: 1.5,
+            }).bindPopup(
+                '<strong>' + c.commune + '</strong>'
+                + ' <span class="text-muted">(' + c.departement + ')</span>'
+                + '<br><i class="fas fa-file-alt me-1"></i>'
+                + c.nb_fiches + ' fiche' + (c.nb_fiches > 1 ? 's' : '')
+            );
+
+            circlesLayer.addLayer(circle);
+        });
+    }
+
+    // --- Mise à jour du graphique ---
+    function updateChart(communes) {
+        const top10 = communes.slice(0, 10);
+        const msgAucune = document.getElementById('msg-aucune-donnee');
+
+        if (!top10.length) {
+            chartCtx.style.display = 'none';
+            msgAucune.style.display = '';
+            chart.data.labels = [];
+            chart.data.datasets[0].data = [];
+            chart.update();
+            return;
+        }
+
+        chartCtx.style.display = '';
+        msgAucune.style.display = 'none';
+
+        chart.data.labels = top10.map(function (c) {
+            return c.commune + ' (' + c.departement + ')';
+        });
+        chart.data.datasets[0].data = top10.map(function (c) { return c.nb_fiches; });
+        chart.update();
+    }
+
+    // --- Chargement des données ---
+    function chargerDonnees() {
+        const params = new URLSearchParams({
+            annee_debut: document.getElementById('annee_debut').value,
+            annee_fin:   document.getElementById('annee_fin').value,
+            espece_id:   document.getElementById('espece_id').value,
+        });
+
+        fetch(DATA_URL + '?' + params.toString())
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                updateKpis(data.kpis);
+                updateMap(data.communes);
+                updateChart(data.communes);
+            })
+            .catch(function (err) {
+                console.error('Erreur chargement données géo :', err);
+            });
+    }
+
+    // Soumission du formulaire de filtres
+    document.getElementById('filtres-geo').addEventListener('submit', function (e) {
+        e.preventDefault();
+        chargerDonnees();
+    });
+
+    // Chargement initial (toutes années, toutes espèces)
+    chargerDonnees();
+})();
+</script>
+
+{% endblock %}

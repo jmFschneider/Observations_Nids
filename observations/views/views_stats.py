@@ -7,11 +7,12 @@ statistiques réservés aux administrateurs et correcteurs.
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Q
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from accounts.models import Utilisateur
-from observations.stats import get_stats_tableau_bord
+from observations.stats import StatsGeographie, get_stats_tableau_bord
 
 
 class StatsAccessMixin(UserPassesTestMixin):
@@ -104,3 +105,72 @@ class StatsCorrecteursView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
         context['page_title'] = 'Statistiques des Correcteurs'
 
         return context
+
+
+class StatsGeographieView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
+    """
+    Vue de la page de statistiques géographiques.
+
+    Affiche une carte Leaflet avec des cercles proportionnels par commune,
+    un graphique des top 10 communes, et des KPIs géographiques.
+    Les données sont chargées dynamiquement via l'endpoint AJAX stats_geo_data.
+    Accessible uniquement aux administrateurs et correcteurs.
+    """
+
+    template_name = 'observations/stats/geographie.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['annees_disponibles'] = StatsGeographie.get_annees_disponibles()
+        context['especes_disponibles'] = StatsGeographie.get_especes_disponibles()
+        context['page_title'] = 'Statistiques Géographiques'
+        return context
+
+
+def stats_geo_data(request):
+    """
+    Endpoint AJAX retournant les données géographiques filtrées en JSON.
+
+    Paramètres GET :
+        annee_debut (int, optionnel) : première année à inclure
+        annee_fin   (int, optionnel) : dernière année à inclure
+        espece_id   (int, optionnel) : identifiant de l'espèce à isoler
+
+    Retourne :
+        JsonResponse avec les clés 'communes' et 'kpis'.
+    """
+    if not request.user.is_authenticated or request.user.role not in [
+        'administrateur',
+        'correcteur',
+    ]:
+        return JsonResponse({'error': 'Accès refusé'}, status=403)
+
+    annee_debut = request.GET.get('annee_debut') or None
+    annee_fin = request.GET.get('annee_fin') or None
+    espece_id = request.GET.get('espece_id') or None
+
+    donnees = StatsGeographie.get_donnees_geo(
+        annee_debut=annee_debut,
+        annee_fin=annee_fin,
+        espece_id=espece_id,
+    )
+
+    # Les valeurs Decimal (lat/lon issues de Avg) ne sont pas sérialisables
+    # directement en JSON — on les convertit en float
+    communes_serializables = [
+        {
+            'commune': c['commune'],
+            'departement': c['departement'],
+            'lat': float(c['lat']),
+            'lon': float(c['lon']),
+            'nb_fiches': c['nb_fiches'],
+        }
+        for c in donnees['communes']
+    ]
+
+    return JsonResponse(
+        {
+            'communes': communes_serializables,
+            'kpis': donnees['kpis'],
+        }
+    )

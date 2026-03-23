@@ -39,9 +39,10 @@
             </a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">
+            <a class="nav-link {% if request.resolver_match.url_name == 'stats_geographie' %}active{% endif %}"
+               href="{% url 'observations:stats_geographie' %}"
+               aria-current="{% if request.resolver_match.url_name == 'stats_geographie' %}page{% endif %}">
                 <i class="fas fa-map-marked-alt"></i> Géographie
-                <span class="badge bg-secondary ms-1">Bientôt</span>
             </a>
         </li>
         <li class="nav-item" role="presentation">

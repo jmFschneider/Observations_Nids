@@ -8,11 +8,14 @@ d'observation, les utilisateurs et l'activité de l'application.
 import json
 from datetime import timedelta
 
-from django.db.models import Avg, Count, ExpressionWrapper, F, Q, fields
+from django.db.models import Avg, Count, ExpressionWrapper, F, FloatField, Q, fields
+from django.db.models.functions import Cast
 from django.utils import timezone
 
 from audit.models import HistoriqueModification
+from geo.models import Localisation
 from observations.models import FicheObservation, Observation
+from taxonomy.models import Espece
 
 
 class StatsVolume:
@@ -253,6 +256,107 @@ class StatsPerformance:
             'fiches_validees': taux_validation['validees'],
             'validations_mois_courant': StatsPerformance.get_validations_mois_courant(),
             'modifications_30j': StatsPerformance.get_activite_corrections(30),
+        }
+
+
+class StatsGeographie:
+    """
+    Classe pour calculer les statistiques géographiques des fiches d'observation.
+
+    Fournit les données pour la carte Leaflet et les KPIs géographiques,
+    avec filtrage optionnel par plage d'années et par espèce.
+    """
+
+    @staticmethod
+    def get_annees_disponibles():
+        """Retourne la liste triée des années ayant au moins une fiche."""
+        return list(
+            FicheObservation.objects.values_list('annee', flat=True).distinct().order_by('annee')
+        )
+
+    @staticmethod
+    def get_especes_disponibles():
+        """Retourne les espèces ayant au moins une fiche, triées par nom."""
+        return list(
+            Espece.objects.filter(observations__isnull=False)
+            .distinct()
+            .order_by('nom')
+            .values('id', 'nom')
+        )
+
+    @staticmethod
+    def get_donnees_geo(annee_debut=None, annee_fin=None, espece_id=None):
+        """
+        Retourne les données géographiques filtrées pour la carte et les KPIs.
+
+        Args:
+            annee_debut (int|None): Première année à inclure.
+            annee_fin (int|None): Dernière année à inclure.
+            espece_id (int|None): Filtre sur une espèce spécifique.
+
+        Returns:
+            dict: {
+                'communes': [{'commune', 'departement', 'lat', 'lon', 'nb_fiches'}, ...],
+                'kpis': {'nb_fiches', 'nb_communes', 'nb_departements', 'nb_non_geocodees'}
+            }
+        """
+        qs = FicheObservation.objects.all()
+
+        if annee_debut:
+            qs = qs.filter(annee__gte=int(annee_debut))
+        if annee_fin:
+            qs = qs.filter(annee__lte=int(annee_fin))
+        if espece_id:
+            qs = qs.filter(espece_id=int(espece_id))
+
+        total_fiches = qs.count()
+
+        # Localisations liées aux fiches filtrées
+        locs = Localisation.objects.filter(fiche__in=qs)
+
+        # Fiches sans coordonnées exploitables (lat/lon = '0.0' ou commune vide)
+        nb_non_geocodees = locs.filter(
+            Q(latitude='0.0') | Q(longitude='0.0') | Q(commune='')
+        ).count()
+
+        # Communes géolocalisées : on groupe par commune+département,
+        # on moyenne les coordonnées pour avoir un point représentatif
+        communes_qs = (
+            locs.exclude(latitude='0.0')
+            .exclude(longitude='0.0')
+            .exclude(commune='')
+            .annotate(
+                lat_float=Cast('latitude', FloatField()),
+                lon_float=Cast('longitude', FloatField()),
+            )
+            .values('commune', 'departement')
+            .annotate(
+                nb_fiches=Count('fiche'),
+                lat=Avg('lat_float'),
+                lon=Avg('lon_float'),
+            )
+            .order_by('-nb_fiches')
+        )
+
+        communes_list = list(communes_qs)
+        nb_communes = len(communes_list)
+
+        nb_departements = (
+            locs.exclude(departement='00')
+            .exclude(departement='')
+            .values('departement')
+            .distinct()
+            .count()
+        )
+
+        return {
+            'communes': communes_list,
+            'kpis': {
+                'nb_fiches': total_fiches,
+                'nb_communes': nb_communes,
+                'nb_departements': nb_departements,
+                'nb_non_geocodees': nb_non_geocodees,
+            },
         }
 
 
