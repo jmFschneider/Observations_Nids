@@ -102,9 +102,7 @@ def feedback_triage(request):
     # Mais on utilise l'interface 'triage' qui est mieux organisée.
 
     # On sépare les retours par statut
-    new_feedbacks = Feedback.objects.filter(status__in=["NEW", "READ"]).order_by(
-        "-urgency", "-last_activity"
-    )
+    new_feedbacks = Feedback.objects.filter(status__in=["NEW", "READ"]).order_by("created_at")
     processing_feedbacks = Feedback.objects.filter(
         status__in=["IN_PROGRESS", "WAITING_USER"]
     ).order_by("-last_activity")
