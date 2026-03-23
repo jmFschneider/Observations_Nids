@@ -127,7 +127,7 @@ google-api-core==2.30.0
     # via
     #   -r requirements-base.in
     #   google-api-python-client
-google-api-python-client==2.192.0
+google-api-python-client==2.193.0
     # via -r requirements-base.in
 google-auth[requests]==2.47.0
     # via
@@ -140,7 +140,7 @@ google-auth-httplib2==0.3.0
     # via
     #   -r requirements-base.in
     #   google-api-python-client
-google-genai==1.66.0
+google-genai==1.68.0
     # via -r requirements-base.in
 googleapis-common-protos==1.73.0
     # via
