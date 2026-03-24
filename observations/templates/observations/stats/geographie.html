@@ -3,6 +3,10 @@
 {% block stats_title %}Géographie - Statistiques{% endblock %}
 {% block stats_page_title %}Géographie{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+
 {% block stats_content %}
 
 <!-- Barre de filtres -->
@@ -150,12 +154,11 @@
     </div>
 </div>
 
-<!-- Leaflet CSS + JS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
 
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
     'use strict';
@@ -439,5 +442,4 @@
     chargerDonnees();
 })();
 </script>
-
 {% endblock %}
