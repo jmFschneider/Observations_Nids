@@ -772,6 +772,9 @@ class ImportationService:
                     'importation_id': importation.id,
                 }
             else:
+                # Annuler toute la transaction externe : TranscriptionBrute,
+                # ImportationEnCours et tout ce qui a été écrit seront rollbackés.
+                transaction.set_rollback(True)
                 return {
                     'success': False,
                     'message': message,
@@ -783,6 +786,7 @@ class ImportationService:
             logger.error(
                 f"Erreur lors du traitement unifié de {fichier_source}: {str(e)}", exc_info=True
             )
+            transaction.set_rollback(True)
             return {'success': False, 'message': f"Erreur lors du traitement: {str(e)}"}
 
     @transaction.atomic
@@ -1130,6 +1134,9 @@ class ImportationService:
             logger.error(
                 f"Erreur lors de la finalisation de l'importation {importation_id}: {str(e)}"
             )
+            # Marquer le savepoint pour rollback : la fiche et tous les objets
+            # liés créés dans cette méthode seront annulés.
+            transaction.set_rollback(True)
             return False, str(e)
 
     def reinitialiser_importation(self, importation_id=None, fichier_source=None):
