@@ -3,13 +3,18 @@ Utilitaire de géocodage intelligent pour les communes françaises
 Utilise en priorité la base locale, puis Nominatim en fallback
 """
 
+import difflib
 import logging
+import re
 import time
+import unicodedata
 
 from geopy.exc import GeocoderServiceError, GeocoderTimedOut
 from geopy.geocoders import Nominatim
 
-from geo.models import CommuneFrance
+from geo.models import AncienneCommune, CommuneFrance
+
+FUZZY_THRESHOLD = 0.90  # Score minimum pour accepter une correspondance floue
 
 logger = logging.getLogger(__name__)
 
@@ -60,40 +65,80 @@ class GeocodeurCommunes:
         logger.warning(f"Commune non trouvée: {commune}, {departement}")
         return None
 
+    @staticmethod
+    def _strip_accents(s: str) -> str:
+        """Supprime les accents : 'Écrammeville' → 'Ecrammeville'."""
+        return ''.join(
+            c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn'
+        )
+
+    def _cle_fuzzy(self, nom: str) -> str:
+        """Clé de comparaison floue : sans accents, sans tirets/espaces multiples, majuscules."""
+        s = self._strip_accents(nom).upper()
+        s = re.sub(r'[-\s]+', ' ', s)
+        return s.strip()
+
     def _normaliser_nom_commune(self, nom: str) -> str:
-        """Normalise le nom d'une commune pour améliorer la correspondance"""
-        # Mettre en majuscules
+        """Normalise le nom d'une commune pour améliorer la correspondance."""
         nom_norm = nom.strip().upper()
 
-        # Remplacer les abréviations courantes
+        # 1. Supprimer la ponctuation finale
+        nom_norm = nom_norm.rstrip('.,:;!')
+
+        # 2. Remplacer les points isolés par un espace (séparateur OCR : "TRACY. Mer")
+        nom_norm = nom_norm.replace('.', ' ')
+
+        # 3. Normaliser les espaces autour des tirets : "JUAYE - MONDAYE" → "JUAYE-MONDAYE"
+        nom_norm = re.sub(r'\s*-\s*', '-', nom_norm)
+
+        # 4. ST / STE en début de chaîne
+        nom_norm = re.sub(r'^STE(?=[-\s])', 'SAINTE', nom_norm)
+        nom_norm = re.sub(r'^ST(?=[-\s])', 'SAINT', nom_norm)
+
+        # 5. Abréviations courantes
         remplacements = {
+            ' SUR ': '-SUR-',
             ' S/': '-SUR-',
             ' S ': '-SUR-',
-            ' ST ': '-SAINT-',
-            ' ST-': '-SAINT-',
-            ' STE ': '-SAINTE-',
-            ' STE-': '-SAINTE-',
             '-S-': '-SUR-',
             '-S/': '-SUR-',
+            ' ST-': '-SAINT-',
+            ' ST ': '-SAINT-',
+            ' STE-': '-SAINTE-',
+            ' STE ': '-SAINTE-',
         }
-
         for abr, complet in remplacements.items():
             nom_norm = nom_norm.replace(abr, complet)
+
+        # 6. Nettoyer les tirets/espaces résiduels
+        nom_norm = re.sub(r'-\s+', '-', nom_norm)  # tiret suivi d'espaces → tiret
+        nom_norm = re.sub(r'\s+-', '-', nom_norm)  # espaces suivis d'un tiret → tiret
+        nom_norm = re.sub(r'-+', '-', nom_norm)  # tirets multiples → un seul
+        nom_norm = re.sub(r' +', ' ', nom_norm)  # espaces multiples → un seul
+        nom_norm = nom_norm.strip('-').strip()
 
         return nom_norm
 
     def _variantes_nom(self, nom_normalise: str) -> list[str]:
         """
-        Génère les variantes tirets/espaces d'un nom normalisé.
-        Exemple : "LONGUES SUR MER" → ["LONGUES SUR MER", "LONGUES-SUR-MER"]
+        Génère toutes les variantes utiles d'un nom normalisé.
+        - espaces ↔ tirets
+        - slash → SUR (Condé/Risle → Condé-sur-Risle)
         """
         variantes: list[str] = [nom_normalise]
+
         avec_tirets = nom_normalise.replace(' ', '-')
         avec_espaces = nom_normalise.replace('-', ' ')
-        if avec_tirets != nom_normalise:
+        if avec_tirets not in variantes:
             variantes.append(avec_tirets)
         if avec_espaces not in variantes:
             variantes.append(avec_espaces)
+
+        # Variante slash → SUR : "CROSVILLE/DOUVE" → "CROSVILLE-SUR-DOUVE"
+        if '/' in nom_normalise:
+            variantes.append(nom_normalise.replace('/', '-SUR-'))
+            variantes.append(nom_normalise.replace('/', '-'))
+
         return variantes
 
     def _recherche_base_locale(
@@ -148,8 +193,71 @@ class GeocodeurCommunes:
             ).first()
 
             if result:
-                logger.info(f"Correspondance floue: {commune} -> {result.nom}")
+                logger.info(f"Correspondance floue (contient): {commune} -> {result.nom}")
                 return self._format_resultat_local(result)
+
+        # Stratégie 5: Anciennes communes + correspondance floue ≥ 90%
+        return self._recherche_ancienne_et_fuzzy(commune, commune_clean, variantes, departement)
+
+    def _recherche_ancienne_et_fuzzy(
+        self,
+        commune_orig: str,
+        commune_clean: str,
+        variantes: list[str],
+        departement: str | None,
+    ) -> dict | None:
+        """Stratégies 5 et 6 : anciennes communes et matching flou."""
+        dept_filter_ancienne: dict = {}
+        if departement:
+            dept = str(departement)
+            if dept.isdigit() and len(dept) <= 3:
+                dept_filter_ancienne['code_departement'] = dept
+            else:
+                dept_filter_ancienne['commune_actuelle__departement__icontains'] = dept
+
+        for variante in variantes:
+            ancienne = (
+                AncienneCommune.objects.filter(nom__iexact=variante, **dept_filter_ancienne)
+                .select_related('commune_actuelle')
+                .first()
+            )
+            if ancienne:
+                logger.info(
+                    "Ancienne commune: %s -> %s -> %s",
+                    commune_orig,
+                    ancienne.nom,
+                    ancienne.commune_actuelle.nom,
+                )
+                return self._format_resultat_local(ancienne.commune_actuelle)
+
+        if not departement:
+            return None
+
+        dept_filter: dict = {}
+        if len(str(departement)) <= 3 and str(departement).isdigit():
+            dept_filter['code_departement'] = departement
+        else:
+            dept_filter['departement__icontains'] = departement
+
+        cle_recherche = self._cle_fuzzy(commune_clean)
+        candidates = list(CommuneFrance.objects.filter(**dept_filter).values_list('nom', 'id'))
+        meilleur_score = 0.0
+        meilleur_id = None
+        for nom_db, id_db in candidates:
+            score = difflib.SequenceMatcher(None, cle_recherche, self._cle_fuzzy(nom_db)).ratio()
+            if score > meilleur_score:
+                meilleur_score = score
+                meilleur_id = id_db
+
+        if meilleur_score >= FUZZY_THRESHOLD and meilleur_id is not None:
+            result = CommuneFrance.objects.get(id=meilleur_id)
+            logger.info(
+                "Correspondance floue (%.0f%%): %s -> %s",
+                meilleur_score * 100,
+                commune_orig,
+                result.nom,
+            )
+            return self._format_resultat_local(result)
 
         return None
 
