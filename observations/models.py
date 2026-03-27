@@ -81,7 +81,9 @@ class FicheObservation(models.Model):
                     'nombre_oeufs_pondus': None,
                     'nombre_oeufs_eclos': None,
                     'nombre_oeufs_non_eclos': None,
-                    'nombre_poussins': None,
+                    'nombre_poussins_1_2': None,
+                    'nombre_poussins_3_4': None,
+                    'nombre_poussins_vol_t': None,
                 },
             )
 
