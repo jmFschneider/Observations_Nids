@@ -63,7 +63,8 @@ def communes_proches(nom_ocr: str, departement: str | None, top: int) -> list[tu
     return scores[:top]
 
 
-def run(top: int = 3, dept_filtre: str | None = None) -> None:
+def run(top: int = 3, dept: str | None = None) -> None:
+    dept_filtre = dept
     qs = Localisation.objects.filter(commune_non_resolue=True).select_related('fiche')
     if dept_filtre:
         qs = qs.filter(departement=dept_filtre)
