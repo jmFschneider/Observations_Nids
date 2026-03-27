@@ -106,7 +106,9 @@ Observation.objects.create(
 fiche.resume.nombre_oeufs_pondus = 6
 fiche.resume.nombre_oeufs_eclos = 5
 fiche.resume.nombre_oeufs_non_eclos = 1
-fiche.resume.nombre_poussins = 4
+fiche.resume.nombre_poussins_1_2 = None
+fiche.resume.nombre_poussins_3_4 = 2
+fiche.resume.nombre_poussins_vol_t = 4
 fiche.resume.save()
 
 fiche.causes_echec.description = "Prédation probable, coquilles au sol"

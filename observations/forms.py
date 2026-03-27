@@ -386,7 +386,9 @@ class ResumeObservationForm(forms.ModelForm):
             'nombre_oeufs_pondus',
             'nombre_oeufs_eclos',
             'nombre_oeufs_non_eclos',
-            'nombre_poussins',
+            'nombre_poussins_1_2',
+            'nombre_poussins_3_4',
+            'nombre_poussins_vol_t',
         ]
         widgets = {
             'premier_oeuf_pondu_jour': forms.NumberInput(
@@ -414,7 +416,15 @@ class ResumeObservationForm(forms.ModelForm):
             'nombre_oeufs_non_eclos': forms.NumberInput(
                 attrs={'min': 0, 'placeholder': 'Non observé'}
             ),
-            'nombre_poussins': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Non observé'}),
+            'nombre_poussins_1_2': forms.NumberInput(
+                attrs={'min': 0, 'placeholder': 'Non observé'}
+            ),
+            'nombre_poussins_3_4': forms.NumberInput(
+                attrs={'min': 0, 'placeholder': 'Non observé'}
+            ),
+            'nombre_poussins_vol_t': forms.NumberInput(
+                attrs={'min': 0, 'placeholder': 'Non observé'}
+            ),
         }
 
     def clean_nombre_oeufs_pondus(self):
@@ -429,8 +439,16 @@ class ResumeObservationForm(forms.ModelForm):
         value = self.cleaned_data.get('nombre_oeufs_non_eclos')
         return None if value == '' or value is None else value
 
-    def clean_nombre_poussins(self):
-        value = self.cleaned_data.get('nombre_poussins')
+    def clean_nombre_poussins_1_2(self):
+        value = self.cleaned_data.get('nombre_poussins_1_2')
+        return None if value == '' or value is None else value
+
+    def clean_nombre_poussins_3_4(self):
+        value = self.cleaned_data.get('nombre_poussins_3_4')
+        return None if value == '' or value is None else value
+
+    def clean_nombre_poussins_vol_t(self):
+        value = self.cleaned_data.get('nombre_poussins_vol_t')
         return None if value == '' or value is None else value
 
 
