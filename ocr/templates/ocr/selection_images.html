@@ -94,6 +94,13 @@
                         <p class="text-muted">Aucune image sélectionnée</p>
                     </div>
 
+                    <div class="mt-3">
+                        <label for="gemini-rpm" class="form-label small mb-1">Requêtes/minute Gemini</label>
+                        <input type="number" id="gemini-rpm" class="form-control form-control-sm"
+                               value="60" min="1" max="60" style="width: 90px;">
+                        <div class="form-text">60 = quota standard. Réduire si erreurs de limite API.</div>
+                    </div>
+
                     <div id="progress-container" class="mt-4 d-none">
                         <h6>Progression</h6>
                         <div class="progress mb-2">
@@ -139,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressContainer = document.getElementById('progress-container');
     const tasksProgressText = document.getElementById('tasks-progress-text');
     const tasksProgressList = document.getElementById('tasks-progress-list');
+    const geminiRpmInput = document.getElementById('gemini-rpm');
     function updateSummary() {
         const count = document.querySelectorAll('.image-checkbox:checked').length;
         if (count > 0) {
@@ -167,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .filter(cb => cb.checked)
             .map(cb => cb.value);
         btnLancer.disabled = true;
+        if (geminiRpmInput) geminiRpmInput.disabled = true;
         btnLancer.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Traitement...';
         progressContainer.classList.remove('d-none');
         progressBar.classList.remove('bg-success', 'bg-danger');
@@ -183,6 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('images', JSON.stringify(selectedImages));
         formData.append('repertoire', '{{ current_path }}');
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        if (geminiRpmInput) formData.append('gemini_rpm', geminiRpmInput.value);
 
         fetch('{% url "ocr:lancer_ocr" %}', {
             method: 'POST',
@@ -195,9 +205,12 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 alert("Erreur: " + data.error);
                 btnLancer.disabled = false;
+                if (geminiRpmInput) geminiRpmInput.disabled = false;
             }
         })
-        .catch(() => {});
+        .catch(() => {
+            if (geminiRpmInput) geminiRpmInput.disabled = false;
+        });
     };
 
     let displayedLogsCount = 0;
@@ -340,6 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 progressText.innerHTML = `<strong class="text-success">Terminé !</strong>`;
                 btnLancer.disabled = false;
                 btnLancer.innerHTML = '<i class="fas fa-check me-2"></i> Terminé';
+                if (geminiRpmInput) geminiRpmInput.disabled = false;
                 showResults(data);
                 return;
             }
@@ -359,6 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showFailureResults(data);
             btnLancer.disabled = false;
             btnLancer.innerHTML = '<i class="fas fa-robot me-2"></i> Réessayer';
+            if (geminiRpmInput) geminiRpmInput.disabled = false;
             return;
         }
 

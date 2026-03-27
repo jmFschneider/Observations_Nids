@@ -170,6 +170,7 @@ def lancer_ocr(request: HttpRequest) -> JsonResponse:
         images_json = request.POST.get('images')
         repertoire = request.POST.get('repertoire', '')
         parallelism_raw = request.POST.get('parallelism')
+        gemini_rpm_raw = request.POST.get('gemini_rpm')
 
         if not images_json:
             return JsonResponse({'error': 'Aucune image sélectionnée'}, status=400)
@@ -192,7 +193,16 @@ def lancer_ocr(request: HttpRequest) -> JsonResponse:
             except ValueError:
                 parallelism = None
 
-        dispatch = enqueue_parallel_ocr_tasks(image_paths, requested_parallelism=parallelism)
+        gemini_rpm: int = 60
+        if gemini_rpm_raw:
+            try:
+                gemini_rpm = max(1, min(60, int(gemini_rpm_raw)))
+            except ValueError:
+                gemini_rpm = 60
+
+        dispatch = enqueue_parallel_ocr_tasks(
+            image_paths, requested_parallelism=parallelism, gemini_rpm=gemini_rpm
+        )
         task_ids = dispatch['task_ids']
         chunk_sizes = cast(list[int], dispatch.get('chunks', []))
         request.session['ocr_task_id'] = task_ids[0] if task_ids else None

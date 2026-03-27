@@ -70,7 +70,9 @@ def _chunk_image_paths(image_paths_relatifs: list[str], parallel_tasks: int) -> 
 
 
 def enqueue_parallel_ocr_tasks(
-    image_paths_relatifs: list[str], requested_parallelism: int | None = None
+    image_paths_relatifs: list[str],
+    requested_parallelism: int | None = None,
+    gemini_rpm: int = 60,
 ) -> dict[str, Any]:
     """
     Lance plusieurs tâches OCR en parallèle avec time_limit dynamique par chunk.
@@ -90,7 +92,7 @@ def enqueue_parallel_ocr_tasks(
         soft_limit = max(60, min(hard_limit - 30, int(hard_limit * SOFT_TIME_LIMIT_RATIO)))
 
         task = process_images_production_task.apply_async(
-            args=[chunk],
+            args=[chunk, gemini_rpm],
             queue='ocr',
             time_limit=hard_limit,
             soft_time_limit=soft_limit,
@@ -271,7 +273,7 @@ def _charger_prompt_production(image_path: str) -> str:
 
 
 @shared_task(bind=True, name='ocr.process_images_production', queue='ocr')
-def process_images_production_task(self, image_paths_relatifs: list[str]):
+def process_images_production_task(self, image_paths_relatifs: list[str], gemini_rpm: int = 60):
     """
     Tâche de production pour traiter un lot d'images.
     Utilise gemini-3-flash par défaut.
@@ -287,7 +289,7 @@ def process_images_production_task(self, image_paths_relatifs: list[str]):
         return {'status': 'ERROR', 'error': "Clé API Gemini non configurée"}
 
     client = genai.Client(api_key=api_key)
-    rate_limiter = RedisRateLimiter(60)
+    rate_limiter = RedisRateLimiter(gemini_rpm)
 
     total = len(image_paths_relatifs)
     success_count = 0
