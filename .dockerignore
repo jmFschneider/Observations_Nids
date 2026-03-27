@@ -91,8 +91,8 @@ requirements-dev.in
 !README.md
 !README-DOCKER.md
 
-# Scripts de développement
-scripts/
+# Scripts de développement (inclus dans l'image pour usage via docker exec)
+# scripts/
 
 # Répertoires de test
 test_scans/
