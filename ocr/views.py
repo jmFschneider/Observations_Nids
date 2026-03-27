@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 from typing import Any, cast
 
+from celery import current_app
 from celery.result import AsyncResult
 from django.conf import settings
 from django.contrib import messages
@@ -396,6 +397,33 @@ def verifier_progression(request: HttpRequest) -> JsonResponse:
             'total_tasks': total_tasks,
         }
     )
+
+
+@transcription_required
+def annuler_ocr(request: HttpRequest) -> JsonResponse:
+    """Révoque les tâches OCR en cours."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
+
+    task_ids = request.session.get('ocr_task_ids')
+    if isinstance(task_ids, str):
+        task_ids = [task_ids]
+    if not task_ids:
+        task_id = request.session.get('ocr_task_id')
+        task_ids = [task_id] if task_id else []
+
+    if not task_ids:
+        return JsonResponse({'error': 'Aucune tâche en cours'}, status=400)
+
+    current_app.control.revoke(task_ids, terminate=True)
+    logger.info("OCR: révocation demandée pour %d tâche(s) : %s", len(task_ids), task_ids)
+
+    request.session.pop('ocr_task_ids', None)
+    request.session.pop('ocr_task_id', None)
+    request.session.pop('ocr_total_images', None)
+    request.session.pop('ocr_task_chunks', None)
+
+    return JsonResponse({'success': True, 'revoked': len(task_ids)})
 
 
 @transcription_required

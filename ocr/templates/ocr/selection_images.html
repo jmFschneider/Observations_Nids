@@ -142,6 +142,9 @@
                         <button id="btn-lancer" class="btn btn-primary btn-lg" disabled>
                             <i class="fas fa-robot me-2"></i> Démarrer la transcription
                         </button>
+                        <button id="btn-annuler" class="btn btn-outline-danger btn-sm d-none">
+                            <i class="fas fa-stop-circle me-1"></i> Arrêter le traitement
+                        </button>
                     </div>
                 </div>
                 <div class="card-footer bg-light small">
@@ -166,6 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const parallelismInput = document.getElementById('ocr-parallelism');
     const minChunkInput = document.getElementById('ocr-min-chunk');
     const tasksPreview = document.getElementById('tasks-preview');
+    const btnAnnuler = document.getElementById('btn-annuler');
 
     function computeEffectiveTasks(total, parallelism, minChunk) {
         if (total === 0) return 0;
@@ -223,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (geminiRpmInput) geminiRpmInput.disabled = true;
         if (parallelismInput) parallelismInput.disabled = true;
         if (minChunkInput) minChunkInput.disabled = true;
+        if (btnAnnuler) btnAnnuler.classList.remove('d-none');
         btnLancer.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Traitement...';
         progressContainer.classList.remove('d-none');
         progressBar.classList.remove('bg-success', 'bg-danger');
@@ -253,18 +258,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 pollProgress();
             } else {
                 alert("Erreur: " + data.error);
-                btnLancer.disabled = false;
-                if (geminiRpmInput) geminiRpmInput.disabled = false;
-                if (parallelismInput) parallelismInput.disabled = false;
-                if (minChunkInput) minChunkInput.disabled = false;
+                resetControls();
             }
         })
-        .catch(() => {
-            if (geminiRpmInput) geminiRpmInput.disabled = false;
-            if (parallelismInput) parallelismInput.disabled = false;
-            if (minChunkInput) minChunkInput.disabled = false;
-        });
+        .catch(() => resetControls());
     };
+
+    function resetControls() {
+        btnLancer.disabled = false;
+        if (geminiRpmInput) geminiRpmInput.disabled = false;
+        if (parallelismInput) parallelismInput.disabled = false;
+        if (minChunkInput) minChunkInput.disabled = false;
+        if (btnAnnuler) btnAnnuler.classList.add('d-none');
+    }
+
+    if (btnAnnuler) {
+        btnAnnuler.addEventListener('click', function () {
+            btnAnnuler.disabled = true;
+            btnAnnuler.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Annulation...';
+            fetch('{% url "ocr:annuler_ocr" %}', {
+                method: 'POST',
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            })
+            .then(r => r.json())
+            .then(() => {
+                progressBar.classList.remove('progress-bar-animated');
+                progressText.innerHTML = '<span class="text-warning">Traitement annulé.</span>';
+                resetControls();
+                btnLancer.innerHTML = '<i class="fas fa-robot me-2"></i> Démarrer la transcription';
+            })
+            .catch(() => {
+                btnAnnuler.disabled = false;
+                btnAnnuler.innerHTML = '<i class="fas fa-stop-circle me-1"></i> Arrêter le traitement';
+            });
+        });
+    }
 
     let displayedLogsCount = 0;
 
@@ -404,11 +432,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 progressBar.classList.remove('bg-danger');
                 progressBar.classList.add('bg-success');
                 progressText.innerHTML = `<strong class="text-success">Terminé !</strong>`;
-                btnLancer.disabled = false;
+                resetControls();
                 btnLancer.innerHTML = '<i class="fas fa-check me-2"></i> Terminé';
-                if (geminiRpmInput) geminiRpmInput.disabled = false;
-                if (parallelismInput) parallelismInput.disabled = false;
-                if (minChunkInput) minChunkInput.disabled = false;
                 showResults(data);
                 return;
             }
@@ -426,11 +451,8 @@ document.addEventListener('DOMContentLoaded', function() {
             progressText.innerHTML = `<span class="text-danger">Erreur lors du traitement</span>`;
             updateTasksProgress(data);
             showFailureResults(data);
-            btnLancer.disabled = false;
+            resetControls();
             btnLancer.innerHTML = '<i class="fas fa-robot me-2"></i> Réessayer';
-            if (geminiRpmInput) geminiRpmInput.disabled = false;
-            if (parallelismInput) parallelismInput.disabled = false;
-            if (minChunkInput) minChunkInput.disabled = false;
             return;
         }
 
@@ -464,6 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (geminiRpmInput) geminiRpmInput.disabled = true;
                 if (parallelismInput) parallelismInput.disabled = true;
                 if (minChunkInput) minChunkInput.disabled = true;
+                if (btnAnnuler) btnAnnuler.classList.remove('d-none');
                 btnLancer.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Suivi OCR en cours';
                 applyProgressPayload(data, false);
 
