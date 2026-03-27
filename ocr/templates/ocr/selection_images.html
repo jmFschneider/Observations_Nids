@@ -94,22 +94,12 @@
                         <p class="text-muted">Aucune image sélectionnée</p>
                     </div>
 
-                    <div class="form-check mt-3">
-                        <input class="form-check-input" type="checkbox" id="open-flower-on-start">
-                        <label class="form-check-label small" for="open-flower-on-start">
-                            Ouvrir Flower au lancement
-                        </label>
-                    </div>
-
                     <div id="progress-container" class="mt-4 d-none">
                         <h6>Progression</h6>
                         <div class="progress mb-2">
                             <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
                         </div>
                         <p id="progress-text" class="small text-center">Initialisation...</p>
-                        <p class="small text-center mb-2">
-                            <a href="/flower" target="_blank" rel="noopener noreferrer">Ouvrir Flower dans un nouvel onglet</a>
-                        </p>
                         <p id="tasks-progress-text" class="small text-muted text-center mb-2 d-none"></p>
                         <div id="tasks-progress-list" class="small mb-2"></div>
                         <div id="log-container" class="mt-2 d-none">
@@ -149,8 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressContainer = document.getElementById('progress-container');
     const tasksProgressText = document.getElementById('tasks-progress-text');
     const tasksProgressList = document.getElementById('tasks-progress-list');
-    const openFlowerCheckbox = document.getElementById('open-flower-on-start');
-    
     function updateSummary() {
         const count = document.querySelectorAll('.image-checkbox:checked').length;
         if (count > 0) {
@@ -178,15 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedImages = Array.from(checkboxes)
             .filter(cb => cb.checked)
             .map(cb => cb.value);
-        let flowerWindow = null;
-        if (openFlowerCheckbox && openFlowerCheckbox.checked) {
-            // Appel direct dans le click handler pour limiter le blocage popup navigateur.
-            flowerWindow = window.open('', '_blank', 'noopener,noreferrer');
-            if (flowerWindow) {
-                flowerWindow.document.write('<p style="font-family:sans-serif;padding:1rem;">Ouverture de Flower...</p>');
-            }
-        }
-            
         btnLancer.disabled = true;
         btnLancer.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Traitement...';
         progressContainer.classList.remove('d-none');
@@ -212,23 +191,13 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                if (flowerWindow) {
-                    flowerWindow.location.href = '/flower';
-                }
                 pollProgress();
             } else {
                 alert("Erreur: " + data.error);
                 btnLancer.disabled = false;
-                if (flowerWindow) {
-                    flowerWindow.close();
-                }
             }
         })
-        .catch(() => {
-            if (flowerWindow) {
-                flowerWindow.close();
-            }
-        });
+        .catch(() => {});
     };
 
     let displayedLogsCount = 0;
