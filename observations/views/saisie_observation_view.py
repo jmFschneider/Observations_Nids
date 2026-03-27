@@ -501,13 +501,7 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
 
                     # Gérer le numéro personnel
                     numero_personnel = request.POST.get('numero_personnel')
-                    if numero_personnel:
-                        try:
-                            fiche.numero_personnel = int(numero_personnel)
-                        except (ValueError, TypeError):
-                            fiche.numero_personnel = None
-                    else:
-                        fiche.numero_personnel = None
+                    fiche.numero_personnel = numero_personnel.strip() if numero_personnel else None
 
                     fiche.save()
 

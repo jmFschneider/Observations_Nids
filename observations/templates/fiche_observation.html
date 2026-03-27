@@ -368,13 +368,15 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Premier œuf pondu</th>
-                        <th>Premier poussin éclos</th>
-                        <th>Premier poussin volant</th>
+                        <th>1er œuf pondu</th>
+                        <th>1er pouss. éclos</th>
+                        <th>1er pouss. volant</th>
                         <th>Œufs pondus</th>
                         <th>Œufs éclos</th>
                         <th>Œufs non éclos</th>
-                        <th>Nombre de poussins</th>
+                        <th>Poussins 1/2</th>
+                        <th>Poussins 3/4</th>
+                        <th>Poussins vol't</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -403,7 +405,9 @@
                         <td>{% if fiche.resume.nombre_oeufs_pondus is not None %}{{ fiche.resume.nombre_oeufs_pondus }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
                         <td>{% if fiche.resume.nombre_oeufs_eclos is not None %}{{ fiche.resume.nombre_oeufs_eclos }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
                         <td>{% if fiche.resume.nombre_oeufs_non_eclos is not None %}{{ fiche.resume.nombre_oeufs_non_eclos }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
-                        <td>{% if fiche.resume.nombre_poussins is not None %}{{ fiche.resume.nombre_poussins }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                        <td>{% if fiche.resume.nombre_poussins_1_2 is not None %}{{ fiche.resume.nombre_poussins_1_2 }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                        <td>{% if fiche.resume.nombre_poussins_3_4 is not None %}{{ fiche.resume.nombre_poussins_3_4 }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                        <td>{% if fiche.resume.nombre_poussins_vol_t is not None %}{{ fiche.resume.nombre_poussins_vol_t }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
                     </tr>
                 </tbody>
             </table>

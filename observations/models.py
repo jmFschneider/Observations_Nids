@@ -21,12 +21,13 @@ class FicheObservation(models.Model):
     )
     espece = models.ForeignKey(Espece, on_delete=models.PROTECT, related_name="observations")
     annee = models.IntegerField()
-    numero_personnel = models.IntegerField(
+    numero_personnel = models.CharField(  # noqa: DJ001
+        max_length=20,
         null=True,
         blank=True,
         default=None,
         verbose_name='Numéro personnel',
-        help_text='Numéro attribué par l\'observateur',
+        help_text='Numéro attribué par l\'observateur (ex : A082)',
     )
     chemin_image = models.CharField(max_length=255, blank=True)
     chemin_json = models.CharField(max_length=255, blank=True)
@@ -80,7 +81,9 @@ class FicheObservation(models.Model):
                     'nombre_oeufs_pondus': None,
                     'nombre_oeufs_eclos': None,
                     'nombre_oeufs_non_eclos': None,
-                    'nombre_poussins': None,
+                    'nombre_poussins_1_2': None,
+                    'nombre_poussins_3_4': None,
+                    'nombre_poussins_vol_t': None,
                 },
             )
 
@@ -209,7 +212,9 @@ class ResumeObservation(models.Model):
     nombre_oeufs_pondus = models.PositiveSmallIntegerField(blank=True, null=True)
     nombre_oeufs_eclos = models.PositiveSmallIntegerField(blank=True, null=True)
     nombre_oeufs_non_eclos = models.PositiveSmallIntegerField(blank=True, null=True)
-    nombre_poussins = models.PositiveSmallIntegerField(blank=True, null=True)
+    nombre_poussins_1_2 = models.PositiveSmallIntegerField(blank=True, null=True)
+    nombre_poussins_3_4 = models.PositiveSmallIntegerField(blank=True, null=True)
+    nombre_poussins_vol_t = models.PositiveSmallIntegerField(blank=True, null=True)
 
     class Meta:
         constraints = [
@@ -271,11 +276,11 @@ class ResumeObservation(models.Model):
                 ),
             ),
             models.CheckConstraint(
-                name="resume_poussins_le_eclos",
+                name="resume_poussins_vol_t_le_eclos",
                 condition=(
-                    Q(nombre_poussins__isnull=True)
+                    Q(nombre_poussins_vol_t__isnull=True)
                     | Q(nombre_oeufs_eclos__isnull=True)
-                    | Q(nombre_poussins__lte=models.F("nombre_oeufs_eclos"))
+                    | Q(nombre_poussins_vol_t__lte=models.F("nombre_oeufs_eclos"))
                 ),
             ),
         ]

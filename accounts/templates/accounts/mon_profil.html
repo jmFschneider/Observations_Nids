@@ -36,7 +36,9 @@
                         <th>Numéro de Fiche</th>
                         <th>Date</th>
                         <th>Nombre d'œufs</th>
-                        <th>Nombre de poussins</th>
+                        <th>Poussins 1/2</th>
+                        <th>Poussins 3/4</th>
+                        <th>Poussins vol't</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -46,7 +48,9 @@
                         <td>{{ fiche.num_fiche }}</td>
                         <td>{{ fiche.annee }}</td>
                         <td>{{ fiche.resume.nombre_oeufs_pondus }}</td>
-                        <td>{{ fiche.resume.nombre_poussins }}</td>
+                        <td>{{ fiche.resume.nombre_poussins_1_2|default:"-" }}</td>
+                        <td>{{ fiche.resume.nombre_poussins_3_4|default:"-" }}</td>
+                        <td>{{ fiche.resume.nombre_poussins_vol_t|default:"-" }}</td>
                         <td>
                             <a href="{% url 'observations:fiche_observation' fiche.num_fiche %}" class="btn btn-sm btn-info">Voir détails</a>
                             <a href="{% url 'modifier_observation' fiche.num_fiche %}" class="btn btn-sm btn-primary">Modifier</a>

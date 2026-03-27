@@ -753,13 +753,15 @@ function fermerModalRecherche() {
                 <table>
                     <thead>
                         <tr>
-                            <th>Premier œuf pondu</th>
-                            <th>Premier poussin éclos</th>
-                            <th>Premier poussin volant</th>
+                            <th>1er œuf pondu</th>
+                            <th>1er pouss. éclos</th>
+                            <th>1er pouss. volant</th>
                             <th>Œufs pondus</th>
                             <th>Œufs éclos</th>
                             <th>Œufs non éclos</th>
-                            <th>Nombre de poussins</th>
+                            <th>Poussins 1/2</th>
+                            <th>Poussins 3/4</th>
+                            <th>Poussins vol't</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -826,8 +828,22 @@ function fermerModalRecherche() {
                             </td>
                             <td>
                                 <div class="form-field">
-                                    {{ resume_form.nombre_poussins.errors }}
-                                    {{ resume_form.nombre_poussins }}
+                                    {{ resume_form.nombre_poussins_1_2.errors }}
+                                    {{ resume_form.nombre_poussins_1_2 }}
+                                    <small style="display: block; color: #6c757d; font-size: 0.8em;">Vide = non observé</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-field">
+                                    {{ resume_form.nombre_poussins_3_4.errors }}
+                                    {{ resume_form.nombre_poussins_3_4 }}
+                                    <small style="display: block; color: #6c757d; font-size: 0.8em;">Vide = non observé</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-field">
+                                    {{ resume_form.nombre_poussins_vol_t.errors }}
+                                    {{ resume_form.nombre_poussins_vol_t }}
                                     <small style="display: block; color: #6c757d; font-size: 0.8em;">Vide = non observé</small>
                                 </div>
                             </td>

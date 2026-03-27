@@ -772,6 +772,9 @@ class ImportationService:
                     'importation_id': importation.id,
                 }
             else:
+                # Annuler toute la transaction externe : TranscriptionBrute,
+                # ImportationEnCours et tout ce qui a été écrit seront rollbackés.
+                transaction.set_rollback(True)
                 return {
                     'success': False,
                     'message': message,
@@ -783,6 +786,7 @@ class ImportationService:
             logger.error(
                 f"Erreur lors du traitement unifié de {fichier_source}: {str(e)}", exc_info=True
             )
+            transaction.set_rollback(True)
             return {'success': False, 'message': f"Erreur lors du traitement: {str(e)}"}
 
     @transaction.atomic
@@ -855,12 +859,20 @@ class ImportationService:
                     f"Fichier {nom_fichier_json} non trouvé dans le cache, utilisation des chemins par défaut"
                 )
 
+            # Récupérer le numéro personnel de fiche depuis le JSON (ex : "A082")
+            n_fiche_ocr = None
+            if 'informations_generales' in donnees:
+                n_fiche_brut = donnees['informations_generales'].get('n_fiche')
+                if n_fiche_brut and str(n_fiche_brut).strip():
+                    n_fiche_ocr = str(n_fiche_brut).strip()
+
             # Création de la fiche d'observation (les objets liés seront créés automatiquement
             # par la méthode save() du modèle FicheObservation)
             fiche = FicheObservation.objects.create(
                 observateur=importation.observateur,
                 espece=importation.espece_candidate.espece_validee,
                 annee=annee,
+                numero_personnel=n_fiche_ocr,
                 chemin_image=chemin_image,
                 chemin_json=chemin_json,
                 transcription=True,
@@ -1020,29 +1032,36 @@ class ImportationService:
                 nombre_oeufs_pondus = safe_int(nombre_oeufs_dict.get('pondus'))
                 nombre_oeufs_eclos = safe_int(nombre_oeufs_dict.get('eclos'))
                 nombre_oeufs_non_eclos = safe_int(nombre_oeufs_dict.get('n_ecl'))
-                nombre_poussins = safe_int(nombre_poussins_dict.get('vol_t'))
+                nombre_poussins_1_2 = safe_int(nombre_poussins_dict.get('1/2'))
+                nombre_poussins_3_4 = safe_int(nombre_poussins_dict.get('3/4'))
+                nombre_poussins_vol_t = safe_int(nombre_poussins_dict.get('vol_t'))
 
                 # Log des valeurs pour debugging
                 logger.info(
                     f"Fiche {fiche.num_fiche} - Valeurs résumé: pondus={nombre_oeufs_pondus}, "
-                    f"éclos={nombre_oeufs_eclos}, non_éclos={nombre_oeufs_non_eclos}, poussins={nombre_poussins}"
+                    f"éclos={nombre_oeufs_eclos}, non_éclos={nombre_oeufs_non_eclos}, "
+                    f"poussins 1/2={nombre_poussins_1_2}, 3/4={nombre_poussins_3_4}, vol't={nombre_poussins_vol_t}"
                 )
 
                 # Validation et correction automatique des contraintes
-                # Si on a des poussins mais pas d'œufs éclos renseignés, on déduit le minimum d'œufs éclos
+                # Si on a des poussins vol't mais pas d'œufs éclos renseignés, on déduit le minimum d'œufs éclos
                 if (
-                    nombre_poussins
-                    and nombre_poussins > 0
+                    nombre_poussins_vol_t
+                    and nombre_poussins_vol_t > 0
                     and (nombre_oeufs_eclos is None or nombre_oeufs_eclos == 0)
                 ):
-                    nombre_oeufs_eclos = nombre_poussins
+                    nombre_oeufs_eclos = nombre_poussins_vol_t
                     logger.warning(
-                        f"Fiche {fiche.num_fiche}: Correction automatique - œufs éclos ajusté à {nombre_oeufs_eclos} pour cohérence avec {nombre_poussins} poussins"
+                        f"Fiche {fiche.num_fiche}: Correction automatique - œufs éclos ajusté à {nombre_oeufs_eclos} pour cohérence avec {nombre_poussins_vol_t} poussins vol't"
                     )
 
-                # Si on a plus de poussins que d'œufs éclos, ajuster les œufs éclos
-                if nombre_poussins and nombre_oeufs_eclos and nombre_poussins > nombre_oeufs_eclos:
-                    nombre_oeufs_eclos = nombre_poussins
+                # Si on a plus de poussins vol't que d'œufs éclos, ajuster les œufs éclos
+                if (
+                    nombre_poussins_vol_t
+                    and nombre_oeufs_eclos
+                    and nombre_poussins_vol_t > nombre_oeufs_eclos
+                ):
+                    nombre_oeufs_eclos = nombre_poussins_vol_t
                     logger.warning(
                         f"Fiche {fiche.num_fiche}: Correction automatique - œufs éclos ajusté à {nombre_oeufs_eclos} pour respecter la contrainte"
                     )
@@ -1077,7 +1096,9 @@ class ImportationService:
                 resume.nombre_oeufs_pondus = nombre_oeufs_pondus
                 resume.nombre_oeufs_eclos = nombre_oeufs_eclos
                 resume.nombre_oeufs_non_eclos = nombre_oeufs_non_eclos
-                resume.nombre_poussins = nombre_poussins
+                resume.nombre_poussins_1_2 = nombre_poussins_1_2
+                resume.nombre_poussins_3_4 = nombre_poussins_3_4
+                resume.nombre_poussins_vol_t = nombre_poussins_vol_t
 
                 resume.save()
                 logger.info(f"Fiche {fiche.num_fiche}: Résumé sauvegardé avec succès")
@@ -1113,6 +1134,9 @@ class ImportationService:
             logger.error(
                 f"Erreur lors de la finalisation de l'importation {importation_id}: {str(e)}"
             )
+            # Marquer le savepoint pour rollback : la fiche et tous les objets
+            # liés créés dans cette méthode seront annulés.
+            transaction.set_rollback(True)
             return False, str(e)
 
     def reinitialiser_importation(self, importation_id=None, fichier_source=None):
