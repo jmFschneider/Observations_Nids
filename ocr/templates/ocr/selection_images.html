@@ -399,9 +399,12 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (!data || data.status === 'NO_TASK') return;
+                // Ne restaurer que si une tâche est encore active
+                if (data.status === 'SUCCESS' || data.status === 'FAILURE') return;
 
                 progressContainer.classList.remove('d-none');
                 btnLancer.disabled = true;
+                if (geminiRpmInput) geminiRpmInput.disabled = true;
                 btnLancer.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Suivi OCR en cours';
                 applyProgressPayload(data, false);
 
