@@ -855,12 +855,20 @@ class ImportationService:
                     f"Fichier {nom_fichier_json} non trouvé dans le cache, utilisation des chemins par défaut"
                 )
 
+            # Récupérer le numéro personnel de fiche depuis le JSON (ex : "A082")
+            n_fiche_ocr = None
+            if 'informations_generales' in donnees:
+                n_fiche_brut = donnees['informations_generales'].get('n_fiche')
+                if n_fiche_brut and str(n_fiche_brut).strip():
+                    n_fiche_ocr = str(n_fiche_brut).strip()
+
             # Création de la fiche d'observation (les objets liés seront créés automatiquement
             # par la méthode save() du modèle FicheObservation)
             fiche = FicheObservation.objects.create(
                 observateur=importation.observateur,
                 espece=importation.espece_candidate.espece_validee,
                 annee=annee,
+                numero_personnel=n_fiche_ocr,
                 chemin_image=chemin_image,
                 chemin_json=chemin_json,
                 transcription=True,

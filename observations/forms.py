@@ -40,11 +40,10 @@ class FicheObservationForm(forms.ModelForm):
                     'data-search-delay': '800',  # Délai de 800ms entre les frappes
                 }
             ),
-            "numero_personnel": forms.NumberInput(
+            "numero_personnel": forms.TextInput(
                 attrs={
                     'class': 'form-control form-control-sm',
                     'placeholder': 'N°',
-                    'min': 1,
                     'style': 'width: 80px;',
                 }
             ),

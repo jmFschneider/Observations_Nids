@@ -21,12 +21,13 @@ class FicheObservation(models.Model):
     )
     espece = models.ForeignKey(Espece, on_delete=models.PROTECT, related_name="observations")
     annee = models.IntegerField()
-    numero_personnel = models.IntegerField(
+    numero_personnel = models.CharField(  # noqa: DJ001
+        max_length=20,
         null=True,
         blank=True,
         default=None,
         verbose_name='Numéro personnel',
-        help_text='Numéro attribué par l\'observateur',
+        help_text='Numéro attribué par l\'observateur (ex : A082)',
     )
     chemin_image = models.CharField(max_length=255, blank=True)
     chemin_json = models.CharField(max_length=255, blank=True)
