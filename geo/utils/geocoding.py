@@ -82,6 +82,20 @@ class GeocodeurCommunes:
 
         return nom_norm
 
+    def _variantes_nom(self, nom_normalise: str) -> list[str]:
+        """
+        Génère les variantes tirets/espaces d'un nom normalisé.
+        Exemple : "LONGUES SUR MER" → ["LONGUES SUR MER", "LONGUES-SUR-MER"]
+        """
+        variantes: list[str] = [nom_normalise]
+        avec_tirets = nom_normalise.replace(' ', '-')
+        avec_espaces = nom_normalise.replace('-', ' ')
+        if avec_tirets != nom_normalise:
+            variantes.append(avec_tirets)
+        if avec_espaces not in variantes:
+            variantes.append(avec_espaces)
+        return variantes
+
     def _recherche_base_locale(
         self, commune: str, departement: str | None = None, code_postal: str | None = None
     ) -> dict | None:
@@ -89,38 +103,39 @@ class GeocodeurCommunes:
 
         # Nettoyer et normaliser le nom de commune
         commune_clean = self._normaliser_nom_commune(commune)
+        variantes = self._variantes_nom(commune_clean)
 
-        # Stratégie 1: Nom exact + département
+        # Stratégie 1: Nom exact + département (toutes variantes tirets/espaces)
         if departement:
-            # Gérer code ou nom de département
             dept_filter = {}
             if len(str(departement)) <= 3 and str(departement).isdigit():
                 dept_filter['code_departement'] = departement
             else:
                 dept_filter['departement__icontains'] = departement
 
-            result = CommuneFrance.objects.filter(nom__iexact=commune_clean, **dept_filter).first()
+            for variante in variantes:
+                result = CommuneFrance.objects.filter(nom__iexact=variante, **dept_filter).first()
+                if result:
+                    return self._format_resultat_local(result)
 
-            if result:
-                return self._format_resultat_local(result)
-
-        # Stratégie 2: Code postal
+        # Stratégie 2: Code postal (toutes variantes)
         if code_postal:
-            result = CommuneFrance.objects.filter(
-                nom__iexact=commune_clean, code_postal=code_postal
-            ).first()
+            for variante in variantes:
+                result = CommuneFrance.objects.filter(
+                    nom__iexact=variante, code_postal=code_postal
+                ).first()
+                if result:
+                    return self._format_resultat_local(result)
 
-            if result:
-                return self._format_resultat_local(result)
+        # Stratégie 3: Nom seul unique (toutes variantes)
+        for variante in variantes:
+            results = CommuneFrance.objects.filter(nom__iexact=variante)
+            if results.count() == 1:
+                first_result = results.first()
+                if first_result:
+                    return self._format_resultat_local(first_result)
 
-        # Stratégie 3: Nom seul (si unique)
-        results = CommuneFrance.objects.filter(nom__iexact=commune_clean)
-        if results.count() == 1:
-            first_result = results.first()
-            if first_result:
-                return self._format_resultat_local(first_result)
-
-        # Stratégie 4: Recherche floue (contient)
+        # Stratégie 4: Recherche floue (contient) — sur le nom normalisé original
         if departement:
             dept_filter = {}
             if len(str(departement)) <= 3 and str(departement).isdigit():
