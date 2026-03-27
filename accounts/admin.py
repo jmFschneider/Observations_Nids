@@ -26,5 +26,12 @@ class UtilisateurAdmin(UserAdmin):
         ('Informations supplémentaires', {'fields': ('role', 'est_valide', 'est_transcription')}),
     )
 
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj) or [])
+        # Seul un administrateur (role='administrateur') peut modifier le rôle des utilisateurs
+        if not (hasattr(request.user, 'role') and request.user.role == 'administrateur'):
+            readonly.append('role')
+        return readonly
+
 
 admin.site.register(Utilisateur, UtilisateurAdmin)

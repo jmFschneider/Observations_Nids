@@ -312,9 +312,9 @@ def inscription_publique(request):
     return render(request, 'accounts/inscription_publique.html', {'form': form})
 
 
-@user_passes_test(est_superuser)
+@user_passes_test(est_admin)
 def promouvoir_administrateur(request):
-    """Vue pour promouvoir un utilisateur au rôle d'administrateur (réservée aux superusers)"""
+    """Vue pour promouvoir un utilisateur au rôle d'administrateur (réservée aux administrateurs)"""
     if request.method == 'POST':
         user_id = request.POST.get('user_id')
         if user_id:
