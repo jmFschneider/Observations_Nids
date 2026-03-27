@@ -416,7 +416,20 @@ def annuler_ocr(request: HttpRequest) -> JsonResponse:
         return JsonResponse({'error': 'Aucune tâche en cours'}, status=400)
 
     current_app.control.revoke(task_ids, terminate=True)
-    logger.info("OCR: révocation demandée pour %d tâche(s) : %s", len(task_ids), task_ids)
+
+    # Purge uniquement la queue OCR pour nettoyer les tâches en attente
+    purged = 0
+    try:
+        with current_app.connection_for_write() as conn, conn.channel() as ch:
+            purged = ch.queue_purge('ocr')
+    except Exception as exc:
+        logger.warning("OCR: impossible de purger la queue ocr : %s", exc)
+
+    logger.info(
+        "OCR: révocation de %d tâche(s), %d message(s) purgé(s) de la queue ocr",
+        len(task_ids),
+        purged,
+    )
 
     request.session.pop('ocr_task_ids', None)
     request.session.pop('ocr_task_id', None)
