@@ -30,9 +30,9 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 DEFAULT_OCR_PARALLEL_TASKS = 4
-MAX_OCR_PARALLEL_TASKS = 8
-MIN_OCR_CHUNK_SIZE = 100
-FALLBACK_SECONDS_PER_IMAGE = 35.0
+MAX_OCR_PARALLEL_TASKS = 10
+DEFAULT_MIN_CHUNK_SIZE = 55
+FALLBACK_SECONDS_PER_IMAGE = 25.0
 TIMEOUT_MARGIN_FACTOR = 1.5
 MIN_CHUNK_TIME_LIMIT_SECONDS = 30 * 60
 MAX_CHUNK_TIME_LIMIT_SECONDS = 8 * 60 * 60
@@ -55,14 +55,18 @@ def _compute_time_limit_seconds(chunk_size: int, seconds_per_image: float) -> in
     return max(MIN_CHUNK_TIME_LIMIT_SECONDS, min(estimated, MAX_CHUNK_TIME_LIMIT_SECONDS))
 
 
-def _chunk_image_paths(image_paths_relatifs: list[str], parallel_tasks: int) -> list[list[str]]:
+def _chunk_image_paths(
+    image_paths_relatifs: list[str],
+    parallel_tasks: int,
+    min_chunk_size: int = DEFAULT_MIN_CHUNK_SIZE,
+) -> list[list[str]]:
     """Découpe les images en chunks équilibrés pour traitement parallèle."""
     total = len(image_paths_relatifs)
     if total == 0:
         return []
 
     tasks = max(1, min(parallel_tasks, total, MAX_OCR_PARALLEL_TASKS))
-    while tasks > 1 and (total / tasks) < MIN_OCR_CHUNK_SIZE:
+    while tasks > 1 and (total / tasks) < min_chunk_size:
         tasks -= 1
 
     chunk_size = ceil(total / tasks)
@@ -73,6 +77,7 @@ def enqueue_parallel_ocr_tasks(
     image_paths_relatifs: list[str],
     requested_parallelism: int | None = None,
     gemini_rpm: int = 60,
+    min_chunk_size: int = DEFAULT_MIN_CHUNK_SIZE,
 ) -> dict[str, Any]:
     """
     Lance plusieurs tâches OCR en parallèle avec time_limit dynamique par chunk.
@@ -82,7 +87,7 @@ def enqueue_parallel_ocr_tasks(
         return {'task_ids': [], 'chunks': [], 'seconds_per_image': FALLBACK_SECONDS_PER_IMAGE}
 
     parallelism = requested_parallelism or DEFAULT_OCR_PARALLEL_TASKS
-    chunks = _chunk_image_paths(image_paths_relatifs, parallelism)
+    chunks = _chunk_image_paths(image_paths_relatifs, parallelism, min_chunk_size)
     seconds_per_image = _estimer_seconds_par_image()
 
     task_ids: list[str] = []

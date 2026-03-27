@@ -19,7 +19,7 @@ from django.shortcuts import render
 
 from observations.decorators import transcription_required
 from ocr.models import TranscriptionOCR
-from ocr.tasks import enqueue_parallel_ocr_tasks
+from ocr.tasks import DEFAULT_MIN_CHUNK_SIZE, enqueue_parallel_ocr_tasks
 
 logger = logging.getLogger('ocr')
 
@@ -171,6 +171,7 @@ def lancer_ocr(request: HttpRequest) -> JsonResponse:
         repertoire = request.POST.get('repertoire', '')
         parallelism_raw = request.POST.get('parallelism')
         gemini_rpm_raw = request.POST.get('gemini_rpm')
+        min_chunk_size_raw = request.POST.get('min_chunk_size')
 
         if not images_json:
             return JsonResponse({'error': 'Aucune image sélectionnée'}, status=400)
@@ -200,8 +201,18 @@ def lancer_ocr(request: HttpRequest) -> JsonResponse:
             except ValueError:
                 gemini_rpm = 60
 
+        min_chunk_size: int = DEFAULT_MIN_CHUNK_SIZE
+        if min_chunk_size_raw:
+            try:
+                min_chunk_size = max(10, int(min_chunk_size_raw))
+            except ValueError:
+                min_chunk_size = DEFAULT_MIN_CHUNK_SIZE
+
         dispatch = enqueue_parallel_ocr_tasks(
-            image_paths, requested_parallelism=parallelism, gemini_rpm=gemini_rpm
+            image_paths,
+            requested_parallelism=parallelism,
+            gemini_rpm=gemini_rpm,
+            min_chunk_size=min_chunk_size,
         )
         task_ids = dispatch['task_ids']
         chunk_sizes = cast(list[int], dispatch.get('chunks', []))
