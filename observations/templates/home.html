@@ -6,6 +6,13 @@
 {% endblock %}
 
 {% block content %}
+{% load static %}
+<div class="text-center mb-4">
+    <img src="{% static 'Observations/images/GONm-logo-bouton.png' %}"
+         alt="Logo GONm"
+         style="max-width: 400px; width: 100%; height: auto;">
+</div>
+
 {% if user.role == 'administrateur' and demandes_en_attente > 0 %}
 <div class="alert alert-warning fade show" role="alert" id="alertDemandes" style="background-color: #fff3cd; border-color: #ffc107; color: #856404; position: relative; padding-right: 40px;">
     <strong><i class="fas fa-exclamation-triangle"></i> {{ demandes_en_attente }} demande(s) de compte en attente !</strong>
