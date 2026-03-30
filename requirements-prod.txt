@@ -151,7 +151,7 @@ greenlet==3.3.2
     # via
     #   -r requirements-base.in
     #   eventlet
-grpcio==1.78.1
+grpcio==1.80.0
     # via
     #   -r requirements-base.in
     #   grpcio-status
