@@ -270,7 +270,7 @@ pytz==2026.1.post1
     #   vobject
 radicale==3.6.1
     # via -r requirements-base.in
-redis==7.3.0
+redis==7.4.0
     # via -r requirements-base.in
 requests==2.33.0
     # via
