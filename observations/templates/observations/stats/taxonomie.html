@@ -80,6 +80,10 @@
         <h5 class="mb-0">
             <i class="fas fa-chart-line text-info me-2"></i>Évolution annuelle
             <small class="text-muted fw-normal ms-2">espèces distinctes &amp; taux de succès</small>
+            <i class="fas fa-info-circle text-muted ms-2"
+               style="cursor:help; font-size:0.85rem;"
+               data-bs-toggle="tooltip" data-bs-placement="right"
+               title="Taux de succès = fiches ayant au moins 1 poussin volant (champ &quot;nombre poussins vol. T&quot; &gt; 0) divisé par le total des fiches de l'année, exprimé en %."></i>
         </h5>
     </div>
     <div class="card-body">
@@ -159,6 +163,11 @@
 <script>
 (function () {
     'use strict';
+
+    // Initialisation des tooltips Bootstrap
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+        new bootstrap.Tooltip(el);
+    });
 
     // -----------------------------------------------------------------------
     // Données injectées par Django
