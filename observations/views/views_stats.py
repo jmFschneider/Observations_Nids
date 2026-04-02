@@ -5,6 +5,8 @@ Ce module contient les vues pour afficher les différents tableaux de bord
 statistiques réservés aux administrateurs et correcteurs.
 """
 
+import json
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Q
 from django.http import JsonResponse
@@ -14,7 +16,7 @@ from django.views.generic import TemplateView
 
 from accounts.models import Utilisateur
 from observations.models import FicheObservation
-from observations.stats import StatsGeographie, get_stats_tableau_bord
+from observations.stats import StatsGeographie, StatsTaxonomie, get_stats_tableau_bord
 
 
 class StatsAccessMixin(UserPassesTestMixin):
@@ -127,6 +129,87 @@ class StatsGeographieView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
         context['especes_disponibles'] = StatsGeographie.get_especes_disponibles()
         context['page_title'] = 'Statistiques Géographiques'
         return context
+
+
+class StatsTaxonomieView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
+    """
+    Vue de la page de statistiques taxonomiques.
+
+    Blocs :
+    - Couverture + Top espèces (Chart.js barres horizontales)
+    - Répartition par famille (Chart.js donut)
+    - Espèces sans aucune fiche (tableau)
+    - Évolution annuelle : nb espèces + taux de succès (double axe)
+    - Carte maille géographique par espèce (Leaflet, données AJAX)
+    """
+
+    template_name = 'observations/stats/taxonomie.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        couverture = StatsTaxonomie.get_couverture()
+        top_especes = StatsTaxonomie.get_top_especes(20)
+        familles = StatsTaxonomie.get_repartition_familles()
+        especes_sans_fiche = StatsTaxonomie.get_especes_sans_fiche()
+        evolution = StatsTaxonomie.get_evolution_annuelle()
+
+        context['couverture'] = couverture
+        context['chart_especes_labels'] = json.dumps([e['espece__nom'] for e in top_especes])
+        context['chart_especes_data'] = json.dumps([e['nb_fiches'] for e in top_especes])
+        context['chart_familles_labels'] = json.dumps(
+            [f['espece__famille__nom'] or 'Non classée' for f in familles]
+        )
+        context['chart_familles_data'] = json.dumps([f['nb_fiches'] for f in familles])
+        context['especes_sans_fiche'] = especes_sans_fiche
+        context['nb_especes_sans_fiche'] = len(especes_sans_fiche)
+        context['chart_evolution_annees'] = json.dumps([e['annee'] for e in evolution])
+        context['chart_evolution_especes'] = json.dumps([e['nb_especes'] for e in evolution])
+        context['chart_evolution_succes'] = json.dumps([e['taux_succes'] for e in evolution])
+        context['annees_disponibles'] = StatsGeographie.get_annees_disponibles()
+        context['page_title'] = 'Statistiques Taxonomiques'
+        return context
+
+
+def stats_taxo_maille_data(request):
+    """
+    Endpoint AJAX retournant les données de la grille géographique par espèce.
+
+    Paramètres GET :
+        taille  (float) : taille de maille en degrés (0.1, 0.25, 0.5, 1.0)
+        annee   (int, optionnel) : filtre sur l'année
+
+    Retourne :
+        JsonResponse avec 'mailles' (liste) et 'kpis' (max_especes, nb_mailles).
+    """
+    if not request.user.is_authenticated or request.user.role not in [
+        'administrateur',
+        'correcteur',
+    ]:
+        return JsonResponse({'error': 'Accès refusé'}, status=403)
+
+    taille_str = request.GET.get('taille', '0.5')
+    annee = request.GET.get('annee') or None
+
+    try:
+        taille = float(taille_str)
+        if taille not in (0.1, 0.25, 0.5, 1.0):
+            taille = 0.5
+    except ValueError:
+        taille = 0.5
+
+    mailles = StatsTaxonomie.get_donnees_maille(taille=taille, annee=annee)
+    max_especes = mailles[0]['nb_especes'] if mailles else 0
+
+    return JsonResponse(
+        {
+            'mailles': mailles,
+            'kpis': {
+                'nb_mailles': len(mailles),
+                'max_especes': max_especes,
+            },
+        }
+    )
 
 
 def stats_geo_data(request):
