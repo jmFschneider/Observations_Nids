@@ -442,7 +442,7 @@ class StatsTaxonomie:
         return result
 
     @staticmethod
-    def get_donnees_maille(taille=0.5, annee=None):
+    def get_donnees_maille(taille=0.5, annee=None, espece_id=None):
         """
         Regroupe les fiches dans une grille de mailles carrées (en degrés).
         Retourne pour chaque maille non vide le nombre d'espèces distinctes.
@@ -450,6 +450,7 @@ class StatsTaxonomie:
         Args:
             taille (float): Côté de la maille en degrés (ex: 0.25, 0.5, 1.0).
             annee (int|None): Filtre optionnel sur l'année.
+            espece_id (int|None): Filtre optionnel sur une espèce spécifique.
         """
         qs = (
             Localisation.objects.exclude(latitude='0.0')
@@ -462,6 +463,8 @@ class StatsTaxonomie:
         )
         if annee:
             qs = qs.filter(fiche__annee=int(annee))
+        if espece_id:
+            qs = qs.filter(fiche__espece_id=int(espece_id))
 
         cells = defaultdict(set)
         for loc in qs.values('lat_f', 'lon_f', 'fiche__espece_id'):

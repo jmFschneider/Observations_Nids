@@ -73,57 +73,6 @@
 </div>
 
 <!-- =========================================================
-     BLOC 3 — Espèces sans fiche
-     ========================================================= -->
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-light">
-        <button class="btn btn-link text-decoration-none text-dark p-0 w-100 text-start"
-                type="button" data-bs-toggle="collapse" data-bs-target="#collapseEspecesSansFiche"
-                aria-expanded="false">
-            <h5 class="mb-0">
-                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                Espèces sans fiche
-                <span class="badge bg-warning text-dark ms-2">{{ nb_especes_sans_fiche }}</span>
-                <i class="fas fa-chevron-down ms-2 small"></i>
-            </h5>
-        </button>
-    </div>
-    <div class="collapse" id="collapseEspecesSansFiche">
-        <div class="card-body p-0">
-            {% if especes_sans_fiche %}
-            <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
-                <table class="table table-sm table-hover mb-0">
-                    <thead class="table-light sticky-top">
-                        <tr>
-                            <th>Espèce</th>
-                            <th>Nom scientifique</th>
-                            <th>Code GONM</th>
-                            <th>Famille</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for e in especes_sans_fiche %}
-                        <tr>
-                            <td>{{ e.nom }}</td>
-                            <td><em class="text-muted small">{{ e.nom_scientifique|default:"—" }}</em></td>
-                            <td><span class="badge bg-light text-dark border">{{ e.code_gonm|default:"—" }}</span></td>
-                            <td class="small">{{ e.famille__nom|default:"Non classée" }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="text-center py-4 text-muted">
-                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
-                <p class="mb-0">Toutes les espèces du référentiel ont au moins une fiche.</p>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-<!-- =========================================================
      BLOC 4 — Évolution annuelle (double axe)
      ========================================================= -->
 <div class="card shadow-sm mb-4">
@@ -159,22 +108,29 @@
                     <option value="1.0">1° (~110 km)</option>
                 </select>
             </div>
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-2">
                 <label for="maille-annee" class="form-label small fw-bold mb-1">Année</label>
                 <select class="form-select form-select-sm" id="maille-annee" name="annee">
-                    <option value="">Toutes les années</option>
+                    <option value="">Toutes</option>
                     {% for annee in annees_disponibles %}
                     <option value="{{ annee }}">{{ annee }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-12 col-md-2">
-                <button type="submit" class="btn btn-primary btn-sm w-100">
+            <div class="col-12 col-md-4">
+                <label for="maille-espece" class="form-label small fw-bold mb-1">Espèce</label>
+                <select class="form-select form-select-sm" id="maille-espece" name="espece_id">
+                    <option value="">Toutes les espèces</option>
+                    {% for espece in especes_disponibles %}
+                    <option value="{{ espece.id }}">{{ espece.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-3 d-flex flex-column gap-1">
+                <button type="submit" class="btn btn-primary btn-sm">
                     <i class="fas fa-filter me-1"></i>Appliquer
                 </button>
-            </div>
-            <div class="col-12 col-md-4 d-flex align-items-end">
-                <div id="kpis-maille" class="text-muted small">
+                <div id="kpis-maille" class="text-muted small text-center">
                     <span id="kpi-nb-mailles">—</span> mailles &bull;
                     max <span id="kpi-max-especes">—</span> espèces
                 </div>
@@ -383,8 +339,9 @@
 
     function chargerMailles() {
         const params = new URLSearchParams({
-            taille: document.getElementById('maille-taille').value,
-            annee:  document.getElementById('maille-annee').value,
+            taille:    document.getElementById('maille-taille').value,
+            annee:     document.getElementById('maille-annee').value,
+            espece_id: document.getElementById('maille-espece').value,
         });
 
         fetch(MAILLE_URL + '?' + params.toString())

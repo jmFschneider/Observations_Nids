@@ -151,7 +151,6 @@ class StatsTaxonomieView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
         couverture = StatsTaxonomie.get_couverture()
         top_especes = StatsTaxonomie.get_top_especes(20)
         familles = StatsTaxonomie.get_repartition_familles()
-        especes_sans_fiche = StatsTaxonomie.get_especes_sans_fiche()
         evolution = StatsTaxonomie.get_evolution_annuelle()
 
         context['couverture'] = couverture
@@ -161,12 +160,11 @@ class StatsTaxonomieView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
             [f['espece__famille__nom'] or 'Non classée' for f in familles]
         )
         context['chart_familles_data'] = json.dumps([f['nb_fiches'] for f in familles])
-        context['especes_sans_fiche'] = especes_sans_fiche
-        context['nb_especes_sans_fiche'] = len(especes_sans_fiche)
         context['chart_evolution_annees'] = json.dumps([e['annee'] for e in evolution])
         context['chart_evolution_especes'] = json.dumps([e['nb_especes'] for e in evolution])
         context['chart_evolution_succes'] = json.dumps([e['taux_succes'] for e in evolution])
         context['annees_disponibles'] = StatsGeographie.get_annees_disponibles()
+        context['especes_disponibles'] = StatsGeographie.get_especes_disponibles()
         context['page_title'] = 'Statistiques Taxonomiques'
         return context
 
@@ -190,6 +188,7 @@ def stats_taxo_maille_data(request):
 
     taille_str = request.GET.get('taille', '0.5')
     annee = request.GET.get('annee') or None
+    espece_id = request.GET.get('espece_id') or None
 
     try:
         taille = float(taille_str)
@@ -198,7 +197,7 @@ def stats_taxo_maille_data(request):
     except ValueError:
         taille = 0.5
 
-    mailles = StatsTaxonomie.get_donnees_maille(taille=taille, annee=annee)
+    mailles = StatsTaxonomie.get_donnees_maille(taille=taille, annee=annee, espece_id=espece_id)
     max_especes = mailles[0]['nb_especes'] if mailles else 0
 
     return JsonResponse(
