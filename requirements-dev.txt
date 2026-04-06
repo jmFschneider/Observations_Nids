@@ -285,7 +285,7 @@ pathspec==1.0.4
     #   mypy
 pika==1.3.2
     # via radicale
-pillow==12.1.1
+pillow==12.2.0
     # via -r requirements-base.in
 pip-tools==7.5.3
     # via -r requirements-dev.in
