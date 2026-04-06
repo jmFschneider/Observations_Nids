@@ -156,7 +156,7 @@ geopy==2.4.1
     # via -r requirements-base.in
 ghp-import==2.1.0
     # via mkdocs
-google-api-core==2.30.0
+google-api-core==2.30.2
     # via
     #   -r requirements-base.in
     #   google-api-python-client
@@ -169,11 +169,11 @@ google-auth[requests]==2.49.1
     #   google-api-python-client
     #   google-auth-httplib2
     #   google-genai
-google-auth-httplib2==0.3.0
+google-auth-httplib2==0.3.1
     # via
     #   -r requirements-base.in
     #   google-api-python-client
-google-genai==1.69.0
+google-genai==1.70.0
     # via -r requirements-base.in
 googleapis-common-protos==1.73.1
     # via
