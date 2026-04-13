@@ -381,22 +381,26 @@ class ImportationService:
                 prenom = parts[0]
                 nom = ' '.join(parts[1:])
             else:
-                # Un seul mot, on le duplique
-                prenom = parts[0]
+                # Un seul mot : c'est le nom de famille, prénom inconnu
+                prenom = ""
                 nom = parts[0]
 
         # Normaliser les valeurs (supprimer caractères spéciaux, etc.)
         prenom = ''.join(c for c in prenom if c.isalnum() or c.isspace()).strip()
         nom = ''.join(c for c in nom if c.isalnum() or c.isspace()).strip()
 
-        # Si après nettoyage on a des chaînes vides, revenir aux valeurs par défaut
-        if not prenom or not nom:
+        # Si après nettoyage le nom est vide, revenir aux valeurs par défaut
+        if not nom:
             prenom = "Obs"
             nom = "Observateur"
 
-        # Construire username et email
-        base_username = f"{prenom.lower()}.{nom.lower()}"
-        email = f"{prenom.lower()}.{nom.lower()}@transcription.trans"
+        # Construire username et email (le prénom peut être absent)
+        if prenom:
+            base_username = f"{prenom.lower()}.{nom.lower()}"
+            email = f"{prenom.lower()}.{nom.lower()}@transcription.trans"
+        else:
+            base_username = nom.lower()
+            email = f"{nom.lower()}@transcription.trans"
 
         # Créer un username unique
         username = base_username
