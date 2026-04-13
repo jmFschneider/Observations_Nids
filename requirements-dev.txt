@@ -34,7 +34,7 @@ billiard==4.2.4
     # via
     #   -r requirements-base.in
     #   celery
-build==1.4.0
+build==1.4.3
     # via
     #   -r requirements-dev.in
     #   pip-tools
@@ -54,11 +54,11 @@ certifi==2026.2.25
     #   requests
 cffi==2.0.0
     # via cryptography
-charset-normalizer==3.4.6
+charset-normalizer==3.4.7
     # via
     #   -r requirements-base.in
     #   requests
-click==8.3.1
+click==8.3.2
     # via
     #   -r requirements-base.in
     #   celery
@@ -118,7 +118,7 @@ django-crispy-forms==2.6
     # via
     #   -r requirements-base.in
     #   crispy-bootstrap5
-django-debug-toolbar==6.2.0
+django-debug-toolbar==6.3.0
     # via -r requirements-dev.in
 django-extensions==4.1
     # via -r requirements-dev.in
@@ -128,11 +128,11 @@ django-helpdesk==2.1.1
     # via -r requirements-base.in
 django-model-utils==5.0.0
     # via django-helpdesk
-django-stubs==6.0.1
+django-stubs==6.0.2
     # via
     #   -r requirements-dev.in
     #   types-django-filter
-django-stubs-ext==6.0.1
+django-stubs-ext==6.0.2
     # via
     #   -r requirements-dev.in
     #   django-stubs
@@ -146,7 +146,7 @@ email-reply-parser==0.5.12
     # via django-helpdesk
 et-xmlfile==2.0.0
     # via openpyxl
-eventlet==0.40.4
+eventlet==0.41.0
     # via -r requirements-base.in
 flower==2.0.1
     # via -r requirements-base.in
@@ -156,26 +156,26 @@ geopy==2.4.1
     # via -r requirements-base.in
 ghp-import==2.1.0
     # via mkdocs
-google-api-core==2.30.0
+google-api-core==2.30.3
     # via
     #   -r requirements-base.in
     #   google-api-python-client
-google-api-python-client==2.193.0
+google-api-python-client==2.194.0
     # via -r requirements-base.in
-google-auth[requests]==2.49.1
+google-auth[requests]==2.49.2
     # via
     #   -r requirements-base.in
     #   google-api-core
     #   google-api-python-client
     #   google-auth-httplib2
     #   google-genai
-google-auth-httplib2==0.3.0
+google-auth-httplib2==0.3.1
     # via
     #   -r requirements-base.in
     #   google-api-python-client
-google-genai==1.69.0
+google-genai==1.72.0
     # via -r requirements-base.in
-googleapis-common-protos==1.73.1
+googleapis-common-protos==1.74.0
     # via
     #   -r requirements-base.in
     #   google-api-core
@@ -226,7 +226,7 @@ kombu==5.6.2
     #   celery
 libpass==1.9.3
     # via radicale
-librt==0.7.4
+librt==0.9.0
     # via mypy
 lxml==6.0.2
     # via django-helpdesk
@@ -255,7 +255,7 @@ mkdocs-material==9.7.6
     # via -r requirements-dev.in
 mkdocs-material-extensions==1.3.1
     # via mkdocs-material
-mypy==1.19.1
+mypy==1.20.1
     # via -r requirements-dev.in
 mypy-extensions==1.1.0
     # via mypy
@@ -285,11 +285,11 @@ pathspec==1.0.4
     #   mypy
 pika==1.3.2
     # via radicale
-pillow==12.1.1
+pillow==12.2.0
     # via -r requirements-base.in
 pip-tools==7.5.3
     # via -r requirements-dev.in
-platformdirs==4.9.4
+platformdirs==4.9.6
     # via
     #   -r requirements-dev.in
     #   mkdocs-get-deps
@@ -342,7 +342,7 @@ pygments==2.20.0
     # via
     #   mkdocs-material
     #   pytest
-pymdown-extensions==10.21
+pymdown-extensions==10.21.2
     # via
     #   -r requirements-dev.in
     #   mkdocs-material
@@ -355,7 +355,7 @@ pyproject-hooks==1.2.0
     #   -r requirements-dev.in
     #   build
     #   pip-tools
-pytest==9.0.2
+pytest==9.0.3
     # via
     #   -r requirements-dev.in
     #   pytest-cov
@@ -388,11 +388,11 @@ pyyaml==6.0.3
     #   pyyaml-env-tag
 pyyaml-env-tag==1.1
     # via mkdocs
-radicale==3.6.1
+radicale==3.7.0
     # via -r requirements-base.in
 redis==7.4.0
     # via -r requirements-base.in
-requests==2.33.0
+requests==2.33.1
     # via
     #   -r requirements-base.in
     #   django-helpdesk
@@ -406,7 +406,7 @@ requests-oauthlib==2.0.0
     # via django-helpdesk
 rsa==4.9.1
     # via -r requirements-base.in
-ruff==0.15.7
+ruff==0.15.10
     # via -r requirements-dev.in
 six==1.17.0
     # via
@@ -459,7 +459,7 @@ typing-inspection==0.4.2
     #   -r requirements-dev.in
     #   pydantic
     #   pydantic-settings
-tzdata==2025.3
+tzdata==2026.1
     # via
     #   -r requirements-base.in
     #   kombu
