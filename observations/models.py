@@ -585,6 +585,8 @@ class ConfigurationVerrouillage(models.Model):
         (2, '2 jours'),
         (5, '5 jours'),
         (10, '10 jours'),
+        (30, '30 jours'),
+        (60, '60 jours'),
         (0, 'Jamais (verrouillage permanent)'),
     ]
 
