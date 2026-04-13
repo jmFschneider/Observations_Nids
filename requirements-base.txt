@@ -278,7 +278,7 @@ radicale==3.6.1
     # via -r requirements-base.in
 redis==7.4.0
     # via -r requirements-base.in
-requests==2.33.0
+requests==2.33.1
     # via
     #   -r requirements-base.in
     #   django-helpdesk
