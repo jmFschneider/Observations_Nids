@@ -87,13 +87,13 @@ coverage[toml]==7.13.0
     # via pytest-cov
 crispy-bootstrap5==2026.3
     # via -r requirements-base.in
-cryptography==46.0.6
+cryptography==46.0.7
     # via google-auth
 defusedxml==0.7.1
     # via radicale
 distro==1.9.0
     # via google-genai
-django==6.0.3
+django==6.0.4
     # via
     #   -r requirements-base.in
     #   crispy-bootstrap5
@@ -338,7 +338,7 @@ pydantic-core==2.41.5
     #   pydantic
 pydantic-settings==2.13.1
     # via -r requirements-base.in
-pygments==2.19.2
+pygments==2.20.0
     # via
     #   mkdocs-material
     #   pytest
