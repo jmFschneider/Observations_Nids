@@ -1157,7 +1157,11 @@ def rouvrir_fiche(request, fiche_id):
         request, f"La fiche #{fiche_id} a été rouverte et placée en cours de correction."
     )
 
-    return redirect('observations:modifier_observation', fiche_id=fiche_id)
+    redirect_url = reverse('observations:modifier_observation', kwargs={'fiche_id': fiche_id})
+    return_list_query = request.GET.urlencode()
+    if return_list_query:
+        redirect_url = f"{redirect_url}?{return_list_query}"
+    return redirect(redirect_url)
 
 
 @login_required
