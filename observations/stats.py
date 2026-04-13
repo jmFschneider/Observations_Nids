@@ -6,7 +6,9 @@ d'observation, les utilisateurs et l'activité de l'application.
 """
 
 import json
+from collections import defaultdict
 from datetime import timedelta
+from math import floor
 
 from django.db.models import Avg, Count, ExpressionWrapper, F, FloatField, Q, fields
 from django.db.models.functions import Cast
@@ -358,6 +360,125 @@ class StatsGeographie:
                 'nb_non_geocodees': nb_non_geocodees,
             },
         }
+
+
+class StatsTaxonomie:
+    """
+    Statistiques taxonomiques : couverture des espèces, répartition par famille,
+    évolution annuelle et maille géographique par espèce.
+    """
+
+    @staticmethod
+    def get_couverture():
+        """Retourne nb espèces observées, nb au référentiel et taux de couverture."""
+        nb_referentiel = Espece.objects.count()
+        nb_observees = FicheObservation.objects.values('espece').distinct().count()
+        taux = round(nb_observees / nb_referentiel * 100, 1) if nb_referentiel > 0 else 0
+        return {
+            'nb_referentiel': nb_referentiel,
+            'nb_observees': nb_observees,
+            'taux': taux,
+        }
+
+    @staticmethod
+    def get_top_especes(limit=20):
+        """Retourne les N espèces avec le plus de fiches."""
+        return list(
+            FicheObservation.objects.values('espece__nom', 'espece__code_gonm')
+            .annotate(nb_fiches=Count('num_fiche'))
+            .order_by('-nb_fiches')[:limit]
+        )
+
+    @staticmethod
+    def get_repartition_familles():
+        """Retourne la répartition du nombre de fiches par famille taxonomique."""
+        return list(
+            FicheObservation.objects.values('espece__famille__nom')
+            .annotate(nb_fiches=Count('num_fiche'))
+            .order_by('-nb_fiches')
+        )
+
+    @staticmethod
+    def get_especes_sans_fiche():
+        """Retourne les espèces du référentiel sans aucune fiche d'observation."""
+        return list(
+            Espece.objects.annotate(nb_fiches=Count('observations'))
+            .filter(nb_fiches=0)
+            .order_by('nom')
+            .values('nom', 'nom_scientifique', 'code_gonm', 'famille__nom')
+        )
+
+    @staticmethod
+    def get_evolution_annuelle():
+        """
+        Retourne par année : nombre d'espèces distinctes et taux de succès de nidification.
+        Taux de succès = fiches avec au moins 1 poussin volant / total fiches de l'année.
+        """
+        par_annee = {
+            row['annee']: {'total': row['total'], 'nb_especes': row['nb_especes']}
+            for row in FicheObservation.objects.values('annee').annotate(
+                total=Count('num_fiche'),
+                nb_especes=Count('espece', distinct=True),
+            )
+        }
+        succes_par_annee = dict(
+            FicheObservation.objects.filter(resume__nombre_poussins_vol_t__gt=0)
+            .values('annee')
+            .annotate(nb=Count('num_fiche'))
+            .values_list('annee', 'nb')
+        )
+        result = []
+        for annee in sorted(par_annee):
+            total = par_annee[annee]['total']
+            succes = succes_par_annee.get(annee, 0)
+            taux_succes = round(succes / total * 100, 1) if total > 0 else 0
+            result.append(
+                {
+                    'annee': annee,
+                    'nb_especes': par_annee[annee]['nb_especes'],
+                    'taux_succes': taux_succes,
+                }
+            )
+        return result
+
+    @staticmethod
+    def get_donnees_maille(taille=0.5, annee=None, espece_id=None):
+        """
+        Regroupe les fiches dans une grille de mailles carrées (en degrés).
+        Retourne pour chaque maille non vide le nombre d'espèces distinctes.
+
+        Args:
+            taille (float): Côté de la maille en degrés (ex: 0.25, 0.5, 1.0).
+            annee (int|None): Filtre optionnel sur l'année.
+            espece_id (int|None): Filtre optionnel sur une espèce spécifique.
+        """
+        qs = (
+            Localisation.objects.exclude(latitude='0.0')
+            .exclude(longitude='0.0')
+            .exclude(commune='')
+            .annotate(
+                lat_f=Cast('latitude', FloatField()),
+                lon_f=Cast('longitude', FloatField()),
+            )
+        )
+        if annee:
+            qs = qs.filter(fiche__annee=int(annee))
+        if espece_id:
+            qs = qs.filter(fiche__espece_id=int(espece_id))
+
+        cells = defaultdict(set)
+        for loc in qs.values('lat_f', 'lon_f', 'fiche__espece_id'):
+            if loc['lat_f'] and loc['lon_f']:
+                cell_lat = floor(loc['lat_f'] / taille) * taille
+                cell_lon = floor(loc['lon_f'] / taille) * taille
+                cells[(cell_lat, cell_lon)].add(loc['fiche__espece_id'])
+
+        result = [
+            {'lat': k[0], 'lon': k[1], 'nb_especes': len(v), 'taille': taille}
+            for k, v in cells.items()
+        ]
+        result.sort(key=lambda x: -x['nb_especes'])
+        return result
 
 
 def get_stats_tableau_bord():

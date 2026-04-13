@@ -1,0 +1,379 @@
+{% extends "observations/stats/base_stats.html" %}
+
+{% block stats_title %}Taxonomie - Statistiques{% endblock %}
+{% block stats_page_title %}Taxonomie{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+
+{% block stats_content %}
+
+<!-- =========================================================
+     BLOC 1 — KPIs couverture + Top espèces
+     ========================================================= -->
+<div class="row row-cols-1 row-cols-md-3 g-3 mb-4">
+    <div class="col">
+        <div class="card bg-primary-subtle text-primary-emphasis h-100 border-primary-subtle">
+            <div class="card-body text-center py-3">
+                <p class="card-title mb-1 small">Espèces observées</p>
+                <h2 class="fw-bold mb-0">{{ couverture.nb_observees }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-secondary-subtle text-secondary-emphasis h-100 border-secondary-subtle">
+            <div class="card-body text-center py-3">
+                <p class="card-title mb-1 small">Espèces au référentiel</p>
+                <h2 class="fw-bold mb-0">{{ couverture.nb_referentiel }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-success-subtle text-success-emphasis h-100 border-success-subtle">
+            <div class="card-body text-center py-3">
+                <p class="card-title mb-1 small">Taux de couverture</p>
+                <h2 class="fw-bold mb-0">{{ couverture.taux }} %</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <!-- Top 20 espèces -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-feather-alt text-primary me-2"></i>Top 20 espèces
+                </h5>
+                <small class="text-muted">par nombre de fiches</small>
+            </div>
+            <div class="card-body">
+                <canvas id="chartTopEspeces" style="max-height: 480px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         BLOC 2 — Répartition par famille
+         ========================================================= -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-sitemap text-success me-2"></i>Familles taxonomiques
+                </h5>
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                <canvas id="chartFamilles"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     BLOC 4 — Évolution annuelle (double axe)
+     ========================================================= -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">
+            <i class="fas fa-chart-line text-info me-2"></i>Évolution annuelle
+            <small class="text-muted fw-normal ms-2">espèces distinctes &amp; taux de succès</small>
+            <i class="fas fa-info-circle text-muted ms-2"
+               style="cursor:help; font-size:0.85rem;"
+               data-bs-toggle="tooltip" data-bs-placement="right"
+               title="Taux de succès = fiches ayant au moins 1 poussin volant (champ &quot;nombre poussins vol. T&quot; &gt; 0) divisé par le total des fiches de l'année, exprimé en %."></i>
+        </h5>
+    </div>
+    <div class="card-body">
+        <canvas id="chartEvolution" style="max-height: 320px;"></canvas>
+    </div>
+</div>
+
+<!-- =========================================================
+     BLOC 5 — Carte maille géographique
+     ========================================================= -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">
+            <i class="fas fa-th text-primary me-2"></i>Richesse spécifique par maille
+        </h5>
+    </div>
+    <div class="card-body py-3">
+        <!-- Filtres -->
+        <form id="filtres-maille" class="row g-3 align-items-end mb-3">
+            <div class="col-12 col-md-3">
+                <label for="maille-taille" class="form-label small fw-bold mb-1">Taille de maille</label>
+                <select class="form-select form-select-sm" id="maille-taille" name="taille">
+                    <option value="0.1">0,1° (~11 km)</option>
+                    <option value="0.25">0,25° (~28 km)</option>
+                    <option value="0.5" selected>0,5° (~55 km)</option>
+                    <option value="1.0">1° (~110 km)</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-2">
+                <label for="maille-annee" class="form-label small fw-bold mb-1">Année</label>
+                <select class="form-select form-select-sm" id="maille-annee" name="annee">
+                    <option value="">Toutes</option>
+                    {% for annee in annees_disponibles %}
+                    <option value="{{ annee }}">{{ annee }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-4">
+                <label for="maille-espece" class="form-label small fw-bold mb-1">Espèce</label>
+                <select class="form-select form-select-sm" id="maille-espece" name="espece_id">
+                    <option value="">Toutes les espèces</option>
+                    {% for espece in especes_disponibles %}
+                    <option value="{{ espece.id }}">{{ espece.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-3 d-flex flex-column gap-1">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-filter me-1"></i>Appliquer
+                </button>
+                <div id="kpis-maille" class="text-muted small text-center">
+                    <span id="kpi-nb-mailles">—</span> mailles &bull;
+                    max <span id="kpi-max-especes">—</span> espèces
+                </div>
+            </div>
+        </form>
+
+        <!-- Légende couleur -->
+        <div class="d-flex align-items-center gap-2 mb-2 small text-muted">
+            <span>1 espèce</span>
+            <div style="width:120px; height:12px; border-radius:4px;
+                        background: linear-gradient(to right, hsl(120,70%,70%), hsl(120,70%,25%));
+                        border: 1px solid #ccc;"></div>
+            <span id="legende-max">— espèces</span>
+        </div>
+
+        <!-- Carte Leaflet -->
+        <div id="carte-maille" style="height: 480px; border-radius: 0.375rem; border: 1px solid #dee2e6;"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    // Initialisation des tooltips Bootstrap
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+        new bootstrap.Tooltip(el);
+    });
+
+    // -----------------------------------------------------------------------
+    // Données injectées par Django
+    // -----------------------------------------------------------------------
+    const especesLabels  = {{ chart_especes_labels|safe }};
+    const especesData    = {{ chart_especes_data|safe }};
+    const famillesLabels = {{ chart_familles_labels|safe }};
+    const famillesData   = {{ chart_familles_data|safe }};
+    const evolutionAnnees  = {{ chart_evolution_annees|safe }};
+    const evolutionEspeces = {{ chart_evolution_especes|safe }};
+    const evolutionSucces  = {{ chart_evolution_succes|safe }};
+
+    const MAILLE_URL = "{% url 'observations:stats_taxo_maille_data' %}";
+
+    // -----------------------------------------------------------------------
+    // BLOC 1 — Top espèces (barres horizontales)
+    // -----------------------------------------------------------------------
+    new Chart(document.getElementById('chartTopEspeces'), {
+        type: 'bar',
+        data: {
+            labels: especesLabels,
+            datasets: [{
+                data: especesData,
+                backgroundColor: 'rgba(13, 110, 253, 0.55)',
+                borderColor:     'rgba(13, 110, 253, 0.85)',
+                borderWidth: 1,
+            }],
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { beginAtZero: true, ticks: { precision: 0 } },
+                y: { ticks: { font: { size: 11 } } },
+            },
+        },
+    });
+
+    // -----------------------------------------------------------------------
+    // BLOC 2 — Familles (donut)
+    // -----------------------------------------------------------------------
+    const paletteDonut = [
+        '#0d6efd','#198754','#ffc107','#dc3545','#0dcaf0','#6f42c1',
+        '#fd7e14','#20c997','#6c757d','#d63384','#0a58ca','#146c43',
+    ];
+    new Chart(document.getElementById('chartFamilles'), {
+        type: 'doughnut',
+        data: {
+            labels: famillesLabels,
+            datasets: [{
+                data: famillesData,
+                backgroundColor: famillesLabels.map(function (_, i) {
+                    return paletteDonut[i % paletteDonut.length];
+                }),
+                borderWidth: 1,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { size: 11 }, boxWidth: 12, padding: 8 },
+                },
+            },
+        },
+    });
+
+    // -----------------------------------------------------------------------
+    // BLOC 4 — Évolution annuelle (double axe)
+    // -----------------------------------------------------------------------
+    new Chart(document.getElementById('chartEvolution'), {
+        data: {
+            labels: evolutionAnnees,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'Espèces distinctes',
+                    data: evolutionEspeces,
+                    backgroundColor: 'rgba(13, 110, 253, 0.55)',
+                    borderColor:     'rgba(13, 110, 253, 0.85)',
+                    borderWidth: 1,
+                    yAxisID: 'y',
+                },
+                {
+                    type: 'line',
+                    label: 'Taux de succès (%)',
+                    data: evolutionSucces,
+                    borderColor:     'rgba(25, 135, 84, 0.9)',
+                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    yAxisID: 'y2',
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: function (ctx) {
+                            if (ctx.datasetIndex === 1) {
+                                return ' Taux de succès : ' + ctx.parsed.y + ' %';
+                            }
+                            return ' Espèces : ' + ctx.parsed.y;
+                        },
+                    },
+                },
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    position: 'left',
+                    beginAtZero: true,
+                    ticks: { precision: 0 },
+                    title: { display: true, text: 'Espèces distinctes' },
+                },
+                y2: {
+                    type: 'linear',
+                    position: 'right',
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { drawOnChartArea: false },
+                    ticks: { callback: function (v) { return v + ' %'; } },
+                    title: { display: true, text: 'Taux de succès' },
+                },
+            },
+        },
+    });
+
+    // -----------------------------------------------------------------------
+    // BLOC 5 — Carte maille
+    // -----------------------------------------------------------------------
+    const map = L.map('carte-maille').setView([49.0, -1.2], 8);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+    }).addTo(map);
+
+    let maillesLayer = L.layerGroup().addTo(map);
+
+    function especesToCouleur(nb, maxNb) {
+        const ratio = maxNb > 1 ? (nb - 1) / (maxNb - 1) : 1;
+        const lightness = Math.round(70 - ratio * 45);   // 70 % → 25 %
+        return 'hsla(120, 70%, ' + lightness + '%, 0.65)';
+    }
+
+    function updateMailles(mailles, maxEspeces) {
+        maillesLayer.clearLayers();
+        if (!mailles.length) return;
+
+        mailles.forEach(function (m) {
+            const taille = m.taille;
+            const bounds = [[m.lat, m.lon], [m.lat + taille, m.lon + taille]];
+            const couleur = especesToCouleur(m.nb_especes, maxEspeces);
+
+            const rect = L.rectangle(bounds, {
+                color:       'rgba(0, 100, 0, 0.6)',
+                fillColor:   couleur,
+                fillOpacity: 0.75,
+                weight:      0.8,
+            });
+
+            rect.bindTooltip(
+                '<strong>' + m.nb_especes + ' espèce' + (m.nb_especes > 1 ? 's' : '') + '</strong>'
+                + '<br><small>' + m.lat.toFixed(2) + '° N, ' + m.lon.toFixed(2) + '° E</small>',
+                { sticky: true, direction: 'top', opacity: 0.92 }
+            );
+
+            maillesLayer.addLayer(rect);
+        });
+    }
+
+    function chargerMailles() {
+        const params = new URLSearchParams({
+            taille:    document.getElementById('maille-taille').value,
+            annee:     document.getElementById('maille-annee').value,
+            espece_id: document.getElementById('maille-espece').value,
+        });
+
+        fetch(MAILLE_URL + '?' + params.toString())
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                const kpis = data.kpis;
+                document.getElementById('kpi-nb-mailles').textContent  = kpis.nb_mailles.toLocaleString('fr-FR');
+                document.getElementById('kpi-max-especes').textContent = kpis.max_especes;
+                document.getElementById('legende-max').textContent     = kpis.max_especes + ' espèces';
+                updateMailles(data.mailles, kpis.max_especes);
+            })
+            .catch(function (err) {
+                console.error('Erreur chargement mailles :', err);
+            });
+    }
+
+    document.getElementById('filtres-maille').addEventListener('submit', function (e) {
+        e.preventDefault();
+        chargerMailles();
+    });
+
+    // Chargement initial
+    chargerMailles();
+})();
+</script>
+{% endblock %}

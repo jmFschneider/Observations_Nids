@@ -508,7 +508,7 @@
     <div class="floating-action-bar-content">
         {% if fiche.etat_correction.statut == 'valide' %}
             {% if user.role == 'administrateur' or user.role == 'super_utilisateur' or user == fiche.etat_correction.validee_par %}
-                <a href="{% url 'observations:rouvrir_fiche' fiche_id=fiche.num_fiche %}"
+                <a href="{% url 'observations:rouvrir_fiche' fiche_id=fiche.num_fiche %}{% if return_list_query %}?{{ return_list_query }}{% endif %}"
                    class="btn btn-danger"
                    onclick="return confirm('ATTENTION : Rouvrir la fiche va annuler sa validation et la remettre en correction. Confirmer ?');">
                     <i class="fas fa-lock-open"></i> Rouvrir la fiche

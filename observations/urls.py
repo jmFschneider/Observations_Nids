@@ -45,8 +45,10 @@ from .views.views_stats import (
     StatsCorrecteursView,
     StatsDashboardView,
     StatsGeographieView,
+    StatsTaxonomieView,
     stats_geo_data,
     stats_geo_fiches,
+    stats_taxo_maille_data,
 )
 
 app_name = 'observations'
@@ -77,6 +79,8 @@ urlpatterns = [
     path('statistiques/geographie/', StatsGeographieView.as_view(), name='stats_geographie'),
     path('statistiques/geographie/data/', stats_geo_data, name='stats_geo_data'),
     path('statistiques/geographie/fiches/', stats_geo_fiches, name='stats_geo_fiches'),
+    path('statistiques/taxonomie/', StatsTaxonomieView.as_view(), name='stats_taxonomie'),
+    path('statistiques/taxonomie/maille/', stats_taxo_maille_data, name='stats_taxo_maille_data'),
     #    path('observations/nouvelle/', saisie_observation, name='saisie_observation'),
     #    path('observations/sauvegarde/', traiter_saisie_observation, name='traiter_saisie_observation'),
     path('observations/modifier/<int:fiche_id>/', saisie_observation, name='modifier_observation'),

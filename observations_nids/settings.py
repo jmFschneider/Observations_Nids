@@ -109,6 +109,7 @@ CSRF_COOKIE_SECURE = settings.CSRF_COOKIE_SECURE
 SECURE_HSTS_SECONDS = settings.SECURE_HSTS_SECONDS
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 # Celery Configuration - utilise les variables d'environnement
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')

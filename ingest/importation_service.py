@@ -381,22 +381,26 @@ class ImportationService:
                 prenom = parts[0]
                 nom = ' '.join(parts[1:])
             else:
-                # Un seul mot, on le duplique
-                prenom = parts[0]
+                # Un seul mot : c'est le nom de famille, prénom inconnu
+                prenom = ""
                 nom = parts[0]
 
         # Normaliser les valeurs (supprimer caractères spéciaux, etc.)
         prenom = ''.join(c for c in prenom if c.isalnum() or c.isspace()).strip()
         nom = ''.join(c for c in nom if c.isalnum() or c.isspace()).strip()
 
-        # Si après nettoyage on a des chaînes vides, revenir aux valeurs par défaut
-        if not prenom or not nom:
+        # Si après nettoyage le nom est vide, revenir aux valeurs par défaut
+        if not nom:
             prenom = "Obs"
             nom = "Observateur"
 
-        # Construire username et email
-        base_username = f"{prenom.lower()}.{nom.lower()}"
-        email = f"{prenom.lower()}.{nom.lower()}@transcription.trans"
+        # Construire username et email (le prénom peut être absent)
+        if prenom:
+            base_username = f"{prenom.lower()}.{nom.lower()}"
+            email = f"{prenom.lower()}.{nom.lower()}@transcription.trans"
+        else:
+            base_username = nom.lower()
+            email = f"{nom.lower()}@transcription.trans"
 
         # Créer un username unique
         username = base_username
@@ -997,8 +1001,23 @@ class ImportationService:
                                 heure = 0
                                 heure_connue = False
 
+                        minute_brute = obs.get('Minute')
+                        if (
+                            minute_brute is None
+                            or str(minute_brute).strip() == ""
+                            or str(minute_brute).lower() == "null"
+                        ):
+                            minute = 0
+                        else:
+                            try:
+                                minute = int(str(minute_brute).strip())
+                                if not 0 <= minute <= 59:
+                                    minute = 0
+                            except (ValueError, TypeError):
+                                minute = 0
+
                         date_obs = timezone.make_aware(
-                            datetime.datetime(annee, mois, jour, heure, 0)
+                            datetime.datetime(annee, mois, jour, heure, minute)
                         )
 
                         observations_a_creer.append(

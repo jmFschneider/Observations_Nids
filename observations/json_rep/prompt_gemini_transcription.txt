@@ -29,7 +29,8 @@ Produit un SEUL et UNIQUE objet JSON **strictement structuré** selon le modèle
    Chaque ligne contient :
    - Jour (entier entre 1 et 31, ou null)
    - Mois (entier entre 1 et 12, ou null)
-   - Heure (entier entre 1 et 24, ou null)
+   - Heure (entier entre 0 et 23, ou null)
+   - Minute (entier entre 0 et 59, ou null — transcrire fidèlement la valeur inscrite, même si différente de 00)
    - Nombre_oeuf (entier entre 0 et 12, ou null)
    - Nombre_pou (entier entre 0 et 12, ou null)
    - age (texte ou null)
