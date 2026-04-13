@@ -119,7 +119,7 @@ email-reply-parser==0.5.12
     # via django-helpdesk
 et-xmlfile==2.0.0
     # via openpyxl
-eventlet==0.40.4
+eventlet==0.41.0
     # via -r requirements-base.in
 flower==2.0.1
     # via -r requirements-base.in
