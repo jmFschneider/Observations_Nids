@@ -5,7 +5,7 @@ Produit un SEUL et UNIQUE objet JSON **strictement structuré** selon le modèle
 1. **informations_generales** (object) :
    - n_fiche (string ou null)
    - observateur (string ou null)
-   - n_espece (null ou code numérique si lisible)
+   - n_espece (null ou code alphanumérique GONM si lisible, ex: "A15", "PARAMA")
    - espece (string)
    - annee (année complète, format "YYYY")
 

@@ -207,7 +207,8 @@ class ImportationService:
                         if created:
                             especes_ajoutees += 1
 
-                            # Tenter une correspondance automatique
+                        # Tenter une correspondance si pas encore résolue (nouvelle ou existante)
+                        if espece.espece_validee is None:
                             self._trouver_correspondance_espece(espece)
 
                     elif code_gonm and isinstance(code_gonm, str):
@@ -367,6 +368,22 @@ class ImportationService:
             f"(code GONM: '{espece_candidate.code_gonm_transcrit or 'absent'}')"
         )
         return False
+
+    def resoudre_especes_non_resolues(self):
+        """
+        Relance le matching sur toutes les EspeceCandidate encore non résolues.
+        Utile pour bénéficier d'améliorations du matching sur les imports passés.
+        Retourne le nombre de nouvelles résolutions.
+        """
+        self._initialiser_cache_especes()
+        candidates = EspeceCandidate.objects.filter(espece_validee__isnull=True)
+        total = candidates.count()
+        resolues = 0
+        for espece in candidates:
+            if self._trouver_correspondance_espece(espece):
+                resolues += 1
+        logger.info(f"Résolution des espèces non résolues : {resolues}/{total} identifiées")
+        return resolues
 
     def creer_ou_recuperer_utilisateur(self, nom_observateur):
         """Crée ou récupère un utilisateur à partir d'un nom d'observateur manuscrit"""
