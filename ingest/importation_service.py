@@ -997,8 +997,23 @@ class ImportationService:
                                 heure = 0
                                 heure_connue = False
 
+                        minute_brute = obs.get('Minute')
+                        if (
+                            minute_brute is None
+                            or str(minute_brute).strip() == ""
+                            or str(minute_brute).lower() == "null"
+                        ):
+                            minute = 0
+                        else:
+                            try:
+                                minute = int(str(minute_brute).strip())
+                                if not 0 <= minute <= 59:
+                                    minute = 0
+                            except (ValueError, TypeError):
+                                minute = 0
+
                         date_obs = timezone.make_aware(
-                            datetime.datetime(annee, mois, jour, heure, 0)
+                            datetime.datetime(annee, mois, jour, heure, minute)
                         )
 
                         observations_a_creer.append(
