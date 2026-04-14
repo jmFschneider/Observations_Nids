@@ -30,10 +30,10 @@
                         {{ f.content }}
                     </div>
                     {% if f.messages.count > 0 %}
-                        {% with last_msg=f.messages.all|last %}
+                        {% with last_msg=f.messages.last %}
                         <small class="text-muted">
                             <i class="fas fa-reply"></i> {{ f.messages.count }} réponse(s)
-                            — <span class="fw-semibold">{{ last_msg.author.get_full_name|default:last_msg.author.username }}</span>
+                            {% if last_msg %}— <span class="fw-semibold">{{ last_msg.author.get_full_name|default:last_msg.author.username }}</span>{% endif %}
                         </small>
                         {% endwith %}
                     {% endif %}
