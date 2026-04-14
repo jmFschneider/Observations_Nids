@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -102,12 +103,24 @@ def feedback_triage(request):
     # Mais on utilise l'interface 'triage' qui est mieux organisée.
 
     # On sépare les retours par statut
-    new_feedbacks = Feedback.objects.filter(status__in=["NEW", "READ"]).order_by("created_at")
-    processing_feedbacks = Feedback.objects.filter(
-        status__in=["IN_PROGRESS", "WAITING_USER"]
-    ).order_by("-last_activity")
-    resolved_feedbacks = Feedback.objects.filter(status__in=["RESOLVED", "ARCHIVED"]).order_by(
-        "-last_activity"
+    messages_prefetch = Prefetch(
+        "messages",
+        queryset=FeedbackMessage.objects.select_related("author").order_by("created_at"),
+    )
+    new_feedbacks = (
+        Feedback.objects.filter(status__in=["NEW", "READ"])
+        .prefetch_related(messages_prefetch)
+        .order_by("created_at")
+    )
+    processing_feedbacks = (
+        Feedback.objects.filter(status__in=["IN_PROGRESS", "WAITING_USER"])
+        .prefetch_related(messages_prefetch)
+        .order_by("-last_activity")
+    )
+    resolved_feedbacks = (
+        Feedback.objects.filter(status__in=["RESOLVED", "ARCHIVED"])
+        .prefetch_related(messages_prefetch)
+        .order_by("-last_activity")
     )
 
     context = {

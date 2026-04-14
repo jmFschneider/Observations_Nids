@@ -2,6 +2,7 @@
     <table class="table table-hover align-middle">
         <thead class="table-light">
             <tr>
+                <th style="width: 40px;">#</th>
                 <th style="width: 100px;">Date</th>
                 <th>Utilisateur</th>
                 <th style="width: 30%;">Message</th>
@@ -14,6 +15,7 @@
         <tbody>
             {% for f in feedbacks %}
             <tr class="{% if f.messages.count > 0 and f.last_activity > recent_activity_threshold %}table-success bg-opacity-10{% endif %}">
+                <td class="small text-muted fw-bold">{{ f.id }}</td>
                 <td class="small text-muted">
                     {{ f.created_at|date:"d/m/Y" }}<br>
                     <small>{{ f.created_at|date:"H:i" }}</small>
@@ -28,7 +30,12 @@
                         {{ f.content }}
                     </div>
                     {% if f.messages.count > 0 %}
-                        <small class="text-muted"><i class="fas fa-reply"></i> {{ f.messages.count }} réponse(s)</small>
+                        {% with last_msg=f.messages.all|last %}
+                        <small class="text-muted">
+                            <i class="fas fa-reply"></i> {{ f.messages.count }} réponse(s)
+                            — <span class="fw-semibold">{{ last_msg.author.get_full_name|default:last_msg.author.username }}</span>
+                        </small>
+                        {% endwith %}
                     {% endif %}
                 </td>
                 <td>
@@ -61,7 +68,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7" class="text-center py-5 text-muted">
+                <td colspan="8" class="text-center py-5 text-muted">
                     <p class="mb-0">Aucun message dans cette catégorie.</p>
                 </td>
             </tr>
