@@ -1,16 +1,13 @@
 """
 Vues pour les statistiques de l'application Observations de Nids.
-
-Ce module contient les vues pour afficher les différents tableaux de bord
-statistiques réservés aux administrateurs et correcteurs.
 """
 
 import json
 
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import TemplateView
 
@@ -19,32 +16,11 @@ from observations.models import FicheObservation
 from observations.stats import StatsGeographie, StatsTaxonomie, get_stats_tableau_bord
 
 
-class StatsAccessMixin(UserPassesTestMixin):
-    """
-    Mixin pour restreindre l'accès aux statistiques aux admins et correcteurs.
-    """
-
-    def test_func(self):
-        """
-        Vérifie que l'utilisateur est admin ou correcteur.
-        """
-        return self.request.user.is_authenticated and (
-            self.request.user.role in ['administrateur', 'correcteur']
-        )
-
-    def handle_no_permission(self):
-        """
-        Redirige vers une page d'accès refusé si l'utilisateur n'a pas la permission.
-        """
-        return render(self.request, 'access_restricted.html', status=403)
-
-
-class StatsDashboardView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
+class StatsDashboardView(LoginRequiredMixin, TemplateView):
     """
     Vue du tableau de bord principal des statistiques (Le Cockpit).
 
     Affiche les statistiques globales de volume et de performance.
-    Accessible uniquement aux administrateurs et correcteurs.
     """
 
     template_name = 'observations/stats/dashboard.html'
@@ -68,12 +44,11 @@ class StatsDashboardView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
         return context
 
 
-class StatsCorrecteursView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
+class StatsCorrecteursView(LoginRequiredMixin, TemplateView):
     """
     Vue détaillée des statistiques des correcteurs.
 
     Affiche la charge de travail, le classement et les performances des correcteurs.
-    Accessible uniquement aux administrateurs et correcteurs.
     """
 
     template_name = 'observations/stats/correcteurs.html'
@@ -111,14 +86,13 @@ class StatsCorrecteursView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
         return context
 
 
-class StatsGeographieView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
+class StatsGeographieView(LoginRequiredMixin, TemplateView):
     """
     Vue de la page de statistiques géographiques.
 
     Affiche une carte Leaflet avec des cercles proportionnels par commune,
     un graphique des top 10 communes, et des KPIs géographiques.
     Les données sont chargées dynamiquement via l'endpoint AJAX stats_geo_data.
-    Accessible uniquement aux administrateurs et correcteurs.
     """
 
     template_name = 'observations/stats/geographie.html'
@@ -131,7 +105,7 @@ class StatsGeographieView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
         return context
 
 
-class StatsTaxonomieView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
+class StatsTaxonomieView(LoginRequiredMixin, TemplateView):
     """
     Vue de la page de statistiques taxonomiques.
 
@@ -169,6 +143,7 @@ class StatsTaxonomieView(LoginRequiredMixin, StatsAccessMixin, TemplateView):
         return context
 
 
+@login_required
 def stats_taxo_maille_data(request):
     """
     Endpoint AJAX retournant les données de la grille géographique par espèce.
@@ -180,12 +155,6 @@ def stats_taxo_maille_data(request):
     Retourne :
         JsonResponse avec 'mailles' (liste) et 'kpis' (max_especes, nb_mailles).
     """
-    if not request.user.is_authenticated or request.user.role not in [
-        'administrateur',
-        'correcteur',
-    ]:
-        return JsonResponse({'error': 'Accès refusé'}, status=403)
-
     taille_str = request.GET.get('taille', '0.5')
     annee = request.GET.get('annee') or None
     espece_id = request.GET.get('espece_id') or None
@@ -211,6 +180,7 @@ def stats_taxo_maille_data(request):
     )
 
 
+@login_required
 def stats_geo_data(request):
     """
     Endpoint AJAX retournant les données géographiques filtrées en JSON.
@@ -223,12 +193,6 @@ def stats_geo_data(request):
     Retourne :
         JsonResponse avec les clés 'communes' et 'kpis'.
     """
-    if not request.user.is_authenticated or request.user.role not in [
-        'administrateur',
-        'correcteur',
-    ]:
-        return JsonResponse({'error': 'Accès refusé'}, status=403)
-
     annee_debut = request.GET.get('annee_debut') or None
     annee_fin = request.GET.get('annee_fin') or None
     espece_id = request.GET.get('espece_id') or None
@@ -260,6 +224,7 @@ def stats_geo_data(request):
     )
 
 
+@login_required
 def stats_geo_fiches(request):
     """
     Endpoint AJAX retournant la liste des fiches d'une commune donnée.
@@ -274,12 +239,6 @@ def stats_geo_fiches(request):
     Retourne :
         JsonResponse avec les clés 'commune', 'departement', 'total', 'fiches'.
     """
-    if not request.user.is_authenticated or request.user.role not in [
-        'administrateur',
-        'correcteur',
-    ]:
-        return JsonResponse({'error': 'Accès refusé'}, status=403)
-
     commune = request.GET.get('commune', '').strip()
     departement = request.GET.get('departement', '').strip()
 
