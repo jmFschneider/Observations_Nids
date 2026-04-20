@@ -205,7 +205,7 @@ oauthlib==3.3.1
     #   requests-oauthlib
 openpyxl==3.1.5
     # via -r requirements-base.in
-packaging==26.0
+packaging==26.1
     # via
     #   -r requirements-base.in
     #   kombu
