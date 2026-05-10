@@ -299,6 +299,7 @@
                         <th style="text-align: center;">Date et heure</th>
                         <th style="text-align: center;">Nombre d'œufs</th>
                         <th style="text-align: center;">Nombre de poussins</th>
+                        <th style="text-align: center;">Âge</th>
                         <th>Observations</th>
                     </tr>
                 </thead>
@@ -345,11 +346,12 @@
                                 -
                             {% endif %}
                         </td>
+                        <td style="text-align: center;">{{ observation.age|default:"-" }}</td>
                         <td>{{ observation.observations }}</td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" class="text-center text-muted">Aucune observation enregistrée.</td>
+                        <td colspan="5" class="text-center text-muted">Aucune observation enregistrée.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

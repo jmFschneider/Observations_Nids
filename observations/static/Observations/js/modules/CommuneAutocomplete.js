@@ -126,10 +126,10 @@ export default function initCommuneAutocomplete() {
             // Remplir le champ commune
             communeInput.value = commune.nom;
 
-            // Remplir automatiquement le département (si vide ou valeur par défaut "00")
+            // Remplir automatiquement le département depuis la commune sélectionnée
             const departementInput = document.getElementById('id_departement');
-            if (departementInput && (!departementInput.value || departementInput.value === '' || departementInput.value === '00')) {
-                departementInput.value = commune.departement;
+            if (departementInput && commune.code_departement) {
+                departementInput.value = commune.code_departement;
             }
 
             // Remplir les coordonnées GPS si vides ou valeurs par défaut (0, 0.0)

@@ -164,6 +164,12 @@ class Observation(models.Model):
         verbose_name="Estimation incertaine (poussins)",
         help_text="Cocher si le nombre de poussins est une estimation approximative",
     )
+    age = models.CharField(
+        max_length=50,
+        blank=True,
+        default='',
+        help_text="Âge des poussins ou classe d'âge (ex: pullus, juvénile, 5j)",
+    )
     observations = models.TextField(blank=True, default='')
 
     class Meta:

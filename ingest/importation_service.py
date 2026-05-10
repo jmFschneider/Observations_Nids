@@ -1044,6 +1044,7 @@ class ImportationService:
                                 heure_connue=heure_connue,
                                 nombre_oeufs=safe_int(obs.get('Nombre_oeuf')),
                                 nombre_poussins=safe_int(obs.get('Nombre_pou')),
+                                age=str(obs.get('age') or '').strip(),
                                 observations=obs.get('observations') or '',
                             )
                         )

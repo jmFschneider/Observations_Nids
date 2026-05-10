@@ -220,6 +220,7 @@ class ObservationForm(forms.ModelForm):
             'nombre_oeufs_incertain',
             'nombre_poussins',
             'nombre_poussins_incertain',
+            'age',
             'observations',
         ]
         widgets = {
@@ -228,6 +229,13 @@ class ObservationForm(forms.ModelForm):
             ),
             'nombre_oeufs_incertain': forms.HiddenInput(),
             'nombre_poussins_incertain': forms.HiddenInput(),
+            'age': forms.TextInput(
+                attrs={
+                    'class': 'form-field',
+                    'placeholder': 'Âge (ex: pullus, juv., 5j)',
+                    'autocomplete': 'off',
+                }
+            ),
             'observations': forms.Textarea(
                 attrs={
                     'class': 'section-content clear-on-focus',

@@ -666,6 +666,7 @@ function fermerModalRecherche() {
                             <th style="text-align: center;">Heure connue</th>
                             <th style="text-align: center;">Nombre d'œufs</th>
                             <th style="text-align: center;">Nombre de poussins</th>
+                            <th style="text-align: center;">Âge</th>
                             <th>Observations</th>
                             <th style="text-align: center;">Actions</th>
                         </tr>
@@ -709,6 +710,10 @@ function fermerModalRecherche() {
                                            title="Estimation incertaine"
                                            data-field="nombre_poussins"></i>
                                     </div>
+                                </td>
+                                <td style="text-align: center;">
+                                    {% if form.age.errors %}<div class="error">{{ form.age.errors }}</div>{% endif %}
+                                    {{ form.age }}
                                 </td>
                                 <td>
                                     {% if form.observations.errors %}<div class="error">{{ form.observations.errors }}</div>{% endif %}
