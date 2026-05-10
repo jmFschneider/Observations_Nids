@@ -333,6 +333,7 @@ def saisie_observation(request, fiche_id=None):  # noqa: PLR0911
             'heure_connue',
             'nombre_oeufs',
             'nombre_poussins',
+            'age',
             'observations',
         ],
         extra=0,
