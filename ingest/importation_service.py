@@ -3,6 +3,7 @@ import datetime
 import json
 import logging
 import os
+import unicodedata
 from difflib import SequenceMatcher
 
 from django.conf import settings
@@ -64,6 +65,14 @@ class ImportationService:
         logger.info(
             f"Cache espèces initialisé: {len(self._especes_cache)} espèces, "
             f"{len(self._especes_index)} lettres indexées"
+        )
+
+    @staticmethod
+    def _normaliser_nom(nom):
+        """Normalise un nom pour la comparaison : minuscule, sans accents."""
+        nom_lower = nom.lower().strip()
+        return ''.join(
+            c for c in unicodedata.normalize('NFD', nom_lower) if unicodedata.category(c) != 'Mn'
         )
 
     def _initialiser_cache_fichiers(self):
@@ -316,6 +325,30 @@ class ImportationService:
                 f"'{espece_trouvee.nom}' (score: {meilleur_score:.0%})"
             )
 
+        # PRIORITÉ 1b : Matching par mot entier contenu dans le nom (noms abrégés)
+        # Ex: "castagneux" → "Grèbe castagneux", "fulmar" → "Fulmar boréal"
+        # N'accepte que si la correspondance est unique (pas d'ambiguïté)
+        if not espece_trouvee:
+            nom_norm = self._normaliser_nom(espece_candidate.nom_transcrit)
+            correspondances_mot = [
+                e
+                for e in self._especes_cache
+                if nom_norm in set(self._normaliser_nom(e.nom).split())
+            ]
+            if len(correspondances_mot) == 1:
+                espece_trouvee = correspondances_mot[0]
+                methode_matching = 'mot_inclus'
+                meilleur_score = 0.85
+                logger.info(
+                    f"Espèce '{espece_candidate.nom_transcrit}' identifiée par mot inclus: "
+                    f"'{espece_trouvee.nom}' (correspondance unique)"
+                )
+            elif len(correspondances_mot) > 1:
+                logger.info(
+                    f"Correspondance ambiguë par mot inclus pour '{espece_candidate.nom_transcrit}': "
+                    f"{[e.nom for e in correspondances_mot]} — intervention manuelle requise"
+                )
+
         # PRIORITÉ 2 : Fallback sur code GONM si le nom a échoué
         if not espece_trouvee and espece_candidate.code_gonm_transcrit:
             try:
@@ -357,7 +390,7 @@ class ImportationService:
         if espece_trouvee:
             espece_candidate.espece_validee = espece_trouvee
             espece_candidate.score_similarite = (
-                meilleur_score * 100 if methode_matching == 'nom' else 100.0
+                meilleur_score * 100 if methode_matching in ('nom', 'mot_inclus') else 100.0
             )
             espece_candidate.save()
             return True
