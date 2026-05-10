@@ -297,7 +297,7 @@ pluggy==1.6.0
     # via
     #   pytest
     #   pytest-cov
-prometheus-client==0.24.1
+prometheus-client==0.25.0
     # via
     #   -r requirements-base.in
     #   flower
