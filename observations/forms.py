@@ -231,9 +231,10 @@ class ObservationForm(forms.ModelForm):
             'nombre_poussins_incertain': forms.HiddenInput(),
             'age': forms.TextInput(
                 attrs={
-                    'class': 'form-field',
-                    'placeholder': 'Âge (ex: pullus, juv., 5j)',
+                    'class': 'clear-on-focus',
+                    'placeholder': 'Âge',
                     'autocomplete': 'off',
+                    'style': 'width: 80px;',
                 }
             ),
             'observations': forms.Textarea(
