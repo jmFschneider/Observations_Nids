@@ -34,7 +34,7 @@ billiard==4.2.4
     # via
     #   -r requirements-base.in
     #   celery
-build==1.4.4
+build==1.5.0
     # via
     #   -r requirements-dev.in
     #   pip-tools
@@ -128,11 +128,11 @@ django-helpdesk==2.1.1
     # via -r requirements-base.in
 django-model-utils==5.0.0
     # via django-helpdesk
-django-stubs==6.0.3
+django-stubs==6.0.4
     # via
     #   -r requirements-dev.in
     #   types-django-filter
-django-stubs-ext==6.0.3
+django-stubs-ext==6.0.4
     # via
     #   -r requirements-dev.in
     #   django-stubs
@@ -434,7 +434,7 @@ tqdm==4.67.3
     # via -r requirements-base.in
 types-django-filter==25.2.0.20260408
     # via -r requirements-dev.in
-types-pytz==2026.1.1.20260408
+types-pytz==2026.2.0.20260506
     # via -r requirements-dev.in
 types-pyyaml==6.0.12.20260408
     # via
