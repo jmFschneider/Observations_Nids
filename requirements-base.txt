@@ -143,7 +143,7 @@ google-auth-httplib2==0.4.0
     #   google-api-python-client
 google-genai==1.74.0
     # via -r requirements-base.in
-googleapis-common-protos==1.74.0
+googleapis-common-protos==1.75.0
     # via
     #   -r requirements-base.in
     #   google-api-core
