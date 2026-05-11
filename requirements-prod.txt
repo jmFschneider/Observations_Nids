@@ -151,7 +151,7 @@ googleapis-common-protos==1.74.0
     #   -r requirements-base.in
     #   google-api-core
     #   grpcio-status
-greenlet==3.4.0
+greenlet==3.5.0
     # via
     #   -r requirements-base.in
     #   eventlet
