@@ -46,7 +46,7 @@ celery==5.6.3
     #   django-celery-results
     #   django-helpdesk
     #   flower
-certifi==2026.2.25
+certifi==2026.4.22
     # via
     #   -r requirements-base.in
     #   httpcore
