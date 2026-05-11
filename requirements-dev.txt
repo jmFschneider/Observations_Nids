@@ -432,7 +432,7 @@ tornado==6.5.5
     #   flower
 tqdm==4.67.3
     # via -r requirements-base.in
-types-django-filter==25.2.0.20260408
+types-django-filter==25.2.0.20260508
     # via -r requirements-dev.in
 types-pytz==2026.2.0.20260506
     # via -r requirements-dev.in
